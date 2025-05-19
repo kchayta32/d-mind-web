@@ -53,7 +53,16 @@ const VictimReportsList: React.FC = () => {
 
       if (error) throw error;
 
-      setReports(data as VictimReport[]);
+      // Transform the data to match our VictimReport interface
+      const transformedReports = data.map(report => ({
+        ...report,
+        coordinates: {
+          latitude: report.coordinates?.latitude || 0,
+          longitude: report.coordinates?.longitude || 0
+        }
+      })) as VictimReport[];
+
+      setReports(transformedReports);
     } catch (err) {
       console.error('Error fetching reports:', err);
       setError('ไม่สามารถโหลดข้อมูลรายงานได้ กรุณาลองอีกครั้งภายหลัง');
