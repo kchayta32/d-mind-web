@@ -54,13 +54,27 @@ const VictimReportsList: React.FC = () => {
       if (error) throw error;
 
       // Transform the data to match our VictimReport interface
-      const transformedReports = data.map(report => ({
-        ...report,
-        coordinates: {
-          latitude: report.coordinates?.latitude || 0,
-          longitude: report.coordinates?.longitude || 0
+      const transformedReports = data.map(report => {
+        // Check the type and structure of coordinates
+        let latitude = 0;
+        let longitude = 0;
+        
+        if (report.coordinates) {
+          // If coordinates is an object with latitude and longitude properties
+          if (typeof report.coordinates === 'object' && report.coordinates !== null) {
+            latitude = Number(report.coordinates.latitude) || 0;
+            longitude = Number(report.coordinates.longitude) || 0;
+          }
         }
-      })) as VictimReport[];
+        
+        return {
+          ...report,
+          coordinates: {
+            latitude,
+            longitude
+          }
+        };
+      }) as VictimReport[];
 
       setReports(transformedReports);
     } catch (err) {
