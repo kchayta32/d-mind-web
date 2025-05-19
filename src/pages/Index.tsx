@@ -24,6 +24,10 @@ const Index = () => {
     navigate('/contacts');
   };
 
+  const handleAlertsClick = () => {
+    navigate('/alerts');
+  };
+
   return (
     <div className="min-h-screen bg-guardian-light-bg">
       {/* Header */}
@@ -39,6 +43,7 @@ const Index = () => {
           onAssistantClick={handleAssistantClick}
           onManualClick={handleManualClick}
           onContactsClick={handleContactsClick}
+          onAlertsClick={handleAlertsClick}
         />
         
         <DisasterMap />

@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      disaster_alerts: {
+        Row: {
+          coordinates: Json | null
+          created_at: string
+          description: string | null
+          end_time: string | null
+          id: string
+          is_active: boolean
+          location: string
+          severity: string
+          start_time: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          coordinates?: Json | null
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          location: string
+          severity: string
+          start_time?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          coordinates?: Json | null
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          location?: string
+          severity?: string
+          start_time?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       disaster_info: {
         Row: {
           content: string

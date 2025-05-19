@@ -2,21 +2,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavButton from './NavButton';
-import { MessageSquare, Phone, BookOpen } from 'lucide-react';
+import { MessageSquare, Phone, BookOpen, Bell } from 'lucide-react';
 
 interface NavBarProps {
   onAssistantClick: () => void;
   onManualClick: () => void;
   onContactsClick: () => void;
+  onAlertsClick: () => void;
 }
 
 const NavBar: React.FC<NavBarProps> = ({ 
   onAssistantClick, 
   onManualClick,
-  onContactsClick
+  onContactsClick,
+  onAlertsClick
 }) => {
   return (
-    <div className="flex gap-3 mb-6 w-full">
+    <div className="flex gap-3 mb-6 w-full overflow-x-auto pb-2">
       <NavButton 
         icon={<MessageSquare size={24} />}
         label="AI Assistant"
@@ -31,6 +33,11 @@ const NavBar: React.FC<NavBarProps> = ({
         icon={<Phone size={24} />}
         label="Emergency Contacts"
         onClick={onContactsClick}
+      />
+      <NavButton 
+        icon={<Bell size={24} />}
+        label="การแจ้งเตือนภัยอื่นๆ"
+        onClick={onAlertsClick}
       />
     </div>
   );
