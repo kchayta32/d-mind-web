@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import MapView from './MapView';
 import FilterControls from './FilterControls';
+import StatisticsPanel from './StatisticsPanel';
 import { useEarthquakeData } from './useEarthquakeData';
 
 const DisasterMap: React.FC = () => {
@@ -17,7 +18,8 @@ const DisasterMap: React.FC = () => {
     setTimeFilter,
     refreshing,
     error,
-    fetchEarthquakeData
+    fetchEarthquakeData,
+    statistics
   } = useEarthquakeData();
 
   // Handle manual refresh button click
@@ -38,7 +40,11 @@ const DisasterMap: React.FC = () => {
           <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
         </Button>
       </CardHeader>
-      <CardContent className="p-0 pb-4">
+      <CardContent className="p-0 pb-2">
+        {/* Statistics Panel */}
+        <StatisticsPanel stats={statistics} />
+        
+        {/* Map View */}
         <div className="relative h-64 sm:h-72 md:h-80 w-full border-b">
           <MapView 
             error={error}
@@ -47,6 +53,7 @@ const DisasterMap: React.FC = () => {
           />
         </div>
 
+        {/* Filter Controls */}
         <FilterControls
           magnitudeFilter={magnitudeFilter}
           setMagnitudeFilter={setMagnitudeFilter}

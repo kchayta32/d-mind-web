@@ -1,7 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { Earthquake } from './types';
+import { Earthquake, EarthquakeStats } from './types';
+
+// Threshold for defining significant earthquakes
+const SIGNIFICANT_MAGNITUDE_THRESHOLD = 5.0;
+const SIGNIFICANT_RECENT_HOURS = 6;
 
 export const useEarthquakeData = () => {
   const [earthquakes, setEarthquakes] = useState<Earthquake[]>([]);
@@ -11,6 +15,33 @@ export const useEarthquakeData = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Calculate earthquake statistics
+  const statistics: EarthquakeStats = useMemo(() => {
+    if (earthquakes.length === 0) {
+      return {
+        total: 0,
+        averageMagnitude: 0,
+        maxMagnitude: 0,
+        last24Hours: 0,
+        significantCount: 0
+      };
+    }
+
+    const now = Date.now();
+    const last24Hours = earthquakes.filter(eq => now - eq.time < 24 * 60 * 60 * 1000).length;
+    const significantCount = earthquakes.filter(eq => eq.isSignificant).length;
+    const totalMagnitude = earthquakes.reduce((sum, eq) => sum + eq.magnitude, 0);
+    const maxMagnitude = Math.max(...earthquakes.map(eq => eq.magnitude));
+    
+    return {
+      total: earthquakes.length,
+      averageMagnitude: totalMagnitude / earthquakes.length,
+      maxMagnitude,
+      last24Hours,
+      significantCount
+    };
+  }, [earthquakes]);
 
   // Fetch earthquake data from USGS API
   const fetchEarthquakeData = async () => {
@@ -27,14 +58,27 @@ export const useEarthquakeData = () => {
       const data = await response.json();
       
       // Transform GeoJSON features to our Earthquake interface
-      const transformedData: Earthquake[] = data.features.map((feature: any) => ({
-        id: feature.id,
-        magnitude: feature.properties.mag,
-        location: feature.properties.place,
-        time: feature.properties.time,
-        // GeoJSON uses [longitude, latitude] format, but we need [latitude, longitude] for Leaflet
-        coordinates: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
-      }));
+      const now = Date.now();
+      const transformedData: Earthquake[] = data.features.map((feature: any) => {
+        const magnitude = feature.properties.mag;
+        const time = feature.properties.time;
+        
+        // Determine if this is a significant earthquake (high magnitude or recent and moderate)
+        const isRecent = now - time < SIGNIFICANT_RECENT_HOURS * 60 * 60 * 1000;
+        const isSignificant = 
+          magnitude >= SIGNIFICANT_MAGNITUDE_THRESHOLD || 
+          (isRecent && magnitude >= SIGNIFICANT_MAGNITUDE_THRESHOLD - 0.5);
+
+        return {
+          id: feature.id,
+          magnitude,
+          location: feature.properties.place,
+          time,
+          // GeoJSON uses [longitude, latitude] format, but we need [latitude, longitude] for Leaflet
+          coordinates: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+          isSignificant
+        };
+      });
       
       setEarthquakes(transformedData);
       toast({
@@ -101,6 +145,7 @@ export const useEarthquakeData = () => {
     setTimeFilter,
     refreshing,
     error,
-    fetchEarthquakeData
+    fetchEarthquakeData,
+    statistics
   };
 };

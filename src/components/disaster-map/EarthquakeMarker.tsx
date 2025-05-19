@@ -5,14 +5,24 @@ import { Icon } from 'leaflet';
 import { Badge } from '@/components/ui/badge';
 import { Earthquake } from './types';
 
-// Custom icon for earthquake markers
-const earthquakeIcon = new Icon({
+// Custom icons for earthquake markers
+const regularIcon = new Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
+});
+
+// Larger icon for significant earthquakes
+const significantIcon = new Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [30, 48],
+  iconAnchor: [15, 48],
+  popupAnchor: [1, -40],
+  shadowSize: [48, 48]
 });
 
 interface EarthquakeMarkerProps {
@@ -36,11 +46,16 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
     <Marker 
       key={earthquake.id} 
       position={[earthquake.coordinates[0], earthquake.coordinates[1]]}
-      icon={earthquakeIcon}
+      icon={earthquake.isSignificant ? significantIcon : regularIcon}
     >
       <Popup>
         <div className="text-sm">
-          <div className="font-bold">{earthquake.location}</div>
+          <div className="font-bold">
+            {earthquake.location}
+            {earthquake.isSignificant && (
+              <Badge variant="destructive" className="ml-1">Significant</Badge>
+            )}
+          </div>
           <div>
             Magnitude: <Badge variant={getMagnitudeColor(earthquake.magnitude)}>
               {earthquake.magnitude}

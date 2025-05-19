@@ -5,4 +5,13 @@ export interface Earthquake {
   location: string;
   time: number; // timestamp
   coordinates: [number, number]; // [latitude, longitude]
+  isSignificant?: boolean; // Whether this earthquake is considered significant
+}
+
+export interface EarthquakeStats {
+  total: number;
+  averageMagnitude: number;
+  maxMagnitude: number;
+  last24Hours: number;
+  significantCount: number;
 }
