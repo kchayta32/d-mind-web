@@ -37,9 +37,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-guardian-light-bg">
       {/* Header */}
-      <header className="bg-guardian-purple text-white p-4 flex items-center">
-        <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
-        <h1 className="text-xl font-bold">AI Emergency Guardian</h1>
+      <header className="bg-guardian-purple text-white p-4 flex flex-col items-start">
+        <div className="flex items-center">
+          <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
+          <h1 className="text-2xl font-bold font-sans">AI Emergency Guardian</h1>
+        </div>
+        <p className="text-sm mt-2 font-sans">
+          ระบบแจ้งเตือนภัยพิบัติและช่วยเหลือฉุกเฉิน ช่วยให้คุณและครอบครัวปลอดภัยจากภัยธรรมชาติด้วยเทคโนโลยี AI
+        </p>
       </header>
 
       {/* Main Content */}
