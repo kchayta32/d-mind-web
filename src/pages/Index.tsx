@@ -5,6 +5,7 @@ import DisasterAlert from '@/components/DisasterAlert';
 import NavBar from '@/components/NavBar';
 import DisasterResources from '@/components/DisasterResources';
 import AIChat from '@/components/AIChat';
+import DisasterMap from '@/components/DisasterMap';
 import { useToast } from '@/components/ui/use-toast';
 
 const resourcesData = [
@@ -52,6 +53,8 @@ const Index = () => {
           onManualClick={handleManualClick}
           onContactsClick={handleContactsClick}
         />
+        
+        <DisasterMap />
         
         <DisasterResources resources={resourcesData} />
         
