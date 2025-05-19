@@ -15,7 +15,8 @@ import LoadingScreen from "./components/LoadingScreen";
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
-const App = () => {
+// Create the App component
+const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   // For demonstration purposes, show loading screen for minimum time
@@ -45,24 +46,22 @@ const App = () => {
   }
 
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/manual" element={<EmergencyManual />} />
-              <Route path="/contacts" element={<EmergencyContacts />} />
-              <Route path="/assistant" element={<AIAssistant />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/manual" element={<EmergencyManual />} />
+            <Route path="/contacts" element={<EmergencyContacts />} />
+            <Route path="/assistant" element={<AIAssistant />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
