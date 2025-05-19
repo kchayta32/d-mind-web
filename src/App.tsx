@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,11 +10,40 @@ import NotFound from "./pages/NotFound";
 import EmergencyManual from "./pages/EmergencyManual";
 import EmergencyContacts from "./pages/EmergencyContacts";
 import AIAssistant from "./pages/AIAssistant";
+import LoadingScreen from "./components/LoadingScreen";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // For demonstration purposes, show loading screen for minimum time
+  useEffect(() => {
+    const minLoadTime = setTimeout(() => {
+      // This ensures the loading screen shows for at least 3 seconds
+      // even if the app loads faster
+      window.addEventListener('load', () => {
+        setIsLoading(false);
+      });
+      
+      // If window already loaded, we can hide the loading screen
+      if (document.readyState === 'complete') {
+        setIsLoading(false);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(minLoadTime);
+  }, []);
+  
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+  
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
