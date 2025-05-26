@@ -135,6 +135,45 @@ export type Database = {
         }
         Relationships: []
       }
+      from_rain_sensor: {
+        Row: {
+          humidity: number | null
+          id: string
+          inserted_at: string | null
+          is_raining: boolean | null
+        }
+        Insert: {
+          humidity?: number | null
+          id?: string
+          inserted_at?: string | null
+          is_raining?: boolean | null
+        }
+        Update: {
+          humidity?: number | null
+          id?: string
+          inserted_at?: string | null
+          is_raining?: boolean | null
+        }
+        Relationships: []
+      }
+      n8n_chat_histories: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
+        }
+        Relationships: []
+      }
       victim_reports: {
         Row: {
           contact: string | null

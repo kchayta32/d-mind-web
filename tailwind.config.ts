@@ -67,9 +67,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				guardian: {
-					purple: '#5C38E1',
-					'dark-purple': '#261A5F',
-					'light-bg': '#F5F7FA',
+					blue: '#007AFF',
+					'dark-blue': '#005BB5',
+					'light-blue': '#E6F3FF',
+					'gradient-start': '#00C2FF',
+					'gradient-end': '#0066FF',
 				}
 			},
 			borderRadius: {

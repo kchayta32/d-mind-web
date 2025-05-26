@@ -75,34 +75,36 @@ const EmergencyContacts: React.FC = () => {
   };
   
   return (
-    <div className="container max-w-md mx-auto p-4">
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => window.history.back()} className="mr-2 p-2">
-          <ArrowLeft size={20} />
-        </Button>
-        <h1 className="text-xl font-bold">เบอร์โทรฉุกเฉิน</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-guardian-light-blue to-white">
+      <div className="container max-w-md mx-auto p-4">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" onClick={() => window.history.back()} className="mr-2 p-2 hover:bg-guardian-light-blue/50">
+            <ArrowLeft size={20} className="text-guardian-blue" />
+          </Button>
+          <h1 className="text-xl font-bold text-guardian-dark-blue">เบอร์โทรฉุกเฉิน</h1>
+        </div>
 
-      <div className="space-y-4">
-        {thaiEmergencyContacts.map((contact, index) => (
-          <Card key={index}>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="font-medium">{contact.name}</h2>
-                  <p className="text-sm text-muted-foreground">{contact.description}</p>
-                  <p className="text-sm font-semibold text-guardian-purple mt-1">{contact.phoneNumber}</p>
+        <div className="space-y-4">
+          {thaiEmergencyContacts.map((contact, index) => (
+            <Card key={index} className="shadow-md border border-guardian-light-blue/20">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="font-medium text-guardian-dark-blue">{contact.name}</h2>
+                    <p className="text-sm text-muted-foreground">{contact.description}</p>
+                    <p className="text-sm font-semibold text-guardian-blue mt-1">{contact.phoneNumber}</p>
+                  </div>
+                  <Button 
+                    className="bg-guardian-blue hover:bg-guardian-dark-blue rounded-full h-10 w-10 p-0 shadow-md"
+                    onClick={() => handleCallClick(contact.name, contact.phoneNumber)}
+                  >
+                    <Phone size={18} />
+                  </Button>
                 </div>
-                <Button 
-                  className="bg-guardian-purple hover:bg-guardian-purple/90 rounded-full h-10 w-10 p-0"
-                  onClick={() => handleCallClick(contact.name, contact.phoneNumber)}
-                >
-                  <Phone size={18} />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

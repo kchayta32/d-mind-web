@@ -35,15 +35,19 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-guardian-light-bg">
+    <div className="min-h-screen bg-gradient-to-br from-guardian-light-blue to-white">
       {/* Header */}
-      <header className="bg-guardian-purple text-white p-4 flex flex-col items-start">
+      <header className="bg-gradient-to-r from-guardian-gradient-start to-guardian-gradient-end text-white p-4 flex flex-col items-start shadow-lg">
         <div className="flex items-center">
-          <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
-          <h1 className="text-2xl font-bold font-sans">AI Emergency Guardian</h1>
+          <img 
+            src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
+            alt="D-MIND Logo" 
+            className="h-8 w-8 mr-3"
+          />
+          <h1 className="text-2xl font-bold font-sans">D-MIND</h1>
         </div>
-        <p className="text-sm mt-2 font-sans">
-          ระบบแจ้งเตือนภัยพิบัติและช่วยเหลือฉุกเฉิน ช่วยให้คุณและครอบครัวปลอดภัยจากภัยธรรมชาติด้วยเทคโนโลยี AI
+        <p className="text-sm mt-2 font-sans opacity-90">
+          ระบบติดตามภัยพิบัติและแจ้งเตือนอัจฉริยะ (Disaster Monitoring and Intelligent Notification Device)
         </p>
       </header>
 
@@ -61,7 +65,7 @@ const Index = () => {
         {/* Victim Reports Button */}
         <div className="my-4">
           <Button 
-            className="w-full bg-red-600 hover:bg-red-700 text-white"
+            className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
             onClick={handleVictimReportsClick}
           >
             <MessageSquare className="mr-2 h-4 w-4" />
