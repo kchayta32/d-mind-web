@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DisasterAlert from '@/components/DisasterAlert';
@@ -145,11 +144,11 @@ const Index = () => {
     );
   }
 
-  // Desktop/Landscape layout
+  // Desktop/Landscape layout - Improved proportions and removed AI Assistant
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex">
-      {/* Sidebar */}
-      <aside className="w-80 bg-white shadow-xl border-r border-blue-100 flex flex-col">
+      {/* Sidebar - Made narrower for better proportions */}
+      <aside className="w-72 bg-white shadow-xl border-r border-blue-100 flex flex-col">
         {/* Sidebar Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
           <div className="flex items-center mb-3">
@@ -196,7 +195,7 @@ const Index = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content - Full width for map */}
       <main className="flex-1 flex flex-col">
         {/* Top Bar */}
         <header className="bg-white shadow-sm border-b border-gray-200 p-4">
@@ -210,29 +209,15 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Content Area */}
+        {/* Content Area - Full width map layout */}
         <div className="flex-1 p-6">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
-            {/* Left Panel - Map */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <h3 className="font-semibold text-gray-800">แผนที่ภัยพิบัติ</h3>
-              </div>
-              <div className="p-4">
-                <DisasterMap />
-              </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <h3 className="font-semibold text-gray-800">แผนที่ภัยพิบัติ</h3>
+              <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
             </div>
-            
-            {/* Right Panel - AI Chat */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <h3 className="font-semibold text-gray-800">AI Assistant</h3>
-              </div>
-              <div className="p-4">
-                <div id="ai-chat">
-                  <AIChat />
-                </div>
-              </div>
+            <div className="p-6 h-[calc(100%-80px)]">
+              <DisasterMap />
             </div>
           </div>
         </div>
