@@ -1,5 +1,5 @@
 
-import React from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,11 +19,11 @@ import LoadingScreen from "./components/LoadingScreen";
 const queryClient = new QueryClient();
 
 // Create the App component
-const App: React.FC = () => {
-  const [isLoading, setIsLoading] = React.useState(true);
+const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
   
   // For demonstration purposes, show loading screen for minimum time
-  React.useEffect(() => {
+  useEffect(() => {
     const minLoadTime = setTimeout(() => {
       // This ensures the loading screen shows for at least 3 seconds
       // even if the app loads faster
