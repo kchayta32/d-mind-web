@@ -1,66 +1,90 @@
 
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Settings } from 'lucide-react';
+import { DisasterType } from './DisasterMap';
 
 interface FilterControlsProps {
-  magnitudeFilter: number[];
-  setMagnitudeFilter: (value: number[]) => void;
-  timeFilter: string;
-  setTimeFilter: (value: string) => void;
-  filteredCount: number;
+  magnitudeFilter: number;
+  onMagnitudeChange: (value: number) => void;
+  humidityFilter: number;
+  onHumidityChange: (value: number) => void;
+  selectedType: DisasterType;
 }
 
-const FilterControls: React.FC<FilterControlsProps> = ({ 
-  magnitudeFilter, 
-  setMagnitudeFilter, 
-  timeFilter, 
-  setTimeFilter,
-  filteredCount 
+export const FilterControls: React.FC<FilterControlsProps> = ({
+  magnitudeFilter,
+  onMagnitudeChange,
+  humidityFilter,
+  onHumidityChange,
+  selectedType
 }) => {
+  const renderFilters = () => {
+    switch (selectedType) {
+      case 'earthquake':
+        return (
+          <div>
+            <Label className="text-sm font-medium">
+              ระดับความรุนแรง (Magnitude): {magnitudeFilter}+
+            </Label>
+            <Slider 
+              value={[magnitudeFilter]} 
+              min={0}
+              max={9}
+              step={0.1}
+              onValueChange={(value) => onMagnitudeChange(value[0])}
+              className="mt-2"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0</span>
+              <span>9</span>
+            </div>
+          </div>
+        );
+
+      case 'heavyrain':
+        return (
+          <div>
+            <Label className="text-sm font-medium">
+              ความชื้นขั้นต่ำ: {humidityFilter}%
+            </Label>
+            <Slider 
+              value={[humidityFilter]} 
+              min={0}
+              max={100}
+              step={5}
+              onValueChange={(value) => onHumidityChange(value[0])}
+              className="mt-2"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0%</span>
+              <span>100%</span>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="text-center py-4 text-gray-500">
+            ตัวกรองจะเปิดให้บริการเร็วๆ นี้
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="px-4 pt-4 space-y-3">
-      <div>
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">Magnitude: {magnitudeFilter[0]}+</label>
-        </div>
-        <Slider 
-          value={magnitudeFilter} 
-          min={0}
-          max={9}
-          step={0.5}
-          onValueChange={setMagnitudeFilter}
-          className="mt-2"
-        />
-      </div>
-      
-      <div>
-        <label className="text-sm font-medium block mb-2">Time Period:</label>
-        <Select value={timeFilter} onValueChange={setTimeFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select time period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All time</SelectItem>
-            <SelectItem value="1h">Last hour</SelectItem>
-            <SelectItem value="6h">Last 6 hours</SelectItem>
-            <SelectItem value="24h">Last 24 hours</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredCount} earthquake{filteredCount !== 1 ? 's' : ''}
-      </div>
-    </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Settings className="h-5 w-5" />
+          ตัวกรอง
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {renderFilters()}
+      </CardContent>
+    </Card>
   );
 };
-
-export default FilterControls;

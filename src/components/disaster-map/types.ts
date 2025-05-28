@@ -15,3 +15,19 @@ export interface EarthquakeStats {
   last24Hours: number;
   significantCount: number;
 }
+
+export interface RainSensor {
+  id: string;
+  humidity: number;
+  is_raining: boolean;
+  inserted_at: string;
+  coordinates?: [number, number]; // We'll need to add coordinates for mapping
+}
+
+export interface RainSensorStats {
+  total: number;
+  activeRaining: number;
+  averageHumidity: number;
+  maxHumidity: number;
+  last24Hours: number;
+}
