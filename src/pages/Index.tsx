@@ -37,7 +37,7 @@ const Index = () => {
   };
 
   if (isMobile) {
-    // Mobile layout (existing)
+    // Mobile layout - Updated to show map properly
     return (
       <div className="min-h-screen bg-gradient-to-br from-guardian-light-blue to-white">
         {/* Header */}
@@ -57,37 +57,37 @@ const Index = () => {
 
         {/* Main Content */}
         <main className="container mx-auto p-4 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-4">
-              <DisasterAlert isActive={true} />
-              
-              <NavBar 
-                onAssistantClick={handleAssistantClick}
-                onManualClick={handleManualClick}
-                onContactsClick={handleContactsClick}
-                onAlertsClick={handleAlertsClick}
-              />
-              
-              {/* Victim Reports Button */}
-              <Button 
-                className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
-                onClick={handleVictimReportsClick}
-              >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                รายงานสถานะผู้ประสบภัย
-              </Button>
-              
-              <DisasterResources />
+          <div className="space-y-4">
+            {/* Top Section - Alerts and Navigation */}
+            <DisasterAlert isActive={true} />
+            
+            <NavBar 
+              onAssistantClick={handleAssistantClick}
+              onManualClick={handleManualClick}
+              onContactsClick={handleContactsClick}
+              onAlertsClick={handleAlertsClick}
+            />
+            
+            {/* Victim Reports Button */}
+            <Button 
+              className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
+              onClick={handleVictimReportsClick}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              รายงานสถานะผู้ประสบภัย
+            </Button>
+            
+            {/* Disaster Map - Full width for mobile */}
+            <div className="w-full h-96 bg-white rounded-lg shadow-md overflow-hidden">
+              <DisasterMap />
             </div>
             
-            {/* Right Column */}
-            <div className="space-y-4">
-              <DisasterMap />
-              
-              <div id="ai-chat">
-                <AIChat />
-              </div>
+            {/* Resources */}
+            <DisasterResources />
+            
+            {/* AI Chat */}
+            <div id="ai-chat" className="w-full">
+              <AIChat />
             </div>
           </div>
         </main>
