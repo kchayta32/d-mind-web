@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapView } from './MapView';
 import { StatisticsPanel } from './StatisticsPanel';
 import { FilterControls } from './FilterControls';
-import { DisasterTypeSelector } from './DisasterTypeSelector';
+import DisasterTypeSelector from './DisasterTypeSelector';
 import { useEarthquakeData } from './useEarthquakeData';
 import { useRainSensorData } from './useRainSensorData';
 import { RefreshCw } from 'lucide-react';
@@ -23,7 +23,7 @@ const DisasterMap: React.FC = () => {
 
   const handleRefresh = () => {
     if (selectedType === 'earthquake') {
-      earthquakeData.refetch();
+      earthquakeData.fetchEarthquakeData();
     } else if (selectedType === 'heavyrain') {
       rainSensorData.refetch();
     }
@@ -34,8 +34,8 @@ const DisasterMap: React.FC = () => {
       case 'earthquake':
         return {
           data: earthquakeData.earthquakes,
-          stats: earthquakeData.stats,
-          isLoading: earthquakeData.isLoading,
+          stats: earthquakeData.statistics,
+          isLoading: earthquakeData.refreshing,
           error: earthquakeData.error
         };
       case 'heavyrain':
