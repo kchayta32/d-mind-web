@@ -14,7 +14,7 @@ const VictimReports: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 shadow-lg">
-        <div className="container max-w-md mx-auto flex items-center">
+        <div className="container max-w-7xl mx-auto flex items-center">
           <Button 
             variant="ghost" 
             size="icon"
@@ -35,10 +35,10 @@ const VictimReports: React.FC = () => {
         </div>
       </header>
       
-      {/* Main Content */}
-      <main className="container max-w-md mx-auto p-4">
+      {/* Main Content - Responsive Layout */}
+      <main className="container max-w-7xl mx-auto p-4">
         <Tabs defaultValue="report" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-blue-200">
+          <TabsList className="grid w-full grid-cols-2 mb-4 bg-white border border-blue-200 max-w-md mx-auto lg:max-w-none">
             <TabsTrigger 
               value="report"
               className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
@@ -53,16 +53,18 @@ const VictimReports: React.FC = () => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="report" className="space-y-4">
-            <div className="bg-white rounded-lg shadow-md border border-blue-200 p-4">
-              <h2 className="text-lg font-semibold mb-4 text-blue-700">แจ้งสถานะของท่านหรือผู้ประสบภัย</h2>
-              <VictimReportForm />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="view">
-            <VictimReportsList />
-          </TabsContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TabsContent value="report" className="space-y-4 lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md border border-blue-200 p-4">
+                <h2 className="text-lg font-semibold mb-4 text-blue-700">แจ้งสถานะของท่านหรือผู้ประสบภัย</h2>
+                <VictimReportForm />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="view" className="lg:col-span-2">
+              <VictimReportsList />
+            </TabsContent>
+          </div>
         </Tabs>
       </main>
     </div>

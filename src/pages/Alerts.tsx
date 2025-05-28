@@ -23,7 +23,7 @@ const Alerts: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 shadow-lg">
-        <div className="container mx-auto flex items-center">
+        <div className="container mx-auto max-w-7xl flex items-center">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -43,32 +43,40 @@ const Alerts: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto p-4 max-w-3xl">
-        <div className="mb-4 flex justify-end">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => refetch()} 
-            disabled={isLoading}
-            className="flex items-center gap-2 bg-white hover:bg-blue-50 border-blue-200 text-blue-600 hover:text-blue-700"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            รีเฟรช
-          </Button>
+      {/* Main Content - Responsive Layout */}
+      <main className="container mx-auto p-4 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Filters Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="mb-4 flex justify-end lg:justify-start">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => refetch()} 
+                disabled={isLoading}
+                className="flex items-center gap-2 bg-white hover:bg-blue-50 border-blue-200 text-blue-600 hover:text-blue-700"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                รีเฟรช
+              </Button>
+            </div>
+            
+            <AlertFilters
+              filters={filters}
+              updateFilters={updateFilters}
+              availableTypes={alertTypes}
+              availableSeverities={severityLevels}
+            />
+          </div>
+          
+          {/* Alerts List */}
+          <div className="lg:col-span-3">
+            <AlertsList
+              alerts={alerts}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-        
-        <AlertFilters
-          filters={filters}
-          updateFilters={updateFilters}
-          availableTypes={alertTypes}
-          availableSeverities={severityLevels}
-        />
-        
-        <AlertsList
-          alerts={alerts}
-          isLoading={isLoading}
-        />
       </main>
     </div>
   );

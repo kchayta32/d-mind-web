@@ -51,34 +51,40 @@ const Index = () => {
         </p>
       </header>
 
-      {/* Main Content */}
-      <main className="container max-w-md mx-auto p-4">
-        <DisasterAlert isActive={true} />
-        
-        <NavBar 
-          onAssistantClick={handleAssistantClick}
-          onManualClick={handleManualClick}
-          onContactsClick={handleContactsClick}
-          onAlertsClick={handleAlertsClick}
-        />
-        
-        {/* Victim Reports Button */}
-        <div className="my-4">
-          <Button 
-            className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
-            onClick={handleVictimReportsClick}
-          >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            รายงานสถานะผู้ประสบภัย
-          </Button>
-        </div>
-        
-        <DisasterMap />
-        
-        <DisasterResources />
-        
-        <div id="ai-chat">
-          <AIChat />
+      {/* Main Content - Responsive Layout */}
+      <main className="container mx-auto p-4 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-4">
+            <DisasterAlert isActive={true} />
+            
+            <NavBar 
+              onAssistantClick={handleAssistantClick}
+              onManualClick={handleManualClick}
+              onContactsClick={handleContactsClick}
+              onAlertsClick={handleAlertsClick}
+            />
+            
+            {/* Victim Reports Button */}
+            <Button 
+              className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
+              onClick={handleVictimReportsClick}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              รายงานสถานะผู้ประสบภัย
+            </Button>
+            
+            <DisasterResources />
+          </div>
+          
+          {/* Right Column */}
+          <div className="space-y-4">
+            <DisasterMap />
+            
+            <div id="ai-chat">
+              <AIChat />
+            </div>
+          </div>
         </div>
       </main>
     </div>
