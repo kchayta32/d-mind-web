@@ -3,7 +3,7 @@ import React from 'react';
 import { DisasterAlert } from './types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Calendar, MapPin, Flame } from 'lucide-react';
+import { AlertTriangle, Calendar, MapPin, Flame, MapPinIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 
@@ -13,6 +13,11 @@ interface AlertCardProps {
 
 // Type and severity icon/color mapping
 const typeConfig: Record<string, { icon: React.ReactNode, color: string, label: string }> = {
+  'earthquake': { 
+    icon: <MapPinIcon className="h-5 w-5" />, 
+    color: "bg-orange-100 text-orange-800", 
+    label: "แผ่นดินไหว" 
+  },
   'storm': { 
     icon: <AlertTriangle className="h-5 w-5" />, 
     color: "bg-blue-100 text-blue-800", 
@@ -76,7 +81,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert }) => {
     <Card className={`mb-4 border-l-4 ${alert.is_active ? 'border-l-red-500' : 'border-l-gray-300'}`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge className={typeInfo.color}>
               {typeInfo.icon}
               <span className="ml-1">{typeInfo.label}</span>
@@ -84,6 +89,23 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert }) => {
             <Badge className={severityColor}>
               {severityLabel}
             </Badge>
+            
+            {/* Additional info badges */}
+            {alert.magnitude && (
+              <Badge variant="outline" className="text-orange-600">
+                Magnitude {alert.magnitude}
+              </Badge>
+            )}
+            {alert.rain_intensity && (
+              <Badge variant="outline" className="text-blue-600">
+                {alert.rain_intensity}% ความรุนแรง
+              </Badge>
+            )}
+            {alert.flood_level && (
+              <Badge variant="outline" className="text-cyan-600">
+                {alert.flood_level} ม. ระดับน้ำ
+              </Badge>
+            )}
           </div>
           {!alert.is_active && (
             <Badge variant="outline" className="text-gray-500">สิ้นสุด</Badge>

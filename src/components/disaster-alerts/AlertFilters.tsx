@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Filter } from 'lucide-react';
+import AdvancedFilters from './AdvancedFilters';
 
 interface AlertFiltersProps {
   filters: AlertsFilterState;
@@ -15,6 +16,7 @@ interface AlertFiltersProps {
 }
 
 const typeTranslations: Record<string, string> = {
+  'earthquake': 'แผ่นดินไหว',
   'storm': 'พายุ',
   'flood': 'น้ำท่วม',
   'strongwind': 'ลมแรง',
@@ -28,6 +30,9 @@ const severityTranslations: Record<string, string> = {
   'high': 'สูง',
   'severe': 'รุนแรง'
 };
+
+// Extended available types to include all disaster types
+const allDisasterTypes = ['earthquake', 'heavyrain', 'flood', 'wildfire', 'storm', 'strongwind'];
 
 const AlertFilters: React.FC<AlertFiltersProps> = ({
   filters,
@@ -63,59 +68,71 @@ const AlertFilters: React.FC<AlertFiltersProps> = ({
     return severityTranslations[severity] || severity;
   };
 
+  // Combine available types with all disaster types for comprehensive filtering
+  const combinedTypes = [...new Set([...allDisasterTypes, ...availableTypes])];
+
   return (
-    <Card className="mb-4">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          ตัวกรองการแจ้งเตือน
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-medium mb-2">ประเภทภัยพิบัติ:</h3>
-            <div className="flex flex-wrap gap-2">
-              {availableTypes.map(type => (
-                <Badge 
-                  key={type}
-                  variant={filters.types.includes(type) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleTypeChange(type)}
-                >
-                  {getTypeLabel(type)}
-                </Badge>
-              ))}
+    <>
+      <Card className="mb-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            ตัวกรองการแจ้งเตือน
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium mb-2">ประเภทภัยพิบัติ:</h3>
+              <div className="flex flex-wrap gap-2">
+                {combinedTypes.map(type => (
+                  <Badge 
+                    key={type}
+                    variant={filters.types.includes(type) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => handleTypeChange(type)}
+                  >
+                    {getTypeLabel(type)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">ระดับความรุนแรง:</h3>
+              <div className="flex flex-wrap gap-2">
+                {availableSeverities.map(severity => (
+                  <Badge 
+                    key={severity}
+                    variant={filters.severity.includes(severity) ? "default" : "outline"} 
+                    className="cursor-pointer"
+                    onClick={() => handleSeverityChange(severity)}
+                  >
+                    {getSeverityLabel(severity)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="active-only" 
+                checked={filters.activeOnly}
+                onCheckedChange={handleActiveChange}
+              />
+              <Label htmlFor="active-only">แสดงเฉพาะการแจ้งเตือนที่ยังใช้งานอยู่</Label>
             </div>
           </div>
-          
-          <div>
-            <h3 className="text-sm font-medium mb-2">ระดับความรุนแรง:</h3>
-            <div className="flex flex-wrap gap-2">
-              {availableSeverities.map(severity => (
-                <Badge 
-                  key={severity}
-                  variant={filters.severity.includes(severity) ? "default" : "outline"} 
-                  className="cursor-pointer"
-                  onClick={() => handleSeverityChange(severity)}
-                >
-                  {getSeverityLabel(severity)}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="active-only" 
-              checked={filters.activeOnly}
-              onCheckedChange={handleActiveChange}
-            />
-            <Label htmlFor="active-only">แสดงเฉพาะการแจ้งเตือนที่ยังใช้งานอยู่</Label>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Advanced Filters */}
+      <AdvancedFilters 
+        filters={filters}
+        updateFilters={updateFilters}
+        selectedTypes={filters.types}
+      />
+    </>
   );
 };
 

@@ -10,6 +10,9 @@ export const useDisasterAlerts = () => {
     types: [],
     severity: [],
     activeOnly: true,
+    earthquakeMagnitude: [0],
+    rainIntensity: [0],
+    floodLevel: [0]
   });
 
   const fetchAlerts = async (): Promise<DisasterAlert[]> => {
@@ -18,7 +21,7 @@ export const useDisasterAlerts = () => {
       .select('*')
       .order('start_time', { ascending: false });
 
-    // Apply filters
+    // Apply basic filters
     if (filters.activeOnly) {
       query = query.eq('is_active', true);
     }
@@ -43,7 +46,34 @@ export const useDisasterAlerts = () => {
       return [];
     }
 
-    return data as DisasterAlert[];
+    let filteredData = data as DisasterAlert[];
+
+    // Apply advanced filters
+    if (filters.earthquakeMagnitude && filters.earthquakeMagnitude[0] > 0) {
+      filteredData = filteredData.filter(alert => 
+        alert.type === 'earthquake' && 
+        alert.magnitude && 
+        alert.magnitude >= filters.earthquakeMagnitude![0]
+      );
+    }
+
+    if (filters.rainIntensity && filters.rainIntensity[0] > 0) {
+      filteredData = filteredData.filter(alert => 
+        alert.type === 'heavyrain' && 
+        alert.rain_intensity && 
+        alert.rain_intensity >= filters.rainIntensity![0]
+      );
+    }
+
+    if (filters.floodLevel && filters.floodLevel[0] > 0) {
+      filteredData = filteredData.filter(alert => 
+        alert.type === 'flood' && 
+        alert.flood_level && 
+        alert.flood_level >= filters.floodLevel![0]
+      );
+    }
+
+    return filteredData;
   };
 
   const { data: alerts = [], isLoading, error, refetch } = useQuery({
