@@ -97,7 +97,7 @@ const Index = () => {
             </Button>
           </div>
           
-          {/* Disaster Map Section - Expanded height */}
+          {/* Disaster Map Section - Now scrollable */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800 flex items-center">
@@ -106,7 +106,7 @@ const Index = () => {
               </h2>
               <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
             </div>
-            <div className="h-[60vh] relative overflow-auto">
+            <div className="h-96 relative overflow-auto">
               <div className="min-h-full">
                 <DisasterMap />
               </div>
@@ -143,7 +143,7 @@ const Index = () => {
     );
   }
 
-  // Desktop/Landscape layout - Expanded map section
+  // Desktop/Landscape layout - Improved proportions and removed AI Assistant
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex">
       {/* Sidebar - Made narrower for better proportions */}
@@ -194,7 +194,7 @@ const Index = () => {
         </div>
       </aside>
 
-      {/* Main Content - Full height layout */}
+      {/* Main Content - Split between map and chatbot */}
       <main className="flex-1 flex flex-col">
         {/* Top Bar */}
         <header className="bg-white shadow-sm border-b border-gray-200 p-4">
@@ -208,21 +208,21 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Content Area - Vertical split layout */}
-        <div className="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
-          {/* Map Section - Expanded to take more space */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex-1">
+        {/* Content Area - Split layout */}
+        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Map Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 bg-gray-50">
               <h3 className="font-semibold text-gray-800">แผนที่ภัยพิบัติ</h3>
               <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
             </div>
-            <div className="p-6 h-[calc(100%-80px)] min-h-[600px]">
+            <div className="p-6 h-[calc(100%-80px)] min-h-[500px]">
               <DisasterMap />
             </div>
           </div>
 
-          {/* Enhanced Chatbot Section - Compact at bottom */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-96">
+          {/* Enhanced Chatbot Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
               <h3 className="font-semibold text-gray-800">ปรึกษาผู้เชี่ยวชาญ</h3>
               <p className="text-sm text-gray-600 mt-1">ดร.สมชาย ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
