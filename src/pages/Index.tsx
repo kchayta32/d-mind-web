@@ -120,7 +120,7 @@ const Index = () => {
                 <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
                 ปรึกษาผู้เชี่ยวชาญ
               </h2>
-              <p className="text-sm text-gray-600 mt-1">ดร.สมชาย ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
+                <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
             </div>
             <div className="p-0">
               <EnhancedChatBot />
@@ -225,7 +225,7 @@ const Index = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
               <h3 className="font-semibold text-gray-800">ปรึกษาผู้เชี่ยวชาญ</h3>
-              <p className="text-sm text-gray-600 mt-1">ดร.สมชาย ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
+              <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
             </div>
             <div className="h-[calc(100%-80px)]">
               <EnhancedChatBot className="h-full border-0 shadow-none" />
