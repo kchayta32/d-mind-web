@@ -1,9 +1,10 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Phone } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import AppLogo from '@/components/AppLogo';
 
 interface EmergencyContactProps {
   name: string;
@@ -81,6 +82,7 @@ const EmergencyContacts: React.FC = () => {
           <Button variant="ghost" onClick={() => window.history.back()} className="mr-2 p-2 hover:bg-guardian-light-blue/50">
             <ArrowLeft size={20} className="text-guardian-blue" />
           </Button>
+          <AppLogo className="mr-3" />
           <h1 className="text-xl font-bold text-guardian-dark-blue">เบอร์โทรฉุกเฉิน</h1>
         </div>
 
