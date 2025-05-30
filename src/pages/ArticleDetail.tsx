@@ -53,7 +53,7 @@ const ArticleDetail: React.FC = () => {
                     แผ่นดินไหวเกิดใหม่ 3 ประเทศ เมียนมา ลาว ไทย แรงสุด สะเทือนเชียงราย
                   </h1>
                   <p className="text-sm opacity-90 text-gray-300">จาก bangkokbiznews.com</p>
-                  <p className="text-sm opacity-90">13 พฤษภาคม 2568</p>
+                  <p className="text-sm opacity-90">30 พฤษภาคม 2568</p>
                 </div>
               </div>
             </div>
