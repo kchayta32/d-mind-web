@@ -12,7 +12,7 @@ const mockCoordinates: Record<string, [number, number]> = {
 
 const generateMockCoordinates = (id: string): [number, number] => {
   // Generate consistent coordinates based on sensor ID
-  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = id.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const lat = 8 + (hash % 15); // Thailand latitude range roughly 8-23
   const lng = 97 + (hash % 8); // Thailand longitude range roughly 97-105
   return [lat + (hash % 100) / 1000, lng + (hash % 100) / 1000];
@@ -51,7 +51,7 @@ export const useRainSensorData = () => {
       // Transform the data to include coordinates
       const transformedSensors: RainSensor[] = sensorData.map(sensor => ({
         ...sensor,
-        coordinates: mockCoordinates[sensor.id] || generateMockCoordinates(sensor.id)
+        coordinates: mockCoordinates[sensor.id.toString()] || generateMockCoordinates(sensor.id.toString())
       }));
 
       setSensors(transformedSensors);
@@ -61,12 +61,12 @@ export const useRainSensorData = () => {
       const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
       const recentSensors = transformedSensors.filter(sensor => 
-        new Date(sensor.inserted_at) >= last24Hours
+        sensor.inserted_at && new Date(sensor.inserted_at) >= last24Hours
       );
 
       const activeRaining = transformedSensors.filter(sensor => sensor.is_raining).length;
       const humidityValues = transformedSensors
-        .filter(sensor => sensor.humidity !== null)
+        .filter(sensor => sensor.humidity !== null && sensor.humidity !== undefined)
         .map(sensor => sensor.humidity);
       
       const averageHumidity = humidityValues.length > 0 

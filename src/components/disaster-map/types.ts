@@ -2,26 +2,29 @@
 export interface Earthquake {
   id: string;
   magnitude: number;
-  location: string;
-  time: number; // timestamp
-  coordinates: [number, number]; // [latitude, longitude]
-  isSignificant?: boolean; // Whether this earthquake is considered significant
+  latitude: number;
+  longitude: number;
+  depth: number;
+  time: string;
+  location?: string;
+  coordinates: [number, number];
 }
 
 export interface EarthquakeStats {
   total: number;
+  last24Hours: number;
   averageMagnitude: number;
   maxMagnitude: number;
-  last24Hours: number;
-  significantCount: number;
+  averageDepth: number;
 }
 
 export interface RainSensor {
-  id: string;
-  humidity: number;
-  is_raining: boolean;
-  inserted_at: string;
-  coordinates?: [number, number]; // We'll need to add coordinates for mapping
+  id: number;
+  humidity: number | null;
+  is_raining: boolean | null;
+  created_at: string | null;
+  inserted_at?: string | null;
+  coordinates: [number, number];
 }
 
 export interface RainSensorStats {

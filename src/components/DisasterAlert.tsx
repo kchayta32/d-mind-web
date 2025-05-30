@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DisasterAlert as AlertType } from '@/components/disaster-alerts/types';
-import { supabase } from '@/integrations/supabase/client';
+import { useSharedDisasterAlerts } from '@/hooks/useSharedDisasterAlerts';
 import { toast } from '@/components/ui/use-toast';
 
 interface DisasterAlertProps {
@@ -18,6 +18,8 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [nearbyAlerts, setNearbyAlerts] = useState<AlertType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { alerts } = useSharedDisasterAlerts();
 
   // Get user's location
   useEffect(() => {
@@ -71,101 +73,73 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
     return distance;
   };
 
-  // Fetch active alerts when user location is available
+  // Filter alerts based on your conditions
   useEffect(() => {
-    if (!userLocation) return;
+    if (!userLocation || !alerts.length) {
+      setLoading(false);
+      return;
+    }
 
-    const fetchActiveAlerts = async () => {
-      try {
-        const { data: alerts, error } = await supabase
-          .from('disaster_alerts')
-          .select('*')
-          .eq('is_active', true);
-
-        if (error) {
-          throw error;
+    const filteredAlerts = alerts
+      .filter(alert => alert.coordinates && alert.is_active)
+      .filter(alert => {
+        const distance = calculateDistance(userLocation, alert.coordinates as [number, number]);
+        
+        // Apply your specific conditions
+        if (alert.type === 'earthquake') {
+          // 3+ magnitude within 800km OR 1+ magnitude within 500m
+          if (alert.magnitude && alert.magnitude >= 3.0 && distance <= 800) {
+            return true;
+          }
+          if (alert.magnitude && alert.magnitude >= 1.0 && distance <= 0.5) {
+            return true;
+          }
         }
-
-        if (alerts) {
-          // Filter alerts that have coordinates and are within 800km
-          const nearbyActiveAlerts = alerts
-            .filter(alert => alert.coordinates)
-            .filter(alert => {
-              // Parse coordinates from Supabase's JSON format
-              let alertCoords: [number, number];
-              
-              if (typeof alert.coordinates === 'string') {
-                try {
-                  alertCoords = JSON.parse(alert.coordinates) as [number, number];
-                } catch (e) {
-                  console.error("Invalid coordinates format:", alert.coordinates);
-                  return false;
-                }
-              } else if (Array.isArray(alert.coordinates) && alert.coordinates.length === 2) {
-                alertCoords = alert.coordinates as [number, number];
-              } else {
-                console.error("Unsupported coordinates format:", alert.coordinates);
-                return false;
-              }
-              
-              const distance = calculateDistance(userLocation, alertCoords);
-              return distance <= 800; // Filter alerts within 800km
-            })
-            .map(alert => {
-              // Convert coordinates to the proper format for our AlertType
-              let coords: [number, number];
-              
-              if (typeof alert.coordinates === 'string') {
-                coords = JSON.parse(alert.coordinates) as [number, number];
-              } else if (Array.isArray(alert.coordinates)) {
-                coords = alert.coordinates as [number, number];
-              } else {
-                coords = [0, 0]; // Fallback
-              }
-              
-              return {
-                ...alert,
-                coordinates: coords
-              } as AlertType;
-            })
-            .sort((a, b) => {
-              const distA = calculateDistance(userLocation, a.coordinates as [number, number]);
-              const distB = calculateDistance(userLocation, b.coordinates as [number, number]);
-              return distA - distB; // Sort by proximity
-            });
-
-          setNearbyAlerts(nearbyActiveAlerts);
+        
+        if (alert.type === 'heavyrain') {
+          // 50%+ humidity within 100m OR 70%+ humidity within 1km
+          if (alert.rain_intensity && alert.rain_intensity >= 50 && distance <= 0.1) {
+            return true;
+          }
+          if (alert.rain_intensity && alert.rain_intensity >= 70 && distance <= 1.0) {
+            return true;
+          }
         }
-      } catch (error) {
-        console.error('Error fetching alerts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        
+        return false;
+      })
+      .sort((a, b) => {
+        const distA = calculateDistance(userLocation, a.coordinates as [number, number]);
+        const distB = calculateDistance(userLocation, b.coordinates as [number, number]);
+        return distA - distB; // Sort by proximity
+      });
 
-    fetchActiveAlerts();
-  }, [userLocation]);
+    setNearbyAlerts(filteredAlerts);
+    setLoading(false);
+  }, [userLocation, alerts]);
 
   const getAlertMessage = () => {
     if (loading) return "กำลังตรวจสอบการแจ้งเตือนในพื้นที่...";
     
     if (nearbyAlerts.length === 0) {
-      return "ไม่พบการแจ้งเตือนในรัศมี 800 กิโลเมตร";
+      return "ไม่พบการแจ้งเตือนภัยพิบัติในพื้นที่ของคุณ";
     }
     
     const closestAlert = nearbyAlerts[0];
     const distance = userLocation && closestAlert.coordinates ? 
-      Math.round(calculateDistance(
-        userLocation, 
-        closestAlert.coordinates as [number, number]
-      )) : 0;
+      calculateDistance(userLocation, closestAlert.coordinates as [number, number]) : 0;
       
-    return `${closestAlert.type === 'wildfire' ? 'ไฟป่า' : 
-            closestAlert.type === 'storm' ? 'พายุ' : 
-            closestAlert.type === 'flood' ? 'น้ำท่วม' : 
-            closestAlert.type === 'strongwind' ? 'ลมแรง' : 
-            closestAlert.type === 'heavyrain' ? 'ฝนตกหนัก' : 
-            closestAlert.type} ที่ ${closestAlert.location} (ห่างประมาณ ${distance} กม.)`;
+    const distanceText = distance < 1 ? 
+      `${Math.round(distance * 1000)} เมตร` : 
+      `${Math.round(distance)} กิโลเมตร`;
+      
+    const typeText = closestAlert.type === 'earthquake' ? 
+      `แผ่นดินไหวขนาด ${closestAlert.magnitude}` :
+      closestAlert.type === 'heavyrain' ? 
+      `ฝนตกหนัก ความชื้น ${closestAlert.rain_intensity}%` :
+      closestAlert.type;
+      
+    return `${typeText} ที่ ${closestAlert.location} (ห่างประมาณ ${distanceText})`;
   };
 
   const hasNearbyAlerts = nearbyAlerts.length > 0;

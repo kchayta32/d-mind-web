@@ -15,9 +15,12 @@ export type Database = {
           created_at: string
           description: string | null
           end_time: string | null
+          flood_level: number | null
           id: string
           is_active: boolean
           location: string
+          magnitude: number | null
+          rain_intensity: number | null
           severity: string
           start_time: string
           type: string
@@ -28,9 +31,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           end_time?: string | null
+          flood_level?: number | null
           id?: string
           is_active?: boolean
           location: string
+          magnitude?: number | null
+          rain_intensity?: number | null
           severity: string
           start_time?: string
           type: string
@@ -41,9 +47,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           end_time?: string | null
+          flood_level?: number | null
           id?: string
           is_active?: boolean
           location?: string
+          magnitude?: number | null
+          rain_intensity?: number | null
           severity?: string
           start_time?: string
           type?: string
@@ -137,20 +146,23 @@ export type Database = {
       }
       from_rain_sensor: {
         Row: {
+          created_at: string | null
           humidity: number | null
-          id: string
+          id: number
           inserted_at: string | null
           is_raining: boolean | null
         }
         Insert: {
+          created_at?: string | null
           humidity?: number | null
-          id?: string
+          id?: number
           inserted_at?: string | null
           is_raining?: boolean | null
         }
         Update: {
+          created_at?: string | null
           humidity?: number | null
-          id?: string
+          id?: number
           inserted_at?: string | null
           is_raining?: boolean | null
         }
