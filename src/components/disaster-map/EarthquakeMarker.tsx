@@ -30,8 +30,8 @@ interface EarthquakeMarkerProps {
 }
 
 const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
-  const formatTime = (timestamp: number) => {
-    const date = new Date(timestamp);
+  const formatTime = (timeString: string) => {
+    const date = new Date(timeString);
     return date.toLocaleString();
   };
 
@@ -45,7 +45,7 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
   return (
     <Marker 
       key={earthquake.id} 
-      position={[earthquake.coordinates[0], earthquake.coordinates[1]]}
+      position={[earthquake.latitude, earthquake.longitude]}
       icon={earthquake.isSignificant ? significantIcon : regularIcon}
     >
       <Popup>

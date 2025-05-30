@@ -151,6 +151,8 @@ export type Database = {
           id: number
           inserted_at: string | null
           is_raining: boolean | null
+          latitude: number | null
+          longitude: number | null
         }
         Insert: {
           created_at?: string | null
@@ -158,6 +160,8 @@ export type Database = {
           id?: number
           inserted_at?: string | null
           is_raining?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
         }
         Update: {
           created_at?: string | null
@@ -165,6 +169,8 @@ export type Database = {
           id?: number
           inserted_at?: string | null
           is_raining?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
         }
         Relationships: []
       }
