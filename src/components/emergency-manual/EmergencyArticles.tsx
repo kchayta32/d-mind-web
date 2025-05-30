@@ -39,14 +39,23 @@ const EmergencyArticles: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Static article data for the new article
-  const staticArticle = {
-    id: 'disaster-20years',
-    title: '20 ปี ไทยสูญเสียจาก \'ภัยพิบัติ\' แค่ไหน ในวันที่โลกกำลังเผชิญกับความรุนแรงจาก \'โลกรวน\'',
-    category: 'สถิติภัยพิบัติ',
-    summary: 'ตลอด 20 ปีที่ผ่านมาไทยต้องเผชิญกับความสูญเสียจาก \'ภัยพิบัติ\' ต่าง ๆ อย่างต่อเนื่องจนมีผู้เสียชีวิตกว่า 10,000 คน และสร้างความเสียหายทางเศรษฐกิจสูงถึง 2.2 ล้านล้านบาท',
-    source: 'จาก heactive.thaipbs.or.th'
-  };
+  // Static articles data
+  const staticArticles = [
+    {
+      id: 'earthquake-3countries',
+      title: 'แผ่นดินไหวเกิดใหม่ 3 ประเทศ เมียนมา ลาว ไทย แรงสุด สะเทือนเชียงราย',
+      category: 'แผ่นดินไหว',
+      summary: 'จับตาแผ่นดินไหวเกิดใหม่ 3 ประเทศ "เมียนมา-ลาว-ไทย" แรงสุดวันนี้ รู้สึกแรงสั่นสะเทือนที่เชียงราย โดยแผ่นดินไหวเมียนมา มีขนาดสูงสุดถึง 3.9 - ลาวเจอเขย่า 2 ครั้งซ้อน',
+      source: 'จาก bangkokbiznews.com'
+    },
+    {
+      id: 'disaster-20years',
+      title: '20 ปี ไทยสูญเสียจาก \'ภัยพิบัติ\' แค่ไหน ในวันที่โลกกำลังเผชิญกับความรุนแรงจาก \'โลกรวน\'',
+      category: 'สถิติภัยพิบัติ',
+      summary: 'ตลอด 20 ปีที่ผ่านมาไทยต้องเผชิญกับความสูญเสียจาก \'ภัยพิบัติ\' ต่าง ๆ อย่างต่อเนื่องจนมีผู้เสียชีวิตกว่า 10,000 คน และสร้างความเสียหายทางเศรษฐกิจสูงถึง 2.2 ล้านล้านบาท',
+      source: 'จาก heactive.thaipbs.or.th'
+    }
+  ];
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -81,8 +90,8 @@ const EmergencyArticles: React.FC = () => {
   }, []);
 
   const handleArticleClick = (articleId: string | number | undefined) => {
-    if (articleId === 'disaster-20years') {
-      navigate('/article/disaster-20years');
+    if (articleId === 'disaster-20years' || articleId === 'earthquake-3countries') {
+      navigate(`/article/${articleId}`);
     }
   };
 
@@ -104,21 +113,23 @@ const EmergencyArticles: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Static article */}
-      <Card key={staticArticle.id} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleArticleClick(staticArticle.id)}>
-        <CardContent className="p-4">
-          <h2 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors">
-            {staticArticle.title}
-          </h2>
-          <p className="text-xs text-gray-500 mb-2">{staticArticle.source}</p>
-          
-          <div className="inline-block bg-guardian-purple/10 text-guardian-purple px-2 py-0.5 rounded text-xs mb-2">
-            {staticArticle.category}
-          </div>
-          
-          <p className="text-sm text-gray-700 mb-2">{staticArticle.summary}</p>
-        </CardContent>
-      </Card>
+      {/* Static articles */}
+      {staticArticles.map((article) => (
+        <Card key={article.id} className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleArticleClick(article.id)}>
+          <CardContent className="p-4">
+            <h2 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors">
+              {article.title}
+            </h2>
+            <p className="text-xs text-gray-500 mb-2">{article.source}</p>
+            
+            <div className="inline-block bg-guardian-purple/10 text-guardian-purple px-2 py-0.5 rounded text-xs mb-2">
+              {article.category}
+            </div>
+            
+            <p className="text-sm text-gray-700 mb-2">{article.summary}</p>
+          </CardContent>
+        </Card>
+      ))}
 
       {/* Dynamic articles from Supabase */}
       {articles.length === 0 ? (
