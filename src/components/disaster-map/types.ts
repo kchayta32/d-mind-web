@@ -8,6 +8,7 @@ export interface Earthquake {
   time: string;
   location?: string;
   coordinates: [number, number];
+  isSignificant?: boolean;
 }
 
 export interface EarthquakeStats {
@@ -16,6 +17,7 @@ export interface EarthquakeStats {
   averageMagnitude: number;
   maxMagnitude: number;
   averageDepth: number;
+  significantCount: number;
 }
 
 export interface RainSensor {

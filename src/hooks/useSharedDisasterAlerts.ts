@@ -41,9 +41,9 @@ export const useSharedDisasterAlerts = () => {
   useEffect(() => {
     const combinedData: DisasterAlert[] = [...dbAlerts];
 
-    // Add earthquake data as alerts
+    // Add earthquake data as alerts with proper null checks
     earthquakes.forEach(eq => {
-      if (eq.magnitude >= 1.0) { // Only include magnitude 1.0 and above
+      if (eq.magnitude >= 1.0 && eq.latitude !== undefined && eq.longitude !== undefined) {
         combinedData.push({
           id: `earthquake-${eq.id}`,
           type: 'earthquake',
@@ -60,9 +60,9 @@ export const useSharedDisasterAlerts = () => {
       }
     });
 
-    // Add rain sensor data as alerts for high humidity/rain
+    // Add rain sensor data as alerts for high humidity/rain with proper null checks
     rainSensors.forEach(sensor => {
-      if (sensor.humidity && sensor.humidity >= 50) { // 50% humidity threshold
+      if (sensor.humidity && sensor.humidity >= 50 && sensor.coordinates) {
         combinedData.push({
           id: `rain-${sensor.id}`,
           type: 'heavyrain',
