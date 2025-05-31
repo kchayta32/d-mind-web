@@ -42,6 +42,13 @@ const EmergencyArticles: React.FC = () => {
   // Static articles data
   const staticArticles = [
     {
+      id: 'natural-disasters',
+      title: 'ภัยพิบัติทางธรรมชาติ ภัยจากธรรมชาติที่สร้างความสูญเสียเกินกว่าที่จะจินตนาการได้',
+      category: 'ภัยพิบัติธรรมชาติ',
+      summary: 'ภัยพิบัติทางธรรมชาติ ภัยที่ไม่สามารถคาดการณ์ได้ ทำความรู้จักว่าภัยพิบัติธรรมชาติสามารถทำให้เกิดการพลัดถิ่นและลี้ภัยของผู้คนนับล้านได้อย่างไร?',
+      source: 'จาก bunhcr.org'
+    },
+    {
       id: 'earthquake-3countries',
       title: 'แผ่นดินไหวเกิดใหม่ 3 ประเทศ เมียนมา ลาว ไทย แรงสุด สะเทือนเชียงราย',
       category: 'แผ่นดินไหว',
@@ -90,7 +97,7 @@ const EmergencyArticles: React.FC = () => {
   }, []);
 
   const handleArticleClick = (articleId: string | number | undefined) => {
-    if (articleId === 'disaster-20years' || articleId === 'earthquake-3countries') {
+    if (articleId === 'disaster-20years' || articleId === 'earthquake-3countries' || articleId === 'natural-disasters') {
       navigate(`/article/${articleId}`);
     }
   };
