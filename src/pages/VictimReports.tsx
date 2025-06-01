@@ -7,6 +7,7 @@ import VictimReportForm from '@/components/victim-reports/VictimReportForm';
 import VictimReportsList from '@/components/victim-reports/VictimReportsList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
+import AppLogo from '@/components/AppLogo';
 
 const VictimReports: React.FC = () => {
   const navigate = useNavigate();
@@ -29,11 +30,7 @@ const VictimReports: React.FC = () => {
               <span className="sr-only">กลับ</span>
             </Button>
             <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
-                className="h-8 w-8 mr-3"
-              />
+              <AppLogo size="md" className="mr-4" />
               <h1 className="text-xl font-bold">รายงานสถานะผู้ประสบภัย</h1>
             </div>
           </div>
