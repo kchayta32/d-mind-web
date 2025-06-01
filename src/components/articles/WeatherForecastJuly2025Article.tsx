@@ -78,7 +78,7 @@ const WeatherForecastJuly2025Article = () => {
             
             <div className="bg-white rounded-lg border p-4 space-y-2">
               <a href="#item-1" className="block p-2 hover:bg-blue-50 rounded transition-colors">
-                <p className="text-gray-800">คาดหมายอากาศรายเดือนแบบอินโฟกราฟิก</p>
+                <p className="text-gray-800">คาดหมายอากาศรายเดือน</p>
               </a>
               <a href="#item-2" className="block p-2 hover:bg-blue-50 rounded transition-colors">
                 <p className="text-gray-800">คาดหมายอากาศทั่วไป</p>
@@ -93,14 +93,14 @@ const WeatherForecastJuly2025Article = () => {
             {/* Section 1: Infographic Forecast */}
             <section id="item-1" className="mb-12">
               <div className="flex items-baseline gap-4 mb-6">
-                <h2 className="text-3xl font-bold text-blue-800">คาดหมายอากาศรายเดือนแบบอินโฟกราฟิก</h2>
+                <h2 className="text-3xl font-bold text-blue-800">คาดหมายอากาศรายเดือน</h2>
                 <span className="text-lg text-gray-600">กรกฎาคม 2568</span>
               </div>
               
               {/* Weather Map Placeholder */}
               <div className="bg-gradient-to-br from-blue-100 to-green-100 rounded-xl p-8 mb-6 text-center">
                 <div className="bg-white rounded-lg p-6 shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">แผนที่คาดหมายอากาศประเทศไทย</h3>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">ตารางคาดหมายอากาศประเทศไทย</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h4 className="font-semibold text-blue-800">ภาคเหนือ</h4>
