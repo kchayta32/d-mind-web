@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, FileText, Menu } from 'lucide-react';
+import AppLogo from '@/components/AppLogo';
 
 const WeatherForecastJuly2025Article = () => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
-    navigate('/emergency-manual');
+    navigate('/manual');
   };
 
   const handlePdfDownload = () => {
@@ -30,11 +31,7 @@ const WeatherForecastJuly2025Article = () => {
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
-                className="h-10 w-10 mr-4"
-              />
+              <AppLogo size="md" className="mr-4" />
               <h1 className="text-2xl font-bold">คาดหมายอากาศรายเดือน ก.ค. 2568</h1>
             </div>
           </div>
@@ -266,7 +263,7 @@ const WeatherForecastJuly2025Article = () => {
             className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
-            กลับหน้าหลัก
+            กลับหน้ารายการบทความ
           </Button>
         </div>
       </main>
