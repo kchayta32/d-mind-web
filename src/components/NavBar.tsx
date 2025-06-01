@@ -59,7 +59,7 @@ const NavBar: React.FC<NavBarProps> = ({
       />
       <NavButton 
         icon={<BookOpen size={20} />}
-        label="คู่มือฉุกเฉิน"
+        label="คู่มือและบทความ"
         onClick={onManualClick}
         className="w-full justify-start text-left"
       />
