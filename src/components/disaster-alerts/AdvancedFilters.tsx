@@ -32,12 +32,6 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     return null;
   }
 
-  const getDistanceLabel = (distance: number) => {
-    if (distance <= 1000) return 'ในประเทศไทย';
-    if (distance <= 3000) return 'รัศมี 3,000 กม.';
-    return 'ทั่วโลก';
-  };
-
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2">
@@ -47,28 +41,6 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Earthquake Distance Filter */}
-        {hasEarthquake && (
-          <div>
-            <Label className="text-sm font-medium">
-              ระยะห่างแผ่นดินไหว: {getDistanceLabel(filters.earthquakeDistance?.[0] || 0)}
-            </Label>
-            <Slider 
-              value={filters.earthquakeDistance || [0]} 
-              min={0}
-              max={10000}
-              step={500}
-              onValueChange={(value) => updateFilters({ earthquakeDistance: value })}
-              className="mt-2"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>ในประเทศ</span>
-              <span>3,000 กม.</span>
-              <span>ทั่วโลก</span>
-            </div>
-          </div>
-        )}
-
         {/* Earthquake Magnitude Filter */}
         {hasEarthquake && (
           <div>

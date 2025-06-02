@@ -23,5 +23,4 @@ export interface AlertsFilterState {
   earthquakeMagnitude?: number[];
   rainIntensity?: number[];
   floodLevel?: number[];
-  earthquakeDistance?: number[]; // New field for distance filtering
 }
