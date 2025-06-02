@@ -1,9 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Star, Send, Smartphone, Map, Bot, BookOpen, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface SurveyData {
   overallRating: number;
@@ -24,6 +25,7 @@ interface SurveyFormProps {
 }
 
 const SurveyForm: React.FC<SurveyFormProps> = ({ onSubmit }) => {
+  const { toast } = useToast();
   const [surveyData, setSurveyData] = useState<SurveyData>({
     overallRating: 0,
     features: {
@@ -78,26 +80,56 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ onSubmit }) => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      onSubmit(surveyData);
-      setIsSubmitting(false);
-      
-      // Reset form
-      setSurveyData({
-        overallRating: 0,
-        features: {
-          mapVisualization: 0,
-          aiAssistant: 0,
-          emergencyInfo: 0,
-          userInterface: 0,
-          alertSystem: 0,
-        },
-        mostUsefulFeature: '',
-        suggestions: '',
-        wouldRecommend: 0,
+    try {
+      const { error } = await supabase
+        .from('satisfaction_surveys')
+        .insert([{
+          overall_rating: surveyData.overallRating,
+          map_visualization_rating: surveyData.features.mapVisualization || null,
+          ai_assistant_rating: surveyData.features.aiAssistant || null,
+          emergency_info_rating: surveyData.features.emergencyInfo || null,
+          user_interface_rating: surveyData.features.userInterface || null,
+          alert_system_rating: surveyData.features.alertSystem || null,
+          most_useful_feature: surveyData.mostUsefulFeature || null,
+          suggestions: surveyData.suggestions || null,
+          would_recommend: surveyData.wouldRecommend || null,
+        }]);
+
+      if (error) {
+        console.error('Error submitting survey:', error);
+        toast({
+          title: "เกิดข้อผิดพลาด",
+          description: "ไม่สามารถส่งแบบประเมินได้ กรุณาลองใหม่อีกครั้ง",
+          variant: "destructive",
+        });
+      } else {
+        onSubmit(surveyData);
+        
+        // Reset form
+        setSurveyData({
+          overallRating: 0,
+          features: {
+            mapVisualization: 0,
+            aiAssistant: 0,
+            emergencyInfo: 0,
+            userInterface: 0,
+            alertSystem: 0,
+          },
+          mostUsefulFeature: '',
+          suggestions: '',
+          wouldRecommend: 0,
+        });
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "ไม่สามารถส่งแบบประเมินได้ กรุณาลองใหม่อีกครั้ง",
+        variant: "destructive",
       });
-    }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const featureLabels = [

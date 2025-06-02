@@ -192,6 +192,51 @@ export type Database = {
         }
         Relationships: []
       }
+      satisfaction_surveys: {
+        Row: {
+          ai_assistant_rating: number | null
+          alert_system_rating: number | null
+          created_at: string
+          emergency_info_rating: number | null
+          id: string
+          map_visualization_rating: number | null
+          most_useful_feature: string | null
+          overall_rating: number
+          suggestions: string | null
+          updated_at: string
+          user_interface_rating: number | null
+          would_recommend: number | null
+        }
+        Insert: {
+          ai_assistant_rating?: number | null
+          alert_system_rating?: number | null
+          created_at?: string
+          emergency_info_rating?: number | null
+          id?: string
+          map_visualization_rating?: number | null
+          most_useful_feature?: string | null
+          overall_rating: number
+          suggestions?: string | null
+          updated_at?: string
+          user_interface_rating?: number | null
+          would_recommend?: number | null
+        }
+        Update: {
+          ai_assistant_rating?: number | null
+          alert_system_rating?: number | null
+          created_at?: string
+          emergency_info_rating?: number | null
+          id?: string
+          map_visualization_rating?: number | null
+          most_useful_feature?: string | null
+          overall_rating?: number
+          suggestions?: string | null
+          updated_at?: string
+          user_interface_rating?: number | null
+          would_recommend?: number | null
+        }
+        Relationships: []
+      }
       victim_reports: {
         Row: {
           contact: string | null
