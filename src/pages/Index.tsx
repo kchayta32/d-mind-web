@@ -5,22 +5,16 @@ import DisasterAlert from '@/components/DisasterAlert';
 import NavBar from '@/components/NavBar';
 import DisasterResources from '@/components/DisasterResources';
 import EnhancedChatBot from '@/components/chat/EnhancedChatBot';
-import { StatisticsPanel } from '@/components/disaster-map/StatisticsPanel';
-import { useEarthquakeData } from '@/components/disaster-map/useEarthquakeData';
-import { useRainSensorData } from '@/components/disaster-map/useRainSensorData';
+import DisasterMap from '@/components/DisasterMap';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Shield } from 'lucide-react';
+import { MessageSquare, AlertTriangle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-
-  // Data for statistics
-  const earthquakeData = useEarthquakeData();
-  const rainSensorData = useRainSensorData();
 
   const handleAssistantClick = () => {
     navigate('/assistant');
@@ -43,169 +37,138 @@ const Index = () => {
   };
 
   if (isMobile) {
+    // Enhanced Mobile layout with professional design
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* Modern Header with Glass Effect */}
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+        {/* Enhanced Header */}
+        <header className="bg-white shadow-lg border-b border-blue-100 sticky top-0 z-50">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl blur opacity-60"></div>
-                  <div className="relative bg-gradient-to-br from-blue-600 to-indigo-700 p-3 rounded-2xl shadow-xl">
-                    <img 
-                      src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                      alt="D-MIND Logo" 
-                      className="h-6 w-6"
-                    />
-                  </div>
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-2 rounded-xl shadow-md">
+                  <img 
+                    src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
+                    alt="D-MIND Logo" 
+                    className="h-6 w-6"
+                  />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">D-MIND</h1>
-                  <p className="text-xs text-gray-500 font-medium">Disaster Intelligence System</p>
+                  <h1 className="text-xl font-bold text-gray-800">D-MIND</h1>
+                  <p className="text-xs text-gray-500 font-medium">Disaster Monitoring System</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
+                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs text-gray-600 font-medium">ออนไลน์</span>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Main Content with Better Spacing */}
-        <main className="px-4 py-6 space-y-8 max-w-md mx-auto pb-8">
+        {/* Main Content with improved spacing */}
+        <main className="px-4 py-6 space-y-6 max-w-md mx-auto">
           {/* Alert Section */}
-          <div className="relative">
+          <div className="space-y-4">
             <DisasterAlert isActive={true} />
           </div>
           
-          {/* Navigation Section */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-white/40 to-blue-50/60 rounded-3xl blur-sm"></div>
-            <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 p-6">
-              <div className="flex items-center mb-6">
-                <div className="h-1 w-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-3"></div>
-                <h2 className="text-lg font-semibold text-gray-800">เมนูหลัก</h2>
-              </div>
-              <NavBar 
-                onAssistantClick={handleAssistantClick}
-                onManualClick={handleManualClick}
-                onContactsClick={handleContactsClick}
-                onAlertsClick={handleAlertsClick}
-              />
-            </div>
+          {/* Navigation Section - Now icon-only */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mr-3"></div>
+              เมนูหลัก
+            </h2>
+            <NavBar 
+              onAssistantClick={handleAssistantClick}
+              onManualClick={handleManualClick}
+              onContactsClick={handleContactsClick}
+              onAlertsClick={handleAlertsClick}
+            />
           </div>
           
-          {/* Emergency Report Button */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-600 rounded-2xl blur opacity-30"></div>
+          {/* Emergency Report Button - Now red color */}
+          <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-lg p-1">
             <Button 
-              className="relative w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-xl hover:shadow-2xl border-0 rounded-2xl py-6 font-semibold text-base transition-all duration-300 transform hover:scale-[1.02]"
+              className="w-full bg-red-600 hover:bg-red-700 text-white shadow-none border-0 rounded-xl py-4 font-semibold text-base transition-all duration-200"
               onClick={handleVictimReportsClick}
             >
               <MessageSquare className="mr-3 h-5 w-5" />
               รายงานสถานะผู้ประสบภัย
             </Button>
           </div>
-
-          {/* Statistics Section */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-white/40 rounded-3xl blur-sm"></div>
-            <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 px-6 py-5 border-b border-gray-100/50">
-                <div className="flex items-center">
-                  <div className="h-1 w-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-3"></div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">สถิติภัยพิบัติ</h2>
-                    <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 space-y-6">
-                <div>
-                  <h3 className="text-md font-semibold text-gray-700 mb-3">แผ่นดินไหว</h3>
-                  <StatisticsPanel 
-                    stats={earthquakeData.statistics} 
-                    isLoading={earthquakeData.refreshing}
-                    disasterType="earthquake"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-md font-semibold text-gray-700 mb-3">ฝนตกหนัก</h3>
-                  <StatisticsPanel 
-                    stats={rainSensorData.stats} 
-                    isLoading={rainSensorData.isLoading}
-                    disasterType="heavyrain"
-                  />
-                </div>
+          
+          {/* Disaster Map Section - Increased height significantly */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mr-3"></div>
+                แผนที่ภัยพิบัติ
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
+            </div>
+            <div className="h-[1000px] relative overflow-auto">
+              <div className="min-h-full">
+                <DisasterMap />
               </div>
             </div>
           </div>
 
-          {/* AI Expert Section */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-100/60 to-blue-100/60 rounded-3xl blur-sm"></div>
-            <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-50/80 to-purple-50/80 px-6 py-5 border-b border-gray-100/50">
-                <div className="flex items-center">
-                  <div className="h-1 w-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-                      <Shield className="mr-2 h-5 w-5 text-blue-600" />
-                      ปรึกษาผู้เชี่ยวชาญ
-                    </h2>
-                    <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
-                  </div>
-                </div>
-              </div>
-              <div className="h-[500px]">
-                <EnhancedChatBot />
-              </div>
+          {/* Enhanced AI Chat Section - Now with expert personality */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-100 px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
+                ปรึกษาผู้เชี่ยวชาญ
+              </h2>
+                <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
+            </div>
+            <div className="p-0">
+              <EnhancedChatBot />
             </div>
           </div>
           
           {/* Resources Section */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-white/40 rounded-3xl blur-sm"></div>
-            <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 p-6">
-              <div className="flex items-center mb-6">
-                <div className="h-1 w-10 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full mr-3"></div>
-                <h2 className="text-lg font-semibold text-gray-800">แหล่งข้อมูลฉุกเฉิน</h2>
-              </div>
-              <DisasterResources />
-            </div>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <div className="h-1 w-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full mr-3"></div>
+              แหล่งข้อมูลฉุกเฉิน
+            </h2>
+            <DisasterResources />
           </div>
+
+          {/* Bottom spacing for better scroll experience */}
+          <div className="h-6"></div>
         </main>
       </div>
     );
   }
 
-  // Desktop Layout 
+  // Desktop/Landscape layout - Improved proportions and removed AI Assistant
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex">
-      {/* Modern Sidebar - เปลี่ยนเป็นแนวตั้งแคบ */}
-      <aside className="w-24 bg-white/90 backdrop-blur-md shadow-2xl border-r border-white/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex">
+      {/* Sidebar - Made narrower for better proportions */}
+      <aside className="w-72 bg-white shadow-xl border-r border-blue-100 flex flex-col">
         {/* Sidebar Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-4">
-          <div className="flex flex-col items-center">
-            <div className="relative mb-2">
-              <div className="absolute inset-0 bg-white/20 rounded-xl blur"></div>
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
-                className="relative h-8 w-8"
-              />
-            </div>
-            <h1 className="text-sm font-bold text-center">D-MIND</h1>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+          <div className="flex items-center mb-3">
+            <img 
+              src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
+              alt="D-MIND Logo" 
+              className="h-10 w-10 mr-3"
+            />
+            <h1 className="text-xl font-bold">D-MIND</h1>
           </div>
+          <p className="text-sm opacity-90 leading-relaxed">
+            ระบบติดตามภัยพิบัติและแจ้งเตือนอัจฉริยะ
+          </p>
         </div>
 
-        {/* Sidebar Content */}
-        <div className="p-3 space-y-4 flex-1">
+        {/* Navigation */}
+        <div className="p-6 space-y-4 flex-1">
           <DisasterAlert isActive={true} />
           
           <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">เมนูหลัก</h3>
             <NavBar 
               onAssistantClick={handleAssistantClick}
               onManualClick={handleManualClick}
@@ -217,10 +180,11 @@ const Index = () => {
           {/* Victim Reports Button */}
           <div className="pt-4 border-t border-gray-100">
             <Button 
-              className="w-full aspect-square flex items-center justify-center bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] p-2"
+              className="w-full bg-red-600 hover:bg-red-700 text-white shadow-md"
               onClick={handleVictimReportsClick}
             >
-              <MessageSquare className="h-5 w-5" />
+              <MessageSquare className="mr-2 h-4 w-4" />
+              รายงานสถานะผู้ประสบภัย
             </Button>
           </div>
           
@@ -230,75 +194,40 @@ const Index = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content - Split between map and chatbot */}
       <main className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/30 p-6">
+        <header className="bg-white shadow-sm border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-3"></div>
-              <h2 className="text-xl font-semibold text-gray-800">แผงควบคุมหลัก</h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-800">แผงควบคุมหลัก</h2>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600 flex items-center">
-                สถานะระบบ: 
-                <div className="flex items-center ml-2">
-                  <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse mr-1"></div>
-                  <span className="text-emerald-600 font-medium">ออนไลน์</span>
-                </div>
+              <div className="text-sm text-gray-600">
+                สถานะระบบ: <span className="text-green-600 font-medium">ออนไลน์</span>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Content Grid */}
-        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Statistics Section */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/30 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50/80 to-indigo-50/80">
-              <div className="flex items-center">
-                <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-3"></div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">สถิติภัยพิบัติ</h3>
-                  <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
-                </div>
-              </div>
+        {/* Content Area - Split layout */}
+        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Map Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <h3 className="font-semibold text-gray-800">แผนที่ภัยพิบัติ</h3>
+              <p className="text-sm text-gray-600 mt-1">ข้อมูลสถานการณ์แบบเรียลไทม์</p>
             </div>
-            <div className="p-6 space-y-6 h-[600px] overflow-y-auto">
-              <div>
-                <h4 className="text-md font-semibold text-gray-700 mb-3">แผ่นดินไหว</h4>
-                <StatisticsPanel 
-                  stats={earthquakeData.statistics} 
-                  isLoading={earthquakeData.refreshing}
-                  disasterType="earthquake"
-                />
-              </div>
-              <div>
-                <h4 className="text-md font-semibold text-gray-700 mb-3">ฝนตกหนัก</h4>
-                <StatisticsPanel 
-                  stats={rainSensorData.stats} 
-                  isLoading={rainSensorData.isLoading}
-                  disasterType="heavyrain"
-                />
-              </div>
+            <div className="p-6 h-[calc(100%-80px)] min-h-[500px]">
+              <DisasterMap />
             </div>
           </div>
 
-          {/* Chatbot Section */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/30 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50/80 to-purple-50/80">
-              <div className="flex items-center">
-                <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
-                <div className="flex items-center">
-                  <Shield className="mr-2 h-5 w-5 text-blue-600" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">ปรึกษาผู้เชี่ยวชาญ</h3>
-                    <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
-                  </div>
-                </div>
-              </div>
+          {/* Enhanced Chatbot Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+              <h3 className="font-semibold text-gray-800">ปรึกษาผู้เชี่ยวชาญ</h3>
+              <p className="text-sm text-gray-600 mt-1">Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน</p>
             </div>
-            <div className="h-[600px]">
+            <div className="h-[calc(100%-80px)]">
               <EnhancedChatBot className="h-full border-0 shadow-none" />
             </div>
           </div>
