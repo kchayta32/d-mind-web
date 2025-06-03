@@ -4,7 +4,6 @@ import { Bell, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DisasterAlert as AlertType } from '@/components/disaster-alerts/types';
 import { useSharedDisasterAlerts } from '@/hooks/useSharedDisasterAlerts';
-import { useNotificationService } from '@/hooks/useNotificationService';
 import { toast } from '@/components/ui/use-toast';
 
 interface DisasterAlertProps {
@@ -19,10 +18,8 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [nearbyAlerts, setNearbyAlerts] = useState<AlertType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [lastNotifiedAlerts, setLastNotifiedAlerts] = useState<Set<string>>(new Set());
 
   const { alerts } = useSharedDisasterAlerts();
-  const { sendDisasterAlert, permission } = useNotificationService();
 
   // Get user's location
   useEffect(() => {
@@ -76,7 +73,7 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
     return distance;
   };
 
-  // Filter alerts based on conditions and send notifications
+  // Filter alerts based on your conditions
   useEffect(() => {
     if (!userLocation || !alerts.length) {
       setLoading(false);
@@ -88,7 +85,7 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
       .filter(alert => {
         const distance = calculateDistance(userLocation, alert.coordinates as [number, number]);
         
-        // Apply specific conditions
+        // Apply your specific conditions
         if (alert.type === 'earthquake') {
           // 3+ magnitude within 800km OR 1+ magnitude within 500m
           if (alert.magnitude && alert.magnitude >= 3.0 && distance <= 800) {
@@ -117,26 +114,9 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
         return distA - distB; // Sort by proximity
       });
 
-    // Send notifications for new alerts
-    if (permission.granted) {
-      filteredAlerts.forEach(alert => {
-        if (!lastNotifiedAlerts.has(alert.id)) {
-          sendDisasterAlert(
-            alert.type,
-            alert.location,
-            alert.severity,
-            alert.description
-          );
-        }
-      });
-
-      // Update the set of notified alerts
-      setLastNotifiedAlerts(new Set(filteredAlerts.map(alert => alert.id)));
-    }
-
     setNearbyAlerts(filteredAlerts);
     setLoading(false);
-  }, [userLocation, alerts, permission.granted, sendDisasterAlert, lastNotifiedAlerts]);
+  }, [userLocation, alerts]);
 
   const getAlertMessage = () => {
     if (loading) return "กำลังตรวจสอบการแจ้งเตือนในพื้นที่...";
@@ -177,11 +157,6 @@ const DisasterAlert: React.FC<DisasterAlertProps> = ({
         <p className={`${hasNearbyAlerts ? "text-red-400 font-bold" : "text-gray-200"}`}>
           {getAlertMessage()}
         </p>
-        {permission.granted && hasNearbyAlerts && (
-          <p className="text-sm text-green-200 mt-2">
-            📱 การแจ้งเตือนถูกส่งไปยังอุปกรณ์ของคุณแล้ว
-          </p>
-        )}
       </CardContent>
     </Card>
   );
