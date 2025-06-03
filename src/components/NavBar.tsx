@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavButton from './NavButton';
-import { MessageSquare, Phone, BookOpen, Bell, Star } from 'lucide-react';
+import { MessageSquare, Phone, BookOpen, Bell, Star, HelpCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavBarProps {
@@ -25,11 +25,15 @@ const NavBar: React.FC<NavBarProps> = ({
     navigate('/satisfaction-survey');
   };
 
+  const handleAppGuideClick = () => {
+    navigate('/app-guide');
+  };
+
   if (isMobile) {
-    // Mobile layout - 2x2 grid + survey button
+    // Mobile layout - 2x3 grid + survey button
     return (
       <div className="space-y-3">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+        <div className="grid grid-cols-2 gap-3 w-full">
           <NavButton 
             icon={<MessageSquare size={24} />}
             label="AI Assistant"
@@ -49,6 +53,12 @@ const NavBar: React.FC<NavBarProps> = ({
             icon={<Bell size={24} />}
             label="การแจ้งเตือนภัยทั้งหมด"
             onClick={onAlertsClick}
+          />
+          <NavButton 
+            icon={<HelpCircle size={24} />}
+            label="คู่มือการใช้งานแอพ"
+            onClick={handleAppGuideClick}
+            className="col-span-2"
           />
         </div>
         
@@ -88,6 +98,12 @@ const NavBar: React.FC<NavBarProps> = ({
         icon={<Bell size={20} />}
         label="การแจ้งเตือนภัยทั้งหมด"
         onClick={onAlertsClick}
+        className="w-full justify-start text-left"
+      />
+      <NavButton 
+        icon={<HelpCircle size={20} />}
+        label="คู่มือการใช้งานแอพ"
+        onClick={handleAppGuideClick}
         className="w-full justify-start text-left"
       />
       <NavButton 
