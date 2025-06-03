@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DisasterAlert as AlertType } from '@/components/disaster-alerts/types';
 import { useSharedDisasterAlerts } from '@/hooks/useSharedDisasterAlerts';
 import { toast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 
 interface DisasterAlertProps {
   isActive: boolean;
