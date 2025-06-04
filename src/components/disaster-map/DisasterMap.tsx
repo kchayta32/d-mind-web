@@ -8,6 +8,8 @@ import { FilterControls } from './FilterControls';
 import DisasterTypeSelector from './DisasterTypeSelector';
 import { useEarthquakeData } from './useEarthquakeData';
 import { useRainSensorData } from './useRainSensorData';
+import { useRainViewerData } from './useRainViewerData';
+import { useGISTDAData } from './useGISTDAData';
 import { RefreshCw } from 'lucide-react';
 
 export type DisasterType = 'earthquake' | 'heavyrain' | 'flood' | 'wildfire' | 'storm';
@@ -20,12 +22,21 @@ const DisasterMap: React.FC = () => {
   // Data hooks
   const earthquakeData = useEarthquakeData();
   const rainSensorData = useRainSensorData();
+  const rainViewerData = useRainViewerData();
+  const gistdaData = useGISTDAData();
 
   const handleRefresh = () => {
-    if (selectedType === 'earthquake') {
-      earthquakeData.fetchEarthquakeData();
-    } else if (selectedType === 'heavyrain') {
-      rainSensorData.refetch();
+    switch (selectedType) {
+      case 'earthquake':
+        earthquakeData.fetchEarthquakeData();
+        break;
+      case 'heavyrain':
+        rainSensorData.refetch();
+        rainViewerData.refetch();
+        break;
+      case 'wildfire':
+        gistdaData.refetch();
+        break;
     }
   };
 
@@ -41,9 +52,16 @@ const DisasterMap: React.FC = () => {
       case 'heavyrain':
         return {
           data: rainSensorData.sensors,
-          stats: rainSensorData.stats,
-          isLoading: rainSensorData.isLoading,
-          error: rainSensorData.error
+          stats: { ...rainSensorData.stats, rainViewer: rainViewerData.stats },
+          isLoading: rainSensorData.isLoading || rainViewerData.isLoading,
+          error: rainSensorData.error || rainViewerData.error
+        };
+      case 'wildfire':
+        return {
+          data: gistdaData.hotspots,
+          stats: gistdaData.stats,
+          isLoading: gistdaData.isLoading,
+          error: gistdaData.error
         };
       default:
         return {
@@ -118,9 +136,9 @@ const DisasterMap: React.FC = () => {
               <CardTitle className="text-lg flex items-center justify-between">
                 <span>
                   {selectedType === 'earthquake' && 'แผนที่แผ่นดินไหว'}
-                  {selectedType === 'heavyrain' && 'แผนที่เซ็นเซอร์ฝน'}
+                  {selectedType === 'heavyrain' && 'แผนที่เซ็นเซอร์ฝนและเรดาร์'}
                   {selectedType === 'flood' && 'แผนที่น้ำท่วม (เร็วๆ นี้)'}
-                  {selectedType === 'wildfire' && 'แผนที่ไฟป่า (เร็วๆ นี้)'}
+                  {selectedType === 'wildfire' && 'แผนที่จุดความร้อน (ไฟป่า)'}
                   {selectedType === 'storm' && 'แผนที่พายุ (เร็วๆ นี้)'}
                 </span>
                 {currentData.isLoading && (
@@ -136,6 +154,8 @@ const DisasterMap: React.FC = () => {
                 <MapView 
                   earthquakes={selectedType === 'earthquake' ? earthquakeData.earthquakes : []}
                   rainSensors={selectedType === 'heavyrain' ? rainSensorData.sensors : []}
+                  hotspots={selectedType === 'wildfire' ? gistdaData.hotspots : []}
+                  rainData={selectedType === 'heavyrain' ? rainViewerData.rainData : null}
                   selectedType={selectedType}
                   magnitudeFilter={magnitudeFilter}
                   humidityFilter={humidityFilter}

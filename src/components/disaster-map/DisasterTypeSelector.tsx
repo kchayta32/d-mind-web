@@ -49,7 +49,16 @@ const disasterTypes: DisasterTypeOption[] = [
     icon: <CloudRain className="h-4 w-4" />,
     color: 'text-blue-700',
     bgColor: 'bg-blue-100 border-blue-300 hover:bg-blue-200',
-    description: 'การเตือนฝนตกหนัก',
+    description: 'เซ็นเซอร์ฝนและเรดาร์ฝน',
+    status: 'active'
+  },
+  {
+    id: 'wildfire',
+    name: 'ไฟป่า',
+    icon: <Flame className="h-4 w-4" />,
+    color: 'text-red-700',
+    bgColor: 'bg-red-100 border-red-300 hover:bg-red-200',
+    description: 'จุดความร้อนจาก GISTDA',
     status: 'active'
   },
   {
@@ -59,15 +68,6 @@ const disasterTypes: DisasterTypeOption[] = [
     color: 'text-cyan-700',
     bgColor: 'bg-cyan-100 border-cyan-300 hover:bg-cyan-200',
     description: 'พื้นที่เสี่ยงน้ำท่วม',
-    status: 'coming-soon'
-  },
-  {
-    id: 'wildfire',
-    name: 'ไฟป่า',
-    icon: <Flame className="h-4 w-4" />,
-    color: 'text-red-700',
-    bgColor: 'bg-red-100 border-red-300 hover:bg-red-200',
-    description: 'พื้นที่เสี่ยงไฟป่า',
     status: 'coming-soon'
   },
   {
