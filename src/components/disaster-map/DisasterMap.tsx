@@ -57,6 +57,12 @@ const DisasterMap: React.FC = () => {
 
   const currentData = getCurrentData();
 
+  const getErrorMessage = (error: string | Error | null): string => {
+    if (!error) return '';
+    if (typeof error === 'string') return error;
+    return error.message || 'Unknown error occurred';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
@@ -145,7 +151,7 @@ const DisasterMap: React.FC = () => {
           <Card className="mt-6 border-red-200 bg-red-50">
             <CardContent className="p-4">
               <p className="text-red-700">
-                เกิดข้อผิดพลาด: {currentData.error.message}
+                เกิดข้อผิดพลาด: {getErrorMessage(currentData.error)}
               </p>
             </CardContent>
           </Card>
