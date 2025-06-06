@@ -159,7 +159,7 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
         </div>
       </div>
       <div className="border-t pt-2">
-        <div className="text-xs text-gray-600 mb-1">5 จังหวัดเสี่ยงสูงสุด:</div>
+        <div className="text-xs text-gray-600 mb-1">3 จังหวัดเสี่ยงสูงสุด:</div>
         <div className="space-y-1">
           {droughtStats.topProvinces.slice(0, 3).map((province, index) => (
             <div key={index} className="flex justify-between text-xs">
