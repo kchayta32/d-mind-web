@@ -7,6 +7,7 @@ import DisasterTwentyYearsArticle from '@/components/articles/DisasterTwentyYear
 import PM25vsPM10Article from '@/components/articles/PM25vsPM10Article';
 import WeatherForecastJuly2025Article from '@/components/articles/WeatherForecastJuly2025Article';
 import AirQualityIndexArticle from '@/components/articles/AirQualityIndexArticle';
+import UVAerosolIndexArticle from '@/components/articles/UVAerosolIndexArticle';
 import ArticleNotFound from '@/components/articles/ArticleNotFound';
 
 const ArticleDetail: React.FC = () => {
@@ -15,6 +16,8 @@ const ArticleDetail: React.FC = () => {
   switch (id) {
     case 'air-quality-index':
       return <AirQualityIndexArticle />;
+    case 'uv-aerosol-index':
+      return <UVAerosolIndexArticle />;
     case 'weather-forecast-july-2025':
       return <WeatherForecastJuly2025Article />;
     case 'natural-disasters':

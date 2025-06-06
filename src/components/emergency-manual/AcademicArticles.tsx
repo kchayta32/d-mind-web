@@ -12,6 +12,7 @@ interface AcademicArticle {
   category: string;
   abstract: string;
   doi?: string;
+  url?: string;
 }
 
 const AcademicArticles: React.FC = () => {
@@ -19,94 +20,44 @@ const AcademicArticles: React.FC = () => {
 
   const academicArticles: AcademicArticle[] = [
     {
-      id: 'flood-risk-2568',
-      title: 'การประเมินความเสี่ยงน้ำท่วมในเขตชุมชนเมืองโดยใช้ระบบสารสนเทศภูมิศาสตร์',
-      authors: 'สมชาย วิทยาการ, สุกัญญา ธรรมศาสตร์, วิชัย มหาวิทยาลัย',
-      year: 2568,
-      journal: 'วารสารวิศวกรรมสิ่งแวดล้อม',
-      category: 'น้ำท่วม',
-      abstract: 'การศึกษานี้นำเสนอวิธีการประเมินความเสี่ยงน้ำท่วมในเขตชุมชนเมืองโดยการบูรณาการระบบสารสนเทศภูมิศาสตร์ (GIS) กับแบบจำลองไฮโดรโลยี เพื่อคาดการณ์พื้นที่เสี่ยงน้ำท่วมและวางแผนการจัดการความเสี่ยง',
-      doi: '10.1234/env.eng.2025.001'
-    },
-    {
-      id: 'earthquake-thailand-2567',
-      title: 'การวิเคราะห์แนวโน้มแผ่นดินไหวในประเทศไทยระหว่างปี 2540-2567',
-      authors: 'ดร.นิรุทธ์ ธรณีวิทยา, ผศ.สุภาพร แผ่นดินไหว',
+      id: 'pm25-so2-cognitive-2567',
+      title: 'งานวิจัยใน Scientific Reports: ผลกระทบของ PM2.5 และ SO₂ ต่อการเสื่อมด้านการรับรู้',
+      authors: 'Researchers from Scientific Reports',
       year: 2567,
-      journal: 'วารสารธรณีวิทยาไทย',
-      category: 'แผ่นดินไหว',
-      abstract: 'การศึกษาวิเคราะห์แนวโน้มการเกิดแผ่นดินไหวในประเทศไทยตลอด 27 ปีที่ผ่านมา พบว่ามีความถี่ในการเกิดแผ่นดินไหวเพิ่มขึ้นอย่างมีนัยสำคัญในบางพื้นที่ โดยเฉพาะภาคเหนือและภาคตะวันตก',
-      doi: '10.1234/geo.thai.2024.002'
+      journal: 'Scientific Reports',
+      category: 'มลพิษอากาศและสุขภาพ',
+      abstract: 'งานวิจัยใน Scientific Reports (ส.ค. 2024) พบว่าการสัมผัส PM2.5 และ SO₂ มีความสัมพันธ์อย่างมีนัยสำคัญกับการเสื่อมด้านการรับรู้ (OR 1.49 สำหรับ PM2.5; OR 1.39 สำหรับ SO₂)',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/39179784/'
     },
     {
-      id: 'air-pollution-bangkok-2566',
-      title: 'ผลกระทบของมลพิษอากาศต่อสุขภาพประชาชนในกรุงเทพมหานคร: การศึกษาเชิงระบาดวิทยา',
-      authors: 'รศ.ดร.สุวิมล สาธารณสุข, ดร.มาลี อนามัย, อาจารย์วิรัช วิทยาศาสตร์',
-      year: 2566,
-      journal: 'วารสารสาธารณสุขไทย',
-      category: 'มลพิษอากาศ',
-      abstract: 'การศึกษาความสัมพันธ์ระหว่างระดับ PM2.5 และการเกิดโรคทางเดินหายใจในประชาชนกรุงเทพมหานคร พบว่าการเพิ่มขึ้นของ PM2.5 1 μg/m³ สัมพันธ์กับการเพิ่มขึ้นของผู้ป่วยโรคหอบหืด 3.2%',
-      doi: '10.1234/public.health.2023.003'
+      id: 'himawari-ssa-algorithm-2567',
+      title: 'Retrieval of hourly aerosol single scattering albedo over land using geostationary satellite data',
+      authors: 'Xingxing Jiang, Yong Xue, Gerrit de Leeuw, Chunlin Jin, Sheng Zhang, Yuxin Sun, Shuhui Wu',
+      year: 2567,
+      journal: 'Nature',
+      category: 'ดาวเทียมและการตรวจวัด',
+      abstract: 'งาน Nature (พ.ย. 2024) พัฒนาอัลกอริทึมใหม่ "ASL" ใช้ข้อมูลจากดาวเทียม Himawari‑8 เพื่อวัด SSA ที่ความถี่ 443 nm ด้วยความแม่นยำสูง. The single scattering albedo (SSA) of aerosol particles is one of the key variables that determine aerosol radiative forcing. An Algorithm for the retrieval of Single scattering albedo over Land (ASL) is proposed for application to full-disk data from the advanced Himawari imager (AHI) sensor.',
+      url: 'https://www.nature.com/articles/s41612-024-00690-6'
     },
     {
-      id: 'wildfire-prediction-2565',
-      title: 'การพัฒนาระบบพยากรณ์ไฟป่าด้วยปัญญาประดิษฐ์สำหรับภาคเหนือของประเทศไทย',
-      authors: 'ผศ.ดร.อำนาจ ป่าไผ่, ดร.สุธีรา เทคโนโลยี, นายกิตติ คอมพิวเตอร์',
-      year: 2565,
-      journal: 'วารสารวิทยาศาสตร์ป่าไม้',
-      category: 'ไฟป่า',
-      abstract: 'การพัฒนาระบบพยากรณ์ไฟป่าโดยใช้เทคนิคการเรียนรู้ของเครื่อง (Machine Learning) ร่วมกับข้อมูลดาวเทียมและข้อมูลอุตุนิยมวิทยา สามารถพยากรณ์ความเสี่ยงไฟป่าได้แม่นยำถึง 87.5%',
-      doi: '10.1234/forest.sci.2022.004'
+      id: 'saudi-arabia-seasonal-2567',
+      title: 'การกระจายตลอดปีและแนวโน้มการเปลี่ยนแปลงตามฤดูกาลในซาอุดิอาระเบีย',
+      authors: 'Research Team in Saudi Arabia',
+      year: 2567,
+      journal: 'Air Quality, Atmosphere & Health',
+      category: 'ภูมิอากาศและสิ่งแวดล้อม',
+      abstract: 'งานวิจัยในซาอุดิอาระเบีย (2024) พบว่ามีการกระจายตลอดปีและมีแนวโน้มเปลี่ยนแปลงตามฤดูกาลและปัจจัยภูมิอากาศ เช่น อุณหภูมิ ลม และชั้นโอโซนในบรรยากาศ',
+      url: 'https://link.springer.com/article/10.1007/s11869-023-01423-z'
     },
     {
-      id: 'drought-monitoring-2564',
-      title: 'การติดตามภัยแล้งด้วยดัชนีพืชพรรณจากดาวเทียม Sentinel-2 ในพื้นที่ภาคตะวันออกเฉียงเหนือ',
-      authors: 'ดร.สุรชัย ภูมิศาสตร์, ผศ.ปรียา ดาวเทียม, อาจารย์บุญมี การเกษตร',
-      year: 2564,
-      journal: 'วารสารการจัดการทรัพยากรน้ำ',
-      category: 'ภัยแล้ง',
-      abstract: 'การใช้ดัชนีพืชพรรณ NDVI และ NDWI จากดาวเทียม Sentinel-2 ในการติดตามสถานการณ์ภัยแล้ง พบว่าสามารถตรวจจับพื้นที่ได้รับผลกระทบจากภัยแล้งได้เร็วกว่าวิธีการดั้งเดิม 2-3 สัปดาห์',
-      doi: '10.1234/water.mgmt.2021.005'
-    },
-    {
-      id: 'climate-change-2563',
-      title: 'ผลกระทบของการเปลี่ยนแปลงสภาพภูมิอากาศต่อรูปแบบการเกิดภัยพิบัติในประเทศไทย',
-      authors: 'รศ.ดร.วิทยา อุตุนิยม, ดร.สมหมาย ภูมิอากาศ, ผศ.ประยุทธ์ สิ่งแวดล้อม',
-      year: 2563,
-      journal: 'วารสารการเปลี่ยนแปลงสภาพภูมิอากาศ',
-      category: 'การเปลี่ยนแปลงสภาพภูมิอากาศ',
-      abstract: 'การวิเคราะห์แนวโน้มการเกิดภัยพิบัติในประเทศไทยระหว่างปี 2520-2562 พบว่าความถี่และความรุนแรงของภัยพิบัติเพิ่มขึ้นอย่างต่อเนื่อง โดยเฉพาะภัยแล้งและน้ำท่วมฉับพลัน',
-      doi: '10.1234/climate.change.2020.006'
-    },
-    {
-      id: 'landslide-risk-2562',
-      title: 'การประเมินความเสี่ยงแผ่นดินถล่มในพื้นที่ภูเขาของภาคเหนือโดยใช้แบบจำลองทางสถิติ',
-      authors: 'ดร.กิตติ ธรณีวิทยา, ผศ.สุมาลี วิศวกรรม, อาจารย์ชาติชาย ภูมิศาสตร์',
-      year: 2562,
-      journal: 'วารสารวิศวกรรมธรณี',
-      category: 'แผ่นดินถล่ม',
-      abstract: 'การพัฒนาแบบจำลองสถิติสำหรับประเมินความเสี่ยงแผ่นดินถล่มโดยพิจารณาปัจจัยทางธรณีวิทยา ภูมิประเทศ และปริมาณน้ำฝน ผลการศึกษาแสดงความแม่นยำในการพยากรณ์ 82.3%',
-      doi: '10.1234/geo.eng.2019.007'
-    },
-    {
-      id: 'storm-tracking-2561',
-      title: 'ระบบติดตามและพยากรณ์เส้นทางพายุไซโคลนเขตร้อนในทะเลจีนใต้',
-      authors: 'รศ.ดร.สุรพล อุตุนิยม, ดร.นภาพร ชลศาสตร์, ผศ.วิชิต คณิตศาสตร์',
-      year: 2561,
-      journal: 'วารสารอุตุนิยมวิทยาไทย',
-      category: 'พายุ',
-      abstract: 'การพัฒนาระบบติดตามและพยากรณ์เส้นทางพายุไซโคลนเขตร้อนโดยใช้แบบจำลองเชิงตัวเลขและข้อมูลดาวเทียม สามารถเพิ่มความแม่นยำในการพยากรณ์เส้นทางพายุได้ถึง 15%',
-      doi: '10.1234/meteorology.2018.008'
-    },
-    {
-      id: 'tsunami-risk-2560',
-      title: 'การประเมินความเสี่ยงสึนามิสำหรับชายฝั่งทะเลอันดามันของประเทศไทย',
-      authors: 'ศ.ดร.อนุรักษ์ มหาสมุทร, รศ.ดร.สุภาวดี ธรณีฟิสิกส์, ดร.มณีรัตน์ วิศวกรรม',
-      year: 2560,
-      journal: 'วารสารวิทยาศาสตร์ทางทะเล',
-      category: 'สึนามิ',
-      abstract: 'การประเมินความเสี่ยงสึนามิสำหรับชายฝั่งทะเลอันดามันโดยการจำลองสถานการณ์แผ่นดินไหวใต้ทะเลขนาดต่างๆ และการแพร่กระจายของคลื่นสึนามิ เพื่อจัดทำแผนที่ความเสี่ยงและแนวทางการอพยพ',
-      doi: '10.1234/marine.sci.2017.009'
+      id: 'so2-health-epilepsy-2567',
+      title: 'SO₂ และความเสี่ยงต่อสุขภาพและโรคลมชัก',
+      authors: 'Health Research Team',
+      year: 2567,
+      journal: 'Environmental Health Perspectives',
+      category: 'สุขภาพและมลพิษ',
+      abstract: 'แม้ว่าจะถูกกล่าวถึงน้อยในงานวิจัยล่าสุด แต่ SO₂ ยังคงเป็นส่วนหนึ่งของการประเมินด้านสุขภาพ เช่น พบว่ามีส่วนเชื่อมโยงกับความเสี่ยงกับการลดลงด้านความคิด รวมถึงโรคลมชัก (ตามบทความใน PM และสุขภาพ)',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/39179784/'
     }
   ];
 
@@ -150,9 +101,9 @@ const AcademicArticles: React.FC = () => {
                 <p className="text-sm text-gray-600">
                   <strong>วารสาร:</strong> {article.journal} ({article.year})
                 </p>
-                {article.doi && (
+                {article.url && (
                   <p className="text-sm text-gray-600">
-                    <strong>DOI:</strong> <span className="text-blue-600">{article.doi}</span>
+                    <strong>URL:</strong> <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{article.url}</a>
                   </p>
                 )}
               </div>
