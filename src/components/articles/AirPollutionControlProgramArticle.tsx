@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +31,7 @@ const AirPollutionControlProgramArticle: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-4">Execution effects of the Air Pollution Control Program (2020-2023)</h2>
             
             <p className="text-gray-700 leading-relaxed mb-6">
-              The statistics data shows that the percentage of days with Air Quality Index (AQI) ≦ 100 (moderate to good air quality) exceeded 93% in 2023 after factoring out the effects of dust storms, and even the number of days with AQI >150 (Unhealthy and Hazardous categories) is 0.5%.
+              The statistics data shows that the percentage of days with Air Quality Index (AQI) ≤ 100 (moderate to good air quality) exceeded 93% in 2023 after factoring out the effects of dust storms, and even the number of days with AQI {'>'}150 (Unhealthy and Hazardous categories) is 0.5%.
             </p>
 
             <p className="text-gray-700 leading-relaxed mb-6">
@@ -96,7 +97,7 @@ const AirPollutionControlProgramArticle: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-4">Air quality management measures - Air Pollution Control Program (2024-2027)</h2>
             
             <p className="text-gray-700 leading-relaxed mb-6">
-              The "Air Pollution Control Program (2024-2027)" (referred to as the phase 2 program) continues the efforts of the Air Pollution Control Program (2020-2023) (referred to as the phase 1 program) to further improve PM2.5 and O3-8hr air quality. The phase 2 program focuses on precise management of regional and seasonal air quality issues while aligning with the 2050 net-zero policy to enhance co-benefits in pollution and carbon reduction. The phase 2 program aims to improve the national annual average concentration of PM2.5 to 13.0 μg/m³ by 2027 and to decrease the number of AQI>150 O3-8hr station-days by 80% compared to the baseline year 2019.
+              The "Air Pollution Control Program (2024-2027)" (referred to as the phase 2 program) continues the efforts of the Air Pollution Control Program (2020-2023) (referred to as the phase 1 program) to further improve PM2.5 and O3-8hr air quality. The phase 2 program focuses on precise management of regional and seasonal air quality issues while aligning with the 2050 net-zero policy to enhance co-benefits in pollution and carbon reduction. The phase 2 program aims to improve the national annual average concentration of PM2.5 to 13.0 μg/m³ by 2027 and to decrease the number of AQI{'>'}150 O3-8hr station-days by 80% compared to the baseline year 2019.
             </p>
 
             <h3 className="text-xl font-semibold mb-4">The phase 2 program outlines eight key aspects of the control strategies, as follows:</h3>
@@ -164,7 +165,7 @@ const AirPollutionControlProgramArticle: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-4">ผลการดำเนินงานของโครงการควบคุมมลพิษอากาศ (พ.ศ. 2563-2566)</h2>
             
             <p className="text-gray-700 leading-relaxed mb-6">
-              ข้อมูลสถิติแสดงให้เห็นว่าเปอร์เซ็นต์ของวันที่ดัชนีคุณภาพอากาศ (AQI) ≦ 100 (คุณภาพอากาศปานกลางถึงดี) เกิน 93% ในปี 2566 หลังจากหักผลกระทบจากพายุฝุ่น และจำนวนวันที่ AQI >150 (ประเภทที่ไม่ดีต่อสุขภาพและเป็นอันตราย) คือ 0.5%
+              ข้อมูลสถิติแสดงให้เห็นว่าเปอร์เซ็นต์ของวันที่ดัชนีคุณภาพอากาศ (AQI) ≤ 100 (คุณภาพอากาศปานกลางถึงดี) เกิน 93% ในปี 2566 หลังจากหักผลกระทบจากพายุฝุ่น และจำนวนวันที่ AQI {'>'}150 (ประเภทที่ไม่ดีต่อสุขภาพและเป็นอันตราย) คือ 0.5%
             </p>
 
             <p className="text-gray-700 leading-relaxed mb-6">
@@ -230,7 +231,7 @@ const AirPollutionControlProgramArticle: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-4">มาตรการจัดการคุณภาพอากาศ - โครงการควบคุมมลพิษทางอากาศ (พ.ศ. 2567-2570)</h2>
             
             <p className="text-gray-700 leading-relaxed mb-6">
-              "โครงการควบคุมมลพิษทางอากาศ (พ.ศ. 2567-2570)" (เรียกว่าโครงการระยะที่ 2) ยังคงสานต่อความพยายามของโครงการควบคุมมลพิษทางอากาศ (พ.ศ. 2563-2566) (เรียกว่าโครงการระยะที่ 1) เพื่อปรับปรุงคุณภาพอากาศ PM2.5 และ O3-8hr ให้ดียิ่งขึ้น โครงการระยะที่ 2 มุ่งเน้นไปที่การจัดการที่แม่นยำของปัญหาคุณภาพอากาศระดับภูมิภาคและตามฤดูกาล ในขณะที่สอดคล้องกับนโยบาย Net-Zero ปี 2593 เพื่อเพิ่มผลประโยชน์ร่วมในการลดมลพิษและการลดคาร์บอน โครงการระยะที่ 2 มีเป้าหมายที่จะปรับปรุงค่าเฉลี่ยรายปีของประเทศของ PM2.5 เป็น 13.0 μg/m³ ภายในปี 2570 และลดจำนวนสถานี O3-8hr ที่มี AQI>150 ลง 80% เมื่อเทียบกับปีฐาน 2562
+              "โครงการควบคุมมลพิษทางอากาศ (พ.ศ. 2567-2570)" (เรียกว่าโครงการระยะที่ 2) ยังคงสานต่อความพยายามของโครงการควบคุมมลพิษทางอากาศ (พ.ศ. 2563-2566) (เรียกว่าโครงการระยะที่ 1) เพื่อปรับปรุงคุณภาพอากาศ PM2.5 และ O3-8hr ให้ดียิ่งขึ้น โครงการระยะที่ 2 มุ่งเน้นไปที่การจัดการที่แม่นยำของปัญหาคุณภาพอากาศระดับภูมิภาคและตามฤดูกาล ในขณะที่สอดคล้องกับนโยบาย Net-Zero ปี 2593 เพื่อเพิ่มผลประโยชน์ร่วมในการลดมลพิษและการลดคาร์บอน โครงการระยะที่ 2 มีเป้าหมายที่จะปรับปรุงค่าเฉลี่ยรายปีของประเทศของ PM2.5 เป็น 13.0 μg/m³ ภายในปี 2570 และลดจำนวนสถานี O3-8hr ที่มี AQI{'>'}150 ลง 80% เมื่อเทียบกับปีฐาน 2562
             </p>
 
             <h3 className="text-xl font-semibold mb-4">โครงการระยะที่ 2 สรุปประเด็นสำคัญ 8 ประการของกลยุทธ์การควบคุมดังนี้:</h3>
