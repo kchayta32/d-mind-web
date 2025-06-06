@@ -1,11 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { DisasterAlert } from '@/components/disaster-alerts/types';
 import { useRainSensorData } from '@/components/disaster-map/useRainSensorData';
 import { useEarthquakeData } from '@/components/disaster-map/useEarthquakeData';
-import { toast } from '@/components/ui/use-toast';
 
 export const useSharedDisasterAlerts = () => {
   const [combinedAlerts, setCombinedAlerts] = useState<DisasterAlert[]>([]);
@@ -13,30 +10,6 @@ export const useSharedDisasterAlerts = () => {
   // Get data from existing sources
   const { earthquakes } = useEarthquakeData();
   const { sensors: rainSensors } = useRainSensorData();
-
-  // Fetch disaster alerts from database
-  const { data: dbAlerts = [], isLoading: isLoadingDb, error: dbError, refetch } = useQuery({
-    queryKey: ['disaster-alerts-shared'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('disaster_alerts')
-        .select('*')
-        .order('start_time', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching disaster alerts:', error);
-        toast({
-          title: "เกิดข้อผิดพลาด",
-          description: "ไม่สามารถโหลดข้อมูลการเตือนภัยได้",
-          variant: "destructive",
-        });
-        return [];
-      }
-
-      return data as DisasterAlert[];
-    },
-    refetchInterval: 60000,
-  });
 
   // Helper function to check if a date is within the last 24 hours
   const isWithinLast24Hours = (dateString: string): boolean => {
@@ -48,12 +21,6 @@ export const useSharedDisasterAlerts = () => {
 
   useEffect(() => {
     const combinedData: DisasterAlert[] = [];
-
-    // Filter database alerts to only include those from the last 24 hours
-    const recentDbAlerts = dbAlerts.filter(alert => 
-      isWithinLast24Hours(alert.start_time) && alert.is_active
-    );
-    combinedData.push(...recentDbAlerts);
 
     // Add earthquake data as alerts with proper null checks - only from last 24 hours
     earthquakes.forEach(eq => {
@@ -108,12 +75,12 @@ export const useSharedDisasterAlerts = () => {
     });
 
     setCombinedAlerts(combinedData);
-  }, [dbAlerts, earthquakes, rainSensors]);
+  }, [earthquakes, rainSensors]);
 
   return {
     alerts: combinedAlerts,
-    isLoading: isLoadingDb,
-    error: dbError,
-    refetch
+    isLoading: false,
+    error: null,
+    refetch: () => Promise.resolve()
   };
 };
