@@ -313,7 +313,7 @@ const SurveyResults: React.FC = () => {
           </div>
         </TabsContent>
 
-        {/* Features Tab */}
+        {/* Features Tab - Changed to vertical orientation */}
         <TabsContent value="features">
           <Card>
             <CardHeader>
@@ -323,14 +323,14 @@ const SurveyResults: React.FC = () => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={stats.featureRatings} layout="horizontal">
+                <BarChart data={stats.featureRatings}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" domain={[0, 5]} />
-                  <YAxis dataKey="feature" type="category" width={120} />
+                  <XAxis dataKey="feature" angle={-45} textAnchor="end" height={80} />
+                  <YAxis domain={[0, 5]} />
                   <Tooltip 
                     formatter={(value) => [`${value}/5 ดาว`, 'คะแนนเฉลี่ย']}
                   />
-                  <Bar dataKey="rating" fill="#10b981" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="rating" fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

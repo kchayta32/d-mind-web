@@ -16,6 +16,12 @@ interface FilterControlsProps {
   onPm25Change: (value: number) => void;
   wildfireTimeFilter: string;
   onWildfireTimeFilterChange: (value: string) => void;
+  droughtLayers: string[];
+  onDroughtLayersChange: (layers: string[]) => void;
+  floodTimeFilter: string;
+  onFloodTimeFilterChange: (value: string) => void;
+  showFloodFrequency: boolean;
+  onShowFloodFrequencyChange: (show: boolean) => void;
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -28,7 +34,21 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onPm25Change,
   wildfireTimeFilter,
   onWildfireTimeFilterChange,
+  droughtLayers,
+  onDroughtLayersChange,
+  floodTimeFilter,
+  onFloodTimeFilterChange,
+  showFloodFrequency,
+  onShowFloodFrequencyChange,
 }) => {
+  const handleDroughtLayerToggle = (layer: string, checked: boolean) => {
+    if (checked) {
+      onDroughtLayersChange([...droughtLayers, layer]);
+    } else {
+      onDroughtLayersChange(droughtLayers.filter(l => l !== layer));
+    }
+  };
+
   const renderFilters = () => {
     switch (selectedType) {
       case 'earthquake':
@@ -121,15 +141,33 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               <Label className="text-sm font-medium">ชั้นข้อมูลภัยแล้ง</Label>
               <div className="mt-2 space-y-2">
                 <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="dri" className="rounded" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    id="dri" 
+                    className="rounded" 
+                    checked={droughtLayers.includes('dri')}
+                    onChange={(e) => handleDroughtLayerToggle('dri', e.target.checked)}
+                  />
                   <label htmlFor="dri" className="text-xs">ดัชนีพื้นที่เสี่ยงภัยแล้ง (DRI)</label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="ndwi" className="rounded" />
+                  <input 
+                    type="checkbox" 
+                    id="ndwi" 
+                    className="rounded" 
+                    checked={droughtLayers.includes('ndwi')}
+                    onChange={(e) => handleDroughtLayerToggle('ndwi', e.target.checked)}
+                  />
                   <label htmlFor="ndwi" className="text-xs">ดัชนีความแตกต่างความชื้น (NDWI)</label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="smap" className="rounded" />
+                  <input 
+                    type="checkbox" 
+                    id="smap" 
+                    className="rounded" 
+                    checked={droughtLayers.includes('smap')}
+                    onChange={(e) => handleDroughtLayerToggle('smap', e.target.checked)}
+                  />
                   <label htmlFor="smap" className="text-xs">ความชื้นดิน (SMAP)</label>
                 </div>
               </div>
@@ -142,7 +180,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium">ช่วงเวลาข้อมูลน้ำท่วม</Label>
-              <Select defaultValue="7days">
+              <Select value={floodTimeFilter} onValueChange={onFloodTimeFilterChange}>
                 <SelectTrigger className="w-full mt-2">
                   <SelectValue />
                 </SelectTrigger>
@@ -158,12 +196,14 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               <Label className="text-sm font-medium">ข้อมูลเพิ่มเติม</Label>
               <div className="mt-2 space-y-2">
                 <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="flood-freq" className="rounded" defaultChecked />
+                  <input 
+                    type="checkbox" 
+                    id="flood-freq" 
+                    className="rounded" 
+                    checked={showFloodFrequency}
+                    onChange={(e) => onShowFloodFrequencyChange(e.target.checked)}
+                  />
                   <label htmlFor="flood-freq" className="text-xs">พื้นที่น้ำท่วมซ้ำซาก</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="water-hyacinth" className="rounded" />
-                  <label htmlFor="water-hyacinth" className="text-xs">สิ่งกีดขวางทางน้ำ</label>
                 </div>
               </div>
             </div>

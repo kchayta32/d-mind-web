@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MapView } from './MapView';
 import DisasterTypeSelector from './DisasterTypeSelector';
@@ -23,6 +24,9 @@ const DisasterMap: React.FC = () => {
   const [humidityFilter, setHumidityFilter] = useState(0);
   const [pm25Filter, setPm25Filter] = useState(0);
   const [wildfireTimeFilter, setWildfireTimeFilter] = useState('3days');
+  const [droughtLayers, setDroughtLayers] = useState(['dri']);
+  const [floodTimeFilter, setFloodTimeFilter] = useState('7days');
+  const [showFloodFrequency, setShowFloodFrequency] = useState(true);
 
   // Data hooks - now passing timeFilter for wildfire data
   const { earthquakes, stats: earthquakeStats, isLoading: isLoadingEarthquakes } = useEarthquakeData();
@@ -90,6 +94,9 @@ const DisasterMap: React.FC = () => {
             magnitudeFilter={magnitudeFilter}
             humidityFilter={humidityFilter}
             pm25Filter={pm25Filter}
+            droughtLayers={droughtLayers}
+            floodTimeFilter={floodTimeFilter}
+            showFloodFrequency={showFloodFrequency}
             isLoading={getCurrentLoading()}
           />
         </div>
@@ -107,6 +114,12 @@ const DisasterMap: React.FC = () => {
             onPm25Change={setPm25Filter}
             wildfireTimeFilter={wildfireTimeFilter}
             onWildfireTimeFilterChange={setWildfireTimeFilter}
+            droughtLayers={droughtLayers}
+            onDroughtLayersChange={setDroughtLayers}
+            floodTimeFilter={floodTimeFilter}
+            onFloodTimeFilterChange={setFloodTimeFilter}
+            showFloodFrequency={showFloodFrequency}
+            onShowFloodFrequencyChange={setShowFloodFrequency}
           />
           
           {/* Statistics Panel */}

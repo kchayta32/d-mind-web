@@ -28,6 +28,9 @@ interface MapViewProps {
   magnitudeFilter: number;
   humidityFilter: number;
   pm25Filter: number;
+  droughtLayers: string[];
+  floodTimeFilter: string;
+  showFloodFrequency: boolean;
   isLoading: boolean;
 }
 
@@ -41,6 +44,9 @@ export const MapView: React.FC<MapViewProps> = ({
   magnitudeFilter,
   humidityFilter,
   pm25Filter,
+  droughtLayers,
+  floodTimeFilter,
+  showFloodFrequency,
   isLoading 
 }) => {
   const [rainOverlayType, setRainOverlayType] = useState<'radar' | 'satellite'>('radar');
@@ -57,6 +63,9 @@ export const MapView: React.FC<MapViewProps> = ({
     airStations: airStations.length,
     rainData: rainData ? 'loaded' : 'null',
     selectedType, 
+    droughtLayers,
+    floodTimeFilter,
+    showFloodFrequency,
     isLoading 
   });
 
@@ -143,7 +152,7 @@ export const MapView: React.FC<MapViewProps> = ({
         {/* WMS layers for drought */}
         {selectedType === 'drought' && (
           <DroughtWMSLayers
-            selectedLayers={['dri']}
+            selectedLayers={droughtLayers}
             opacity={0.7}
           />
         )}
@@ -151,8 +160,8 @@ export const MapView: React.FC<MapViewProps> = ({
         {/* WMS layers for flood */}
         {selectedType === 'flood' && (
           <FloodWMSLayers
-            timeFilter="7days"
-            showFrequency={true}
+            timeFilter={floodTimeFilter as '1day' | '3days' | '7days' | '30days'}
+            showFrequency={showFloodFrequency}
             opacity={0.7}
           />
         )}
