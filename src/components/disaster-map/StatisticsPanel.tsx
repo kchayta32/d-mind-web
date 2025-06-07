@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -106,22 +105,47 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   );
 
   const renderWildfireStats = (wildfireStats: WildfireStats) => (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="text-center">
-        <div className="text-2xl font-bold text-red-600">{wildfireStats.totalHotspots}</div>
-        <div className="text-xs text-gray-600">จุดความร้อนทั้งหมด</div>
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-600">{wildfireStats.totalHotspots}</div>
+          <div className="text-xs text-gray-600">จุดความร้อนทั้งหมด</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">{wildfireStats.highConfidence}</div>
+          <div className="text-xs text-gray-600">ความเชื่อมั่นสูง</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-semibold text-blue-600">{wildfireStats.thailand.totalHotspots}</div>
+          <div className="text-xs text-gray-600">ในประเทศไทย</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-semibold text-purple-600">{wildfireStats.international.totalHotspots}</div>
+          <div className="text-xs text-gray-600">ต่างประเทศ</div>
+        </div>
       </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-orange-600">{wildfireStats.highConfidence}</div>
-        <div className="text-xs text-gray-600">ความเชื่อมั่นสูง</div>
-      </div>
-      <div className="text-center">
-        <div className="text-lg font-semibold text-blue-600">{wildfireStats.thailand.totalHotspots}</div>
-        <div className="text-xs text-gray-600">ในประเทศไทย</div>
-      </div>
-      <div className="text-center">
-        <div className="text-lg font-semibold text-purple-600">{wildfireStats.international.totalHotspots}</div>
-        <div className="text-xs text-gray-600">ต่างประเทศ</div>
+      
+      {/* Risk Assessment Summary */}
+      <div className="border-t pt-2">
+        <div className="text-xs text-gray-600 mb-1">การประเมินพื้นที่เสี่ยง:</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="text-center">
+            <div className="text-lg font-semibold text-red-600">{wildfireStats.thailand.totalRiskArea.toLocaleString()}</div>
+            <div className="text-gray-600">พื้นที่เสี่ยง (ไร่)</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-semibold text-orange-600">{wildfireStats.thailand.byRiskLevel.length > 0 ? wildfireStats.thailand.byRiskLevel[0]?.count || 0 : 0}</div>
+            <div className="text-gray-600">เสี่ยงสูงสุด</div>
+          </div>
+        </div>
+        <div className="mt-2 space-y-1">
+          {wildfireStats.thailand.byRiskLevel.slice(0, 2).map((risk, index) => (
+            <div key={index} className="flex justify-between text-xs">
+              <span>{risk.level}:</span>
+              <span className="font-semibold">{risk.count} จุด ({risk.area.toLocaleString()} ไร่)</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

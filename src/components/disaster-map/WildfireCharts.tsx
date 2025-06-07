@@ -1,207 +1,192 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { GISTDAHotspot, WildfireStats } from './useGISTDAData';
+import { AlertTriangle, TreePine, MapPin } from 'lucide-react';
+import WildfireTimeChart from './charts/WildfireTimeChart';
+import WildfireRegionChart from './charts/WildfireRegionChart';
 
 interface WildfireChartsProps {
   hotspots: GISTDAHotspot[];
   stats: WildfireStats;
 }
 
-export const WildfireCharts: React.FC<WildfireChartsProps> = ({ hotspots, stats }) => {
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return '#DC2626'; // High confidence - Red
-    if (confidence >= 60) return '#EA580C'; // Medium-high confidence - Orange
-    if (confidence >= 40) return '#EAB308'; // Medium confidence - Yellow
-    return '#65A30D'; // Low confidence - Green
-  };
+const WildfireCharts: React.FC<WildfireChartsProps> = ({ hotspots, stats }) => {
+  // Risk level chart data
+  const riskLevelData = stats.thailand.byRiskLevel.map(item => ({
+    name: item.level,
+    count: item.count,
+    area: item.area,
+    color: item.level === 'เสี่ยงมากที่สุด' ? '#7f1d1d' :
+           item.level === 'เสี่ยงสูง' ? '#dc2626' :
+           item.level === 'เสี่ยงปานกลาง' ? '#ea580c' : '#f97316'
+  }));
+
+  const RISK_COLORS = ['#7f1d1d', '#dc2626', '#ea580c', '#f97316'];
 
   return (
-    <div className="space-y-6">
-      {/* Statistics Summary */}
+    <div className="space-y-4">
+      {/* Risk Assessment Overview */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">สถิติไฟป่าโดยรวม</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            การประเมินพื้นที่เสี่ยงไฟป่า
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-red-600">{stats.totalHotspots}</div>
-              <div className="text-sm text-gray-600">จุดความร้อนทั้งหมด</div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="text-center">
+              <div className="text-xl font-bold text-red-600">{stats.thailand.totalRiskArea.toLocaleString()}</div>
+              <div className="text-xs text-gray-600">พื้นที่เสี่ยงรวม (ไร่)</div>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-orange-600">{stats.last24Hours}</div>
-              <div className="text-sm text-gray-600">24 ชั่วโมงที่ผ่านมา</div>
+            <div className="text-center">
+              <div className="text-xl font-bold text-orange-600">{stats.thailand.totalHotspots}</div>
+              <div className="text-xs text-gray-600">จุดเกิดเหตุในไทย</div>
             </div>
-            <div>
-              <div className="text-lg font-semibold text-purple-600">{stats.highConfidence}</div>
-              <div className="text-sm text-gray-600">ความเชื่อมั่นสูง</div>
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-blue-600">{stats.averageConfidence}%</div>
-              <div className="text-sm text-gray-600">ความเชื่อมั่นเฉลี่ย</div>
-            </div>
+          </div>
+          
+          {/* Risk Level Distribution */}
+          <div className="space-y-2">
+            <div className="text-xs text-gray-600 mb-2">การแจกแจงตามระดับความเสี่ยง:</div>
+            {riskLevelData.map((item, index) => (
+              <div key={index} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded" 
+                    style={{ backgroundColor: item.color }}
+                  ></div>
+                  <span>{item.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">{item.count} จุด</div>
+                  <div className="text-gray-500">{item.area.toLocaleString()} ไร่</div>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Thailand vs International Tabs */}
+      {/* Risk Level Chart */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">สถิติแยกตามภูมิภาค</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <TreePine className="h-4 w-4 text-green-500" />
+            สัดส่วนระดับความเสี่ยง
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="thailand" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="thailand">ประเทศไทย</TabsTrigger>
-              <TabsTrigger value="international">ต่างประเทศ</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="thailand" className="space-y-4">
-              <div className="grid grid-cols-3 gap-4 text-center mb-4">
-                <div>
-                  <div className="text-xl font-bold text-green-600">{stats.thailand.totalHotspots}</div>
-                  <div className="text-sm text-gray-600">จุดความร้อน</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-blue-600">{stats.thailand.averageConfidence}%</div>
-                  <div className="text-sm text-gray-600">ความเชื่อมั่นเฉลี่ย</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-purple-600">{stats.thailand.byProvince.length}</div>
-                  <div className="text-sm text-gray-600">จังหวัดที่พบ</div>
-                </div>
-              </div>
-              
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.thailand.byProvince.slice(0, 8)}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={100}
-                    interval={0}
-                    fontSize={10}
-                  />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value: number) => [value, 'จุดความร้อน']}
-                    labelFormatter={(label) => `จังหวัด${label}`}
-                  />
-                  <Bar dataKey="count" name="จุดความร้อน" fill="#DC2626" />
-                </BarChart>
-              </ResponsiveContainer>
-            </TabsContent>
-            
-            <TabsContent value="international" className="space-y-4">
-              <div className="grid grid-cols-3 gap-4 text-center mb-4">
-                <div>
-                  <div className="text-xl font-bold text-red-600">{stats.international.totalHotspots}</div>
-                  <div className="text-sm text-gray-600">จุดความร้อน</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-orange-600">{stats.international.averageConfidence}%</div>
-                  <div className="text-sm text-gray-600">ความเชื่อมั่นเฉลี่ย</div>
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-blue-600">{stats.international.byCountry.length}</div>
-                  <div className="text-sm text-gray-600">ประเทศที่พบ</div>
-                </div>
-              </div>
-              
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.international.byCountry.slice(0, 6)}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={80}
-                    interval={0}
-                  />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value: number) => [value, 'จุดความร้อน']}
-                    labelFormatter={(label) => `ประเทศ ${label}`}
-                  />
-                  <Bar dataKey="count" name="จุดความร้อน" fill="#EA580C" />
-                </BarChart>
-              </ResponsiveContainer>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Confidence Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">การกระจายตามระดับความเชื่อมั่น</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart
-              data={[
-                { confidence: 'สูง (80%+)', count: hotspots.filter(h => h.CONFIDENCE >= 80).length },
-                { confidence: 'ปานกลาง-สูง (60-79%)', count: hotspots.filter(h => h.CONFIDENCE >= 60 && h.CONFIDENCE < 80).length },
-                { confidence: 'ปานกลาง (40-59%)', count: hotspots.filter(h => h.CONFIDENCE >= 40 && h.CONFIDENCE < 60).length },
-                { confidence: 'ต่ำ (<40%)', count: hotspots.filter(h => h.CONFIDENCE < 40).length }
-              ]}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="confidence" 
-                angle={-45} 
-                textAnchor="end" 
-                height={80}
-                fontSize={10}
+          <ResponsiveContainer width="100%" height={150}>
+            <PieChart>
+              <Pie
+                data={riskLevelData}
+                cx="50%"
+                cy="50%"
+                outerRadius={50}
+                fill="#8884d8"
+                dataKey="count"
+                label={({ name, percent }) => `${name.split('เสี่ยง')[1]} ${(percent * 100).toFixed(0)}%`}
+                labelLine={false}
+                fontSize={8}
+              >
+                {riskLevelData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value, name) => [`${value} จุด`, 'จำนวน']}
+                labelFormatter={(label) => `ระดับ${label}`}
               />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" name="จำนวน">
-                {[
-                  { confidence: 'สูง (80%+)', count: hotspots.filter(h => h.CONFIDENCE >= 80).length },
-                  { confidence: 'ปานกลาง-สูง (60-79%)', count: hotspots.filter(h => h.CONFIDENCE >= 60 && h.CONFIDENCE < 80).length },
-                  { confidence: 'ปานกลาง (40-59%)', count: hotspots.filter(h => h.CONFIDENCE >= 40 && h.CONFIDENCE < 60).length },
-                  { confidence: 'ต่ำ (<40%)', count: hotspots.filter(h => h.CONFIDENCE < 40).length }
-                ].map((entry, index) => {
-                  const colors = ['#DC2626', '#EA580C', '#EAB308', '#65A30D'];
-                  return <Cell key={`cell-${index}`} fill={colors[index]} />;
-                })}
-              </Bar>
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Time Distribution */}
-      {stats.timeDistribution && stats.timeDistribution.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">การกระจายตามช่วงเวลา</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={stats.timeDistribution.slice(0, 12)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="time"
-                  interval={0}
-                  fontSize={10}
-                />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value: number) => [value, 'จุดความร้อน']}
-                  labelFormatter={(label) => `เวลา ${label}`}
-                />
-                <Bar dataKey="count" name="จุดความร้อน" fill="#F59E0B" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
+      {/* Top Provinces by Risk Area */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-blue-500" />
+            จังหวัดเสี่ยงสูง
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {stats.thailand.byProvince.slice(0, 5).map((province, index) => {
+              const riskArea = hotspots
+                .filter(h => h.properties?.changwat === province.name)
+                .reduce((sum, h) => sum + (h.properties?.area_rai || 0), 0);
+              
+              return (
+                <div key={index} className="flex justify-between items-center text-xs">
+                  <span className="font-medium">{province.name}</span>
+                  <div className="text-right">
+                    <div className="text-red-600 font-semibold">{province.count} จุด</div>
+                    <div className="text-gray-500">{riskArea.toLocaleString()} ไร่</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Time Distribution Chart */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">การกระจายตามเวลา (7 วันล่าสุด)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <WildfireTimeChart hotspots={hotspots} />
+        </CardContent>
+      </Card>
+
+      {/* Regional Distribution Chart */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">การกระจายตามภูมิภาค</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <WildfireRegionChart hotspots={hotspots} />
+        </CardContent>
+      </Card>
+
+      {/* Thailand vs International Comparison */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">เปรียบเทียบในประเทศและต่างประเทศ</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="text-lg font-bold text-blue-600">{stats.thailand.totalHotspots}</div>
+              <div className="text-xs text-gray-600">ประเทศไทย</div>
+              <div className="text-xs text-blue-600 mt-1">ค่าเฉลี่ย: {stats.thailand.averageConfidence}%</div>
+            </div>
+            <div className="text-center p-3 bg-orange-50 rounded-lg">
+              <div className="text-lg font-bold text-orange-600">{stats.international.totalHotspots}</div>
+              <div className="text-xs text-gray-600">ต่างประเทศ</div>
+              <div className="text-xs text-orange-600 mt-1">ค่าเฉลี่ย: {stats.international.averageConfidence}%</div>
+            </div>
+          </div>
+          
+          {stats.international.byCountry.length > 0 && (
+            <div className="mt-4">
+              <div className="text-xs text-gray-600 mb-2">ประเทศใกล้เคียง:</div>
+              <div className="space-y-1">
+                {stats.international.byCountry.slice(0, 3).map((country, index) => (
+                  <div key={index} className="flex justify-between text-xs">
+                    <span>{country.name}</span>
+                    <span className="font-semibold">{country.count} จุด</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
