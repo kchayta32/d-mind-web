@@ -1,57 +1,63 @@
 
-import React from 'react';
-import { WMSTileLayer } from 'react-leaflet';
+import { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
+import L from 'leaflet';
 
 interface DroughtWMSLayersProps {
-  showDRI?: boolean;
-  showNDWI?: boolean;
-  showSMAP?: boolean;
+  selectedLayers: string[];
+  opacity: number;
 }
 
-const API_KEY = 'wFaHcoOyzK53pVqspkI9Mvobjm5vWzHVOwGOjzW4f2nAAvsVf8CETklHpX1peaDF';
+const DroughtWMSLayers: React.FC<DroughtWMSLayersProps> = ({ selectedLayers, opacity }) => {
+  const map = useMap();
 
-export const DroughtWMSLayers: React.FC<DroughtWMSLayersProps> = ({
-  showDRI = true,
-  showNDWI = false,
-  showSMAP = false
-}) => {
-  return (
-    <>
-      {/* Drought Risk Index (DRI) - 7 days */}
-      {showDRI && (
-        <WMSTileLayer
-          url={`https://api-gateway.gistda.or.th/api/2.0/resources/maps/dri/7days/wms?api_key=${API_KEY}`}
-          layers="6799acce8d739fff9dacee2f"
-          format="image/png"
-          transparent={true}
-          opacity={0.6}
-          attribution="GISTDA Drought Risk Index"
-        />
-      )}
+  useEffect(() => {
+    const layers: L.Layer[] = [];
 
-      {/* Normalized Difference Water Index (NDWI) - 7 days */}
-      {showNDWI && (
-        <WMSTileLayer
-          url={`https://api-gateway.gistda.or.th/api/2.0/resources/maps/ndwi/7days/wms?api_key=${API_KEY}`}
-          layers="default"
-          format="image/png"
-          transparent={true}
-          opacity={0.6}
-          attribution="GISTDA NDWI"
-        />
-      )}
+    // DRI (Drought Risk Index) Layer
+    if (selectedLayers.includes('dri')) {
+      const driLayer = L.tileLayer('https://vallaris.dragonfly.gistda.or.th/core/api/maps/1.0-beta/maps/dri_7days/wmts/{z}/{x}/{y}.png?api_key=p8MB6HQYNFiJMbBigdrXVVC6mvwuj0EkVpXNxI17eogPueG7ed3UvdUDGMvdSLPM', {
+        attribution: 'GISTDA - DRI 7 days',
+        opacity,
+        maxZoom: 18,
+      });
+      
+      driLayer.addTo(map);
+      layers.push(driLayer);
+    }
 
-      {/* Soil Moisture Active Passive (SMAP) - 7 days */}
-      {showSMAP && (
-        <WMSTileLayer
-          url={`https://api-gateway.gistda.or.th/api/2.0/resources/maps/smap/7days/wms?api_key=${API_KEY}`}
-          layers="default"
-          format="image/png"
-          transparent={true}
-          opacity={0.6}
-          attribution="NASA SMAP"
-        />
-      )}
-    </>
-  );
+    // NDWI (Normalized Difference Water Index) Layer
+    if (selectedLayers.includes('ndwi')) {
+      const ndwiLayer = L.tileLayer('https://vallaris.dragonfly.gistda.or.th/core/api/maps/1.0-beta/maps/ndwi_7days/wmts/{z}/{x}/{y}.png?api_key=p8MB6HQYNFiJMbBigdrXVVC6mvwuj0EkVpXNxI17eogPueG7ed3UvdUDGMvdSLPM', {
+        attribution: 'GISTDA - NDWI 7 days',
+        opacity,
+        maxZoom: 18,
+      });
+      
+      ndwiLayer.addTo(map);
+      layers.push(ndwiLayer);
+    }
+
+    // SMAP (Soil Moisture Active Passive) Layer
+    if (selectedLayers.includes('smap')) {
+      const smapLayer = L.tileLayer('https://vallaris.dragonfly.gistda.or.th/core/api/maps/1.0-beta/maps/smap_7days/wmts/{z}/{x}/{y}.png?api_key=p8MB6HQYNFiJMbBigdrXVVC6mvwuj0EkVpXNxI17eogPueG7ed3UvdUDGMvdSLPM', {
+        attribution: 'GISTDA - SMAP 7 days',
+        opacity,
+        maxZoom: 18,
+      });
+      
+      smapLayer.addTo(map);
+      layers.push(smapLayer);
+    }
+
+    return () => {
+      layers.forEach(layer => {
+        map.removeLayer(layer);
+      });
+    };
+  }, [map, selectedLayers, opacity]);
+
+  return null;
 };
+
+export default DroughtWMSLayers;

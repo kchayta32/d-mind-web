@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapView } from './MapView';
 import DisasterTypeSelector from './DisasterTypeSelector';
@@ -7,12 +6,14 @@ import StatisticsPanel from './StatisticsPanel';
 import WildfireCharts from './WildfireCharts';
 import AirPollutionCharts from './AirPollutionCharts';
 import DroughtCharts from './DroughtCharts';
+import FloodCharts from './FloodCharts';
 import { useEarthquakeData } from './useEarthquakeData';
 import { useRainSensorData } from './useRainSensorData';
 import { useGISTDAData } from './useGISTDAData';
 import { useAirPollutionData } from './useAirPollutionData';
 import { useRainViewerData } from './useRainViewerData';
 import { useDroughtData } from './hooks/useDroughtData';
+import { useFloodStatistics } from './hooks/useFloodData';
 
 export type DisasterType = 'earthquake' | 'heavyrain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm';
 
@@ -30,6 +31,7 @@ const DisasterMap: React.FC = () => {
   const { stations: airStations, stats: airStats, isLoading: isLoadingAir } = useAirPollutionData();
   const { rainData, isLoading: isLoadingRainViewer } = useRainViewerData();
   const { stats: droughtStats, isLoading: isLoadingDrought } = useDroughtData();
+  const { data: floodStats, isLoading: isLoadingFlood } = useFloodStatistics();
 
   // Enhanced rain stats with RainViewer data
   const enhancedRainStats = rainData ? {
@@ -50,6 +52,7 @@ const DisasterMap: React.FC = () => {
       case 'wildfire': return wildfireStats;
       case 'airpollution': return airStats;
       case 'drought': return droughtStats;
+      case 'flood': return floodStats;
       default: return null;
     }
   };
@@ -61,6 +64,7 @@ const DisasterMap: React.FC = () => {
       case 'wildfire': return isLoadingWildfire;
       case 'airpollution': return isLoadingAir;
       case 'drought': return isLoadingDrought;
+      case 'flood': return isLoadingFlood;
       default: return false;
     }
   };
@@ -132,6 +136,13 @@ const DisasterMap: React.FC = () => {
           {selectedType === 'drought' && (
             <DroughtCharts 
               stats={droughtStats}
+            />
+          )}
+
+          {/* Specific Charts for Flood */}
+          {selectedType === 'flood' && (
+            <FloodCharts 
+              stats={floodStats}
             />
           )}
         </div>

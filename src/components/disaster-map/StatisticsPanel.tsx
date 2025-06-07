@@ -197,6 +197,46 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
     </div>
   );
 
+  const renderFloodStats = (floodStats: any) => (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-blue-600">{floodStats.currentFloods?.total || 0}</div>
+          <div className="text-xs text-gray-600">พื้นที่น้ำท่วมปัจจุบัน</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-600">{floodStats.recurrentFloods?.totalAreas || 0}</div>
+          <div className="text-xs text-gray-600">พื้นที่น้ำท่วมซ้ำซาก</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-semibold text-green-600">{floodStats.historicalData?.peakYear?.year || 'N/A'}</div>
+          <div className="text-xs text-gray-600">ปีน้ำท่วมหนักสุด</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-semibold text-purple-600">{floodStats.recurrentFloods?.avgFrequency || 0}</div>
+          <div className="text-xs text-gray-600">ความถี่เฉลี่ย</div>
+        </div>
+      </div>
+      
+      {/* Historical Summary */}
+      {floodStats.historicalData && (
+        <div className="border-t pt-2">
+          <div className="text-xs text-gray-600 mb-1">สถิติย้อนหลัง (2554-2566):</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-red-600">{floodStats.historicalData.peakYear?.area?.toLocaleString() || 0}</div>
+              <div className="text-gray-600">พื้นที่สูงสุด (ไร่)</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-blue-600">{floodStats.waterObstructions?.totalHyacinthAreas || 0}</div>
+              <div className="text-gray-600">สิ่งกีดขวางทางน้ำ</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const getTitle = () => {
     switch (disasterType) {
       case 'earthquake': return 'สถิติแผ่นดินไหว';
@@ -204,6 +244,7 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
       case 'wildfire': return 'สถิติจุดความร้อน';
       case 'airpollution': return 'สถิติคุณภาพอากาศ';
       case 'drought': return 'สถิติภัยแล้ง';
+      case 'flood': return 'สถิติน้ำท่วม';
       default: return 'สถิติข้อมูล';
     }
   };
@@ -220,6 +261,8 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
         return renderAirPollutionStats(stats as AirPollutionStats);
       case 'drought':
         return renderDroughtStats(stats as DroughtStats);
+      case 'flood':
+        return renderFloodStats(stats);
       default:
         return <p className="text-sm text-gray-600">ไม่รองรับการแสดงสถิติสำหรับประเภทนี้</p>;
     }
