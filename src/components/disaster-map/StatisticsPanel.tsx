@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import {
 } from './types';
 import { WildfireStats } from './useGISTDAData';
 import { DroughtStats } from './hooks/useDroughtData';
+import { FloodStats } from './hooks/useFloodData';
 import { DisasterType } from './DisasterMap';
 
 interface StatisticsWithRainViewer extends RainSensorStats {
@@ -16,7 +18,7 @@ interface StatisticsWithRainViewer extends RainSensorStats {
 }
 
 interface StatisticsPanelProps {
-  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | null;
+  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | null;
   isLoading: boolean;
   disasterType: DisasterType;
 }
