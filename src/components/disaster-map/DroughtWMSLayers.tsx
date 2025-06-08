@@ -53,7 +53,7 @@ const DroughtWMSLayers: React.FC<DroughtWMSLayersProps> = ({ selectedLayers, opa
     // Add custom drought severity color overlay if needed
     if (selectedLayers.length > 0) {
       // Create a legend for drought colors
-      const legend = L.control({ position: 'bottomright' });
+      const legend = new L.Control({ position: 'bottomright' });
       
       legend.onAdd = function () {
         const div = L.DomUtil.create('div', 'drought-legend');
