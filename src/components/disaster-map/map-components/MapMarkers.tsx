@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { EarthquakeMarker } from '../EarthquakeMarker';
-import { RainSensorMarker } from '../RainSensorMarker';
-import { HotspotMarker } from '../HotspotMarker';
-import { AirStationMarker } from '../AirStationMarker';
+import EarthquakeMarker from '../EarthquakeMarker';
+import RainSensorMarker from '../RainSensorMarker';
+import HotspotMarker from '../HotspotMarker';
+import AirStationMarker from '../AirStationMarker';
 import { FloodDataMarker } from '../FloodDataMarker';
 import { Earthquake, RainSensor, AirPollutionData } from '../types';
 import { GISTDAHotspot } from '../useGISTDAData';
@@ -41,7 +41,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
 
       {/* Wildfire hotspot markers */}
       {selectedType === 'wildfire' && hotspots.map((hotspot) => (
-        <HotspotMarker key={`${hotspot.lat}-${hotspot.lon}-${hotspot.acq_date}`} hotspot={hotspot} />
+        <HotspotMarker key={`${hotspot.geometry?.coordinates?.[1]}-${hotspot.geometry?.coordinates?.[0]}-${hotspot.ACQ_DATE}`} hotspot={hotspot} />
       ))}
 
       {/* Air pollution station markers */}

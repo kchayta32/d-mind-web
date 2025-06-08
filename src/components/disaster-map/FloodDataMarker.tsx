@@ -50,7 +50,6 @@ export const FloodDataMarker: React.FC<FloodDataMarkerProps> = ({ floodPoint }) 
         minWidth={350}
         maxHeight={400}
         closeOnEscapeKey={true}
-        onClose={() => setIsOpen(false)}
       >
         <div className="p-2">
           <FloodTimeSeriesChart 
