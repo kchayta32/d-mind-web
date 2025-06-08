@@ -15,9 +15,13 @@ const EmergencyManual: React.FC = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const { isAuthenticated, isLoading, login, logout } = useAdminAuth();
 
+  const handleBackFromLogin = () => {
+    setShowAdminLogin(false);
+  };
+
   // Show admin login if requested and not authenticated
   if (showAdminLogin && !isAuthenticated) {
-    return <AdminLogin onLogin={login} />;
+    return <AdminLogin onLogin={login} onBack={handleBackFromLogin} />;
   }
 
   // Show admin panel if authenticated

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { Earthquake, RainSensor, AirPollutionData } from './types';
@@ -11,6 +10,7 @@ import { MapOverlays } from './MapOverlays';
 import { DebugInfo } from './DebugInfo';
 import { DisasterType } from './DisasterMap';
 import 'leaflet/dist/leaflet.css';
+import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
 
 interface MapViewProps {
   earthquakes: Earthquake[];
@@ -18,6 +18,7 @@ interface MapViewProps {
   hotspots: GISTDAHotspot[];
   airStations: AirPollutionData[];
   rainData: RainViewerData | null;
+  floodDataPoints: FloodDataPoint[];
   selectedType: DisasterType;
   magnitudeFilter: number;
   humidityFilter: number;
@@ -34,6 +35,7 @@ export const MapView: React.FC<MapViewProps> = ({
   hotspots,
   airStations,
   rainData,
+  floodDataPoints,
   selectedType,
   magnitudeFilter,
   humidityFilter,
@@ -56,6 +58,7 @@ export const MapView: React.FC<MapViewProps> = ({
     hotspots: hotspots.length,
     airStations: airStations.length,
     rainData: rainData ? 'loaded' : 'null',
+    floodDataPoints: floodDataPoints.length,
     selectedType, 
     droughtLayers,
     floodTimeFilter,
@@ -116,6 +119,7 @@ export const MapView: React.FC<MapViewProps> = ({
             filteredRainSensors={filteredRainSensors}
             hotspots={hotspots}
             filteredAirStations={filteredAirStations}
+            floodDataPoints={floodDataPoints}
           />
         )}
       </MapContainer>

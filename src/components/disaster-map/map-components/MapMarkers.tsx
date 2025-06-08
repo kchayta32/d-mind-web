@@ -1,12 +1,14 @@
 
 import React from 'react';
-import EarthquakeMarker from '../EarthquakeMarker';
-import RainSensorMarker from '../RainSensorMarker';
-import HotspotMarker from '../HotspotMarker';
-import AirStationMarker from '../AirStationMarker';
-import { DisasterType } from '../DisasterMap';
+import { EarthquakeMarker } from '../EarthquakeMarker';
+import { RainSensorMarker } from '../RainSensorMarker';
+import { HotspotMarker } from '../HotspotMarker';
+import { AirStationMarker } from '../AirStationMarker';
+import { FloodDataMarker } from '../FloodDataMarker';
 import { Earthquake, RainSensor, AirPollutionData } from '../types';
 import { GISTDAHotspot } from '../useGISTDAData';
+import { FloodDataPoint } from '../hooks/useOpenMeteoFloodData';
+import { DisasterType } from '../DisasterMap';
 
 interface MapMarkersProps {
   selectedType: DisasterType;
@@ -14,6 +16,7 @@ interface MapMarkersProps {
   filteredRainSensors: RainSensor[];
   hotspots: GISTDAHotspot[];
   filteredAirStations: AirPollutionData[];
+  floodDataPoints?: FloodDataPoint[];
 }
 
 export const MapMarkers: React.FC<MapMarkersProps> = ({
@@ -21,55 +24,35 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
   filteredEarthquakes,
   filteredRainSensors,
   hotspots,
-  filteredAirStations
+  filteredAirStations,
+  floodDataPoints = []
 }) => {
-  switch (selectedType) {
-    case 'earthquake':
-      console.log('Rendering earthquake markers:', filteredEarthquakes.length);
-      return (
-        <>
-          {filteredEarthquakes.map((earthquake) => (
-            <EarthquakeMarker key={earthquake.id} earthquake={earthquake} />
-          ))}
-        </>
-      );
-    
-    case 'heavyrain':
-      console.log('Rendering rain sensor markers:', filteredRainSensors.length);
-      return (
-        <>
-          {filteredRainSensors.map((sensor) => (
-            <RainSensorMarker key={`rain-sensor-${sensor.id}`} sensor={sensor} />
-          ))}
-        </>
-      );
-    
-    case 'wildfire':
-      console.log('Rendering hotspot markers:', hotspots.length);
-      return (
-        <>
-          {hotspots.map((hotspot, index) => (
-            <HotspotMarker key={`hotspot-${index}`} hotspot={hotspot} />
-          ))}
-        </>
-      );
+  return (
+    <>
+      {/* Earthquake markers */}
+      {selectedType === 'earthquake' && filteredEarthquakes.map((earthquake) => (
+        <EarthquakeMarker key={earthquake.id} earthquake={earthquake} />
+      ))}
 
-    case 'airpollution':
-      console.log('Rendering air station markers:', filteredAirStations.length);
-      return (
-        <>
-          {filteredAirStations.map((station) => (
-            <AirStationMarker key={`air-station-${station.id}`} station={station} />
-          ))}
-        </>
-      );
-    
-    case 'drought':
-    case 'flood':
-      // These use WMS layers only, no individual markers
-      return null;
-    
-    default:
-      return null;
-  }
+      {/* Rain sensor markers */}
+      {selectedType === 'heavyrain' && filteredRainSensors.map((sensor) => (
+        <RainSensorMarker key={sensor.id} sensor={sensor} />
+      ))}
+
+      {/* Wildfire hotspot markers */}
+      {selectedType === 'wildfire' && hotspots.map((hotspot) => (
+        <HotspotMarker key={`${hotspot.lat}-${hotspot.lon}-${hotspot.acq_date}`} hotspot={hotspot} />
+      ))}
+
+      {/* Air pollution station markers */}
+      {selectedType === 'airpollution' && filteredAirStations.map((station) => (
+        <AirStationMarker key={station.id} station={station} />
+      ))}
+
+      {/* Flood data markers */}
+      {selectedType === 'flood' && floodDataPoints.map((floodPoint, index) => (
+        <FloodDataMarker key={`flood-${index}`} floodPoint={floodPoint} />
+      ))}
+    </>
+  );
 };

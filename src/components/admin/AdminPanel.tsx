@@ -1,14 +1,29 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LogOut, FileText, Plus, Edit } from 'lucide-react';
+import ArticleManager from './ArticleManager';
 
 interface AdminPanelProps {
   onLogout: () => void;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
+  const [currentView, setCurrentView] = useState<'dashboard' | 'articles' | 'guides'>('dashboard');
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
+  };
+
+  if (currentView === 'articles') {
+    return <ArticleManager onBack={handleBackToDashboard} type="article" />;
+  }
+
+  if (currentView === 'guides') {
+    return <ArticleManager onBack={handleBackToDashboard} type="guide" />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Admin Header */}
@@ -34,11 +49,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full flex items-center gap-2 bg-green-600 hover:bg-green-700">
+            <Button 
+              className="w-full flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              onClick={() => setCurrentView('articles')}
+            >
               <Plus className="w-4 h-4" />
               เพิ่มบทความใหม่
             </Button>
-            <Button variant="outline" className="w-full flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center gap-2"
+              onClick={() => setCurrentView('articles')}
+            >
               <Edit className="w-4 h-4" />
               แก้ไขบทความที่มีอยู่
             </Button>
@@ -53,11 +75,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+            <Button 
+              className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+              onClick={() => setCurrentView('guides')}
+            >
               <Plus className="w-4 h-4" />
               เพิ่มคู่มือใหม่
             </Button>
-            <Button variant="outline" className="w-full flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center gap-2"
+              onClick={() => setCurrentView('guides')}
+            >
               <Edit className="w-4 h-4" />
               แก้ไขคู่มือที่มีอยู่
             </Button>

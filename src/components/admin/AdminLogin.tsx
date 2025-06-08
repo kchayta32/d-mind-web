@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield } from 'lucide-react';
+import { Shield, ArrowLeft } from 'lucide-react';
 
 interface AdminLoginProps {
   onLogin: (username: string, password: string) => Promise<boolean>;
+  onBack: () => void;
 }
 
-const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
+const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onBack }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +30,19 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <Shield className="w-6 h-6 text-blue-600" />
+          <div className="flex items-center justify-between mb-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={onBack}
+              className="text-blue-600 hover:bg-blue-100"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <Shield className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="w-10" /> {/* Spacer for centering */}
           </div>
           <CardTitle className="text-xl font-bold text-blue-700">
             เข้าสู่ระบบแอดมิน

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapView } from './MapView';
 import DisasterTypeSelector from './DisasterTypeSelector';
@@ -15,6 +14,7 @@ import { useAirPollutionData } from './useAirPollutionData';
 import { useRainViewerData } from './useRainViewerData';
 import { useDroughtData } from './hooks/useDroughtData';
 import { useFloodStatistics } from './hooks/useFloodData';
+import { useOpenMeteoFloodData } from './hooks/useOpenMeteoFloodData';
 
 export type DisasterType = 'earthquake' | 'heavyrain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm';
 
@@ -28,7 +28,7 @@ const DisasterMap: React.FC = () => {
   const [floodTimeFilter, setFloodTimeFilter] = useState('7days');
   const [showFloodFrequency, setShowFloodFrequency] = useState(true);
 
-  // Data hooks - now passing timeFilter for wildfire data
+  // Data hooks - now including Open-Meteo flood data
   const { earthquakes, stats: earthquakeStats, isLoading: isLoadingEarthquakes } = useEarthquakeData();
   const { sensors: rainSensors, stats: rainStats, isLoading: isLoadingRain } = useRainSensorData();
   const { hotspots, stats: wildfireStats, isLoading: isLoadingWildfire } = useGISTDAData(wildfireTimeFilter as any);
@@ -36,6 +36,7 @@ const DisasterMap: React.FC = () => {
   const { rainData, isLoading: isLoadingRainViewer } = useRainViewerData();
   const { stats: droughtStats, isLoading: isLoadingDrought } = useDroughtData();
   const { data: floodStats, isLoading: isLoadingFlood } = useFloodStatistics();
+  const { data: floodDataPoints, isLoading: isLoadingOpenMeteoFlood } = useOpenMeteoFloodData();
 
   // Enhanced rain stats with RainViewer data
   const enhancedRainStats = rainData ? {
@@ -68,7 +69,7 @@ const DisasterMap: React.FC = () => {
       case 'wildfire': return isLoadingWildfire;
       case 'airpollution': return isLoadingAir;
       case 'drought': return isLoadingDrought;
-      case 'flood': return isLoadingFlood;
+      case 'flood': return isLoadingFlood || isLoadingOpenMeteoFlood;
       default: return false;
     }
   };
@@ -90,6 +91,7 @@ const DisasterMap: React.FC = () => {
             hotspots={hotspots}
             airStations={airStations}
             rainData={rainData}
+            floodDataPoints={floodDataPoints || []}
             selectedType={selectedType}
             magnitudeFilter={magnitudeFilter}
             humidityFilter={humidityFilter}
