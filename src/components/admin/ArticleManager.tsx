@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Plus, Edit, Save, X } from 'lucide-react';
+import RichTextEditor from './RichTextEditor';
+import ImageUpload from './ImageUpload';
 
 interface Article {
   id: string;
@@ -30,7 +31,7 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
       subtitle: 'จาก ระบบจัดการแอดมิน',
       description: 'นี่คือตัวอย่างบทความสำหรับการทดสอบระบบ',
       image: '/lovable-uploads/70e87fa1-9284-4474-bda5-04c19250a4d5.png',
-      content: 'เนื้อหาตัวอย่าง...',
+      content: '<h2>ตัวอย่างเนื้อหา</h2><p>นี่คือตัวอย่างเนื้อหาที่สามารถจัดรูปแบบได้ด้วย <strong>HTML</strong></p><ul><li>รายการที่ 1</li><li>รายการที่ 2</li></ul>',
       created_at: new Date().toISOString()
     }
   ]);
@@ -143,7 +144,7 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
               {editingArticle?.id.startsWith('new-') ? `เพิ่ม${typeLabel}ใหม่` : `แก้ไข${typeLabel}`}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div>
               <Label htmlFor="title">ชื่อเรื่อง</Label>
               <Input
@@ -153,6 +154,7 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
                 placeholder={`ระบุชื่อ${typeLabel}`}
               />
             </div>
+            
             <div>
               <Label htmlFor="subtitle">คำบรรยาย</Label>
               <Input
@@ -162,35 +164,34 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
                 placeholder="แหล่งที่มาหรือคำบรรยายย่อ"
               />
             </div>
+            
             <div>
               <Label htmlFor="description">รายละเอียดสั้น</Label>
-              <Textarea
+              <Input
                 id="description"
                 value={editingArticle?.description || ''}
                 onChange={(e) => setEditingArticle(prev => prev ? {...prev, description: e.target.value} : null)}
                 placeholder="รายละเอียดสั้นๆ ที่จะแสดงในรายการ"
-                rows={3}
               />
             </div>
-            <div>
-              <Label htmlFor="image">URL รูปภาพ</Label>
-              <Input
-                id="image"
-                value={editingArticle?.image || ''}
-                onChange={(e) => setEditingArticle(prev => prev ? {...prev, image: e.target.value} : null)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+            
+            <ImageUpload
+              value={editingArticle?.image || ''}
+              onChange={(url) => setEditingArticle(prev => prev ? {...prev, image: url} : null)}
+              label={`รูปภาพ${typeLabel}`}
+            />
+            
             <div>
               <Label htmlFor="content">เนื้อหา</Label>
-              <Textarea
-                id="content"
-                value={editingArticle?.content || ''}
-                onChange={(e) => setEditingArticle(prev => prev ? {...prev, content: e.target.value} : null)}
-                placeholder={`เนื้อหาของ${typeLabel}`}
-                rows={10}
-              />
+              <div className="mt-2">
+                <RichTextEditor
+                  value={editingArticle?.content || ''}
+                  onChange={(content) => setEditingArticle(prev => prev ? {...prev, content} : null)}
+                  placeholder={`เขียนเนื้อหาของ${typeLabel}ที่นี่...`}
+                />
+              </div>
             </div>
+            
             <div className="flex gap-2">
               <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
                 <Save className="w-4 h-4 mr-2" />

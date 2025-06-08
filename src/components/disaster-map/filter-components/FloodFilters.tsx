@@ -19,7 +19,7 @@ export const FloodFilters: React.FC<FloodFiltersProps> = ({
   return (
     <div className="space-y-4">
       <div>
-        <Label className="text-sm font-medium">ช่วงเวลาข้อมูลน้ำท่วม</Label>
+        <Label className="text-sm font-medium">ช่วงเวลาข้อมูลน้ำท่วม (GISTDA)</Label>
         <Select value={floodTimeFilter} onValueChange={onFloodTimeFilterChange}>
           <SelectTrigger className="w-full mt-2">
             <SelectValue />
@@ -32,6 +32,7 @@ export const FloodFilters: React.FC<FloodFiltersProps> = ({
           </SelectContent>
         </Select>
       </div>
+      
       <div>
         <Label className="text-sm font-medium">ข้อมูลเพิ่มเติม</Label>
         <div className="mt-2 space-y-2">
@@ -43,7 +44,10 @@ export const FloodFilters: React.FC<FloodFiltersProps> = ({
               checked={showFloodFrequency}
               onChange={(e) => onShowFloodFrequencyChange(e.target.checked)}
             />
-            <label htmlFor="flood-freq" className="text-xs">พื้นที่น้ำท่วมซ้ำซาก</label>
+            <label htmlFor="flood-freq" className="text-xs">พื้นที่น้ำท่วมซ้ำซาก (GISTDA)</label>
+          </div>
+          <div className="text-xs text-gray-600 mt-2 p-2 bg-blue-50 rounded">
+            <strong>Open-Meteo:</strong> ข้อมูลการไหลแม่น้ำจาก GloFAS แสดงบนจุดแม่น้ำหลัก
           </div>
         </div>
       </div>
