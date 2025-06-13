@@ -16,6 +16,7 @@ import { useDroughtData } from './hooks/useDroughtData';
 import { useFloodStatistics } from './hooks/useFloodData';
 import { useOpenMeteoFloodData } from './hooks/useOpenMeteoFloodData';
 import { useOpenMeteoRainData } from './hooks/useOpenMeteoRainData';
+import { OpenMeteoRainStats } from './types';
 
 export type DisasterType = 'earthquake' | 'heavyrain' | 'openmeteorain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm';
 
@@ -53,17 +54,20 @@ const DisasterMap: React.FC = () => {
   } : rainStats;
 
   // Get current stats and loading state
-  const getCurrentStats = () => {
+  const getCurrentStats = (): EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | null => {
     switch (selectedType) {
       case 'earthquake': return earthquakeStats;
       case 'heavyrain': return enhancedRainStats;
-      case 'openmeteorain': return {
-        totalStations: openMeteoRainData?.length || 0,
-        activeRainStations: openMeteoRainData?.filter(d => d.weatherData.current.rain > 0).length || 0,
-        maxRainfall: Math.max(...(openMeteoRainData?.map(d => d.weatherData.current.rain) || [0])),
-        avgTemperature: openMeteoRainData?.reduce((sum, d) => sum + d.weatherData.current.temperature2m, 0) / (openMeteoRainData?.length || 1) || 0,
-        lastUpdated: openMeteoRainData?.[0]?.weatherData.current.time.toISOString() || new Date().toISOString()
-      };
+      case 'openmeteorain': {
+        const openMeteoStats: OpenMeteoRainStats = {
+          totalStations: openMeteoRainData?.length || 0,
+          activeRainStations: openMeteoRainData?.filter(d => d.weatherData.current.rain > 0).length || 0,
+          maxRainfall: Math.max(...(openMeteoRainData?.map(d => d.weatherData.current.rain) || [0])),
+          avgTemperature: openMeteoRainData?.reduce((sum, d) => sum + d.weatherData.current.temperature2m, 0) / (openMeteoRainData?.length || 1) || 0,
+          lastUpdated: openMeteoRainData?.[0]?.weatherData.current.time.toISOString() || new Date().toISOString()
+        };
+        return openMeteoStats;
+      }
       case 'wildfire': return wildfireStats;
       case 'airpollution': return airStats;
       case 'drought': return droughtStats;

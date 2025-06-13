@@ -1,4 +1,3 @@
-
 export interface Earthquake {
   id: string;
   magnitude: number;
@@ -78,4 +77,12 @@ export interface AirPollutionStats {
   maxPM25: number;
   unhealthyStations: number;
   last24Hours: number;
+}
+
+export interface OpenMeteoRainStats {
+  totalStations: number;
+  activeRainStations: number;
+  maxRainfall: number;
+  avgTemperature: number;
+  lastUpdated: string;
 }

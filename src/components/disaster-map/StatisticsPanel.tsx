@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +5,8 @@ import {
   EarthquakeStats, 
   RainSensorStats, 
   AirPollutionStats,
-  RainViewerStats 
+  RainViewerStats,
+  OpenMeteoRainStats
 } from './types';
 import { WildfireStats } from './useGISTDAData';
 import { DroughtStats } from './hooks/useDroughtData';
@@ -18,7 +18,7 @@ interface StatisticsWithRainViewer extends RainSensorStats {
 }
 
 interface StatisticsPanelProps {
-  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | null;
+  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | null;
   isLoading: boolean;
   disasterType: DisasterType;
 }
@@ -239,10 +239,32 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
     </div>
   );
 
+  const renderOpenMeteoRainStats = (openMeteoStats: OpenMeteoRainStats) => (
+    <div className="grid grid-cols-2 gap-4">
+      <div className="text-center">
+        <div className="text-2xl font-bold text-blue-600">{openMeteoStats.totalStations}</div>
+        <div className="text-xs text-gray-600">สถานีทั้งหมด</div>
+      </div>
+      <div className="text-center">
+        <div className="text-2xl font-bold text-green-600">{openMeteoStats.activeRainStations}</div>
+        <div className="text-xs text-gray-600">กำลังตกฝน</div>
+      </div>
+      <div className="text-center">
+        <div className="text-lg font-semibold text-purple-600">{openMeteoStats.maxRainfall.toFixed(1)} mm</div>
+        <div className="text-xs text-gray-600">ฝนสูงสุด</div>
+      </div>
+      <div className="text-center">
+        <div className="text-lg font-semibold text-orange-600">{openMeteoStats.avgTemperature.toFixed(1)}°C</div>
+        <div className="text-xs text-gray-600">อุณหภูมิเฉลี่ย</div>
+      </div>
+    </div>
+  );
+
   const getTitle = () => {
     switch (disasterType) {
       case 'earthquake': return 'สถิติแผ่นดินไหว';
       case 'heavyrain': return 'สถิติเซ็นเซอร์ฝน';
+      case 'openmeteorain': return 'สถิติข้อมูลฝน Open-Meteo';
       case 'wildfire': return 'สถิติจุดความร้อน';
       case 'airpollution': return 'สถิติคุณภาพอากาศ';
       case 'drought': return 'สถิติภัยแล้ง';
@@ -257,6 +279,8 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
         return renderEarthquakeStats(stats as EarthquakeStats);
       case 'heavyrain':
         return renderRainSensorStats(stats as StatisticsWithRainViewer);
+      case 'openmeteorain':
+        return renderOpenMeteoRainStats(stats as OpenMeteoRainStats);
       case 'wildfire':
         return renderWildfireStats(stats as WildfireStats);
       case 'airpollution':
