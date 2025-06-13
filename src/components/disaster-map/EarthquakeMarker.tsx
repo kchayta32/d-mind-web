@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { Earthquake } from './types';
@@ -44,25 +44,32 @@ const createEarthquakeIcon = (magnitude: number) => {
         font-size: ${Math.max(8, size * 0.4)}px;
         text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         position: relative;
-        animation: pulse 2s infinite;
+        transition: all 0.3s ease;
+        transform-origin: center;
       ">
         ${magnitude.toFixed(1)}
       </div>
-      <style>
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-      </style>
     `,
-    className: 'earthquake-marker',
+    className: 'earthquake-marker smooth-marker',
     iconSize: [size + 8, size + 8],
     iconAnchor: [size/2 + 4, size/2 + 4]
   });
 };
 
 const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
+  // Memoize the icon to prevent recreation on every render
+  const earthquakeIcon = useMemo(() => 
+    createEarthquakeIcon(earthquake.magnitude), 
+    [earthquake.magnitude]
+  );
+
+  // Memoize position to prevent unnecessary updates
+  const position = useMemo(() => {
+    const lat = earthquake.latitude || earthquake.lat;
+    const lng = earthquake.longitude || earthquake.lng;
+    return [lat, lng] as [number, number];
+  }, [earthquake.latitude, earthquake.longitude, earthquake.lat, earthquake.lng]);
+
   const getMagnitudeDescription = (magnitude: number) => {
     if (magnitude < 3.0) return 'แผ่นดินไหวเล็กน้อย';
     if (magnitude < 4.0) return 'แผ่นดินไหวเล็ก';
@@ -87,20 +94,16 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
     }
   };
 
-  // Use latitude/longitude from the earthquake object
-  const lat = earthquake.latitude || earthquake.lat;
-  const lng = earthquake.longitude || earthquake.lng;
-
   return (
     <Marker
-      position={[lat, lng]}
-      icon={createEarthquakeIcon(earthquake.magnitude)}
+      position={position}
+      icon={earthquakeIcon}
     >
-      <Popup className="earthquake-popup">
+      <Popup className="earthquake-popup" closeOnEscapeKey={true} maxWidth={300}>
         <div className="p-2 min-w-64">
           <div className="flex items-center gap-2 mb-3">
             <div 
-              className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold transition-all duration-300"
               style={{ 
                 background: `radial-gradient(circle, ${
                   earthquake.magnitude >= 7.0 ? '#dc2626' :
@@ -130,7 +133,7 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
             
             <div>
               <span className="font-semibold text-gray-600">ระดับ:</span>
-              <div className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ml-1 ${
+              <div className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ml-1 transition-all duration-300 ${
                 earthquake.magnitude >= 6.0 ? 'bg-red-500' :
                 earthquake.magnitude >= 5.0 ? 'bg-orange-500' :
                 earthquake.magnitude >= 4.0 ? 'bg-yellow-500' : 'bg-green-500'
@@ -141,7 +144,7 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
             
             <div>
               <span className="font-semibold text-gray-600">ตำแหน่ง:</span>
-              <div className="text-gray-700">{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</div>
+              <div className="text-gray-700">{position[0].toFixed(4)}°N, {position[1].toFixed(4)}°E</div>
             </div>
             
             <div>
@@ -162,7 +165,7 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
                   href={earthquake.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-xs underline"
+                  className="text-blue-600 hover:text-blue-800 text-xs underline transition-colors duration-200"
                 >
                   ดูรายละเอียดเพิ่มเติม →
                 </a>
