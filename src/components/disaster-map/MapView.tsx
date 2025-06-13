@@ -11,6 +11,8 @@ import { DebugInfo } from './DebugInfo';
 import { DisasterType } from './DisasterMap';
 import 'leaflet/dist/leaflet.css';
 import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
+import { UserLocationMarker } from './UserLocationMarker';
+import { LocationControls } from './LocationControls';
 
 interface MapViewProps {
   earthquakes: Earthquake[];
@@ -51,6 +53,7 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showModisWMS, setShowModisWMS] = useState(true);
   const [showViirsWMS, setShowViirsWMS] = useState(true);
   const [showBurnScar, setShowBurnScar] = useState(false);
+  const [showUserLocation, setShowUserLocation] = useState(false);
 
   console.log('MapView props:', { 
     earthquakes: earthquakes.length, 
@@ -98,6 +101,9 @@ export const MapView: React.FC<MapViewProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
+        {/* User Location Marker */}
+        <UserLocationMarker showLocation={showUserLocation} />
+        
         <MapLayers
           selectedType={selectedType}
           droughtLayers={droughtLayers}
@@ -123,6 +129,12 @@ export const MapView: React.FC<MapViewProps> = ({
           />
         )}
       </MapContainer>
+      
+      {/* Location Controls */}
+      <LocationControls
+        showUserLocation={showUserLocation}
+        onToggleLocation={setShowUserLocation}
+      />
       
       {/* Rain controls for heavy rain type */}
       {selectedType === 'heavyrain' && (
