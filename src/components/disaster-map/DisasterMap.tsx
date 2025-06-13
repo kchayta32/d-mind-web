@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MapView } from './MapView';
 import DisasterTypeSelector from './DisasterTypeSelector';
@@ -16,9 +17,22 @@ import { useDroughtData } from './hooks/useDroughtData';
 import { useFloodStatistics } from './hooks/useFloodData';
 import { useOpenMeteoFloodData } from './hooks/useOpenMeteoFloodData';
 import { useOpenMeteoRainData } from './hooks/useOpenMeteoRainData';
-import { OpenMeteoRainStats } from './types';
+import { 
+  EarthquakeStats, 
+  RainSensorStats, 
+  AirPollutionStats,
+  RainViewerStats,
+  OpenMeteoRainStats
+} from './types';
+import { WildfireStats } from './useGISTDAData';
+import { DroughtStats } from './hooks/useDroughtData';
+import { FloodStats } from './hooks/useFloodData';
 
 export type DisasterType = 'earthquake' | 'heavyrain' | 'openmeteorain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm';
+
+interface StatisticsWithRainViewer extends RainSensorStats {
+  rainViewer?: RainViewerStats;
+}
 
 const DisasterMap: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DisasterType>('wildfire');
@@ -139,7 +153,7 @@ const DisasterMap: React.FC = () => {
             floodTimeFilter={floodTimeFilter}
             onFloodTimeFilterChange={setFloodTimeFilter}
             showFloodFrequency={showFloodFrequency}
-            onShowFloodFrequencyChange={setShowFloodFrequency}
+            onShowFloodFrequencyChange={setShowFloodFrequencyChange}
           />
           
           {/* Statistics Panel */}
