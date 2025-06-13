@@ -1,18 +1,95 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 import { FeatureChart } from './charts/FeatureChart';
 import { UsabilityChart } from './charts/UsabilityChart';
+import { SatisfactionRadarChart } from './charts/SatisfactionRadarChart';
+
+interface SurveyStats {
+  totalResponses: number;
+  averageOverallRating: number;
+  averageAIRating: number;
+  averageUIRating: number;
+  averageAlertRating: number;
+  averageMapRating: number;
+  averageEmergencyRating: number;
+  satisfactionPercentage: number;
+  recommendationPercentage: number;
+}
 
 const SurveyResults: React.FC = () => {
-  // Mock data - replace with real data from your survey system
-  const featureScores = [
-    { feature: 'แผนที่ภัยพิบัติ', score: 4.2 },
-    { feature: 'แจ้งเตือนภัย', score: 4.0 },
-    { feature: 'คู่มือฉุกเฉิน', score: 3.8 },
-    { feature: 'รายงานเหตุการณ์', score: 3.5 },
-    { feature: 'ผู้ช่วย AI', score: 4.1 },
-  ];
+  const [stats, setStats] = useState<SurveyStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSurveyData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('satisfaction_surveys')
+          .select('*');
+
+        if (error) {
+          console.error('Error fetching survey data:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          // Calculate statistics
+          const totalResponses = data.length;
+          const averageOverallRating = data.reduce((sum, item) => sum + (item.overall_rating || 0), 0) / totalResponses;
+          const averageAIRating = data.filter(item => item.ai_assistant_rating).reduce((sum, item) => sum + (item.ai_assistant_rating || 0), 0) / data.filter(item => item.ai_assistant_rating).length || 0;
+          const averageUIRating = data.filter(item => item.user_interface_rating).reduce((sum, item) => sum + (item.user_interface_rating || 0), 0) / data.filter(item => item.user_interface_rating).length || 0;
+          const averageAlertRating = data.filter(item => item.alert_system_rating).reduce((sum, item) => sum + (item.alert_system_rating || 0), 0) / data.filter(item => item.alert_system_rating).length || 0;
+          const averageMapRating = data.filter(item => item.map_visualization_rating).reduce((sum, item) => sum + (item.map_visualization_rating || 0), 0) / data.filter(item => item.map_visualization_rating).length || 0;
+          const averageEmergencyRating = data.filter(item => item.emergency_info_rating).reduce((sum, item) => sum + (item.emergency_info_rating || 0), 0) / data.filter(item => item.emergency_info_rating).length || 0;
+          
+          // Calculate satisfaction percentage (ratings 4-5 out of 5)
+          const satisfiedCount = data.filter(item => (item.overall_rating || 0) >= 4).length;
+          const satisfactionPercentage = Math.round((satisfiedCount / totalResponses) * 100);
+          
+          // Calculate recommendation percentage (would_recommend 4-5 out of 5)
+          const recommendCount = data.filter(item => (item.would_recommend || 0) >= 4).length;
+          const recommendationPercentage = Math.round((recommendCount / totalResponses) * 100);
+
+          setStats({
+            totalResponses,
+            averageOverallRating: Math.round(averageOverallRating * 10) / 10,
+            averageAIRating: Math.round(averageAIRating * 10) / 10,
+            averageUIRating: Math.round(averageUIRating * 10) / 10,
+            averageAlertRating: Math.round(averageAlertRating * 10) / 10,
+            averageMapRating: Math.round(averageMapRating * 10) / 10,
+            averageEmergencyRating: Math.round(averageEmergencyRating * 10) / 10,
+            satisfactionPercentage,
+            recommendationPercentage
+          });
+        }
+      } catch (error) {
+        console.error('Error processing survey data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSurveyData();
+  }, []);
+
+  // Prepare data for charts
+  const featureScores = stats ? [
+    { feature: 'แผนที่ภัยพิบัติ', score: stats.averageMapRating },
+    { feature: 'แจ้งเตือนภัย', score: stats.averageAlertRating },
+    { feature: 'คู่มือฉุกเฉิน', score: stats.averageEmergencyRating },
+    { feature: 'ผู้ช่วย AI', score: stats.averageAIRating },
+    { feature: 'ส่วนติดต่อผู้ใช้', score: stats.averageUIRating },
+  ].filter(item => item.score > 0) : [];
+
+  const radarData = stats ? [
+    { category: 'แผนที่ภัยพิบัติ', score: stats.averageMapRating, fullMark: 5 },
+    { category: 'แจ้งเตือนภัย', score: stats.averageAlertRating, fullMark: 5 },
+    { category: 'คู่มือฉุกเฉิน', score: stats.averageEmergencyRating, fullMark: 5 },
+    { category: 'ผู้ช่วย AI', score: stats.averageAIRating, fullMark: 5 },
+    { category: 'ส่วนติดต่อผู้ใช้', score: stats.averageUIRating, fullMark: 5 },
+  ].filter(item => item.score > 0) : [];
 
   const usabilityData = [
     { name: 'ใช้งานง่ายมาก', value: 35 },
@@ -22,8 +99,38 @@ const SurveyResults: React.FC = () => {
     { name: 'ใช้งานยากมาก', value: 5 },
   ];
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center h-40">
+              <div className="text-gray-500">กำลังโหลดข้อมูล...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Pentagon Radar Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center">ผลการประเมินความพึงพอใจแบบห้าเหลี่ยม</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {radarData.length > 0 ? (
+            <SatisfactionRadarChart data={radarData} />
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              ยังไม่มีข้อมูลการประเมิน
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>ผลการประเมินความพึงพอใจ</CardTitle>
@@ -32,7 +139,13 @@ const SurveyResults: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-medium mb-4">คะแนนประเมินฟีเจอร์ต่างๆ</h3>
-              <FeatureChart data={featureScores} />
+              {featureScores.length > 0 ? (
+                <FeatureChart data={featureScores} />
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  ยังไม่มีข้อมูลการประเมิน
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-medium mb-4">ความง่ายในการใช้งาน</h3>
@@ -49,19 +162,19 @@ const SurveyResults: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">1,245</div>
+              <div className="text-2xl font-bold text-blue-600">{stats?.totalResponses || 0}</div>
               <div className="text-sm text-gray-600">ผู้ตอบแบบสอบถาม</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">4.1</div>
+              <div className="text-2xl font-bold text-green-600">{stats?.averageOverallRating || 0}</div>
               <div className="text-sm text-gray-600">คะแนนเฉลี่ย</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">87%</div>
+              <div className="text-2xl font-bold text-purple-600">{stats?.satisfactionPercentage || 0}%</div>
               <div className="text-sm text-gray-600">ความพึงพอใจ</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">92%</div>
+              <div className="text-2xl font-bold text-orange-600">{stats?.recommendationPercentage || 0}%</div>
               <div className="text-sm text-gray-600">แนะนำต่อ</div>
             </div>
           </div>
