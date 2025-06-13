@@ -77,10 +77,10 @@ export const FeatureChart: React.FC<FeatureChartProps> = ({ data }) => {
             tick={{ 
               fontSize: 12, 
               fill: '#64748b',
-              angle: -45,
               textAnchor: 'end',
               height: 60
             }}
+            angle={-45}
             tickFormatter={formatXAxisLabel}
             interval={0}
           />
