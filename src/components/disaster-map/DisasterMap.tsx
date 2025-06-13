@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapView } from './MapView';
 import DisasterTypeSelector from './DisasterTypeSelector';
@@ -153,7 +152,7 @@ const DisasterMap: React.FC = () => {
             floodTimeFilter={floodTimeFilter}
             onFloodTimeFilterChange={setFloodTimeFilter}
             showFloodFrequency={showFloodFrequency}
-            onShowFloodFrequencyChange={setShowFloodFrequencyChange}
+            onShowFloodFrequencyChange={setShowFloodFrequency}
           />
           
           {/* Statistics Panel */}
