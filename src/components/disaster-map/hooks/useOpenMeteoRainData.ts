@@ -71,16 +71,18 @@ export interface OpenMeteoRainDataPoint {
   weatherData: OpenMeteoWeatherData;
 }
 
-// Major cities in Thailand for weather data
+// อัปเดตชื่อจังหวัดให้ตรงกับตำแหน่งจริงบนแผนที่
 const THAILAND_WEATHER_POINTS = [
-  { lat: 13.7498, lon: 100.5165, name: 'กรุงเทพมหานคร' },
+  { lat: 13.7498, lon: 100.5165, name: 'กรุงเทพฯ' },
   { lat: 14.7981, lon: 100.654, name: 'ปทุมธานี' },
   { lat: 18.7904, lon: 98.9847, name: 'เชียงใหม่' },
-  { lat: 14.9707, lon: 102.102, name: 'ขอนแก่น' },
-  { lat: 9.1326, lon: 99.1356, name: 'สุราษฎร์ธานี' },
+  { lat: 17.3667, lon: 104.8667, name: 'อุดรธานี' },
   { lat: 16.4322, lon: 102.8236, name: 'หนองคาย' },
+  { lat: 14.9707, lon: 102.102, name: 'ขอนแก่น' },
   { lat: 12.6091, lon: 101.0828, name: 'ชลบุรี' },
+  { lat: 9.1326, lon: 99.1356, name: 'สุราษฎร์ธานี' },
   { lat: 7.8804, lon: 98.3923, name: 'ภูเก็ต' },
+  { lat: 6.5204, lon: 101.1218, name: 'สงขลา' },
 ];
 
 async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
