@@ -14,8 +14,7 @@ export const ArticleTimeline: React.FC<TimelineFilterProps> = ({ onDateRangeChan
   // Generate date range from articles (mock dates for demo)
   const dateRange = useMemo(() => {
     const now = new Date();
-    //const twoMonthsAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-    const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate());
+    const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
     
     // Mock creation dates for articles
     const mockDates = [
@@ -25,7 +24,7 @@ export const ArticleTimeline: React.FC<TimelineFilterProps> = ({ onDateRangeChan
     ];
 
     return {
-      min: twoMonthsAgo,
+      min: oneYearAgo,
       max: now,
       dates: mockDates.sort((a, b) => a.getTime() - b.getTime())
     };
