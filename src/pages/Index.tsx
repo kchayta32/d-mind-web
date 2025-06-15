@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DisasterAlert from '@/components/DisasterAlert';
 import NavBar from '@/components/NavBar';
@@ -15,6 +15,26 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+
+  // Fix auto-scroll issue
+  useEffect(() => {
+    // Reset scroll position to top when component mounts
+    window.scrollTo(0, 0);
+    
+    // Prevent any auto-scrolling
+    const preventAutoScroll = (e: Event) => {
+      e.preventDefault();
+    };
+    
+    // Add a small delay to ensure DOM is fully loaded
+    const timeoutId = setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const handleAssistantClick = () => {
     navigate('/assistant');
