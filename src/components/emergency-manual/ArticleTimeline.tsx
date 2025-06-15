@@ -141,13 +141,13 @@ export const ArticleTimeline: React.FC<TimelineFilterProps> = ({ onDateRangeChan
               onClick={() => handleRangeChange([70, 100])}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-md"
             >
-              3 เดือนล่าสุด
+              1 เดือนล่าสุด
             </button>
             <button
               onClick={() => handleRangeChange([50, 100])}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-md"
             >
-              6 เดือนล่าสุด
+              2 เดือนล่าสุด
             </button>
             <button
               onClick={() => handleRangeChange([0, 100])}
