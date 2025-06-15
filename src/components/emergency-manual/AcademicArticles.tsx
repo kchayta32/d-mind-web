@@ -1,7 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Download, ChevronDown } from 'lucide-react';
 
 interface AcademicArticle {
   id: string;
@@ -13,13 +15,47 @@ interface AcademicArticle {
   abstract: string;
   doi?: string;
   url?: string;
+  downloads?: {
+    pdf?: string;
+    readcube?: string;
+    epub?: string;
+    xml?: string;
+  };
 }
 
 const AcademicArticles: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>('all');
 
   const academicArticles: AcademicArticle[] = [
-    // 2567 articles
+    // New articles from user request
+    {
+      id: 'frontiers-water-2022',
+      title: 'การจัดการทรัพยากรน้ำและการป้องกันน้ำท่วม',
+      authors: 'Frontiers in Water Research Team',
+      year: 2565,
+      journal: 'Frontiers in Water',
+      category: 'การจัดการน้ำและน้ำท่วม',
+      abstract: 'งานวิจัยในวารสาร Frontiers in Water ที่ศึกษาเกี่ยวกับการจัดการทรัพยากรน้ำและระบบป้องกันน้ำท่วมในพื้นที่เสี่ยง พร้อมแนวทางการปรับตัวต่อการเปลี่ยนแปลงสภาพภูมิอากาศ',
+      url: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/full',
+      downloads: {
+        pdf: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/pdf',
+        readcube: 'http://www.readcube.com/articles/10.3389/frwa.2022.786040',
+        epub: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/epub',
+        xml: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/xml/nlm'
+      }
+    },
+    {
+      id: 'aiot-earthquake-warning-2025',
+      title: 'An AIoT System for Earthquake Early Warning on Resource Constrained Devices',
+      authors: 'Marco Esposito, Alberto Belli, Laura Falaschetti, Lorenzo Palma',
+      year: 2568,
+      journal: 'IEEE Internet of Things Journal',
+      category: 'ระบบเตือนภัยแผ่นดินไหว',
+      abstract: 'ระบบ AIoT สำหรับการเตือนภัยแผ่นดินไหวล่วงหน้าบนอุปกรณ์ที่มีทรัพยากรจำกัด งานวิจัยนี้พัฒนาระบบที่สามารถทำงานบนอุปกรณ์ IoT ขนาดเล็กเพื่อให้การเตือนภัยแผ่นดินไหวที่รวดเร็วและแม่นยำ โดยใช้เทคโนโลยี AI และ IoT ร่วมกัน',
+      url: 'https://www.researchgate.net/publication/387870802_An_AIoT_System_for_Earthquake_Early_Warning_on_Resource_Constrained_Devices',
+      doi: '10.1109/JIOT.2025.3527750'
+    },
+    // ... keep existing code (existing articles array)
     {
       id: 'pm25-so2-cognitive-2567',
       title: 'งานวิจัยใน Scientific Reports: ผลกระทบของ PM2.5 และ SO₂ ต่อการเสื่อมด้านการรับรู้',
@@ -119,6 +155,66 @@ const AcademicArticles: React.FC = () => {
     ? academicArticles 
     : academicArticles.filter(article => article.year.toString() === selectedYear);
 
+  const handleDownload = (url: string, filename: string) => {
+    window.open(url, '_blank');
+  };
+
+  const DownloadButton: React.FC<{ article: AcademicArticle }> = ({ article }) => {
+    if (!article.downloads && !article.url) return null;
+
+    if (article.downloads) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Download Article
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {article.downloads.pdf && (
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.pdf!, 'article.pdf')}>
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
+              </DropdownMenuItem>
+            )}
+            {article.downloads.readcube && (
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.readcube!, 'readcube')}>
+                <Download className="w-4 h-4 mr-2" />
+                ReadCube
+              </DropdownMenuItem>
+            )}
+            {article.downloads.epub && (
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.epub!, 'article.epub')}>
+                <Download className="w-4 h-4 mr-2" />
+                EPUB
+              </DropdownMenuItem>
+            )}
+            {article.downloads.xml && (
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.xml!, 'article.xml')}>
+                <Download className="w-4 h-4 mr-2" />
+                XML (NLM)
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={() => handleDownload(article.url!, 'article')}
+        className="flex items-center gap-2"
+      >
+        <Download className="w-4 h-4" />
+        View Article
+      </Button>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* Year Filter */}
@@ -142,9 +238,12 @@ const AcademicArticles: React.FC = () => {
         {filteredArticles.map((article) => (
           <Card key={article.id} className="overflow-hidden hover:shadow-md transition-shadow">
             <CardContent className="p-4">
-              <h2 className="text-lg font-bold mb-2 text-blue-700">
-                {article.title}
-              </h2>
+              <div className="flex justify-between items-start mb-2">
+                <h2 className="text-lg font-bold text-blue-700 flex-1 mr-4">
+                  {article.title}
+                </h2>
+                <DownloadButton article={article} />
+              </div>
               
               <div className="mb-2 space-y-1">
                 <p className="text-sm text-gray-600">
@@ -153,6 +252,11 @@ const AcademicArticles: React.FC = () => {
                 <p className="text-sm text-gray-600">
                   <strong>วารสาร:</strong> {article.journal} ({article.year})
                 </p>
+                {article.doi && (
+                  <p className="text-sm text-gray-600">
+                    <strong>DOI:</strong> {article.doi}
+                  </p>
+                )}
                 {article.url && (
                   <p className="text-sm text-gray-600">
                     <strong>URL:</strong> <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{article.url}</a>
