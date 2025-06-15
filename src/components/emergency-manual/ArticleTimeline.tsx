@@ -18,15 +18,9 @@ export const ArticleTimeline: React.FC<TimelineFilterProps> = ({ onDateRangeChan
     
     // Mock creation dates for articles
     const mockDates = [
-      new Date('2024-01-15'),
-      new Date('2024-03-20'),
-      new Date('2024-05-10'),
-      new Date('2024-07-05'),
-      new Date('2024-09-12'),
-      new Date('2024-11-25'),
-      new Date('2024-12-01'),
-      new Date('2025-01-10'),
-      new Date('2025-06-10'),
+      new Date('2025-05-05'),
+      new Date('2025-06-05'),
+      
     ];
 
     return {
