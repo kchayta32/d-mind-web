@@ -37,7 +37,17 @@ export const useSharedDisasterData = () => {
         return;
       }
 
-      setSharedData(data || []);
+      // Type cast the Json types to our expected types
+      const typedData: SharedDisasterData[] = (data || []).map(item => ({
+        ...item,
+        location: typeof item.location === 'object' && item.location !== null
+          ? item.location as SharedDisasterData['location']
+          : { lat: 0, lng: 0 },
+        shared_with: Array.isArray(item.shared_with) ? item.shared_with : [],
+        data: item.data
+      }));
+
+      setSharedData(typedData);
     } catch (error) {
       console.error('Error in loadSharedData:', error);
     } finally {

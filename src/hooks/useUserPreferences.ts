@@ -37,7 +37,20 @@ export const useUserPreferences = () => {
       }
 
       if (data) {
-        setPreferences(data);
+        // Type cast the Json types to our expected types
+        const typedPreferences: UserPreferences = {
+          ...data,
+          preferred_areas: Array.isArray(data.preferred_areas) ? data.preferred_areas as string[] : [],
+          notification_settings: typeof data.notification_settings === 'object' && data.notification_settings !== null 
+            ? data.notification_settings as UserPreferences['notification_settings']
+            : {
+                earthquakes: true,
+                floods: true,
+                wildfires: true,
+                airPollution: true,
+              }
+        };
+        setPreferences(typedPreferences);
       } else {
         // Create default preferences
         const defaultPreferences = {
