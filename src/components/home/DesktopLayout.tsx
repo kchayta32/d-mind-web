@@ -167,13 +167,13 @@ const DesktopLayout: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center text-purple-700">
                     <BarChart3 className="mr-2 h-5 w-5" />
-                    แผนที่ภัยพิบัติ
+                    แผนที่และสถิติภัยพิบัติ
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Button 
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                    onClick={handleDisasterMapClick}
+                    onClick={onDisasterMapClick}
                   >
                     <Map className="mr-2 h-4 w-4" />
                     ดูแผนที่และสถิติ
