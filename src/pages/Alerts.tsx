@@ -20,6 +20,15 @@ const Alerts = () => {
     activeOnly: true
   });
 
+  // Get unique types and severities from alerts
+  const availableTypes = [...new Set(alerts.map(alert => alert.type))];
+  const availableSeverities = [...new Set(alerts.map(alert => alert.severity))];
+
+  // Update filters function
+  const updateFilters = (newFilters: Partial<AlertsFilterState>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
   // Filter alerts based on current filters
   const filteredAlerts = alerts.filter(alert => {
     if (filters.activeOnly && !alert.is_active) return false;
@@ -65,7 +74,12 @@ const Alerts = () => {
           <TabsContent value="historical" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <div className="lg:col-span-1">
-                <AlertFilters filters={filters} onFiltersChange={setFilters} />
+                <AlertFilters 
+                  filters={filters} 
+                  updateFilters={updateFilters}
+                  availableTypes={availableTypes}
+                  availableSeverities={availableSeverities}
+                />
               </div>
               <div className="lg:col-span-3">
                 <AlertsList alerts={filteredAlerts} isLoading={isLoading} />
