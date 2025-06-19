@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavButton from './NavButton';
-import { MessageSquare, Phone, BookOpen, Bell, Star, HelpCircle } from 'lucide-react';
+import { MessageSquare, Phone, BookOpen, Bell, Star, HelpCircle, Map } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavBarProps {
@@ -27,6 +27,10 @@ const NavBar: React.FC<NavBarProps> = ({
 
   const handleAppGuideClick = () => {
     navigate('/app-guide');
+  };
+
+  const handleDisasterMapClick = () => {
+    navigate('/disaster-map');
   };
 
   if (isMobile) {
@@ -55,10 +59,14 @@ const NavBar: React.FC<NavBarProps> = ({
             onClick={onAlertsClick}
           />
           <NavButton 
+            icon={<Map size={24} />}
+            label="แผนที่ภัยพิบัติ"
+            onClick={handleDisasterMapClick}
+          />
+          <NavButton 
             icon={<HelpCircle size={24} />}
             label="คู่มือการใช้งานแอพ"
             onClick={handleAppGuideClick}
-            className="col-span-2"
           />
         </div>
         
@@ -98,6 +106,12 @@ const NavBar: React.FC<NavBarProps> = ({
         icon={<Bell size={20} />}
         label="การแจ้งเตือนภัยทั้งหมด"
         onClick={onAlertsClick}
+        className="w-full justify-start text-left"
+      />
+      <NavButton 
+        icon={<Map size={20} />}
+        label="แผนที่ภัยพิบัติ"
+        onClick={handleDisasterMapClick}
         className="w-full justify-start text-left"
       />
       <NavButton 
