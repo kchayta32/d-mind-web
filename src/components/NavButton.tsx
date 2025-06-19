@@ -23,8 +23,10 @@ const NavButton: React.FC<NavButtonProps> = ({ icon, label, onClick, className }
       )}
       onClick={onClick}
     >
-      {icon}
-      <span className="text-xs font-medium text-center leading-tight">{label}</span>
+      <div className="flex items-center gap-2">
+        {icon}
+        {!isMobile && <span className="text-sm font-medium">{label}</span>}
+      </div>
     </Button>
   );
 };
