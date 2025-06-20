@@ -23,9 +23,32 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  useServiceWorker(); // Initialize service worker only after React is fully loaded
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/assistant" element={<AIAssistant />} />
+        <Route path="/manual" element={<EmergencyManual />} />
+        <Route path="/contacts" element={<EmergencyContacts />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/disaster-map" element={<DisasterMap />} />
+        <Route path="/victim-reports" element={<VictimReports />} />
+        <Route path="/incident-reports" element={<IncidentReports />} />
+        <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
+        <Route path="/app-guide" element={<AppGuide />} />
+        <Route path="/article/:id" element={<ArticleDetail />} />
+        <Route path="/resource/:id" element={<ResourceDetail />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  useServiceWorker(); // Initialize service worker
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
@@ -40,23 +63,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/assistant" element={<AIAssistant />} />
-            <Route path="/manual" element={<EmergencyManual />} />
-            <Route path="/contacts" element={<EmergencyContacts />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/disaster-map" element={<DisasterMap />} />
-            <Route path="/victim-reports" element={<VictimReports />} />
-            <Route path="/incident-reports" element={<IncidentReports />} />
-            <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
-            <Route path="/app-guide" element={<AppGuide />} />
-            <Route path="/article/:id" element={<ArticleDetail />} />
-            <Route path="/resource/:id" element={<ResourceDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </QueryClientProvider>
   );
