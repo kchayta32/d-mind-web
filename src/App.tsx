@@ -44,28 +44,6 @@ const AppRoutes: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [isReady, setIsReady] = React.useState(false);
-
-  React.useEffect(() => {
-    // Ensure React is fully initialized before rendering components with hooks
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 200); // Further increased delay to ensure full initialization
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!isReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-blue-600 font-medium">กำลังโหลดระบบ...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <AppRoutes />

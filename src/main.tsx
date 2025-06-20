@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
@@ -29,8 +29,26 @@ window.addEventListener('beforeunload', () => {
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error('Failed to find the root element');
 
-createRoot(rootElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Wait for React to be fully ready before rendering
+const renderApp = () => {
+  try {
+    const root = createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  } catch (error) {
+    console.error('Failed to render app:', error);
+    // Retry after a short delay if initial render fails
+    setTimeout(renderApp, 100);
+  }
+};
+
+// Ensure DOM is ready before rendering
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderApp);
+} else {
+  // DOM is already ready, render immediately
+  renderApp();
+}
