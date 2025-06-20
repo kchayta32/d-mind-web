@@ -1,9 +1,15 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const useServiceWorker = () => {
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+
+  // Update the ref when toast changes
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
 
   useEffect(() => {
     // Ensure this only runs in the browser and after component is mounted
@@ -22,7 +28,7 @@ export const useServiceWorker = () => {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                toast({
+                toastRef.current({
                   title: "อัปเดตใหม่พร้อมใช้งาน",
                   description: "รีเฟรชหน้าเพื่อใช้เวอร์ชันล่าสุด",
                   action: (
@@ -45,13 +51,13 @@ export const useServiceWorker = () => {
 
     // Register service worker
     registerServiceWorker();
-  }, [toast]);
+  }, []); // Remove toast dependency to avoid re-registration
 
   useEffect(() => {
     // Handle install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      toast({
+      toastRef.current({
         title: "ติดตั้งแอป D-MIND",
         description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
         action: (
@@ -74,5 +80,5 @@ export const useServiceWorker = () => {
         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       };
     }
-  }, [toast]);
+  }, []); // Remove toast dependency to avoid re-registration
 };
