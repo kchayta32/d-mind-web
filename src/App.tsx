@@ -22,7 +22,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const AppRoutes = () => {
+const AppRoutes: React.FC = () => {
   useServiceWorker(); // Initialize service worker after React is ready
 
   return (
@@ -46,7 +46,20 @@ const AppRoutes = () => {
   );
 };
 
-const App: React.FC = () => {
+// Create a wrapper component that ensures React context is ready
+const AppWrapper: React.FC = () => {
+  // Use a simple state to ensure React is fully initialized
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    // Ensure React context is ready before rendering providers
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -56,6 +69,10 @@ const App: React.FC = () => {
       </TooltipProvider>
     </QueryClientProvider>
   );
+};
+
+const App: React.FC = () => {
+  return <AppWrapper />;
 };
 
 export default App;
