@@ -24,7 +24,17 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   useServiceWorker(); // Initialize service worker only after React is fully loaded
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
 
   return (
     <BrowserRouter>
@@ -48,16 +58,6 @@ const AppContent = () => {
 };
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
