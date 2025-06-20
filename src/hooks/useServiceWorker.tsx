@@ -1,15 +1,12 @@
 
-import { useEffect, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useCallback } from 'react';
 
 export const useServiceWorker = () => {
-  const { toast } = useToast();
-  const toastRef = useRef(toast);
-
-  // Update the ref when toast changes
-  useEffect(() => {
-    toastRef.current = toast;
-  }, [toast]);
+  // Create a function to get toast when needed
+  const getToast = useCallback(async () => {
+    const { useToast } = await import('@/hooks/use-toast');
+    return useToast();
+  }, []);
 
   useEffect(() => {
     // Ensure this only runs in the browser and after component is mounted
@@ -26,9 +23,10 @@ export const useServiceWorker = () => {
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
+            newWorker.addEventListener('statechange', async () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                toastRef.current({
+                const { toast } = await getToast();
+                toast({
                   title: "อัปเดตใหม่พร้อมใช้งาน",
                   description: "รีเฟรชหน้าเพื่อใช้เวอร์ชันล่าสุด",
                   action: (
@@ -51,13 +49,14 @@ export const useServiceWorker = () => {
 
     // Register service worker
     registerServiceWorker();
-  }, []); // Remove toast dependency to avoid re-registration
+  }, [getToast]);
 
   useEffect(() => {
     // Handle install prompt
-    const handleBeforeInstallPrompt = (e: Event) => {
+    const handleBeforeInstallPrompt = async (e: Event) => {
       e.preventDefault();
-      toastRef.current({
+      const { toast } = await getToast();
+      toast({
         title: "ติดตั้งแอป D-MIND",
         description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
         action: (
@@ -80,5 +79,5 @@ export const useServiceWorker = () => {
         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       };
     }
-  }, []); // Remove toast dependency to avoid re-registration
+  }, [getToast]);
 };
