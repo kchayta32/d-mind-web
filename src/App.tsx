@@ -1,4 +1,5 @@
 
+
 import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -50,8 +51,12 @@ const App: React.FC = () => {
   const [isReady, setIsReady] = React.useState(false);
 
   React.useEffect(() => {
-    // Ensure React is fully initialized before rendering TooltipProvider
-    setIsReady(true);
+    // Ensure React is fully initialized before rendering components with hooks
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   if (!isReady) {
@@ -70,3 +75,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
