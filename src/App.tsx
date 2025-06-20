@@ -50,7 +50,7 @@ const App: React.FC = () => {
     // Ensure React is fully initialized before rendering components with hooks
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 100); // Increased delay to ensure full initialization
+    }, 200); // Further increased delay to ensure full initialization
     
     return () => clearTimeout(timer);
   }, []);
