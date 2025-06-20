@@ -1,7 +1,8 @@
 
-import React from "react";
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useServiceWorker } from "./hooks/useServiceWorker";
@@ -46,11 +47,24 @@ const AppRoutes: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    // Ensure React is fully initialized before rendering TooltipProvider
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
-      <AppRoutes />
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AppRoutes />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };
