@@ -23,18 +23,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useServiceWorker(); // Initialize service worker only after React is fully loaded
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
+const AppRoutes = () => {
+  useServiceWorker(); // Initialize service worker after React is ready
 
   return (
     <BrowserRouter>
@@ -55,6 +45,30 @@ const AppContent = () => {
       </Routes>
     </BrowserRouter>
   );
+};
+
+const AppContent = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isReactReady, setIsReactReady] = useState(false);
+
+  useEffect(() => {
+    // Ensure React is fully ready before rendering providers
+    setIsReactReady(true);
+  }, []);
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
+  if (!isReactReady) {
+    return null; // Don't render anything until React is ready
+  }
+
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
+  return <AppRoutes />;
 };
 
 const App = () => {
