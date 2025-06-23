@@ -68,7 +68,7 @@ const MetricsOverview: React.FC<MetricsOverviewProps> = ({
       value: activeAlerts.length,
       description: `${highSeverityAlerts} รายการมีความรุนแรงสูง`,
       icon: <AlertTriangle className="h-4 w-4 text-orange-500" />,
-      trend: activeAlerts.length > 5 ? 'up' : 'neutral' as const,
+      trend: (activeAlerts.length > 5 ? 'up' : 'neutral') as const,
       trendValue: "24 ชม. ที่ผ่านมา"
     },
     {
