@@ -25,35 +25,14 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [isReactReady, setIsReactReady] = useState(false);
-  
-  // Ensure React is fully initialized before rendering any hooks
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReactReady(true);
-    }, 50);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  useServiceWorker(); // Initialize service worker
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
   };
 
-  // Don't render anything until React is ready
-  if (!isReactReady) {
-    return <div>Loading...</div>;
-  }
-
-  // Only after React is ready, we can use components with hooks
-  return (
-    <ReactApp isLoading={isLoading} onLoadingComplete={handleLoadingComplete} />
-  );
-};
-
-const ReactApp = ({ isLoading, onLoadingComplete }: { isLoading: boolean; onLoadingComplete: () => void }) => {
   if (isLoading) {
-    return <LoadingScreen onComplete={onLoadingComplete} />;
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
   }
 
   return (
@@ -62,32 +41,24 @@ const ReactApp = ({ isLoading, onLoadingComplete }: { isLoading: boolean; onLoad
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppContent />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/assistant" element={<AIAssistant />} />
+            <Route path="/manual" element={<EmergencyManual />} />
+            <Route path="/contacts" element={<EmergencyContacts />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/disaster-map" element={<DisasterMap />} />
+            <Route path="/victim-reports" element={<VictimReports />} />
+            <Route path="/incident-reports" element={<IncidentReports />} />
+            <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
+            <Route path="/app-guide" element={<AppGuide />} />
+            <Route path="/article/:id" element={<ArticleDetail />} />
+            <Route path="/resource/:id" element={<ResourceDetail />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
-  );
-};
-
-const AppContent = () => {
-  useServiceWorker(); // Initialize service worker only after all providers are set up
-
-  return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/assistant" element={<AIAssistant />} />
-      <Route path="/manual" element={<EmergencyManual />} />
-      <Route path="/contacts" element={<EmergencyContacts />} />
-      <Route path="/alerts" element={<Alerts />} />
-      <Route path="/disaster-map" element={<DisasterMap />} />
-      <Route path="/victim-reports" element={<VictimReports />} />
-      <Route path="/incident-reports" element={<IncidentReports />} />
-      <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
-      <Route path="/app-guide" element={<AppGuide />} />
-      <Route path="/article/:id" element={<ArticleDetail />} />
-      <Route path="/resource/:id" element={<ResourceDetail />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
   );
 };
 
