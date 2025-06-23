@@ -19,6 +19,8 @@ import AppGuide from "./pages/AppGuide";
 import ArticleDetail from "./pages/ArticleDetail";
 import ResourceDetail from "./pages/ResourceDetail";
 import DisasterMap from "./pages/DisasterMap";
+import Analytics from "./pages/Analytics";
+import NotificationSettings from "./pages/NotificationSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +51,8 @@ const AppContent = () => {
         <Route path="/incident-reports" element={<IncidentReports />} />
         <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
         <Route path="/app-guide" element={<AppGuide />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/notifications" element={<NotificationSettings />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
         <Route path="/resource/:id" element={<ResourceDetail />} />
         <Route path="*" element={<NotFound />} />
