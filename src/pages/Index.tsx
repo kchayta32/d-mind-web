@@ -1,3 +1,4 @@
+
 import React, { useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -93,10 +94,6 @@ const Index = () => {
     window.open('https://line.me/R/ti/p/@307rcire', '_blank');
   };
 
-  const handleDisasterMapClick = () => {
-    navigate('/disaster-map');
-  };
-
   if (isMobile) {
     return (
       <ErrorBoundary>
@@ -110,7 +107,6 @@ const Index = () => {
             onVictimReportsClick={handleVictimReportsClick}
             onIncidentReportsClick={handleIncidentReportsClick}
             onLineClick={handleLineClick}
-            onDisasterMapClick={handleDisasterMapClick}
           />
         </div>
       </ErrorBoundary>
@@ -119,7 +115,14 @@ const Index = () => {
 
   return (
     <ErrorBoundary>
-      <DesktopLayout />
+      <DesktopLayout
+        onAssistantClick={handleAssistantClick}
+        onManualClick={handleManualClick}
+        onContactsClick={handleContactsClick}
+        onAlertsClick={handleAlertsClick}
+        onVictimReportsClick={handleVictimReportsClick}
+        onIncidentReportsClick={handleIncidentReportsClick}
+      />
     </ErrorBoundary>
   );
 };

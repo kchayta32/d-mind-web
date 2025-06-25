@@ -3,28 +3,9 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const useServiceWorker = () => {
-  // Add safety check before using the hook
-  let toast: any;
-  try {
-    const toastHook = useToast();
-    toast = toastHook.toast;
-  } catch (error) {
-    console.warn('useToast not available yet:', error);
-    return; // Exit early if toast is not ready
-  }
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Add safety check to ensure we're in a browser environment
-    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
-      return;
-    }
-
-    // Additional safety check for toast availability
-    if (!toast) {
-      console.warn('Toast not available, skipping service worker registration');
-      return;
-    }
-
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
@@ -60,34 +41,29 @@ export const useServiceWorker = () => {
     }
   }, [toast]);
 
-  useEffect(() => {
-    // Install prompt handler
-    if (typeof window === 'undefined' || !toast) return;
-    
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      toast({
-        title: "ติดตั้งแอป D-MIND",
-        description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
-        action: (
-          <button 
-            onClick={() => {
-              (e as any).prompt();
-            }}
-            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-          >
-            ติดตั้ง
-          </button>
-        )
-      });
-    };
-
+  const installPrompt = () => {
     if ('beforeinstallprompt' in window) {
-      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      
-      return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      };
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        toast({
+          title: "ติดตั้งแอป D-MIND",
+          description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
+          action: (
+            <button 
+              onClick={() => {
+                (e as any).prompt();
+              }}
+              className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+            >
+              ติดตั้ง
+            </button>
+          )
+        });
+      });
     }
-  }, [toast]);
+  };
+
+  useEffect(() => {
+    installPrompt();
+  }, []);
 };

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { Earthquake, RainSensor, AirPollutionData } from './types';
 import { GISTDAHotspot } from './useGISTDAData';
@@ -14,13 +15,6 @@ import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
 import { OpenMeteoRainDataPoint } from './hooks/useOpenMeteoRainData';
 import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
-
-// Extend Window interface to include disasterMapRef
-declare global {
-  interface Window {
-    disasterMapRef?: any;
-  }
-}
 
 interface MapViewProps {
   earthquakes: Earthquake[];
@@ -38,7 +32,6 @@ interface MapViewProps {
   floodTimeFilter: string;
   showFloodFrequency: boolean;
   isLoading: boolean;
-  onLocationSelect?: (lat: number, lon: number, name: string) => void;
 }
 
 export const MapView: React.FC<MapViewProps> = ({ 
@@ -56,8 +49,7 @@ export const MapView: React.FC<MapViewProps> = ({
   droughtLayers,
   floodTimeFilter,
   showFloodFrequency,
-  isLoading,
-  onLocationSelect
+  isLoading 
 }) => {
   const [rainOverlayType, setRainOverlayType] = useState<'radar' | 'satellite'>('radar');
   const [rainTimeType, setRainTimeType] = useState<'past' | 'future'>('past');
@@ -66,15 +58,6 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showViirsWMS, setShowViirsWMS] = useState(true);
   const [showBurnScar, setShowBurnScar] = useState(false);
   const [showUserLocation, setShowUserLocation] = useState(false);
-  const mapRef = useRef<any>(null);
-
-  // Pass map reference to parent component
-  useEffect(() => {
-    if (mapRef.current && onLocationSelect && typeof window !== 'undefined') {
-      // This allows the parent to control the map
-      window.disasterMapRef = mapRef.current;
-    }
-  }, [mapRef.current, onLocationSelect]);
 
   console.log('MapView props:', { 
     earthquakes: earthquakes.length, 
@@ -114,7 +97,6 @@ export const MapView: React.FC<MapViewProps> = ({
   return (
     <div className="relative h-full w-full">
       <MapContainer
-        ref={mapRef}
         center={center}
         zoom={6}
         style={{ height: '100%', width: '100%' }}
@@ -155,47 +137,41 @@ export const MapView: React.FC<MapViewProps> = ({
         )}
       </MapContainer>
       
-      {/* Location Controls - Enhanced for mobile */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-        <LocationControls
-          showUserLocation={showUserLocation}
-          onToggleLocation={setShowUserLocation}
-        />
-      </div>
+      {/* Location Controls */}
+      <LocationControls
+        showUserLocation={showUserLocation}
+        onToggleLocation={setShowUserLocation}
+      />
       
-      {/* Rain controls for heavy rain type - Mobile optimized */}
+      {/* Rain controls for heavy rain type */}
       {selectedType === 'heavyrain' && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-4 md:right-auto z-10">
-          <MapControls
-            rainData={rainData}
-            showRainOverlay={showRainOverlay}
-            setShowRainOverlay={setShowRainOverlay}
-            rainOverlayType={rainOverlayType}
-            setRainOverlayType={setRainOverlayType}
-            rainTimeType={rainTimeType}
-            setRainTimeType={setRainTimeType}
-          />
-        </div>
+        <MapControls
+          rainData={rainData}
+          showRainOverlay={showRainOverlay}
+          setShowRainOverlay={setShowRainOverlay}
+          rainOverlayType={rainOverlayType}
+          setRainOverlayType={setRainOverlayType}
+          rainTimeType={rainTimeType}
+          setRainTimeType={setRainTimeType}
+        />
       )}
       
-      {/* Overlays for loading */}
+      {/* Overlays for loading only (removed coming soon for flood) */}
       <MapOverlays selectedType={selectedType} isLoading={isLoading} />
       
-      {/* Debug information - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <DebugInfo
-          selectedType={selectedType}
-          isLoading={isLoading}
-          rainSensors={rainSensors}
-          filteredRainSensors={filteredRainSensors}
-          humidityFilter={humidityFilter}
-          rainData={rainData}
-          hotspots={hotspots}
-          airStations={airStations}
-          filteredAirStations={filteredAirStations}
-          pm25Filter={pm25Filter}
-        />
-      </div>
+      {/* Debug information */}
+      <DebugInfo
+        selectedType={selectedType}
+        isLoading={isLoading}
+        rainSensors={rainSensors}
+        filteredRainSensors={filteredRainSensors}
+        humidityFilter={humidityFilter}
+        rainData={rainData}
+        hotspots={hotspots}
+        airStations={airStations}
+        filteredAirStations={filteredAirStations}
+        pm25Filter={pm25Filter}
+      />
     </div>
   );
 };
