@@ -23,19 +23,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useServiceWorker(); // Initialize service worker
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
+const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
@@ -55,6 +43,22 @@ const AppContent = () => {
       </Routes>
     </BrowserRouter>
   );
+};
+
+const AppContent = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useServiceWorker(); // Initialize service worker
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
+  return <AppRoutes />;
 };
 
 const App = () => {
