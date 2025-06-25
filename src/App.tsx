@@ -24,7 +24,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  useServiceWorker(); // Now safe to call hooks here
+  // Only call useServiceWorker after React is fully ready
+  useServiceWorker();
   
   return (
     <BrowserRouter>
@@ -54,7 +55,12 @@ const App = () => {
   useEffect(() => {
     // Ensure React is fully initialized before proceeding
     const checkReactReady = () => {
-      if (typeof window !== 'undefined' && window.React !== null) {
+      // More robust React readiness check
+      if (typeof window !== 'undefined' && 
+          typeof React !== 'undefined' && 
+          React !== null &&
+          typeof React.useState === 'function') {
+        console.log('React is ready');
         setIsReactReady(true);
       } else {
         // Wait a bit and check again
@@ -74,7 +80,7 @@ const App = () => {
   }
 
   if (!isReactReady) {
-    return <div>Initializing...</div>;
+    return <div>Initializing React...</div>;
   }
 
   return (

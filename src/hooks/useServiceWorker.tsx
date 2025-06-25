@@ -3,11 +3,25 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const useServiceWorker = () => {
-  const { toast } = useToast();
+  // Add safety check before using the hook
+  let toast: any;
+  try {
+    const toastHook = useToast();
+    toast = toastHook.toast;
+  } catch (error) {
+    console.warn('useToast not available yet:', error);
+    return; // Exit early if toast is not ready
+  }
 
   useEffect(() => {
     // Add safety check to ensure we're in a browser environment
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return;
+    }
+
+    // Additional safety check for toast availability
+    if (!toast) {
+      console.warn('Toast not available, skipping service worker registration');
       return;
     }
 
@@ -48,7 +62,7 @@ export const useServiceWorker = () => {
 
   useEffect(() => {
     // Install prompt handler
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !toast) return;
     
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
