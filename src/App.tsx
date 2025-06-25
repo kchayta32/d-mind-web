@@ -24,8 +24,39 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Main app content with routing
-const AppRoutes = () => {
+// Simple service worker registration
+const registerServiceWorker = () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((error) => {
+        console.log('SW registration failed: ', error);
+      });
+  }
+};
+
+const AppContent = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
+  // Register service worker after loading is complete
+  useEffect(() => {
+    if (!isLoading) {
+      // Small delay to ensure everything is ready
+      setTimeout(registerServiceWorker, 100);
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -47,64 +78,6 @@ const AppRoutes = () => {
       </Routes>
     </BrowserRouter>
   );
-};
-
-// Component that handles loading and service worker after everything is mounted
-const AppContent = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isServiceWorkerReady, setIsServiceWorkerReady] = useState(false);
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  // Initialize service worker after component mounts and providers are ready
-  useEffect(() => {
-    // Add a small delay to ensure all providers are fully initialized
-    const timer = setTimeout(() => {
-      setIsServiceWorkerReady(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
-  return (
-    <>
-      {isServiceWorkerReady && <ServiceWorkerManager />}
-      <AppRoutes />
-    </>
-  );
-};
-
-// Service worker component that only renders after everything is ready
-const ServiceWorkerManager = () => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return;
-
-    // Inline service worker logic to avoid hook issues
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
-        })
-        .catch((error) => {
-          console.log('SW registration failed: ', error);
-        });
-    }
-  }, [isMounted]);
-
-  return null;
 };
 
 const App = () => {
