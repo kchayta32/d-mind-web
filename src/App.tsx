@@ -1,11 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoadingScreen from "./components/LoadingScreen";
 // import { useServiceWorker } from "./hooks/useServiceWorker"; // Temporarily disabled
 import Index from "./pages/Index";
 import AIAssistant from "./pages/AIAssistant";
@@ -45,38 +44,11 @@ const AppRoutes = () => {
   );
 };
 
-const AppContent = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isReady, setIsReady] = useState(false);
-  
-  // Temporarily disable service worker to fix React hooks issue
-  // useServiceWorker(); 
-
-  useEffect(() => {
-    // Ensure React is fully initialized before showing content
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (!isReady || isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
-  return <AppRoutes />;
-};
-
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <AppContent />
+        <AppRoutes />
         <Toaster />
         <Sonner />
       </ThemeProvider>

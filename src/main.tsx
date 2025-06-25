@@ -31,5 +31,5 @@ if (!rootElement) throw new Error('Failed to find the root element');
 
 const root = createRoot(rootElement);
 
-// Render without StrictMode to avoid React hooks initialization issues
+// Render directly without complex loading logic to avoid React hooks initialization issues
 root.render(<App />);
