@@ -194,7 +194,7 @@ const DesktopLayout: React.FC = () => {
                 <CardContent>
                   <Button 
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={onDisasterMapClick}
+                    onClick={handleDisasterMapClick}
                   >
                     <TrendingUp className="mr-2 h-4 w-4" />
                     ดูแผนที่ภัยพิบัติแบบเรียลไทม์
