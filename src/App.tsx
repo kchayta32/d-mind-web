@@ -1,4 +1,5 @@
 
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,34 +41,36 @@ const AppRoutes = () => {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/assistant" element={<AIAssistant />} />
-        <Route path="/manual" element={<EmergencyManual />} />
-        <Route path="/contacts" element={<EmergencyContacts />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/disaster-map" element={<DisasterMap />} />
-        <Route path="/victim-reports" element={<VictimReports />} />
-        <Route path="/incident-reports" element={<IncidentReports />} />
-        <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
-        <Route path="/app-guide" element={<AppGuide />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/notifications" element={<NotificationSettings />} />
-        <Route path="/article/:id" element={<ArticleDetail />} />
-        <Route path="/resource/:id" element={<ResourceDetail />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/assistant" element={<AIAssistant />} />
+          <Route path="/manual" element={<EmergencyManual />} />
+          <Route path="/contacts" element={<EmergencyContacts />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/disaster-map" element={<DisasterMap />} />
+          <Route path="/victim-reports" element={<VictimReports />} />
+          <Route path="/incident-reports" element={<IncidentReports />} />
+          <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
+          <Route path="/app-guide" element={<AppGuide />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/notifications" element={<NotificationSettings />} />
+          <Route path="/article/:id" element={<ArticleDetail />} />
+          <Route path="/resource/:id" element={<ResourceDetail />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 };
 
-// Component that provides all contexts - without TooltipProvider
+// Component that provides all contexts - without toast components
 const AppWithProviders = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
       <AppRoutes />
     </QueryClientProvider>
   );
@@ -109,3 +112,4 @@ const App = () => {
 };
 
 export default App;
+
