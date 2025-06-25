@@ -25,7 +25,20 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const [isLoading, setIsLoading] = useState(true);
-  useServiceWorker(); // Initialize service worker
+  
+  // Initialize service worker after component mounts
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration);
+        })
+        .catch((error) => {
+          console.log('SW registration failed: ', error);
+        });
+    }
+  }, []);
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
@@ -60,9 +73,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <AppContent />
         <Toaster />
         <Sonner />
-        <AppContent />
       </TooltipProvider>
     </QueryClientProvider>
   );
