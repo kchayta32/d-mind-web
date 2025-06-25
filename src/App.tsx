@@ -19,23 +19,14 @@ import ResourceDetail from "./pages/ResourceDetail";
 import DisasterMap from "./pages/DisasterMap";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import AppLoader from "./components/AppLoader";
 
 const queryClient = new QueryClient();
-
-// Safe component wrapper to ensure React is available
-const SafeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Early return if React hooks aren't available
-  if (!React || !React.useState || !React.useContext) {
-    return <div>Loading...</div>;
-  }
-  
-  return <>{children}</>;
-};
 
 const App = () => {
   return (
     <ErrorBoundary>
-      <SafeWrapper>
+      <AppLoader>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <BrowserRouter>
@@ -59,7 +50,7 @@ const App = () => {
             </BrowserRouter>
           </ThemeProvider>
         </QueryClientProvider>
-      </SafeWrapper>
+      </AppLoader>
     </ErrorBoundary>
   );
 };

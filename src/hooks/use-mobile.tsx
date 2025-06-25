@@ -4,11 +4,6 @@ import * as React from "react"
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
-  // Safety check to ensure React is available
-  if (!React || !React.useState || !React.useEffect) {
-    return false; // Return a safe default
-  }
-
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
