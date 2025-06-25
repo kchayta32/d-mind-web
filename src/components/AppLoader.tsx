@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useServiceWorker } from '@/hooks/useServiceWorker';
 
 interface AppLoaderProps {
   children: React.ReactNode;
@@ -8,6 +9,9 @@ interface AppLoaderProps {
 const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
   const [isReactReady, setIsReactReady] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  // Only call useServiceWorker after React is confirmed ready
+  useServiceWorker();
 
   useEffect(() => {
     let mounted = true;
