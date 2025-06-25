@@ -47,15 +47,25 @@ const AppRoutes = () => {
 
 const AppContent = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   
   // Temporarily disable service worker to fix React hooks issue
   // useServiceWorker(); 
+
+  useEffect(() => {
+    // Ensure React is fully initialized before showing content
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
   };
 
-  if (isLoading) {
+  if (!isReady || isLoading) {
     return <LoadingScreen onComplete={handleLoadingComplete} />;
   }
 
@@ -64,15 +74,13 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AppContent />
-          <Toaster />
-          <Sonner />
-        </ThemeProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AppContent />
+        <Toaster />
+        <Sonner />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
