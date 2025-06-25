@@ -3,10 +3,19 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export const useServiceWorker = () => {
-  const { toast } = useToast();
+  // Safe toast hook usage with error handling
+  let toast: any;
+  try {
+    const toastHook = useToast();
+    toast = toastHook.toast;
+  } catch (error) {
+    console.warn('Toast hook not available yet:', error);
+    toast = () => {}; // Fallback
+    return; // Exit early if toast is not available
+  }
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && toast) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
@@ -18,18 +27,22 @@ export const useServiceWorker = () => {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  toast({
-                    title: "อัปเดตใหม่พร้อมใช้งาน",
-                    description: "รีเฟรชหน้าเพื่อใช้เวอร์ชันล่าสุด",
-                    action: (
-                      <button 
-                        onClick={() => window.location.reload()}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-                      >
-                        รีเฟรช
-                      </button>
-                    )
-                  });
+                  try {
+                    toast({
+                      title: "อัปเดตใหม่พร้อมใช้งาน",
+                      description: "รีเฟรชหน้าเพื่อใช้เวอร์ชันล่าสุด",
+                      action: (
+                        <button 
+                          onClick={() => window.location.reload()}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                        >
+                          รีเฟรช
+                        </button>
+                      )
+                    });
+                  } catch (error) {
+                    console.warn('Could not show update toast:', error);
+                  }
                 }
               });
             }
@@ -42,28 +55,34 @@ export const useServiceWorker = () => {
   }, [toast]);
 
   const installPrompt = () => {
-    if ('beforeinstallprompt' in window) {
+    if ('beforeinstallprompt' in window && toast) {
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
-        toast({
-          title: "ติดตั้งแอป D-MIND",
-          description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
-          action: (
-            <button 
-              onClick={() => {
-                (e as any).prompt();
-              }}
-              className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-            >
-              ติดตั้ง
-            </button>
-          )
-        });
+        try {
+          toast({
+            title: "ติดตั้งแอป D-MIND",
+            description: "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้ง่ายขึ้น",
+            action: (
+              <button 
+                onClick={() => {
+                  (e as any).prompt();
+                }}
+                className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+              >
+                ติดตั้ง
+              </button>
+            )
+          });
+        } catch (error) {
+          console.warn('Could not show install toast:', error);
+        }
       });
     }
   };
 
   useEffect(() => {
-    installPrompt();
-  }, []);
+    if (toast) {
+      installPrompt();
+    }
+  }, [toast]);
 };
