@@ -23,9 +23,47 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  useServiceWorker(); // Now safe to call hooks here
+  
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/assistant" element={<AIAssistant />} />
+        <Route path="/manual" element={<EmergencyManual />} />
+        <Route path="/contacts" element={<EmergencyContacts />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/disaster-map" element={<DisasterMap />} />
+        <Route path="/victim-reports" element={<VictimReports />} />
+        <Route path="/incident-reports" element={<IncidentReports />} />
+        <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
+        <Route path="/app-guide" element={<AppGuide />} />
+        <Route path="/article/:id" element={<ArticleDetail />} />
+        <Route path="/resource/:id" element={<ResourceDetail />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  useServiceWorker(); // Initialize service worker
+  const [isReactReady, setIsReactReady] = useState(false);
+
+  useEffect(() => {
+    // Ensure React is fully initialized before proceeding
+    const checkReactReady = () => {
+      if (typeof window !== 'undefined' && window.React !== null) {
+        setIsReactReady(true);
+      } else {
+        // Wait a bit and check again
+        setTimeout(checkReactReady, 10);
+      }
+    };
+    
+    checkReactReady();
+  }, []);
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
@@ -35,28 +73,16 @@ const App = () => {
     return <LoadingScreen onComplete={handleLoadingComplete} />;
   }
 
+  if (!isReactReady) {
+    return <div>Initializing...</div>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/assistant" element={<AIAssistant />} />
-            <Route path="/manual" element={<EmergencyManual />} />
-            <Route path="/contacts" element={<EmergencyContacts />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/disaster-map" element={<DisasterMap />} />
-            <Route path="/victim-reports" element={<VictimReports />} />
-            <Route path="/incident-reports" element={<IncidentReports />} />
-            <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
-            <Route path="/app-guide" element={<AppGuide />} />
-            <Route path="/article/:id" element={<ArticleDetail />} />
-            <Route path="/resource/:id" element={<ResourceDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { Earthquake, RainSensor, AirPollutionData } from './types';
@@ -15,6 +14,13 @@ import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
 import { OpenMeteoRainDataPoint } from './hooks/useOpenMeteoRainData';
 import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
+
+// Extend Window interface to include disasterMapRef
+declare global {
+  interface Window {
+    disasterMapRef?: any;
+  }
+}
 
 interface MapViewProps {
   earthquakes: Earthquake[];
@@ -64,7 +70,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
   // Pass map reference to parent component
   useEffect(() => {
-    if (mapRef.current && onLocationSelect) {
+    if (mapRef.current && onLocationSelect && typeof window !== 'undefined') {
       // This allows the parent to control the map
       window.disasterMapRef = mapRef.current;
     }
