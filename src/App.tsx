@@ -25,11 +25,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Component that uses hooks - only rendered after React is ready
-const AppContent = () => {
+// Main app content after all providers are ready
+const AppRoutes = () => {
   const [isLoading, setIsLoading] = useState(true);
   
-  // Only use service worker hook after component is mounted
+  // Service worker hook - only called after providers are established
   useServiceWorker();
 
   const handleLoadingComplete = () => {
@@ -63,35 +63,52 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
-  const [isReactReady, setIsReactReady] = useState(false);
-
-  useEffect(() => {
-    // Ensure React is fully initialized before rendering providers
-    const timer = setTimeout(() => {
-      setIsReactReady(true);
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!isReactReady) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-        <div className="text-blue-600">Loading...</div>
-      </div>
-    );
-  }
-
+// Component that provides all contexts
+const AppWithProviders = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AppContent />
+        <AppRoutes />
       </TooltipProvider>
     </QueryClientProvider>
   );
+};
+
+const App = () => {
+  const [isReactReady, setIsReactReady] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Multi-step initialization to ensure React is fully ready
+    const initializeApp = () => {
+      // First, ensure React is mounted
+      setIsReactReady(true);
+      
+      // Then, in the next tick, initialize providers
+      setTimeout(() => {
+        setIsInitialized(true);
+      }, 50);
+    };
+
+    // Use requestAnimationFrame to ensure we're in the next frame
+    requestAnimationFrame(initializeApp);
+  }, []);
+
+  // Show loading state while React is initializing
+  if (!isReactReady || !isInitialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="text-blue-600 text-lg font-medium">กำลังเริ่มต้นระบบ...</div>
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return <AppWithProviders />;
 };
 
 export default App;
