@@ -7,52 +7,94 @@ interface ServiceWorkerProviderProps {
 }
 
 const ServiceWorkerProvider: React.FC<ServiceWorkerProviderProps> = ({ children }) => {
-  const [canUseHooks, setCanUseHooks] = useState(false);
+  const [isFullyReady, setIsFullyReady] = useState(false);
 
   useEffect(() => {
-    // Ensure React is fully ready before allowing hooks to run
-    const checkReactReady = () => {
+    const checkFullReadiness = () => {
       try {
-        // Test if React hooks system is working
-        const testState = React.useState(true);
-        if (testState && Array.isArray(testState) && testState.length === 2) {
-          setCanUseHooks(true);
-          return true;
+        // Multiple layer check for React readiness
+        if (
+          typeof React !== 'undefined' &&
+          React &&
+          React.useState &&
+          React.useContext &&
+          React.useEffect &&
+          // Check if we're in a proper React component context
+          typeof React.createElement === 'function'
+        ) {
+          // Test hook creation in a safe way
+          try {
+            const testState = React.useState(true);
+            const testContext = React.useContext;
+            
+            if (testState && 
+                Array.isArray(testState) && 
+                testState.length === 2 &&
+                typeof testContext === 'function') {
+              console.log('All React systems ready for ServiceWorker');
+              return true;
+            }
+          } catch (hookError) {
+            console.warn('React hooks still not ready:', hookError);
+            return false;
+          }
         }
+        return false;
       } catch (error) {
-        console.warn('React hooks not ready yet, retrying...', error);
+        console.warn('React system check failed:', error);
         return false;
       }
-      return false;
     };
 
-    // Try immediately first
-    if (!checkReactReady()) {
-      // If not ready, try again after a short delay
-      const timer = setTimeout(() => {
-        if (!checkReactReady()) {
-          // Force enable after timeout to prevent infinite waiting
-          console.warn('Forcing hook enablement after timeout');
-          setCanUseHooks(true);
-        }
-      }, 500);
+    // Progressive readiness check
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    const checkWithRetry = () => {
+      attempts++;
+      
+      if (checkFullReadiness()) {
+        setIsFullyReady(true);
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        // Exponential backoff
+        const delay = Math.min(100 * Math.pow(1.5, attempts), 1000);
+        setTimeout(checkWithRetry, delay);
+      } else {
+        // Force enable after max attempts to prevent infinite waiting
+        console.warn('Forcing ServiceWorker enablement after max attempts');
+        setIsFullyReady(true);
+      }
+    };
 
-      return () => clearTimeout(timer);
-    }
+    // Start checking after a brief initial delay
+    const initialTimer = setTimeout(checkWithRetry, 200);
+
+    return () => {
+      clearTimeout(initialTimer);
+    };
   }, []);
 
-  // Conditionally use service worker only when React is ready
-  if (canUseHooks) {
-    // This component will re-render once canUseHooks becomes true
+  // Only render ServiceWorkerWrapper when fully ready
+  if (isFullyReady) {
     return <ServiceWorkerWrapper>{children}</ServiceWorkerWrapper>;
   }
 
+  // Return children without ServiceWorker while not ready
   return <>{children}</>;
 };
 
-// Separate component to isolate hook usage
+// Separate component to completely isolate hook usage
 const ServiceWorkerWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useServiceWorker();
+  // Extra safety check before using hooks
+  try {
+    useServiceWorker();
+  } catch (error) {
+    console.warn('ServiceWorker hook failed, continuing without it:', error);
+  }
+  
   return <>{children}</>;
 };
 

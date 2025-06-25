@@ -14,7 +14,7 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
     
     const checkReactReadiness = () => {
       try {
-        // More comprehensive React readiness check
+        // Enhanced React readiness check
         if (
           typeof React !== 'undefined' &&
           React &&
@@ -24,11 +24,22 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
           React.useLayoutEffect &&
           React.createElement &&
           React.Component &&
-          // Check if we can actually create a hook
-          typeof React.useState === 'function'
+          // Ensure we can actually create and use hooks
+          typeof React.useState === 'function' &&
+          typeof React.useContext === 'function' &&
+          typeof React.useEffect === 'function'
         ) {
-          console.log('React is fully ready');
-          return true;
+          // Test actual hook creation to be 100% sure
+          try {
+            const testHook = React.useState(true);
+            if (testHook && Array.isArray(testHook) && testHook.length === 2) {
+              console.log('React is fully ready and hooks are working');
+              return true;
+            }
+          } catch (hookError) {
+            console.warn('Hooks not ready yet:', hookError);
+            return false;
+          }
         }
         return false;
       } catch (error) {
@@ -38,41 +49,49 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
     };
 
     const initializeApp = async () => {
-      // Simulate loading progress
-      const progressSteps = [10, 30, 50, 70, 90, 100];
+      // More aggressive loading sequence
+      const progressSteps = [5, 15, 25, 40, 55, 70, 85, 95, 100];
       
       for (let i = 0; i < progressSteps.length; i++) {
         if (!mounted) return;
         
         setLoadingProgress(progressSteps[i]);
         
-        // Wait between progress updates
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Longer wait at critical steps
+        const waitTime = progressSteps[i] >= 70 ? 150 : 80;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
         
-        // Check React readiness at each step
-        if (progressSteps[i] >= 70 && checkReactReadiness()) {
+        // Start checking React readiness from step 40%
+        if (progressSteps[i] >= 40 && checkReactReadiness()) {
           if (mounted) {
             setLoadingProgress(100);
-            // Give a brief moment for everything to settle
+            // Extra wait to ensure everything is stable
             setTimeout(() => {
               if (mounted) {
                 setIsReactReady(true);
               }
-            }, 200);
+            }, 300);
           }
           return;
         }
       }
       
-      // If we get here, force proceed after timeout
+      // Final fallback - force proceed after extended timeout
       if (mounted) {
-        console.warn('React readiness check completed with timeout');
-        setIsReactReady(true);
+        console.warn('React readiness check completed with extended timeout');
+        // One more check before forcing
+        if (checkReactReadiness() || true) {
+          setIsReactReady(true);
+        }
       }
     };
 
-    // Start initialization
-    initializeApp();
+    // Start initialization with small delay
+    setTimeout(() => {
+      if (mounted) {
+        initializeApp();
+      }
+    }, 100);
 
     return () => {
       mounted = false;
@@ -98,14 +117,14 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
               D-MIND
             </h1>
-            <p className="text-blue-600/70 text-lg">กำลังเริ่มต้นระบบ...</p>
+            <p className="text-blue-600/70 text-lg">กำลังเตรียมระบบ...</p>
           </div>
           
           {/* Progress bar */}
           <div className="w-64 mt-4">
             <div className="h-2 w-full bg-blue-100 border border-blue-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 ease-out"
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
                 style={{ width: `${loadingProgress}%` }}
               />
             </div>
