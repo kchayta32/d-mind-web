@@ -83,6 +83,65 @@ export type Database = {
         }
         Relationships: []
       }
+      damage_assessments: {
+        Row: {
+          assessment_result: Json
+          confidence_score: number | null
+          created_at: string
+          damage_level: string | null
+          detected_categories: string[] | null
+          error_message: string | null
+          estimated_cost: number | null
+          id: string
+          image_url: string
+          incident_id: string | null
+          original_filename: string | null
+          processed_at: string | null
+          processing_status: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_result?: Json
+          confidence_score?: number | null
+          created_at?: string
+          damage_level?: string | null
+          detected_categories?: string[] | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          id?: string
+          image_url: string
+          incident_id?: string | null
+          original_filename?: string | null
+          processed_at?: string | null
+          processing_status?: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_result?: Json
+          confidence_score?: number | null
+          created_at?: string
+          damage_level?: string | null
+          detected_categories?: string[] | null
+          error_message?: string | null
+          estimated_cost?: number | null
+          id?: string
+          image_url?: string
+          incident_id?: string | null
+          original_filename?: string | null
+          processed_at?: string | null
+          processing_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "damage_assessments_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incident_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disaster_statistics: {
         Row: {
           affected_area: number | null

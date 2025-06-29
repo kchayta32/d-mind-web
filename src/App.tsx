@@ -1,6 +1,3 @@
-
-
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -22,6 +19,7 @@ import ResourceDetail from "./pages/ResourceDetail";
 import DisasterMap from "./pages/DisasterMap";
 import Analytics from "./pages/Analytics";
 import NotificationSettings from "./pages/NotificationSettings";
+import DamageAssessment from "./pages/DamageAssessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +50,7 @@ const AppRoutes = () => {
         <Route path="/disaster-map" element={<DisasterMap />} />
         <Route path="/victim-reports" element={<VictimReports />} />
         <Route path="/incident-reports" element={<IncidentReports />} />
+        <Route path="/damage-assessment" element={<DamageAssessment />} />
         <Route path="/satisfaction-survey" element={<SatisfactionSurvey />} />
         <Route path="/app-guide" element={<AppGuide />} />
         <Route path="/analytics" element={<Analytics />} />
@@ -111,5 +110,3 @@ const App = () => {
 };
 
 export default App;
-
-
