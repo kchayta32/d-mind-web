@@ -65,11 +65,26 @@ const AppRoutes = () => {
 
 // Component that provides all contexts and toasters
 const AppWithProviders = () => {
+  const [providersReady, setProvidersReady] = useState(false);
+
+  useEffect(() => {
+    // Ensure providers are ready before rendering toasters
+    const timer = setTimeout(() => {
+      setProvidersReady(true);
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
       <AppRoutes />
+      {providersReady && (
+        <>
+          <Toaster />
+          <Sonner />
+        </>
+      )}
     </QueryClientProvider>
   );
 };
