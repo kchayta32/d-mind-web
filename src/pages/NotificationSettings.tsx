@@ -12,6 +12,11 @@ const NotificationSettings: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">การตั้งค่าการแจ้งเตือน</h1>
           <p className="text-gray-600">จัดการการแจ้งเตือนและการรับข่าวสารภัยพิบัติ</p>
+          <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-destructive font-medium">
+              ระบบแจ้งเตือนจริงจะพร้อมใช้งานใน Application Version
+            </p>
+          </div>
         </div>
 
         <Tabs defaultValue="settings" className="space-y-6">
