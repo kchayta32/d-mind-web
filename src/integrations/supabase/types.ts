@@ -7,10 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
@@ -582,6 +582,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          is_active: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       victim_reports: {
         Row: {
           contact: string | null
@@ -617,7 +644,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      victim_reports_public: {
+        Row: {
+          contact: string | null
+          coordinates: Json | null
+          created_at: string | null
+          description_status: string | null
+          id: string | null
+          name: string | null
+          status: string | null
+        }
+        Insert: {
+          contact?: never
+          coordinates?: Json | null
+          created_at?: string | null
+          description_status?: never
+          id?: string | null
+          name?: never
+          status?: string | null
+        }
+        Update: {
+          contact?: never
+          coordinates?: Json | null
+          created_at?: string | null
+          description_status?: never
+          id?: string | null
+          name?: never
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       binary_quantize: {
@@ -625,14 +681,14 @@ export type Database = {
         Returns: unknown
       }
       calculate_distance: {
-        Args: { lat1: number; lon1: number; lat2: number; lon2: number }
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
       get_nearby_users: {
         Args: { alert_lat: number; alert_lng: number; radius_km?: number }
         Returns: {
-          user_id: string
           distance_km: number
+          user_id: string
         }[]
       }
       get_users_in_alert_radius: {
@@ -694,10 +750,10 @@ export type Database = {
         Returns: unknown
       }
       match_documents: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
+        Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
-          id: number
           content: string
+          id: number
           metadata: Json
           similarity: number
         }[]
@@ -717,6 +773,17 @@ export type Database = {
       update_analytics_stats: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      user_has_role: {
+        Args: {
+          check_user_id: string
+          required_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
+      user_is_emergency_authorized: {
+        Args: { check_user_id: string }
+        Returns: boolean
       }
       vector_avg: {
         Args: { "": number[] }
@@ -744,7 +811,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "emergency_responder" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -871,6 +938,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "emergency_responder", "user"],
+    },
   },
 } as const
