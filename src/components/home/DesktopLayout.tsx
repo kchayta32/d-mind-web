@@ -184,17 +184,23 @@ const DesktopLayout: React.FC = () => {
               </Card>
 
               {/* Analytics Dashboard */}
-              <Card className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow border-0">
+              <Card className="bg-white/40 backdrop-blur-sm shadow-lg border-0 relative opacity-60">
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-100/90 to-gray-200/90 rounded-lg flex items-center justify-center z-10">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-400 transform rotate-12">Coming Soon</div>
+                    <div className="text-sm text-gray-500 mt-1">กำลังจะเปิดให้บริการ</div>
+                  </div>
+                </div>
                 <CardHeader>
-                  <CardTitle className="flex items-center text-blue-700">
+                  <CardTitle className="flex items-center text-gray-400">
                     <BarChart3 className="mr-2 h-5 w-5" />
                     สถิติภัยพิบัติ
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleAnalyticsClick}
+                    className="w-full bg-gray-400 hover:bg-gray-400 text-white cursor-not-allowed"
+                    disabled
                   >
                     <TrendingUp className="mr-2 h-4 w-4" />
                     ดูสถิติและแผนภูมิ
