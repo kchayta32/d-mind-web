@@ -12,6 +12,7 @@ import { DisasterType } from './DisasterMap';
 import 'leaflet/dist/leaflet.css';
 import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
 import { OpenMeteoRainDataPoint } from './hooks/useOpenMeteoRainData';
+import { SinkholeData } from '../../hooks/useSinkholeData';
 import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
 
@@ -23,6 +24,7 @@ interface MapViewProps {
   rainData: RainViewerData | null;
   floodDataPoints: FloodDataPoint[];
   openMeteoRainData: OpenMeteoRainDataPoint[];
+  sinkholes: SinkholeData[];
   selectedType: DisasterType;
   magnitudeFilter: number;
   humidityFilter: number;
@@ -42,6 +44,7 @@ export const MapView: React.FC<MapViewProps> = ({
   rainData,
   floodDataPoints,
   openMeteoRainData,
+  sinkholes,
   selectedType,
   magnitudeFilter,
   humidityFilter,
@@ -145,6 +148,7 @@ export const MapView: React.FC<MapViewProps> = ({
             filteredAirStations={filteredAirStations}
             floodDataPoints={floodDataPoints}
             openMeteoRainData={openMeteoRainData}
+            sinkholes={sinkholes}
           />
         )}
       </MapContainer>

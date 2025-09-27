@@ -19,6 +19,7 @@ import {
 import { WildfireStats } from '../useGISTDAData';
 import { DroughtStats } from './useDroughtData';
 import { FloodStats } from './useFloodData';
+import { SinkholeStats } from '../../../hooks/useSinkholeData';
 
 interface StatisticsWithRainViewer extends RainSensorStats {
   rainViewer?: RainViewerStats;
@@ -50,7 +51,7 @@ export const useDisasterMapData = (
   } : rainStats;
 
   // Get current stats and loading state
-  const getCurrentStats = (selectedType: DisasterType): EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | null => {
+  const getCurrentStats = (selectedType: DisasterType): EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | SinkholeStats | null => {
     switch (selectedType) {
       case 'earthquake': return earthquakeStats;
       case 'heavyrain': return enhancedRainStats;
@@ -68,6 +69,7 @@ export const useDisasterMapData = (
       case 'airpollution': return airStats;
       case 'drought': return droughtStats;
       case 'flood': return floodStats;
+      case 'sinkhole': return null; // Will be handled by component directly
       default: return null;
     }
   };
@@ -81,6 +83,7 @@ export const useDisasterMapData = (
       case 'airpollution': return isLoadingAir;
       case 'drought': return isLoadingDrought;
       case 'flood': return isLoadingFlood || isLoadingOpenMeteoFlood;
+      case 'sinkhole': return false; // Will be handled by component directly
       default: return false;
     }
   };

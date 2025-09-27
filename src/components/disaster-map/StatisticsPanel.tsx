@@ -11,6 +11,7 @@ import {
 import { WildfireStats } from './useGISTDAData';
 import { DroughtStats } from './hooks/useDroughtData';
 import { FloodStats } from './hooks/useFloodData';
+import { SinkholeStats } from '../../hooks/useSinkholeData';
 import { DisasterType } from './DisasterMap';
 
 interface StatisticsWithRainViewer extends RainSensorStats {
@@ -18,7 +19,7 @@ interface StatisticsWithRainViewer extends RainSensorStats {
 }
 
 interface StatisticsPanelProps {
-  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | null;
+  stats: EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | SinkholeStats | null;
   isLoading: boolean;
   disasterType: DisasterType;
 }
@@ -260,6 +261,27 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
     </div>
   );
 
+  const renderSinkholeStats = (sinkholeStats: SinkholeStats) => (
+    <div className="grid grid-cols-2 gap-3">
+      <div className="text-center">
+        <div className="text-2xl font-bold text-amber-600">{sinkholeStats.totalIncidents}</div>
+        <div className="text-xs text-gray-600">เหตุการณ์ทั้งหมด</div>
+      </div>
+      <div className="text-center">
+        <div className="text-2xl font-bold text-red-600">{sinkholeStats.highSeverity}</div>
+        <div className="text-xs text-gray-600">ร้ายแรง</div>
+      </div>
+      <div className="text-center">
+        <div className="text-lg font-semibold text-purple-600">{sinkholeStats.averageSize}</div>
+        <div className="text-xs text-gray-600">ขนาดเฉลี่ย</div>
+      </div>
+      <div className="text-center">
+        <div className="text-lg font-semibold text-blue-600">{sinkholeStats.affectedAreas}</div>
+        <div className="text-xs text-gray-600">พื้นที่ได้รับผลกระทบ</div>
+      </div>
+    </div>
+  );
+
   const getTitle = () => {
     switch (disasterType) {
       case 'earthquake': return 'สถิติแผ่นดินไหว';
@@ -269,6 +291,7 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
       case 'airpollution': return 'สถิติคุณภาพอากาศ';
       case 'drought': return 'สถิติภัยแล้ง';
       case 'flood': return 'สถิติน้ำท่วม';
+      case 'sinkhole': return 'สถิติแผ่นดินยุบ/ดินทรุด';
       default: return 'สถิติข้อมูล';
     }
   };
@@ -289,6 +312,8 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
         return renderDroughtStats(stats as DroughtStats);
       case 'flood':
         return renderFloodStats(stats);
+      case 'sinkhole':
+        return renderSinkholeStats(stats as SinkholeStats);
       default:
         return <p className="text-sm text-gray-600">ไม่รองรับการแสดงสถิติสำหรับประเภทนี้</p>;
     }

@@ -7,9 +7,11 @@ import WildfireCharts from './WildfireCharts';
 import AirPollutionCharts from './AirPollutionCharts';
 import DroughtCharts from './DroughtCharts';
 import FloodCharts from './FloodCharts';
+import SinkholeNews from './SinkholeNews';
 import { DisasterType } from './DisasterMap';
 import { useDisasterMapState } from './hooks/useDisasterMapState';
 import { useDisasterMapData } from './hooks/useDisasterMapData';
+import { useSinkholeData } from '../../hooks/useSinkholeData';
 
 interface DisasterMapContentProps {
   selectedType: DisasterType;
@@ -57,6 +59,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     getCurrentLoading,
   } = useDisasterMapData(rainTimeFilter, wildfireTimeFilter);
 
+  const { sinkholes, stats: sinkholeStats } = useSinkholeData();
+
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
       {/* Main Map */}
@@ -69,6 +73,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           rainData={rainData}
           floodDataPoints={floodDataPoints}
           openMeteoRainData={openMeteoRainData}
+          sinkholes={sinkholes}
           selectedType={selectedType}
           magnitudeFilter={magnitudeFilter}
           humidityFilter={humidityFilter}
@@ -106,7 +111,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
         
         {/* Statistics Panel */}
         <StatisticsPanel
-          stats={getCurrentStats(selectedType)}
+          stats={selectedType === 'sinkhole' ? sinkholeStats : getCurrentStats(selectedType)}
           isLoading={getCurrentLoading(selectedType)}
           disasterType={selectedType}
         />
@@ -139,6 +144,11 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           <FloodCharts 
             stats={floodStats}
           />
+        )}
+
+        {/* Sinkhole News Section */}
+        {selectedType === 'sinkhole' && (
+          <SinkholeNews />
         )}
       </div>
     </div>

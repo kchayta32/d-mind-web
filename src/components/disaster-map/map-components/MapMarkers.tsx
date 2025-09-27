@@ -6,10 +6,12 @@ import HotspotMarker from '../HotspotMarker';
 import AirStationMarker from '../AirStationMarker';
 import { FloodDataMarker } from '../FloodDataMarker';
 import { OpenMeteoWeatherMarker } from '../OpenMeteoWeatherMarker';
+import SinkholeMarker from '../SinkholeMarker';
 import { Earthquake, RainSensor, AirPollutionData } from '../types';
 import { GISTDAHotspot } from '../useGISTDAData';
 import { FloodDataPoint } from '../hooks/useOpenMeteoFloodData';
 import { OpenMeteoRainDataPoint } from '../hooks/useOpenMeteoRainData';
+import { SinkholeData } from '../../../hooks/useSinkholeData';
 import { DisasterType } from '../DisasterMap';
 
 interface MapMarkersProps {
@@ -20,6 +22,7 @@ interface MapMarkersProps {
   filteredAirStations: AirPollutionData[];
   floodDataPoints?: FloodDataPoint[];
   openMeteoRainData?: OpenMeteoRainDataPoint[];
+  sinkholes: SinkholeData[];
 }
 
 export const MapMarkers: React.FC<MapMarkersProps> = ({
@@ -29,7 +32,8 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
   hotspots,
   filteredAirStations,
   floodDataPoints = [],
-  openMeteoRainData = []
+  openMeteoRainData = [],
+  sinkholes
 }) => {
   console.log('MapMarkers rendering with:', {
     selectedType,
@@ -76,6 +80,11 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
       {/* Flood data markers */}
       {selectedType === 'flood' && floodDataPoints.map((floodPoint, index) => (
         <FloodDataMarker key={`flood-${index}`} floodPoint={floodPoint} />
+      ))}
+
+      {/* Sinkhole markers */}
+      {selectedType === 'sinkhole' && sinkholes.map((sinkhole) => (
+        <SinkholeMarker key={sinkhole.id} sinkhole={sinkhole} />
       ))}
     </>
   );
