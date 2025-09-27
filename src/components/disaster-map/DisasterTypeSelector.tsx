@@ -17,7 +17,8 @@ import {
   Sun,
   Waves,
   MapPin,
-  CloudDrizzle
+  CloudDrizzle,
+  Mountain
 } from 'lucide-react';
 import { DisasterType } from './DisasterMap';
 
@@ -88,6 +89,13 @@ const disasterTypes: Array<{
     icon: <MapPin className="w-4 h-4" />,
     color: 'bg-purple-500 hover:bg-purple-600',
     available: false
+  },
+  {
+    type: 'sinkhole',
+    label: 'แผ่นดินยุบ/ดินทรุด',
+    icon: <Mountain className="w-4 h-4" />,
+    color: 'bg-amber-600 hover:bg-amber-700',
+    available: true
   }
 ];
 

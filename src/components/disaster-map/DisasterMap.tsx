@@ -4,7 +4,7 @@ import DisasterTypeSelector from './DisasterTypeSelector';
 import { LocationSearch } from './LocationSearch';
 import { DisasterMapContent } from './DisasterMapContent';
 
-export type DisasterType = 'earthquake' | 'heavyrain' | 'openmeteorain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm';
+export type DisasterType = 'earthquake' | 'heavyrain' | 'openmeteorain' | 'wildfire' | 'airpollution' | 'drought' | 'flood' | 'storm' | 'sinkhole';
 
 const DisasterMap: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DisasterType>('wildfire');
