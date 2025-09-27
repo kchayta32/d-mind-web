@@ -73,14 +73,14 @@ const disasterTypes: Array<{
     label: 'ภัยแล้ง',
     icon: <Sun className="w-4 h-4" />,
     color: 'bg-yellow-500 hover:bg-yellow-600',
-    available: true
+    available: false
   },
   {
     type: 'flood',
     label: 'น้ำท่วม',
     icon: <Waves className="w-4 h-4" />,
     color: 'bg-cyan-500 hover:bg-cyan-600',
-    available: true
+    available: false
   },
   {
     type: 'storm',
