@@ -104,7 +104,7 @@ const SinkholeNews: React.FC = () => {
                     อ่านต่อ
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="fixed inset-4 z-50 max-w-4xl max-h-[80vh] overflow-y-auto bg-background border shadow-lg">
+                <DialogContent className="fixed inset-8 md:inset-16 z-50 max-w-3xl max-h-[70vh] overflow-y-auto bg-background border shadow-lg">
                   <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm" />
                   <DialogHeader>
                     <DialogTitle className="text-left">
