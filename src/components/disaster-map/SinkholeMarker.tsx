@@ -179,12 +179,13 @@ const SinkholeMarker: React.FC<SinkholeMarkerProps> = ({ sinkhole }) => {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-40 bg-black/40" 
+            className="fixed inset-0 bg-black/40" 
+            style={{ zIndex: 9998 }}
             onClick={closeModal}
           />
           
           {/* Modal Panel */}
-          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 md:p-6">
+          <div className="fixed inset-0 flex items-start justify-center p-4 md:p-6" style={{ zIndex: 9999 }}>
             <div
               role="dialog"
               aria-modal="true"

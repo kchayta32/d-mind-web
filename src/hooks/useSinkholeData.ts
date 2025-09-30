@@ -35,7 +35,7 @@ export const useSinkholeData = () => {
       try {
         setIsLoading(true);
         
-        // ข้อมูลจำลองจากเหตุการณ์จริงในดุสิต กทม.
+        // ข้อมูลจำลองจากเหตุการณ์จริงในดุสิต กทม. และญี่ปุ่น
         const mockData: SinkholeData[] = [
           {
             id: 'sinkhole-dusit-001',
@@ -46,24 +46,38 @@ export const useSinkholeData = () => {
             date: '24 กันยายน 2568',
             severity: 'high',
             description: 'เกิดเหตุแผ่นดินยุบทำให้ถนนทรุดตัวลงเป็นหลุมขนาดใหญ่ คาดการณ์ว่าดินหายไปกว่าพันลูกบาศก์เมตร อาจเป็นผลจากการขุดเจาะใต้ดินหรือระบบท่อประปาเก่า',
-            mainImage: '/lovable-uploads/70e87fa1-9284-4474-bda5-04c19250a4d5.png',
+            mainImage: '/lovable-uploads/sinkhole-dusit-01.webp',
             additionalImages: [
-              '/lovable-uploads/7799a9ff-3b81-4e41-9c7b-b6054d5e7b62.png',
-              '/lovable-uploads/9b24d25c-901c-4aaf-98dd-78419a5984cd.png',
-              '/lovable-uploads/9ee04c09-ef87-44e4-b06d-424087a59578.png'
+              '/lovable-uploads/sinkhole-dusit-02.webp',
+              '/lovable-uploads/sinkhole-dusit-03.webp'
             ],
             estimatedSize: '10 x 15 เมตร ลึก 8 เมตร',
             cause: 'การขุดเจาะใต้ดินและระบบสาธารณูปโภคเก่า',
             status: 'อยู่ระหว่างการซ่อมแซม'
+          },
+          {
+            id: 'sinkhole-japan-001',
+            latitude: 35.8229,
+            longitude: 139.8386,
+            title: 'หลุมยุบในเมืองยาชิโอะ ประเทศญี่ปุ่น',
+            location: 'เมืองยาชิโอะ จังหวัดไซตามะ ประเทศญี่ปุ่น',
+            date: '28 มกราคม 2568',
+            severity: 'high',
+            description: 'เกิดหลุมยุบกลางถนนที่มีการจราจรพลุกพล่าน มีความกว้างราว 10 เมตร และลึกประมาณ 5-6 เมตร ทำให้รถบรรทุกตกลงไปและคนขับติดอยู่ในรถ เจ้าหน้าที่ดับเพลิงต้องใช้เครนขนาดใหญ่ในการช่วยเหลือ',
+            mainImage: '/lovable-uploads/sinkhole-japan-01.webp',
+            additionalImages: [],
+            estimatedSize: '10 เมตร กว้าง, 5-6 เมตร ลึก',
+            cause: 'ท่อระบายน้ำใต้ดินผุพังและแตก ประกอบกับพื้นที่เคยเป็นแหล่งน้ำชุ่มน้ำ',
+            status: 'อยู่ระหว่างการช่วยเหลือและซ่อมแซม'
           }
         ];
 
         const mockStats: SinkholeStats = {
           totalIncidents: mockData.length,
           highSeverity: mockData.filter(s => s.severity === 'high').length,
-          averageSize: '12 x 8 เมตร',
+          averageSize: '10 x 8 เมตร',
           lastIncident: mockData[0]?.date || 'ไม่มีข้อมูล',
-          affectedAreas: 1
+          affectedAreas: mockData.length
         };
 
         // จำลองการ delay API

@@ -31,5 +31,31 @@ const menuItems = [{
   description: 'พื้นที่เสี่ยงน้ำท่วม'
 }];
 export function DisasterMapSidebar() {
-  return;
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-4 py-2">
+          <Map className="w-5 h-5" />
+          <h2 className="font-semibold">แผนที่ภัยพิบัติ</h2>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>ประเภทภัยพิบัติ</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton>
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
 }
