@@ -170,15 +170,6 @@ const SinkholeMarker: React.FC<SinkholeMarkerProps> = ({ sinkhole }) => {
             <p className="text-xs text-gray-600 line-clamp-3">
               {sinkhole.description}
             </p>
-
-            <Button
-              size="sm"
-              className="w-full text-xs"
-              onClick={() => setShowImageDialog(true)}
-            >
-              <Images className="w-3 h-3 mr-1" />
-              ดูรูปภาพทั้งหมด
-            </Button>
           </div>
         </Popup>
       </Marker>
