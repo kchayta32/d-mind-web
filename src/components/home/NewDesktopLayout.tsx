@@ -22,6 +22,8 @@ const NewDesktopLayout: React.FC = () => {
   const menuItems = [
     { labelTh: 'หน้าแรก', labelEn: 'Home', route: '/' },
     { labelTh: 'บริการฉุกเฉิน', labelEn: 'Emergency Call', route: '/contacts' },
+    { labelTh: 'รายงานผู้ประสบภัย', labelEn: 'Victim Reports', route: '/victim-reports' },
+    { labelTh: 'รายงานเหตุการณ์', labelEn: 'Incident Reports', route: '/incident-reports' },
     { labelTh: 'ประเมินความพึงพอใจ', labelEn: 'Evaluate Satisfaction', route: '/survey' },
     { labelTh: 'บทความ / งานวิจัย', labelEn: 'Research', route: '/manual' },
     { labelTh: 'เกี่ยวกับเรา', labelEn: 'About', route: '/app-guide' },
