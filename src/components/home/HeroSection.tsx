@@ -44,7 +44,7 @@ const HeroSection: React.FC = () => {
               Disaster Monitoring and Intelligent Notification Device
             </p>
             <p className="text-blue-200 text-lg">
-              แจ้งเตือนภัยอัจฉริยะ • ข้อมูลแบบเรียลไทม์
+              ระบบติดตามภัยพิบัติ • แจ้งเตือนอัจฉริยะ
             </p>
           </div>
 
@@ -73,7 +73,7 @@ const HeroSection: React.FC = () => {
                 ระบบติดตามและแจ้งเตือนภัยพิบัติอัจฉริยะ
               </h2>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-                D-MIND เป็นระบบ AIoT ที่ช่วยติดตามและแจ้งเตือนภัยพิบัติแบบเรียลไทม์ 
+                D-MIND เป็นระบบ AIoT ที่ช่วยติดตามและแจ้งเตือนภัยพิบัติแบบอัจฉริยะ 
                 พร้อมด้วยระบบวิเคราะห์ข้อมูลอัจฉริยะเพื่อความปลอดภัยของคุณและชุมชน
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -88,7 +88,7 @@ const HeroSection: React.FC = () => {
                   size="lg" 
                   variant="outline" 
                   className="bg-white hover:bg-gray-50 border-2"
-                  onClick={() => navigate('/manual')}
+                  onClick={() => navigate('/app-guide')}
                 >
                   เริ่มต้นใช้งาน
                 </Button>
