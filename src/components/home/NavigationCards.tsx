@@ -11,12 +11,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 interface NavigationItem {
-  icon: React.ReactNode;
-  titleTh: string;
-  titleEn: string;
-  description: string;
-  route: string;
-  color: string;
+  icon: React.ReactNode;
+  titleTh: string;
+  titleEn: string;
+  description: string;
+  route?: string; // เปลี่ยนเป็น Optional (มีหรือไม่มีก็ได้) สำหรับ Internal Link
+  href?: string; // เพิ่ม href สำหรับ External Link
+  color: string;
 }
 
 const NavigationCards: React.FC = () => {
@@ -60,7 +61,8 @@ const NavigationCards: React.FC = () => {
       titleTh: 'เกี่ยวกับเรา',
       titleEn: 'About',
       description: 'รายละเอียดโครงการ',
-      herf: 'https://d-mind.my.canva.site/', // Updated link
+      // แก้ไขการสะกดจาก 'herf' เป็น 'href' และใช้สำหรับ External Link
+      href: 'https://d-mind.my.canva.site/', 
       color: 'bg-purple-500'
     },
     {
