@@ -60,7 +60,7 @@ const NavigationCards: React.FC = () => {
       titleTh: 'เกี่ยวกับเรา',
       titleEn: 'About',
       description: 'รายละเอียดโครงการ',
-      route: '/app-guide',
+      route: 'https://d-mind.my.canva.site/',
       color: 'bg-purple-500'
     },
     {
