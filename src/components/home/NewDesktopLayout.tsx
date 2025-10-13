@@ -1,6 +1,9 @@
 import React from 'react';
 import HeroSection from './HeroSection';
 import NavigationCards from './NavigationCards';
+import AboutAppSection from './AboutAppSection';
+import AboutTeamSection from './AboutTeamSection';
+import ContactSection from './ContactSection';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Globe, Menu, X, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -122,6 +125,15 @@ const NewDesktopLayout: React.FC = () => {
 
         {/* Navigation Cards */}
         <NavigationCards />
+
+        {/* About App Section */}
+        <AboutAppSection />
+
+        {/* About Team Section */}
+        <AboutTeamSection />
+
+        {/* Contact Section */}
+        <ContactSection />
 
         {/* Footer */}
         <footer className="bg-slate-900 text-white py-8">
