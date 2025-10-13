@@ -1,6 +1,6 @@
 
 import React from 'react';
-import EarthquakeMarker from '../EarthquakeMarker';
+import ClusteredEarthquakeMarkers from '../ClusteredEarthquakeMarkers';
 import RainSensorMarker from '../RainSensorMarker';
 import HotspotMarker from '../HotspotMarker';
 import AirStationMarker from '../AirStationMarker';
@@ -46,10 +46,10 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
 
   return (
     <>
-      {/* Earthquake markers */}
-      {selectedType === 'earthquake' && filteredEarthquakes.map((earthquake) => (
-        <EarthquakeMarker key={earthquake.id} earthquake={earthquake} />
-      ))}
+      {/* Earthquake markers with clustering */}
+      {selectedType === 'earthquake' && (
+        <ClusteredEarthquakeMarkers earthquakes={filteredEarthquakes} />
+      )}
 
       {/* Rain sensor markers */}
       {selectedType === 'heavyrain' && filteredRainSensors.map((sensor) => {
