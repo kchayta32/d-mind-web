@@ -60,8 +60,8 @@ const NavigationCards: React.FC = () => {
       titleTh: 'เกี่ยวกับเรา',
       titleEn: 'About',
       description: 'รายละเอียดโครงการ',
-      route: 'https://d-mind.my.canva.site/',
-      color: 'bg-purple-500'
+      route: 'https://d-mind.my.canva.site/', // Updated link
+      color: 'bg-purple-500'
     },
     {
       icon: <Mail className="w-8 h-8" />,
