@@ -104,7 +104,7 @@ const NavigationCards: React.FC = () => {
               <Card
                 key={index}
                 className="group cursor-pointer hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-0 overflow-hidden"
-                onClick={() => navigate(item.route)}
+                onClick={() => handleNavigation(item)}
               >
                 <CardContent className="p-8">
                   <div className={`${item.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>

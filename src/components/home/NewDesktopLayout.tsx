@@ -27,12 +27,16 @@ const NewDesktopLayout: React.FC = () => {
     { labelTh: 'ประเมินความพึงพอใจ', labelEn: 'Evaluate Satisfaction', route: '/satisfaction-survey' },
     { labelTh: 'บทความ / งานวิจัย', labelEn: 'Research', route: '/manual' },
     { labelTh: 'คุยกับเอไอ', labelEn: 'Assistant', route: '/assistant' },
-    { labelTh: 'เกี่ยวกับเรา', labelEn: 'About', route: '/app-guide' },
+    { labelTh: 'เกี่ยวกับเรา', labelEn: 'About', href: 'https://d-mind.my.canva.site/' },
     { labelTh: 'ติดต่อเรา', labelEn: 'Contact', route: '/contacts' },
   ];
 
-  const handleMenuClick = (route: string) => {
-    navigate(route);
+  const handleMenuClick = (item: { route?: string; href?: string }) => {
+    if (item.href) {
+      window.open(item.href, '_blank');
+    } else if (item.route) {
+      navigate(item.route);
+    }
     setMenuOpen(false);
   };
 
@@ -99,7 +103,7 @@ const NewDesktopLayout: React.FC = () => {
               {menuItems.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => handleMenuClick(item.route)}
+                  onClick={() => handleMenuClick(item)}
                   className="group text-left p-4 rounded-lg hover:bg-white/5 transition-all duration-200"
                 >
                   <h3 className="text-white text-lg font-semibold mb-1 group-hover:text-blue-400 transition-colors">
