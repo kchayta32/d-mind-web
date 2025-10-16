@@ -153,17 +153,17 @@ export const MapView: React.FC<MapViewProps> = ({
         )}
       </MapContainer>
       
-      {/* Location Controls - Enhanced for mobile */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+      {/* Location Controls - Enhanced for mobile with higher z-index */}
+      <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
         <LocationControls
           showUserLocation={showUserLocation}
           onToggleLocation={setShowUserLocation}
         />
       </div>
       
-      {/* Rain controls for heavy rain type - Mobile optimized */}
+      {/* Rain controls for heavy rain type - Inside map at top right */}
       {selectedType === 'heavyrain' && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-4 md:right-auto z-10">
+        <div className="absolute top-20 right-4 z-[1000]">
           <MapControls
             rainData={rainData}
             showRainOverlay={showRainOverlay}

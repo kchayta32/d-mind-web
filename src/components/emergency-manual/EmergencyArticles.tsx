@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { ArticleTimeline } from './ArticleTimeline';
+import { ImprovedArticleTimeline } from './ImprovedArticleTimeline';
 
 const EmergencyArticles: React.FC = () => {
   const navigate = useNavigate();
@@ -99,47 +99,61 @@ const EmergencyArticles: React.FC = () => {
     setDateRange({ start: startDate, end: endDate });
   };
 
+  const handleShowAll = () => {
+    setDateRange(null);
+  };
+
   return (
-    <div className="space-y-4">
-      <ArticleTimeline 
+    <div className="space-y-6">
+      <ImprovedArticleTimeline 
         onDateRangeChange={handleDateRangeChange}
+        onShowAll={handleShowAll}
         articles={articles}
       />
       
-      {filteredArticles.map((article) => (
-        <Card 
-          key={article.id} 
-          className="cursor-pointer hover:shadow-md transition-shadow border-blue-200"
-          onClick={() => handleArticleClick(article.id)}
-        >
-          <CardContent className="p-4">
-            <div className="flex gap-4">
-              <img 
-                src={article.image} 
-                alt={article.title}
-                className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-              />
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-blue-700 mb-1">{article.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">{article.subtitle}</p>
-                <p className="text-gray-700 text-sm">{article.description}</p>
-                <p className="text-xs text-blue-600 mt-2">
-                  โพสต์: {new Date(article.created_at).toLocaleDateString('th-TH', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
+      <div className="grid gap-4">
+        {filteredArticles.map((article) => (
+          <Card 
+            key={article.id} 
+            className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 border-primary/20 overflow-hidden group"
+            onClick={() => handleArticleClick(article.id)}
+          >
+            <CardContent className="p-0">
+              <div className="flex gap-0 md:gap-4 flex-col md:flex-row">
+                <div className="w-full md:w-32 h-48 md:h-auto overflow-hidden">
+                  <img 
+                    src={article.image} 
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex-1 p-4">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-lg font-bold text-primary group-hover:text-primary/80 transition-colors">
+                      {article.title}
+                    </h3>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full whitespace-nowrap">
+                      {new Date(article.created_at).toLocaleDateString('th-TH', { 
+                        day: 'numeric',
+                        month: 'short',
+                        year: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{article.subtitle}</p>
+                  <p className="text-sm line-clamp-2">{article.description}</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
       
       {filteredArticles.length === 0 && (
-        <Card className="border-blue-200">
+        <Card className="border-primary/20">
           <CardContent className="p-8 text-center">
-            <p className="text-gray-500">ไม่พบบทความในช่วงวันที่ที่เลือก</p>
+            <p className="text-muted-foreground">ไม่พบบทความในช่วงเวลาที่เลือก</p>
+            <p className="text-sm text-muted-foreground mt-2">ลองเลือกช่วงเวลาอื่นหรือแสดงบทความทั้งหมด</p>
           </CardContent>
         </Card>
       )}

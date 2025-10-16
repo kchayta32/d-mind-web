@@ -27,7 +27,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
   if (!rainData) return null;
 
   return (
-    <Card className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur">
+    <Card className="bg-white/95 backdrop-blur-sm shadow-lg w-full md:w-auto">
       <CardContent className="p-3">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
