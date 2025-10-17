@@ -99,10 +99,10 @@ const NewMobileLayout: React.FC = () => {
           <CardContent className="p-4">
             <div className="mb-2 text-center">
               <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                สถิติภัยพิบัติวันนี้
+                สถิติภัยพิบัติ 24 ชั่วโมงล่าสุด
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                รีเซ็ตทุก 0:00 น.
+                Last 24 Hours
               </p>
             </div>
             <div className="grid grid-cols-4 gap-2 text-center">
