@@ -22,15 +22,15 @@ export const useDailyDisasterStats = () => {
       try {
         setIsLoading(true);
         
-        // Get today's date at 00:00:00
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Get timestamp for 24 hours ago
+        const twentyFourHoursAgo = new Date();
+        twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
         
-        // Fetch alerts created today
+        // Fetch alerts from last 24 hours
         const { data: alerts, error } = await supabase
           .from('realtime_alerts')
           .select('alert_type')
-          .gte('created_at', today.toISOString())
+          .gte('created_at', twentyFourHoursAgo.toISOString())
           .eq('is_active', true);
 
         if (error) throw error;
@@ -69,23 +69,8 @@ export const useDailyDisasterStats = () => {
     // Refresh stats every 5 minutes
     const interval = setInterval(fetchDailyStats, 5 * 60 * 1000);
 
-    // Reset stats at midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
-
-    const midnightTimeout = setTimeout(() => {
-      fetchDailyStats();
-      // Set up daily reset
-      const dailyReset = setInterval(fetchDailyStats, 24 * 60 * 60 * 1000);
-      return () => clearInterval(dailyReset);
-    }, timeUntilMidnight);
-
     return () => {
       clearInterval(interval);
-      clearTimeout(midnightTimeout);
     };
   }, []);
 
