@@ -1,25 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, Droplets, Flame, Mountain } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface DisasterStat {
-  icon: React.ReactNode;
-  label: string;
-  count: number;
-  color: string;
-}
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
-
-  const disasterStats: DisasterStat[] = [
-    { icon: <AlertTriangle className="w-6 h-6" />, label: 'แผ่นดินไหว', count: 12, color: 'text-yellow-600' },
-    { icon: <Droplets className="w-6 h-6" />, label: 'น้ำท่วม', count: 8, color: 'text-blue-600' },
-    { icon: <Mountain className="w-6 h-6" />, label: 'ดินถล่ม', count: 5, color: 'text-orange-600' },
-    { icon: <Flame className="w-6 h-6" />, label: 'ไฟป่า', count: 3, color: 'text-red-600' },
-  ];
 
   return (
     <section className="relative min-h-[600px] overflow-hidden">
@@ -48,24 +33,6 @@ const HeroSection: React.FC = () => {
             <p className="text-blue-200 text-lg">
               ระบบติดตามภัยพิบัติ • แจ้งเตือนอัจฉริยะ
             </p>
-          </div>
-
-          {/* Real-time Disaster Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {disasterStats.map((stat, index) => (
-              <Card 
-                key={index} 
-                className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-              >
-                <CardContent className="p-6 text-center">
-                  <div className={`${stat.color} mb-3 flex justify-center`}>
-                    {stat.icon}
-                  </div>
-                  <div className="text-3xl font-bold text-gray-800 mb-1">{stat.count}</div>
-                  <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
           </div>
 
           {/* Description and CTA */}
