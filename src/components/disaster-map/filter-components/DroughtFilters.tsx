@@ -54,7 +54,7 @@ export const DroughtFilters: React.FC<DroughtFiltersProps> = ({
             <input 
               type="checkbox" 
               id="smap" 
-              className="rounded" 
+              className="rounded peer" 
               checked={droughtLayers.includes('smap')}
               onChange={(e) => handleDroughtLayerToggle('smap', e.target.checked)}
               disabled
