@@ -160,9 +160,15 @@ const SurveyResults: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="space-y-6">
+      {/* Filters at Top */}
+      <SurveyFilters 
+        onDateRangeChange={handleDateRangeChange}
+        surveyDates={surveyDates}
+      />
+
       {/* Main Content */}
-      <div className="flex-1 space-y-6">
+      <div className="space-y-6">
         {/* Pentagon Radar Chart */}
         <Card>
         <CardHeader>
@@ -228,14 +234,6 @@ const SurveyResults: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      </div>
-
-      {/* Filters Sidebar */}
-      <div className="lg:w-80">
-        <SurveyFilters 
-          onDateRangeChange={handleDateRangeChange}
-          surveyDates={surveyDates}
-        />
       </div>
     </div>
   );

@@ -115,24 +115,24 @@ export const SurveyFilters: React.FC<SurveyFiltersProps> = ({
   ];
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-b from-blue-50 to-white sticky top-4">
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-center gap-2 pb-3 border-b border-blue-200">
+    <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-white">
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Header - Full Width */}
+          <div className="md:col-span-4 flex items-center gap-3 pb-3 border-b border-blue-200">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Filter className="w-4 h-4 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-blue-900">กรองข้อมูล</h3>
-              <p className="text-xs text-blue-600">
-                เลือกช่วงเวลา
+              <h3 className="text-lg font-semibold text-blue-900">กรองข้อมูลการประเมิน</h3>
+              <p className="text-sm text-blue-600">
+                เลือกช่วงเวลาที่ต้องการดูผลการประเมิน
               </p>
             </div>
           </div>
 
           {/* Year Selector */}
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-1">
             <label className="text-sm font-medium flex items-center gap-2 text-blue-900">
               <Calendar className="w-4 h-4 text-blue-600" />
               เลือกปี
@@ -154,7 +154,7 @@ export const SurveyFilters: React.FC<SurveyFiltersProps> = ({
 
           {/* Month Selector */}
           {selectedYear !== 'all' && (
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-1">
               <label className="text-sm font-medium text-blue-900">เลือกเดือน</label>
               <Select value={selectedMonth} onValueChange={handleMonthChange}>
                 <SelectTrigger className="w-full border-blue-200">
@@ -174,7 +174,7 @@ export const SurveyFilters: React.FC<SurveyFiltersProps> = ({
 
           {/* Day Selector */}
           {selectedYear !== 'all' && selectedMonth !== 'all' && (
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-1">
               <label className="text-sm font-medium text-blue-900">เลือกวัน</label>
               <Select value={selectedDay} onValueChange={handleDayChange}>
                 <SelectTrigger className="w-full border-blue-200">
@@ -192,17 +192,19 @@ export const SurveyFilters: React.FC<SurveyFiltersProps> = ({
             </div>
           )}
 
-          {/* Reset Button */}
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            className="w-full border-blue-200 hover:bg-blue-50"
-          >
-            แสดงทั้งหมด
-          </Button>
+          {/* Reset Button & Filter Summary */}
+          <div className="space-y-2 md:col-span-1 flex flex-col justify-end">
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              className="w-full border-blue-200 hover:bg-blue-50"
+            >
+              แสดงทั้งหมด
+            </Button>
+          </div>
 
-          {/* Filter Summary */}
-          <div className="text-xs text-blue-700 bg-blue-50 rounded-lg p-3 border border-blue-100">
+          {/* Filter Summary - Full Width */}
+          <div className="md:col-span-4 text-sm text-blue-700 bg-blue-50 rounded-lg p-4 border border-blue-100">
             <p className="font-medium mb-1">กำลังแสดง:</p>
             <p className="text-blue-900">
               {selectedYear === 'all' 
