@@ -65,6 +65,7 @@ export const DroughtFilters: React.FC<DroughtFiltersProps> = ({
             >
               ความชื้นดิน (SMAP)
             </label>
+          </div>
         </div>
       </div>
     </div>
