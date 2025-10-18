@@ -81,7 +81,7 @@ const disasterTypes: Array<{
     label: 'น้ำท่วม',
     icon: <Waves className="w-4 h-4" />,
     color: 'bg-cyan-500 hover:bg-cyan-600',
-    available: false
+    available: true
   },
   {
     type: 'storm',
