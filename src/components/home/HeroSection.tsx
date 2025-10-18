@@ -51,7 +51,7 @@ const HeroSection: React.FC = () => {
                   className="bg-primary hover:bg-primary/90 text-white shadow-lg"
                   onClick={() => navigate('/disaster-map')}
                 >
-                  ดูแผนที่์
+                  ดูแผนที่
                 </Button>
                 <Button 
                   size="lg" 
