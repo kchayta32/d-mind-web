@@ -60,7 +60,7 @@ export const DroughtFilters: React.FC<DroughtFiltersProps> = ({
               disabled
             />
             <label 
-              htmlFor="ndwi" 
+              htmlFor="smap" 
               className="text-xs peer-disabled:opacity-50"
             >
               ความชื้นดิน (SMAP)
