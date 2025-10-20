@@ -10,12 +10,15 @@ import SurveyForm from '@/components/survey/SurveyForm';
 import SurveyResults from '@/components/survey/SurveyResults';
 import DemoAppSurveyForm from '@/components/survey/DemoAppSurveyForm';
 import BoothSurveyForm from '@/components/survey/BoothSurveyForm';
+import SurveyResultsDashboard from '@/components/survey/SurveyResultsDashboard';
 
 type SurveyType = 'demo-app' | 'booth' | null;
+type ViewMode = 'selection' | 'form' | 'results';
 
 const SatisfactionSurvey: React.FC = () => {
   const { toast } = useToast();
   const [selectedSurveyType, setSelectedSurveyType] = useState<SurveyType>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('selection');
 
   const handleSubmitSurvey = (surveyData: any) => {
     console.log('Survey submitted:', surveyData);
@@ -51,7 +54,30 @@ const SatisfactionSurvey: React.FC = () => {
 
       {/* Main Content */}
       <div className="container max-w-4xl mx-auto p-4">
-        {!selectedSurveyType ? (
+        {viewMode === 'results' ? (
+          /* Results Dashboard */
+          <div className="space-y-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setViewMode('selection')}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              กลับ
+            </Button>
+            <Card className="border-blue-200 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
+                <CardTitle className="text-blue-700 flex items-center gap-2">
+                  <BarChart3 className="h-6 w-6" />
+                  ผลการประเมินความพึงพอใจ
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <SurveyResultsDashboard />
+              </CardContent>
+            </Card>
+          </div>
+        ) : viewMode === 'selection' ? (
           /* Survey Type Selection */
           <div className="space-y-6">
             <Card className="border-blue-200 shadow-lg">
@@ -68,7 +94,10 @@ const SatisfactionSurvey: React.FC = () => {
                   {/* Demo App Survey Card */}
                   <Card 
                     className="border-2 border-blue-200 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => setSelectedSurveyType('demo-app')}
+                    onClick={() => {
+                      setSelectedSurveyType('demo-app');
+                      setViewMode('form');
+                    }}
                   >
                     <CardContent className="p-6 text-center space-y-4">
                       <div className="flex justify-center">
@@ -94,7 +123,10 @@ const SatisfactionSurvey: React.FC = () => {
                   {/* Booth Survey Card */}
                   <Card 
                     className="border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => setSelectedSurveyType('booth')}
+                    onClick={() => {
+                      setSelectedSurveyType('booth');
+                      setViewMode('form');
+                    }}
                   >
                     <CardContent className="p-6 text-center space-y-4">
                       <div className="flex justify-center">
@@ -119,6 +151,20 @@ const SatisfactionSurvey: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Results Button */}
+            <Card className="border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-6 text-center">
+                <Button
+                  onClick={() => setViewMode('results')}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  size="lg"
+                >
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  ดูผลการประเมินความพึงพอใจ
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Info Card */}
             <Card className="border-gray-200 shadow-sm">
               <CardContent className="p-4">
@@ -134,7 +180,10 @@ const SatisfactionSurvey: React.FC = () => {
           <div className="space-y-6">
             <Button 
               variant="outline" 
-              onClick={() => setSelectedSurveyType(null)}
+              onClick={() => {
+                setSelectedSurveyType(null);
+                setViewMode('selection');
+              }}
               className="mb-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -151,7 +200,10 @@ const SatisfactionSurvey: React.FC = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <DemoAppSurveyForm onSubmit={() => setSelectedSurveyType(null)} />
+                    <DemoAppSurveyForm onSubmit={() => {
+                      setSelectedSurveyType(null);
+                      setViewMode('selection');
+                    }} />
                   </CardContent>
                 </Card>
               </>
@@ -168,7 +220,10 @@ const SatisfactionSurvey: React.FC = () => {
                     </p>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <BoothSurveyForm onSubmit={() => setSelectedSurveyType(null)} />
+                    <BoothSurveyForm onSubmit={() => {
+                      setSelectedSurveyType(null);
+                      setViewMode('selection');
+                    }} />
                   </CardContent>
                 </Card>
               </>
