@@ -6,12 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Shield, ArrowLeft } from 'lucide-react';
 
 interface AdminLoginProps {
-  onLogin: (username: string, password: string) => Promise<boolean>;
+  onLogin: (email: string, password: string) => Promise<boolean>;
   onBack: () => void;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onBack }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,7 +20,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onBack }) => {
     setIsLoading(true);
     
     try {
-      await onLogin(username, password);
+      await onLogin(email, password);
     } finally {
       setIsLoading(false);
     }
@@ -51,15 +51,15 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, onBack }) => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="username" className="text-sm font-medium">
-                ชื่อผู้ใช้
+              <Label htmlFor="email" className="text-sm font-medium">
+                อีเมล
               </Label>
               <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="ระบุชื่อผู้ใช้"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@dmind.com"
                 required
                 className="mt-1"
               />

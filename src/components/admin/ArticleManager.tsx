@@ -12,9 +12,11 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
     articles,
     isEditing,
     editingArticle,
+    isLoading,
     handleCreateNew,
     handleEdit,
     handleSave,
+    handleDelete,
     handleCancel,
     updateEditingArticle
   } = useArticleManager(type);
@@ -40,7 +42,9 @@ const ArticleManager: React.FC<ArticleManagerProps> = ({ onBack, type }) => {
           articles={articles}
           onCreateNew={handleCreateNew}
           onEdit={handleEdit}
+          onDelete={handleDelete}
           typeLabel={typeLabel}
+          isLoading={isLoading}
         />
       ) : (
         <ArticleForm

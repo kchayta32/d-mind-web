@@ -88,6 +88,96 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          layout_type: string
+          published: boolean
+          slug: string | null
+          subtitle: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          layout_type?: string
+          published?: boolean
+          slug?: string | null
+          subtitle?: string | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          layout_type?: string
+          published?: boolean
+          slug?: string | null
+          subtitle?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      booth_surveys: {
+        Row: {
+          age: string
+          booth_ratings: Json
+          consent: boolean
+          created_at: string
+          follow_interest: string | null
+          gender: string
+          id: string
+          improvements: string | null
+          knew_before: string
+          most_liked: string | null
+          status: string
+        }
+        Insert: {
+          age: string
+          booth_ratings: Json
+          consent?: boolean
+          created_at?: string
+          follow_interest?: string | null
+          gender: string
+          id?: string
+          improvements?: string | null
+          knew_before: string
+          most_liked?: string | null
+          status: string
+        }
+        Update: {
+          age?: string
+          booth_ratings?: Json
+          consent?: boolean
+          created_at?: string
+          follow_interest?: string | null
+          gender?: string
+          id?: string
+          improvements?: string | null
+          knew_before?: string
+          most_liked?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       damage_assessments: {
         Row: {
           assessment_result: Json
@@ -146,6 +236,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      demo_app_surveys: {
+        Row: {
+          age: string
+          consent: boolean
+          created_at: string
+          device: string
+          gender: string
+          id: string
+          improvements: string | null
+          likes: string | null
+          mobile_app_interest: string | null
+          occupation: string
+          useful_features: string[]
+          ux_ratings: Json
+        }
+        Insert: {
+          age: string
+          consent?: boolean
+          created_at?: string
+          device: string
+          gender: string
+          id?: string
+          improvements?: string | null
+          likes?: string | null
+          mobile_app_interest?: string | null
+          occupation: string
+          useful_features?: string[]
+          ux_ratings: Json
+        }
+        Update: {
+          age?: string
+          consent?: boolean
+          created_at?: string
+          device?: string
+          gender?: string
+          id?: string
+          improvements?: string | null
+          likes?: string | null
+          mobile_app_interest?: string | null
+          occupation?: string
+          useful_features?: string[]
+          ux_ratings?: Json
+        }
+        Relationships: []
       }
       disaster_statistics: {
         Row: {
@@ -647,10 +782,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
       calculate_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
@@ -668,58 +799,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
-      }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
@@ -729,22 +808,7 @@ export type Database = {
           similarity: number
         }[]
       }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      update_analytics_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      update_analytics_stats: { Args: never; Returns: undefined }
       user_has_role: {
         Args: {
           check_user_id: string
@@ -755,30 +819,6 @@ export type Database = {
       user_is_emergency_authorized: {
         Args: { check_user_id: string }
         Returns: boolean
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
       }
     }
     Enums: {

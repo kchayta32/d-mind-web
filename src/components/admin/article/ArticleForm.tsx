@@ -65,10 +65,35 @@ export const ArticleForm: React.FC<ArticleFormProps> = ({
         </div>
         
         <ImageUpload
-          value={article.image || ''}
-          onChange={(url) => onUpdate({ image: url })}
+          value={article.image_url || ''}
+          onChange={(url) => onUpdate({ image_url: url })}
           label={`รูปภาพ${typeLabel}`}
         />
+        
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <Label htmlFor="layout">รูปแบบการแสดงผล</Label>
+            <select
+              id="layout"
+              value={article.layout_type || 'auto'}
+              onChange={(e) => onUpdate({ layout_type: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            >
+              <option value="auto">อัตโนมัติ (ระบบจัด UI/UX)</option>
+              <option value="manual">แมนนวล (จัดเอง)</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 mt-6">
+            <input
+              type="checkbox"
+              id="published"
+              checked={article.published || false}
+              onChange={(e) => onUpdate({ published: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <Label htmlFor="published">เผยแพร่</Label>
+          </div>
+        </div>
         
         <div>
           <Label htmlFor="content">เนื้อหา</Label>
