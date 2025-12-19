@@ -12,7 +12,7 @@ const AppLogo: React.FC<AppLogoProps> = ({ size = 'md', className = '' }) => {
 
   const sizeClasses = {
     sm: 'h-5 w-5',
-    md: 'h-6 w-6', 
+    md: 'h-6 w-6',
     lg: 'h-8 w-8'
   };
 
@@ -27,14 +27,14 @@ const AppLogo: React.FC<AppLogoProps> = ({ size = 'md', className = '' }) => {
   };
 
   return (
-    <div 
+    <div
       className={`bg-gradient-to-br from-blue-600 to-blue-700 ${containerClasses[size]} rounded-xl shadow-md cursor-pointer transition-transform hover:scale-105 ${className}`}
       onClick={handleClick}
       title="กลับหน้าหลัก"
     >
-      <img 
-        src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-        alt="D-MIND Logo" 
+      <img
+        src="/dmind-premium-icon.png"
+        alt="D-MIND Logo"
         className={sizeClasses[size]}
       />
     </div>

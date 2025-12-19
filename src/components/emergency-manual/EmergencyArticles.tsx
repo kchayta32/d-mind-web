@@ -9,6 +9,22 @@ const EmergencyArticles: React.FC = () => {
 
   const articles = [
     {
+      id: 'pm25-clean-air-act-2025',
+      title: "PM2.5 ทำป่วย จี้รัฐบาลใหม่ 60 วันแรก เร่งคืน 'กองทุนอากาศสะอาด' สู่ร่างกฎหมาย",
+      subtitle: 'จาก bangkokbiznews.com',
+      description: 'ผู้เชี่ยวชาญเรียกร้องให้รัฐบาลใหม่เร่งนำร่าง พ.ร.บ. อากาศสะอาด กลับมาพิจารณาภายใน 60 วัน โดยต้องคง "กองทุนอากาศสะอาด" และมาตรการทางเศรษฐศาสตร์ไว้',
+      image: '/lovable-uploads/20251219_1.webp',
+      created_at: '2025-12-19'
+    },
+    {
+      id: 'sri-lanka-flood-2025',
+      title: 'ศรีลังกาเผชิญมหาอุทกภัย "ที่ท้าทายที่สุด" ในประวัติศาสตร์ประเทศ เสียชีวิตแล้วทะลุ 300 ราย',
+      subtitle: 'จาก BBC NEWS ไทย',
+      description: 'ศรีลังกากำลังเผชิญกับวิกฤตอุทกภัยครั้งใหญ่ที่สุดในประวัติศาสตร์ของประเทศ โดยยอดผู้เสียชีวิตล่าสุดพุ่งสูงทะลุ 300 รายแล้ว',
+      image: '/lovable-uploads/2025121_1.webp',
+      created_at: '2025-12-01'
+    },
+    {
       id: 'air-quality-index',
       title: 'Air Quality Index',
       subtitle: 'จาก airtw.moenv.gov.tw',
@@ -53,7 +69,7 @@ const EmergencyArticles: React.FC = () => {
       title: 'แผ่นดินไหวในภูมิภาคเอเชียตะวันออกเฉียงใต้',
       subtitle: 'จาก USGS และ TMD',
       description: 'ข้อมูลแผ่นดินไหวในไทย เมียนมาร์ และลาว',
-      image: '/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png',
+      image: '/dmind-premium-icon.png',
       created_at: '2025-05-25'
     },
     {
@@ -84,7 +100,7 @@ const EmergencyArticles: React.FC = () => {
 
   const filteredArticles = useMemo(() => {
     if (!dateRange) return articles;
-    
+
     return articles.filter(article => {
       const articleDate = new Date(article.created_at);
       return articleDate >= dateRange.start && articleDate <= dateRange.end;
@@ -105,24 +121,24 @@ const EmergencyArticles: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <ImprovedArticleTimeline 
+      <ImprovedArticleTimeline
         onDateRangeChange={handleDateRangeChange}
         onShowAll={handleShowAll}
         articles={articles}
       />
-      
+
       <div className="grid gap-4">
         {filteredArticles.map((article) => (
-          <Card 
-            key={article.id} 
+          <Card
+            key={article.id}
             className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 border-primary/20 overflow-hidden group"
             onClick={() => handleArticleClick(article.id)}
           >
             <CardContent className="p-0">
               <div className="flex gap-0 md:gap-4 flex-col md:flex-row">
                 <div className="w-full md:w-32 h-48 md:h-auto overflow-hidden">
-                  <img 
-                    src={article.image} 
+                  <img
+                    src={article.image}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
@@ -133,7 +149,7 @@ const EmergencyArticles: React.FC = () => {
                       {article.title}
                     </h3>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full whitespace-nowrap">
-                      {new Date(article.created_at).toLocaleDateString('th-TH', { 
+                      {new Date(article.created_at).toLocaleDateString('th-TH', {
                         day: 'numeric',
                         month: 'short',
                         year: '2-digit'
@@ -148,7 +164,7 @@ const EmergencyArticles: React.FC = () => {
           </Card>
         ))}
       </div>
-      
+
       {filteredArticles.length === 0 && (
         <Card className="border-primary/20">
           <CardContent className="p-8 text-center">

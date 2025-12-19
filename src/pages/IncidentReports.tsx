@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, List, AlertTriangle } from 'lucide-react';
@@ -7,33 +6,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import IncidentReportForm from '@/components/incident-reports/IncidentReportForm';
 import IncidentReportsList from '@/components/incident-reports/IncidentReportsList';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/contexts/LanguageProvider';
 
 const IncidentReports: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('list');
+  const { t } = useLanguage();
 
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950">
         {/* Header */}
-        <header className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 shadow-lg">
+        <header className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-800 dark:to-red-900 text-white p-4 shadow-lg">
           <div className="container mx-auto max-w-7xl flex items-center">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white mr-3 hover:bg-red-400/30 rounded-full" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white mr-3 hover:bg-white/10 rounded-full"
               onClick={() => navigate('/')}
             >
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
+              <img
+                src="/dmind-premium-icon.png"
+                alt="D-MIND Logo"
                 className="h-8 w-8 mr-3"
               />
-              <h1 className="text-xl font-bold">รายงานเหตุการณ์ภัยพิบัติ</h1>
+              <h1 className="text-xl font-bold">{t('incidentReports.title')}</h1>
             </div>
           </div>
         </header>
@@ -44,18 +45,18 @@ const IncidentReports: React.FC = () => {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="list" className="flex items-center gap-2">
                 <List className="h-4 w-4" />
-                รายการรายงาน
+                {t('incidentReports.tabList')}
               </TabsTrigger>
               <TabsTrigger value="report" className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
-                รายงานใหม่
+                {t('incidentReports.tabNew')}
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="list" className="mt-6">
               <IncidentReportsList />
             </TabsContent>
-            
+
             <TabsContent value="report" className="mt-6">
               <IncidentReportForm />
             </TabsContent>
@@ -67,26 +68,26 @@ const IncidentReports: React.FC = () => {
 
   // Desktop layout
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950 flex">
       {/* Sidebar */}
-      <aside className="w-80 bg-white shadow-xl border-r border-red-100">
+      <aside className="w-80 bg-white dark:bg-slate-900 shadow-xl border-r border-red-100 dark:border-red-900">
         <div className="p-6">
-          <Button 
-            variant="ghost" 
-            className="mb-4 text-red-600 hover:bg-red-50"
+          <Button
+            variant="ghost"
+            className="mb-4 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
             onClick={() => navigate('/')}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            กลับหน้าหลัก
+            {t('common.back')}
           </Button>
-          
+
           <div className="flex items-center mb-6">
-            <img 
-              src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-              alt="D-MIND Logo" 
+            <img
+              src="/dmind-premium-icon.png"
+              alt="D-MIND Logo"
               className="h-8 w-8 mr-3"
             />
-            <h1 className="text-xl font-bold text-red-700">รายงานเหตุการณ์</h1>
+            <h1 className="text-xl font-bold text-red-700 dark:text-red-400">{t('incidentReports.title')}</h1>
           </div>
 
           <div className="space-y-3">
@@ -96,7 +97,7 @@ const IncidentReports: React.FC = () => {
               onClick={() => setActiveTab('list')}
             >
               <List className="mr-2 h-4 w-4" />
-              รายการรายงาน
+              {t('incidentReports.tabList')}
             </Button>
             <Button
               variant={activeTab === 'report' ? 'default' : 'outline'}
@@ -104,20 +105,20 @@ const IncidentReports: React.FC = () => {
               onClick={() => setActiveTab('report')}
             >
               <Plus className="mr-2 h-4 w-4" />
-              รายงานเหตุการณ์ใหม่
+              {t('incidentReports.tabNew')}
             </Button>
           </div>
 
-          <div className="mt-6 p-4 bg-red-50 rounded-lg">
+          <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="h-4 w-4 text-red-500" />
-              <span className="font-semibold text-red-700">คำแนะนำ</span>
+              <span className="font-semibold text-red-700 dark:text-red-400">{t('incidentReports.adviceTitle')}</span>
             </div>
-            <ul className="text-sm text-red-600 space-y-1">
-              <li>• รายงานเหตุการณ์ที่เกิดขึ้นจริง</li>
-              <li>• แนบรูปภาพประกอบหากเป็นไปได้</li>
-              <li>• ระบุตำแหน่งให้ชัดเจน</li>
-              <li>• ข้อมูลจะถูกส่งไปยังหน่วยงานที่เกี่ยวข้อง</li>
+            <ul className="text-sm text-red-600 dark:text-red-300 space-y-1">
+              <li>• {t('incidentReports.advice1')}</li>
+              <li>• {t('incidentReports.advice2')}</li>
+              <li>• {t('incidentReports.advice3')}</li>
+              <li>• {t('incidentReports.advice4')}</li>
             </ul>
           </div>
         </div>
@@ -125,14 +126,14 @@ const IncidentReports: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
-        <header className="bg-white shadow-sm border-b border-gray-200 p-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            {activeTab === 'list' ? 'รายการรายงานเหตุการณ์' : 'รายงานเหตุการณ์ใหม่'}
+        <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-gray-200 dark:border-gray-800 p-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+            {activeTab === 'list' ? t('incidentReports.listTitle') : t('incidentReports.newReportTitle')}
           </h2>
-          <p className="text-gray-600 mt-2">
-            {activeTab === 'list' 
-              ? 'ติดตามสถานะรายงานเหตุการณ์ภัยพิบัติ' 
-              : 'แจ้งเหตุการณ์ภัยพิบัติหรือสถานการณ์ฉุกเฉิน'
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {activeTab === 'list'
+              ? t('incidentReports.listDesc')
+              : t('incidentReports.subtitle')
             }
           </p>
         </header>

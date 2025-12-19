@@ -59,11 +59,11 @@ const EmergencyAlertSystem: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       // Transform data to match our interface
       return data.map(alert => ({
         ...alert,
-        coordinates: typeof alert.coordinates === 'object' && alert.coordinates !== null 
+        coordinates: typeof alert.coordinates === 'object' && alert.coordinates !== null
           ? alert.coordinates as { lat: number; lng: number }
           : { lat: 0, lng: 0 },
         affected_provinces: alert.affected_provinces || []
@@ -86,12 +86,12 @@ const EmergencyAlertSystem: React.FC = () => {
         },
         (payload) => {
           const newAlert = payload.new as any;
-          
+
           // Send push notification without actions
           sendNotification(`🚨 ${newAlert.title}`, {
             body: newAlert.message,
-            icon: "/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png",
-            badge: "/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png",
+            icon: "/dmind-premium-icon.png",
+            badge: "/dmind-premium-icon.png",
             tag: `emergency-${newAlert.id}`,
             requireInteraction: true
           });
@@ -106,7 +106,7 @@ const EmergencyAlertSystem: React.FC = () => {
 
           // Play emergency sound
           playEmergencySound();
-          
+
           // Refetch data
           refetch();
         }
@@ -121,21 +121,21 @@ const EmergencyAlertSystem: React.FC = () => {
   const playEmergencySound = () => {
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+
       // Create a more urgent emergency sound
       for (let i = 0; i < 3; i++) {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
-        
+
         oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + i * 0.5);
         oscillator.frequency.setValueAtTime(800, audioContext.currentTime + i * 0.5 + 0.2);
-        
+
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + i * 0.5);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.5 + 0.4);
-        
+
         oscillator.start(audioContext.currentTime + i * 0.5);
         oscillator.stop(audioContext.currentTime + i * 0.5 + 0.4);
       }
@@ -146,7 +146,7 @@ const EmergencyAlertSystem: React.FC = () => {
 
   const handleSOSActivation = () => {
     setSosActivated(true);
-    
+
     // Get user's current location and send SOS alert
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -160,7 +160,7 @@ const EmergencyAlertSystem: React.FC = () => {
             // Send SOS notification
             sendNotification("🆘 SOS ถูกเปิดใช้งาน", {
               body: `ตำแหน่ง: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`,
-              icon: "/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png",
+              icon: "/dmind-premium-icon.png",
               tag: "sos-alert",
               requireInteraction: true,
             });
@@ -229,11 +229,10 @@ const EmergencyAlertSystem: React.FC = () => {
           <Button
             onClick={handleSOSActivation}
             disabled={sosActivated}
-            className={`w-full h-16 text-lg font-bold ${
-              sosActivated 
-                ? 'bg-gray-400 cursor-not-allowed' 
+            className={`w-full h-16 text-lg font-bold ${sosActivated
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-red-600 hover:bg-red-700 animate-pulse'
-            }`}
+              }`}
           >
             {sosActivated ? (
               <>
@@ -294,15 +293,15 @@ const EmergencyAlertSystem: React.FC = () => {
                       {new Date(alert.created_at).toLocaleString('th-TH')}
                     </div>
                   </div>
-                  
+
                   <h3 className="font-semibold text-red-800 mb-2">
                     {alert.title}
                   </h3>
-                  
+
                   <p className="text-red-700 mb-3">
                     {alert.message}
                   </p>
-                  
+
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3 w-3" />

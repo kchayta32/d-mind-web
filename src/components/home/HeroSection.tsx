@@ -12,15 +12,15 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/hero-background.png)' }}></div>
       {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-black/20"></div>
-      
+
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-6xl mx-auto">
           {/* Logo and Title */}
           <div className="text-center mb-12 animate-fade-in">
             <div className="flex items-center justify-center mb-6">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
+              <img
+                src="/dmind-premium-icon.png"
+                alt="D-MIND Logo"
                 className="h-20 w-20 drop-shadow-2xl"
               />
             </div>
@@ -42,20 +42,20 @@ const HeroSection: React.FC = () => {
                 ระบบติดตามและแจ้งเตือนภัยพิบัติอัจฉริยะ
               </h2>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-                D-MIND เป็นระบบ AIoT ที่ช่วยติดตามและแจ้งเตือนภัยพิบัติแบบอัจฉริยะ 
+                D-MIND เป็นระบบ AIoT ที่ช่วยติดตามและแจ้งเตือนภัยพิบัติแบบอัจฉริยะ
                 พร้อมด้วยระบบวิเคราะห์ข้อมูลอัจฉริยะเพื่อความปลอดภัยของคุณและชุมชน
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-primary hover:bg-primary/90 text-white shadow-lg"
                   onClick={() => navigate('/disaster-map')}
                 >
                   ดูแผนที่
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  size="lg"
+                  variant="outline"
                   className="bg-white hover:bg-gray-50 border-2"
                   onClick={() => navigate('/app-guide')}
                 >

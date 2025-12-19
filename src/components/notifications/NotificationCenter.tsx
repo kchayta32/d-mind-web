@@ -72,8 +72,8 @@ const NotificationCenter: React.FC = () => {
     if (settings.enabled) {
       sendNotification("🚨 ทดสอบการแจ้งเตือน", {
         body: "ระบบแจ้งเตือนทำงานปกติ - D-MIND",
-        icon: "/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png",
-        badge: "/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png",
+        icon: "/dmind-premium-icon.png",
+        badge: "/dmind-premium-icon.png",
         tag: "test-notification",
         requireInteraction: true,
       });
@@ -86,17 +86,17 @@ const NotificationCenter: React.FC = () => {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
+
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
       oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
-      
+
       gainNode.gain.setValueAtTime(settings.volume / 100, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      
+
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
     }
@@ -113,7 +113,7 @@ const NotificationCenter: React.FC = () => {
           รับแจ้งเตือนแบบเรียลไทม์เมื่อมีเหตุการณ์ภัยพิบัติ
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Permission Status */}
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -141,7 +141,7 @@ const NotificationCenter: React.FC = () => {
             </Button>
           ) : (
             <div className="flex gap-2">
-              <Button 
+              <Button
                 variant={settings.enabled ? "destructive" : "default"}
                 onClick={settings.enabled ? handleDisableNotifications : handleEnableNotifications}
                 className="flex-1"
@@ -158,7 +158,7 @@ const NotificationCenter: React.FC = () => {
                   </>
                 )}
               </Button>
-              
+
               <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -172,7 +172,7 @@ const NotificationCenter: React.FC = () => {
                       ปรับแต่งการแจ้งเตือนตามความต้องการ
                     </DialogDescription>
                   </DialogHeader>
-                  
+
                   <div className="space-y-4">
                     {/* Sound Settings */}
                     <div className="space-y-3">
@@ -184,18 +184,18 @@ const NotificationCenter: React.FC = () => {
                         <Switch
                           id="sound-toggle"
                           checked={settings.sound}
-                          onCheckedChange={(checked) => 
+                          onCheckedChange={(checked) =>
                             saveSettings({ ...settings, sound: checked })
                           }
                         />
                       </div>
-                      
+
                       {settings.sound && (
                         <div className="space-y-2">
                           <Label>ความดังเสียง: {settings.volume}%</Label>
                           <Slider
                             value={[settings.volume]}
-                            onValueChange={([value]) => 
+                            onValueChange={([value]) =>
                               saveSettings({ ...settings, volume: value })
                             }
                             max={100}
@@ -211,7 +211,7 @@ const NotificationCenter: React.FC = () => {
                       <Switch
                         id="emergency-only"
                         checked={settings.emergencyOnly}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked) =>
                           saveSettings({ ...settings, emergencyOnly: checked })
                         }
                       />

@@ -12,8 +12,8 @@ const NaturalDisastersArticle: React.FC = () => {
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 shadow-lg">
         <div className="container max-w-4xl mx-auto flex items-center">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             className="text-white mr-3 hover:bg-blue-400/30 rounded-full"
             onClick={() => navigate('/manual')}
@@ -21,9 +21,9 @@ const NaturalDisastersArticle: React.FC = () => {
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-              alt="D-MIND Logo" 
+            <img
+              src="/dmind-premium-icon.png"
+              alt="D-MIND Logo"
               className="h-8 w-8 mr-3"
             />
             <div>
@@ -38,7 +38,7 @@ const NaturalDisastersArticle: React.FC = () => {
       <div className="container max-w-4xl mx-auto p-4">
         <article className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header with background image */}
-          <div 
+          <div
             className="h-64 bg-cover bg-center bg-gray-300 relative"
             style={{
               backgroundImage: `url('/lovable-uploads/aa72c068-2cf3-4b36-be9e-a7eb6351cb9d.png')`,
@@ -93,17 +93,17 @@ const NaturalDisastersArticle: React.FC = () => {
                   <h3 className="text-xl font-semibold text-red-800 mb-3">ธรณีพิบัติภัย</h3>
                   <p className="text-gray-700">ภัยพิบัติทางธรรมชาติที่เกิดจากพื้นดิน เช่น แผ่นดินไหว ภูเขาไฟระเบิด และดินถล่ม</p>
                 </div>
-                
+
                 <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
                   <h3 className="text-xl font-semibold text-blue-800 mb-3">อุทกภัย</h3>
                   <p className="text-gray-700">ภัยพิบัติทางธรรมชาติที่เกิดจากน้ำ เช่น น้ำท่วม น้ำป่าไหลหลาก และคลื่นสึนามิ</p>
                 </div>
-                
+
                 <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
                   <h3 className="text-xl font-semibold text-yellow-800 mb-3">วาตภัย</h3>
                   <p className="text-gray-700">ภัยพิบัติทางอากาศ เช่น พายุประเภทต่าง ๆ</p>
                 </div>
-                
+
                 <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
                   <h3 className="text-xl font-semibold text-orange-800 mb-3">อัคคีภัย</h3>
                   <p className="text-gray-700">ภัยพิบัติทางธรรมชาติที่เกิดจากไฟ เช่น ไฟป่า ทั้งนี้การเกิดไฟป่าในบางครั้งก็อาจเกิดจากมนุษย์ได้เช่นกัน</p>
@@ -170,17 +170,17 @@ const NaturalDisastersArticle: React.FC = () => {
                   <h4 className="text-lg font-semibold text-blue-800 mb-3">ความช่วยเหลือฉุกเฉิน</h4>
                   <p className="text-gray-700">มอบความช่วยเหลือขั้นพื้นฐานและปัจจัยสี่ เช่น ที่พักพิง อาหาร น้ำสะอาด สิ่งของบรรเทาทุกข์ และการรักษาพยาบาล</p>
                 </div>
-                
+
                 <div className="bg-green-50 p-6 rounded-lg">
                   <h4 className="text-lg font-semibold text-green-800 mb-3">การพัฒนาที่พักพิง</h4>
                   <p className="text-gray-700">เข้าไปช่วยพัฒนาและสร้างที่พักพิงที่แข็งแรงให้แก่ผู้ประสบภัยจากภัยพิบัติทางธรรมชาติ</p>
                 </div>
-                
+
                 <div className="bg-yellow-50 p-6 rounded-lg">
                   <h4 className="text-lg font-semibold text-yellow-800 mb-3">การดูแลสุขภาพ</h4>
                   <p className="text-gray-700">ส่งมอบความช่วยเหลือด้านการรักษาพยาบาล และการเยียวยาจิตใจ</p>
                 </div>
-                
+
                 <div className="bg-purple-50 p-6 rounded-lg">
                   <h4 className="text-lg font-semibold text-purple-800 mb-3">การดูแลเด็กและครอบครัว</h4>
                   <p className="text-gray-700">การทำงานเพื่อดูแลเด็ก และครอบครัวที่เสี่ยงป่วยด้วยโรคขาดสารอาหาร</p>

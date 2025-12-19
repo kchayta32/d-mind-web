@@ -19,6 +19,7 @@ import Analytics from "./pages/Analytics";
 import NotificationSettings from "./pages/NotificationSettings";
 import DamageAssessment from "./pages/DamageAssessment";
 import NotFound from "./pages/NotFound";
+import ContactUs from "./pages/ContactUs";
 
 const queryClient = new QueryClient();
 
@@ -30,9 +31,9 @@ const BasicLoadingScreen = () => {
         <div className="relative">
           <div className="absolute -inset-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl blur-lg opacity-30 animate-pulse"></div>
           <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-3xl shadow-2xl">
-            <img 
-              src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-              alt="D-MIND Logo" 
+            <img
+              src="/dmind-premium-icon.png"
+              alt="D-MIND Logo"
               className="h-20 w-20 drop-shadow-lg"
             />
           </div>
@@ -84,8 +85,8 @@ class AppErrorBoundary extends Component<
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">เกิดข้อผิดพลาด</h1>
             <p className="text-red-500">กรุณารีเฟรชหน้าเว็บ</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               รีเฟรช
@@ -113,6 +114,7 @@ const AppRoutes = () => {
         <Route path="/manual" element={<EmergencyManual />} />
         <Route path="/contacts" element={<EmergencyContacts />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/contactme" element={<ContactUs />} />
         <Route path="/disaster-map" element={<DisasterMap />} />
         <Route path="/victim-reports" element={<VictimReports />} />
         <Route path="/incident-reports" element={<IncidentReports />} />
@@ -129,14 +131,21 @@ const AppRoutes = () => {
   );
 };
 
+import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { LanguageProvider } from "@/contexts/LanguageProvider";
+
 const App = () => {
   return (
     <AppErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AppRoutes />
-        <Toaster />
-        <Sonner />
-      </QueryClientProvider>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <LanguageProvider defaultLanguage="th" storageKey="app-language">
+          <QueryClientProvider client={queryClient}>
+            <AppRoutes />
+            <Toaster />
+            <Sonner />
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </AppErrorBoundary>
   );
 };

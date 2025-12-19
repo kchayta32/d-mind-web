@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Home, 
-  Phone, 
-  Star, 
-  BookOpen, 
-  Info, 
+import {
+  Home,
+  Phone,
+  Star,
+  BookOpen,
+  Info,
   Mail,
   Moon,
   Sun,
@@ -46,9 +46,9 @@ const NewMobileLayout: React.FC = () => {
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
+              <img
+                src="/dmind-premium-icon.png"
+                alt="D-MIND Logo"
                 className="h-10 w-10"
               />
               <div>
@@ -85,7 +85,7 @@ const NewMobileLayout: React.FC = () => {
         <p className="text-blue-100 text-sm mb-4">
           ระบบติดตามภัยพิบัติและแจ้งเตือนอัจฉริยะ
         </p>
-        <Button 
+        <Button
           className="w-full bg-white text-primary hover:bg-gray-100"
           onClick={() => navigate('/disaster-map')}
         >
@@ -138,9 +138,9 @@ const NewMobileLayout: React.FC = () => {
       {/* Main Content */}
       <div className="px-4 py-6 space-y-4">
         <h3 className="text-lg font-bold text-gray-800 dark:text-white">เมนูหลัก</h3>
-        
+
         <div className="grid grid-cols-2 gap-3">
-          <Card 
+          <Card
             className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => navigate('/contacts')}
           >
@@ -152,7 +152,7 @@ const NewMobileLayout: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => navigate('/survey')}
           >
@@ -164,7 +164,7 @@ const NewMobileLayout: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => navigate('/manual')}
           >
@@ -176,7 +176,7 @@ const NewMobileLayout: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => navigate('/app-guide')}
           >
@@ -200,11 +200,10 @@ const NewMobileLayout: React.FC = () => {
                 setActiveTab(action.id);
                 navigate(action.route);
               }}
-              className={`flex flex-col items-center justify-center py-3 transition-colors ${
-                activeTab === action.id 
-                  ? 'text-primary' 
+              className={`flex flex-col items-center justify-center py-3 transition-colors ${activeTab === action.id
+                  ? 'text-primary'
                   : 'text-gray-500 dark:text-gray-400'
-              }`}
+                }`}
             >
               {action.icon}
               <span className="text-xs mt-1">{action.label}</span>

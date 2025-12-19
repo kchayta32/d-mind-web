@@ -11,11 +11,23 @@ import UVAerosolIndexArticle from '@/components/articles/UVAerosolIndexArticle';
 import AirPollutionControlProgramArticle from '@/components/articles/AirPollutionControlProgramArticle';
 import EarthquakeResponseArticle from '@/components/articles/EarthquakeResponseArticle';
 import ArticleNotFound from '@/components/articles/ArticleNotFound';
+import DMindLaunchArticle from '@/components/articles/DMindLaunchArticle';
+import SystemUpdateArticle from '@/components/articles/SystemUpdateArticle';
+import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
+import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
 
 const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'pm25-clean-air-act-2025':
+      return <PM25CleanAirActArticle />;
+    case 'sri-lanka-flood-2025':
+      return <SriLankaFloodArticle />;
+    case 'dmind-app-launch':
+      return <DMindLaunchArticle />;
+    case 'system-update-v2':
+      return <SystemUpdateArticle />;
     case 'air-quality-index':
       return <AirQualityIndexArticle />;
     case 'uv-aerosol-index':

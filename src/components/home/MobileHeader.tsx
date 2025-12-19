@@ -8,9 +8,9 @@ const MobileHeader: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-2 rounded-xl shadow-md">
-              <img 
-                src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-                alt="D-MIND Logo" 
+              <img
+                src="/dmind-premium-icon.png"
+                alt="D-MIND Logo"
                 className="h-6 w-6"
               />
             </div>

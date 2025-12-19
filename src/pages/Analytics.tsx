@@ -1,26 +1,23 @@
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Loader2, BarChart3, PieChart, TrendingUp, ArrowLeft, Home } from 'lucide-react';
+import { Loader2, TrendingUp, BarChart3, Activity } from 'lucide-react';
 import DashboardChart from '@/components/analytics/DashboardChart';
 import MetricsOverview from '@/components/analytics/MetricsOverview';
+import MainLayout from '@/components/layout/MainLayout';
 
 const Analytics: React.FC = () => {
-  const navigate = useNavigate();
   const { processedData, activeAlerts, incidentReports, disasterStats, isLoading } = useAnalytics();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <MainLayout className="flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-gray-600">กำลังโหลดข้อมูลสถิติ...</p>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
@@ -41,7 +38,7 @@ const Analytics: React.FC = () => {
   }));
 
   const provinceData = Object.entries(processedData.provinceStats)
-    .sort(([,a], [,b]) => (b as number) - (a as number))
+    .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, 10)
     .map(([name, value]) => ({
       name: name,
@@ -49,34 +46,27 @@ const Analytics: React.FC = () => {
     }));
 
   const statusData = Object.entries(processedData.incidentStatus).map(([name, value]) => ({
-    name: name === 'pending' ? 'รอดำเนินการ' : 
-          name === 'in_progress' ? 'กำลังดำเนินการ' : 
-          name === 'resolved' ? 'แก้ไขแล้ว' : name,
+    name: name === 'pending' ? 'รอดำเนินการ' :
+      name === 'in_progress' ? 'กำลังดำเนินการ' :
+        name === 'resolved' ? 'แก้ไขแล้ว' : name,
     value: value as number
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <MainLayout className="bg-slate-50/50">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Analytics</h1>
-            <p className="text-gray-600">ภาพรวมและสถิติระบบติดตามภัยพิบัติ</p>
-          </div>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 hover:bg-blue-50"
-          >
-            <Home className="h-4 w-4" />
-            กลับหน้าหลัก
-          </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <BarChart3 className="w-8 h-8 text-blue-600" />
+            Dashboard Analytics
+          </h1>
+          <p className="text-slate-600">ภาพรวมและสถิติระบบติดตามภัยพิบัติ</p>
         </div>
 
         {/* Metrics Overview */}
         <div className="mb-8">
-          <MetricsOverview 
+          <MetricsOverview
             activeAlerts={activeAlerts}
             incidentReports={incidentReports}
             disasterStats={disasterStats}
@@ -85,56 +75,66 @@ const Analytics: React.FC = () => {
 
         {/* Charts Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full lg:w-[600px] grid-cols-4">
-            <TabsTrigger value="overview">ภาพรวม</TabsTrigger>
-            <TabsTrigger value="disasters">ภัยพิบัติ</TabsTrigger>
-            <TabsTrigger value="incidents">เหตุการณ์</TabsTrigger>
-            <TabsTrigger value="geography">พื้นที่</TabsTrigger>
+          <TabsList className="grid w-full lg:w-[600px] grid-cols-4 bg-white/50 backdrop-blur-sm border border-slate-200 p-1">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">ภาพรวม</TabsTrigger>
+            <TabsTrigger value="disasters" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">ภัยพิบัติ</TabsTrigger>
+            <TabsTrigger value="incidents" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">เหตุการณ์</TabsTrigger>
+            <TabsTrigger value="geography" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">พื้นที่</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-6 animate-in fade-in-50 zoom-in-95 duration-300">
             <div className="grid gap-6 md:grid-cols-2">
-              <DashboardChart
-                title="การแจ้งเตือนตามระดับความรุนแรง"
-                description="จำนวนการแจ้งเตือนที่ใช้งานอยู่แยกตามระดับ"
-                data={severityData}
-                type="pie"
-              />
-              <DashboardChart
-                title="แนวโน้มรายเดือน"
-                description="จำนวนเหตุการณ์ภัยพิบัติรายเดือน"
-                data={monthlyData}
-                type="line"
-              />
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-2">
+                <DashboardChart
+                  title="การแจ้งเตือนตามระดับความรุนแรง"
+                  description="จำนวนการแจ้งเตือนที่ใช้งานอยู่แยกตามระดับ"
+                  data={severityData}
+                  type="pie"
+                />
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-2">
+                <DashboardChart
+                  title="แนวโน้มรายเดือน"
+                  description="จำนวนเหตุการณ์ภัยพิบัติรายเดือน"
+                  data={monthlyData}
+                  type="line"
+                />
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="disasters" className="space-y-6">
+          <TabsContent value="disasters" className="space-y-6 animate-in fade-in-50 zoom-in-95 duration-300">
             <div className="grid gap-6 md:grid-cols-2">
-              <DashboardChart
-                title="ประเภทภัยพิบัติ"
-                description="การแบ่งตามประเภทของภัยพิบัติ"
-                data={disasterTypeData}
-                type="bar"
-              />
-              <DashboardChart
-                title="การกระจายตามระดับความรุนแรง"
-                description="สัดส่วนของภัยพิบัติตามระดับความรุนแรง"
-                data={severityData}
-                type="pie"
-              />
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-2">
+                <DashboardChart
+                  title="ประเภทภัยพิบัติ"
+                  description="การแบ่งตามประเภทของภัยพิบัติ"
+                  data={disasterTypeData}
+                  type="bar"
+                />
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-2">
+                <DashboardChart
+                  title="การกระจายตามระดับความรุนแรง"
+                  description="สัดส่วนของภัยพิบัติตามระดับความรุนแรง"
+                  data={severityData}
+                  type="pie"
+                />
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="incidents" className="space-y-6">
+          <TabsContent value="incidents" className="space-y-6 animate-in fade-in-50 zoom-in-95 duration-300">
             <div className="grid gap-6 md:grid-cols-2">
-              <DashboardChart
-                title="สถานะการรายงานเหตุการณ์"
-                description="การแบ่งตามสถานะของรายงานเหตุการณ์"
-                data={statusData}
-                type="pie"
-              />
-              <Card>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-2">
+                <DashboardChart
+                  title="สถานะการรายงานเหตุการณ์"
+                  description="การแบ่งตามสถานะของรายงานเหตุการณ์"
+                  data={statusData}
+                  type="pie"
+                />
+              </div>
+              <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <TrendingUp className="mr-2 h-5 w-5 text-green-600" />
@@ -146,18 +146,18 @@ const Analytics: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                      <span className="font-medium">รายงานทั้งหมด</span>
+                    <div className="flex justify-between items-center p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                      <span className="font-medium text-slate-700">รายงานทั้งหมด</span>
                       <span className="text-2xl font-bold text-blue-600">{incidentReports.length}</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                      <span className="font-medium">ได้รับการยืนยัน</span>
+                    <div className="flex justify-between items-center p-4 bg-green-50/50 border border-green-100 rounded-xl">
+                      <span className="font-medium text-slate-700">ได้รับการยืนยัน</span>
                       <span className="text-2xl font-bold text-green-600">
                         {incidentReports.filter(r => r.is_verified).length}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                      <span className="font-medium">อยู่ระหว่างดำเนินการ</span>
+                    <div className="flex justify-between items-center p-4 bg-orange-50/50 border border-orange-100 rounded-xl">
+                      <span className="font-medium text-slate-700">อยู่ระหว่างดำเนินการ</span>
                       <span className="text-2xl font-bold text-orange-600">
                         {incidentReports.filter(r => r.status === 'pending').length}
                       </span>
@@ -168,18 +168,20 @@ const Analytics: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="geography" className="space-y-6">
-            <DashboardChart
-              title="จังหวัดที่มีเหตุการณ์มากที่สุด (10 อันดับ)"
-              description="จำนวนเหตุการณ์ภัยพิบัติแยกตามจังหวัด"
-              data={provinceData}
-              type="bar"
-              height={400}
-            />
+          <TabsContent value="geography" className="space-y-6 animate-in fade-in-50 zoom-in-95 duration-300">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm p-4">
+              <DashboardChart
+                title="จังหวัดที่มีเหตุการณ์มากที่สุด (10 อันดับ)"
+                description="จำนวนเหตุการณ์ภัยพิบัติแยกตามจังหวัด"
+                data={provinceData}
+                type="bar"
+                height={400}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

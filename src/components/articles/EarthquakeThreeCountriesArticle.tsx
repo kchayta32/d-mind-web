@@ -12,8 +12,8 @@ const EarthquakeThreeCountriesArticle: React.FC = () => {
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 shadow-lg">
         <div className="container max-w-4xl mx-auto flex items-center">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             className="text-white mr-3 hover:bg-blue-400/30 rounded-full"
             onClick={() => navigate('/manual')}
@@ -21,9 +21,9 @@ const EarthquakeThreeCountriesArticle: React.FC = () => {
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-              alt="D-MIND Logo" 
+            <img
+              src="/dmind-premium-icon.png"
+              alt="D-MIND Logo"
               className="h-8 w-8 mr-3"
             />
             <div>
@@ -38,7 +38,7 @@ const EarthquakeThreeCountriesArticle: React.FC = () => {
       <div className="container max-w-4xl mx-auto p-4">
         <article className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header with background image */}
-          <div 
+          <div
             className="h-64 bg-cover bg-center bg-gray-300 relative"
             style={{
               backgroundImage: `url('/lovable-uploads/9b24d25c-901c-4aaf-98dd-78419a5984cd.png')`,
@@ -145,7 +145,7 @@ const EarthquakeThreeCountriesArticle: React.FC = () => {
 
               <div className="bg-gray-50 p-6 rounded-lg my-6">
                 <p className="text-sm text-gray-600">
-                  <strong>อ้างอิง-ภาพ:</strong> 
+                  <strong>อ้างอิง-ภาพ:</strong>
                   <a href="https://earthquake.tmd.go.th/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
                     กองเฝ้าระวังแผ่นดินไหว
                   </a>

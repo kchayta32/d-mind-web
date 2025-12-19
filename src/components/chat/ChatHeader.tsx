@@ -10,8 +10,8 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onGoBack }) => {
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center shadow-lg">
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         size="icon"
         className="text-white mr-3 hover:bg-blue-500/30 rounded-full"
         onClick={onGoBack}
@@ -19,9 +19,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onGoBack }) => {
         <ArrowLeft size={24} />
       </Button>
       <div className="flex items-center">
-        <img 
-          src="/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png" 
-          alt="D-MIND Logo" 
+        <img
+          src="/dmind-premium-icon.png"
+          alt="D-MIND Logo"
           className="h-8 w-8 mr-3"
         />
         <div>

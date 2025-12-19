@@ -10,7 +10,7 @@ export const useNotifications = () => {
   useEffect(() => {
     // Check if notifications are supported
     setIsSupported('Notification' in window);
-    
+
     if ('Notification' in window) {
       setPermission(Notification.permission);
     }
@@ -29,7 +29,7 @@ export const useNotifications = () => {
     try {
       const result = await Notification.requestPermission();
       setPermission(result);
-      
+
       if (result === 'granted') {
         toast({
           title: "เปิดการแจ้งเตือนสำเร็จ",
@@ -56,8 +56,8 @@ export const useNotifications = () => {
     }
 
     const notification = new Notification(title, {
-      icon: '/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png',
-      badge: '/lovable-uploads/b5550bd4-d83d-4e1e-ac09-025117b87c86.png',
+      icon: '/dmind-premium-icon.png',
+      badge: '/dmind-premium-icon.png',
       ...options,
     });
 
