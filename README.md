@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+# D-MIND Web
 
-## Project info
+![D-MIND Logo](public/icon-512.png)
 
-**URL**: https://lovable.dev/projects/3dbe0d54-4a5d-4127-9cc4-76a44ad44e5e
+**D-MIND** (Disaster Management & Intelligence Network Dashboard) เป็นระบบเว็บแอปพลิเคชันสำหรับติดตามและจัดการภัยพิบัติในประเทศไทย พัฒนาด้วย React และ TypeScript
 
-## How can I edit this code?
+## ✨ Features
 
-There are several ways of editing your application.
+- 🗺️ **แผนที่แบบ Real-time** - แสดงพื้นที่เสี่ยงภัยด้วย MapLibre GL JS
+- 🌧️ **ติดตามสภาพอากาศ** - ข้อมูลจากกรมอุตุนิยมวิทยา, Open-Meteo, RainViewer
+- 🌐 **แผ่นดินไหว** - ข้อมูลแผ่นดินไหวแบบ Real-time จาก USGS
+- 📰 **ข่าวสารภัยพิบัติ** - อัปเดตข่าวสารและคู่มือฉุกเฉิน
+- 🔔 **ระบบแจ้งเตือน** - แจ้งเตือนภัยพิบัติตามตำแหน่ง
+- 📱 **Responsive Design** - รองรับทุกขนาดหน้าจอ
 
-**Use Lovable**
+## 🛠️ Technologies
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3dbe0d54-4a5d-4127-9cc4-76a44ad44e5e) and start prompting.
+- **Frontend**: React 18, TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Maps**: MapLibre GL JS
+- **Data Fetching**: TanStack Query
+- **State Management**: Zustand
+- **Mobile**: Capacitor (cross-platform)
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18+ 
+- npm or bun
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+```bash
+# Clone the repository
+git clone https://github.com/kchayta32/d-mind-web.git
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Navigate to project directory
+cd d-mind-web
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Build for production
+npm run build
 
-**Use GitHub Codespaces**
+# Preview production build
+npm run preview
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📁 Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/     # React components
+│   ├── articles/   # ข่าวสารและบทความ
+│   ├── emergency-manual/  # คู่มือฉุกเฉิน
+│   ├── map/        # Map components
+│   └── ui/         # shadcn/ui components
+├── hooks/          # Custom React hooks
+├── lib/            # Utilities และ API clients
+├── pages/          # Page components
+└── stores/         # Zustand stores
+```
 
-This project is built with:
+## 📊 Data Sources
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+| แหล่งข้อมูล | ประเภท | ลิงก์ |
+|------------|--------|------|
+| กรมอุตุนิยมวิทยา | พยากรณ์อากาศ | [tmd.go.th](https://www.tmd.go.th) |
+| Open-Meteo | Weather API | [open-meteo.com](https://open-meteo.com) |
+| RainViewer | Radar ฝน | [rainviewer.com](https://www.rainviewer.com) |
+| USGS | แผ่นดินไหว | [usgs.gov](https://earthquake.usgs.gov) |
+| OpenStreetMap | แผนที่พื้นฐาน | [openstreetmap.org](https://www.openstreetmap.org) |
 
-## How can I deploy this project?
+## 📝 License
 
-Simply open [Lovable](https://lovable.dev/projects/3dbe0d54-4a5d-4127-9cc4-76a44ad44e5e) and click on Share -> Publish.
+This project is developed for educational purposes.
 
-## Can I connect a custom domain to my Lovable project?
+## 👥 Contributors
 
-Yes, you can!
+- **kchayta32** - Developer
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Made with ❤️ for Thailand Disaster Management

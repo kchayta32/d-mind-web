@@ -14,6 +14,7 @@ import ArticleNotFound from '@/components/articles/ArticleNotFound';
 import DMindLaunchArticle from '@/components/articles/DMindLaunchArticle';
 import SystemUpdateArticle from '@/components/articles/SystemUpdateArticle';
 import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
+import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
 
 const ArticleDetail: React.FC = () => {
@@ -22,6 +23,8 @@ const ArticleDetail: React.FC = () => {
   switch (id) {
     case 'pm25-clean-air-act-2025':
       return <PM25CleanAirActArticle />;
+    case 'weather-warning-cold-2025':
+      return <ColdWeatherArticle />;
     case 'sri-lanka-flood-2025':
       return <SriLankaFloodArticle />;
     case 'dmind-app-launch':
