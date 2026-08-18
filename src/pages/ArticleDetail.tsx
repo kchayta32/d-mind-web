@@ -13,6 +13,7 @@ import EarthquakeResponseArticle from '@/components/articles/EarthquakeResponseA
 import ArticleNotFound from '@/components/articles/ArticleNotFound';
 import DMindLaunchArticle from '@/components/articles/DMindLaunchArticle';
 import SystemUpdateArticle from '@/components/articles/SystemUpdateArticle';
+import DMindMobileArticle from '@/components/articles/DMindMobileArticle';
 import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
 import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
@@ -21,6 +22,10 @@ const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'mobile-app-development':
+    case 'dmind-mobile-native':
+    case 'dmind-mobile-update':
+      return <DMindMobileArticle />;
     case 'pm25-clean-air-act-2025':
       return <PM25CleanAirActArticle />;
     case 'weather-warning-cold-2025':

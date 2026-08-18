@@ -9,6 +9,14 @@ const EmergencyArticles: React.FC = () => {
 
   const articles = [
     {
+      id: 'mobile-app-development',
+      title: 'รายงานความก้าวหน้า D-MIND Mobile App: ยกระดับสู่ Native Android 2.0 สถาปัตยกรรม 5 ชั้น',
+      subtitle: 'จาก ทีมพัฒนา D-MIND',
+      description: 'สรุปการพัฒนาแอปพลิเคชันมือถือ D-MIND แบบ Native 100% พัฒนาด้วย Kotlin และ Jetpack Compose พร้อมสถาปัตยกรรม 5 ชั้น แผนที่ 7 ชั้นข้อมูล และระบบแจ้งเตือน FCM 3 ระดับ',
+      image: '/dmind-premium-icon.png',
+      created_at: '2026-05-28'
+    },
+    {
       id: 'pm25-clean-air-act-2025',
       title: "PM2.5 ทำป่วย จี้รัฐบาลใหม่ 60 วันแรก เร่งคืน 'กองทุนอากาศสะอาด' สู่ร่างกฎหมาย",
       subtitle: 'จาก bangkokbiznews.com',

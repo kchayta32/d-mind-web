@@ -1,63 +1,138 @@
-
-import { useEffect } from 'react';
-import { useMap } from 'react-leaflet';
-import L from 'leaflet';
+import React from 'react';
+import { WMSTileLayer, TileLayer } from 'react-leaflet';
+import { 
+  GISTDA_CONFIG, 
+  DroughtLayerType, 
+  DroughtMapProtocol,
+  getGistdaDroughtWmsUrl, 
+  getGistdaDroughtWmtsUrl, 
+  getGistdaDroughtTmsTileUrl 
+} from '@/services/gistdaService';
 
 interface DroughtWMSLayersProps {
   selectedLayers: string[];
-  opacity: number;
+  opacity?: number;
+  mapProtocol?: DroughtMapProtocol;
 }
 
-const DroughtWMSLayers: React.FC<DroughtWMSLayersProps> = ({ selectedLayers, opacity }) => {
-  const map = useMap();
+export const DroughtWMSLayers: React.FC<DroughtWMSLayersProps> = ({ 
+  selectedLayers = ['dri'], 
+  opacity = 0.7,
+  mapProtocol = 'wmts'
+}) => {
+  const apiKey = GISTDA_CONFIG.PRIMARY_API_KEY;
 
-  useEffect(() => {
-    const layers: L.Layer[] = [];
+  return (
+    <>
+      {/* 1. DRI (Drought Risk Index / DRIPlus) Layer */}
+      {selectedLayers.includes('dri') && (
+        mapProtocol === 'tms' ? (
+          <TileLayer
+            key="dri-tms"
+            url={getGistdaDroughtTmsTileUrl('dri', apiKey)}
+            opacity={opacity}
+            tms={true}
+            attribution="GISTDA DRIPlus 7 days TMS"
+            maxZoom={18}
+          />
+        ) : mapProtocol === 'wms' ? (
+          <WMSTileLayer
+            key="dri-wms"
+            url={getGistdaDroughtWmsUrl('dri', apiKey)}
+            layers="dri"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA DRIPlus 7 days WMS"
+            maxZoom={18}
+          />
+        ) : (
+          <WMSTileLayer
+            key="dri-wmts"
+            url={getGistdaDroughtWmtsUrl('dri', apiKey)}
+            layers="dri"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA DRIPlus 7 days WMTS"
+            maxZoom={18}
+          />
+        )
+      )}
 
-    // DRI (Drought Risk Index) Layer
-    if (selectedLayers.includes('dri')) {
-      const driLayer = L.tileLayer('https://api-gateway.gistda.or.th/api/2.0/resources/maps/dri/7days/wmts/{z}/{x}/{y}.png?api_key=UIKDdatC5lgDcdrGxBJfyjHRlvRSvKQFGjY8A3mG00fj99MqcWCd2VxVTkcfkVX6', {
-        attribution: 'GISTDA - DRI 7 days',
-        opacity,
-        maxZoom: 18,
-      });
-      
-      driLayer.addTo(map);
-      layers.push(driLayer);
-    }
+      {/* 2. NDWI (Normalized Difference Water Index / ความชื้นพืชพรรณ) Layer */}
+      {selectedLayers.includes('ndwi') && (
+        mapProtocol === 'tms' ? (
+          <TileLayer
+            key="ndwi-tms"
+            url={getGistdaDroughtTmsTileUrl('ndwi', apiKey)}
+            opacity={opacity}
+            tms={true}
+            attribution="GISTDA NDWI 7 days TMS"
+            maxZoom={18}
+          />
+        ) : mapProtocol === 'wms' ? (
+          <WMSTileLayer
+            key="ndwi-wms"
+            url={getGistdaDroughtWmsUrl('ndwi', apiKey)}
+            layers="ndwi"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA NDWI 7 days WMS"
+            maxZoom={18}
+          />
+        ) : (
+          <WMSTileLayer
+            key="ndwi-wmts"
+            url={getGistdaDroughtWmtsUrl('ndwi', apiKey)}
+            layers="ndwi"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA NDWI 7 days WMTS"
+            maxZoom={18}
+          />
+        )
+      )}
 
-    // NDWI (Normalized Difference Water Index) Layer
-    if (selectedLayers.includes('ndwi')) {
-      const ndwiLayer = L.tileLayer('https://vallaris.dragonfly.gistda.or.th/core/api/maps/1.0-beta/maps/ndwi_7days/wmts/{z}/{x}/{y}.png?api_key=p8MB6HQYNFiJMbBigdrXVVC6mvwuj0EkVpXNxI17eogPueG7ed3UvdUDGMvdSLPM', {
-        attribution: 'GISTDA - NDWI 7 days',
-        opacity,
-        maxZoom: 18,
-      });
-      
-      ndwiLayer.addTo(map);
-      layers.push(ndwiLayer);
-    }
-
-    // SMAP (Soil Moisture Active Passive) Layer
-    if (selectedLayers.includes('smap')) {
-      const smapLayer = L.tileLayer('https://vallaris.dragonfly.gistda.or.th/core/api/maps/1.0-beta/maps/smap_7days/wmts/{z}/{x}/{y}.png?api_key=p8MB6HQYNFiJMbBigdrXVVC6mvwuj0EkVpXNxI17eogPueG7ed3UvdUDGMvdSLPM', {
-        attribution: 'GISTDA - SMAP 7 days',
-        opacity,
-        maxZoom: 18,
-      });
-      
-      smapLayer.addTo(map);
-      layers.push(smapLayer);
-    }
-
-    return () => {
-      layers.forEach(layer => {
-        map.removeLayer(layer);
-      });
-    };
-  }, [map, selectedLayers, opacity]);
-
-  return null;
+      {/* 3. SMAP (Soil Moisture Active Passive / ความชื้นในดิน) Layer */}
+      {selectedLayers.includes('smap') && (
+        mapProtocol === 'tms' ? (
+          <TileLayer
+            key="smap-tms"
+            url={getGistdaDroughtTmsTileUrl('smap', apiKey)}
+            opacity={opacity}
+            tms={true}
+            attribution="GISTDA SMAP 7 days TMS"
+            maxZoom={18}
+          />
+        ) : mapProtocol === 'wms' ? (
+          <WMSTileLayer
+            key="smap-wms"
+            url={getGistdaDroughtWmsUrl('smap', apiKey)}
+            layers="smap"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA SMAP 7 days WMS"
+            maxZoom={18}
+          />
+        ) : (
+          <WMSTileLayer
+            key="smap-wmts"
+            url={getGistdaDroughtWmtsUrl('smap', apiKey)}
+            layers="smap"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution="GISTDA SMAP 7 days WMTS"
+            maxZoom={18}
+          />
+        )
+      )}
+    </>
+  );
 };
 
 export default DroughtWMSLayers;

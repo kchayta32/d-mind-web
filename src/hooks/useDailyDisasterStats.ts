@@ -66,7 +66,7 @@ export const useDailyDisasterStats = () => {
           });
           if (floodResponse.ok) {
             const floodData = await floodResponse.json();
-            dailyStats.floods = floodData.numberReturned || dailyStats.floods;
+            dailyStats.floods = floodData.numberReturned || (Array.isArray(floodData.features) ? floodData.features.length : dailyStats.floods);
           }
         } catch (error) {
           console.error('Error fetching GISTDA flood data:', error);

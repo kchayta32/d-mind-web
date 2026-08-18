@@ -192,11 +192,11 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
       <div className="grid grid-cols-2 gap-3">
         <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
           <div className="text-2xl font-bold text-red-600">{(wildfireStats.totalHotspots || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">จุดความร้อนทั้งหมด</div>
+          <div className="text-xs text-gray-600">จุดความร้อน VIIRS ทั้งหมด</div>
         </div>
         <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
           <div className="text-2xl font-bold text-orange-600">{(wildfireStats.highConfidence || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">ความเชื่อมั่นสูง</div>
+          <div className="text-xs text-gray-600">ความเชื่อมั่นสูง (80%+)</div>
         </div>
         <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
           <div className="text-lg font-semibold text-blue-600">{(wildfireStats.thailand?.totalHotspots || 0).toLocaleString()}</div>
@@ -208,11 +208,19 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
         </div>
       </div>
       
-      {/* Risk Area */}
-      <div className="border-t pt-2">
-        <div className="flex justify-between text-xs text-gray-700 mb-1">
+      {/* Risk Area & GISTDA Data Info */}
+      <div className="border-t pt-2 space-y-1 text-xs">
+        <div className="flex justify-between text-gray-700">
           <span>พื้นที่เสี่ยงรวมในไทย:</span>
           <span className="font-bold text-red-600">{(wildfireStats.thailand?.totalRiskArea || 0).toLocaleString()} ไร่</span>
+        </div>
+        <div className="flex justify-between text-[11px] text-gray-500">
+          <span>ความเชื่อมั่นเฉลี่ย:</span>
+          <span className="font-semibold text-orange-600">{wildfireStats.averageConfidence || 0}%</span>
+        </div>
+        <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-100 flex items-center justify-between">
+          <span>แหล่งข้อมูล: GISTDA API 2.0</span>
+          <span>VIIRS • Burn Scar • Burn Freq</span>
         </div>
       </div>
     </div>
@@ -350,10 +358,10 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
       case 'volcano': return 'สถิติภูเขาไฟระเบิด (NASA EONET)';
       case 'heavyrain': return 'สถิติเซ็นเซอร์ & เรดาร์ฝน';
       case 'openmeteorain': return 'สถิติสภาพอากาศ (Open-Meteo)';
-      case 'wildfire': return 'สถิติจุดความร้อน (VIIRS & NASA)';
+      case 'wildfire': return 'สถิติจุดความร้อน & ไฟป่า (GISTDA VIIRS 2.0)';
       case 'airpollution': return 'สถิติคุณภาพอากาศ & PM2.5';
-      case 'drought': return 'สถิติภัยแล้ง & ความชื้นดิน';
-      case 'flood': return 'สถิติน้ำท่วม & ลุ่มน้ำ (GloFAS)';
+      case 'drought': return 'สถิติภัยแล้ง & ความชื้น (GISTDA DRIPlus / SMAP)';
+      case 'flood': return 'สถิติน้ำท่วม & ลุ่มน้ำ (GISTDA 2.0 & GloFAS)';
       case 'sinkhole': return 'สถิติแผ่นดินยุบ / ดินทรุด';
       default: return 'สถิติข้อมูล';
     }

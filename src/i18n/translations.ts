@@ -52,7 +52,18 @@ export const translations = {
             mapUi: 'Modern Map UI',
             mapUiDesc: 'จุดเสี่ยง Risk Zones ดูง่ายขึ้น',
             weatherTools: 'Weather & Tools',
-            weatherToolsDesc: 'พยากรณ์อากาศ & เครื่องมือคำนวณ'
+            weatherToolsDesc: 'พยากรณ์อากาศ & เครื่องมือคำนวณ',
+            slide3Badge: 'Mobile v2.0',
+            slide3Title: 'D-MIND Native Android 2.0',
+            slide3Subtitle: 'ยกระดับแอปพลิเคชันสู่ Kotlin & Jetpack Compose เต็มรูปแบบ',
+            slide3Desc: 'สรุปความก้าวหน้าการพัฒนา Mobile App: สถาปัตยกรรม 5 ชั้น, แผนที่ 7 ชั้นข้อมูล (GISTDA/TMD/USGS/Open-Meteo), แจ้งเตือนฉุกเฉิน FCM 3 ระดับ และทำงานออฟไลน์ได้ 100%',
+            nativeTech: '100% Native Kotlin',
+            nativeTechDesc: 'Jetpack Compose & Material 3 ลื่นไหล',
+            mapLayers: 'MapLibre 7 Layers',
+            mapLayersDesc: 'GISTDA, USGS, แม่น้ำ & ความชื้นในดิน',
+            fcmOffline: 'FCM 3 Levels & Offline',
+            fcmOfflineDesc: 'Room DB + SOS Queue WorkManager',
+            readFullArticle: 'อ่านบทความเต็ม'
         },
 
         // Navigation Cards (Home Page)
@@ -379,7 +390,18 @@ export const translations = {
             mapUi: 'Modern Map UI',
             mapUiDesc: 'Easier to see Risk Zones',
             weatherTools: 'Weather & Tools',
-            weatherToolsDesc: 'Weather forecast & calculation hub'
+            weatherToolsDesc: 'Weather forecast & calculation hub',
+            slide3Badge: 'Mobile v2.0',
+            slide3Title: 'D-MIND Native Android 2.0',
+            slide3Subtitle: 'Full Upgrade to 100% Native Kotlin & Jetpack Compose',
+            slide3Desc: 'Mobile development milestone: 5-tier architecture, 7-layer interactive disaster map (GISTDA/TMD/USGS/Open-Meteo), 3-level FCM emergency push alerts, and 100% offline reliability.',
+            nativeTech: '100% Native Kotlin',
+            nativeTechDesc: 'Jetpack Compose & Material 3 UI',
+            mapLayers: 'MapLibre 7 Layers',
+            mapLayersDesc: 'GISTDA, USGS, River & Soil Moisture',
+            fcmOffline: 'FCM 3 Levels & Offline',
+            fcmOfflineDesc: 'Room DB + SOS Queue WorkManager',
+            readFullArticle: 'Read Full Article'
         },
 
         // Navigation Cards (Home Page)

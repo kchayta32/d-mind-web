@@ -80,6 +80,14 @@ const openApis: ApiEndpointInfo[] = [
     description: 'ระบบแจ้งเตือนและประสานงานภัยพิบัติระดับโลก (Tropical Cyclones, Floods, Droughts)'
   },
   {
+    name: 'GISTDA API 2.0 Gateway',
+    provider: 'GISTDA (สทอภ.)',
+    category: 'ไฟป่า & จุดความร้อน & ร่องรอยเผาไหม้',
+    status: 'online',
+    cost: 'ฟรี 100% (Open API)',
+    description: 'จุดความร้อน VIIRS (1d-30d), พื้นที่เผาไหม้ซ้ำซาก, ร่องรอยเผาไหม้รายสัปดาห์, แผนที่ WMS/WMTS/TMS'
+  },
+  {
     name: 'EMSC Seismic Portal',
     provider: 'European-Med Seismological Centre',
     category: 'แผ่นดินไหวฉุกเฉิน',

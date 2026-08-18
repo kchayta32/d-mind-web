@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -106,6 +106,40 @@ const NewsCarousel = () => {
                     </div>
                 </div>
             )
+        },
+        {
+            id: 3,
+            badge: t('newsCarousel.slide3Badge'),
+            title: t('newsCarousel.slide3Title'),
+            subtitle: t('newsCarousel.slide3Subtitle'),
+            description: t('newsCarousel.slide3Desc'),
+            bgImage: '/images/hero-background.png',
+            content: (
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Cpu className="w-6 h-6 text-teal-400 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.nativeTech')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.nativeTechDesc')}</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Layers className="w-6 h-6 text-cyan-300 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.mapLayers')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.mapLayersDesc')}</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Bell className="w-6 h-6 text-amber-300 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.fcmOffline')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.fcmOfflineDesc')}</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                        <Button onClick={() => navigate('/article/mobile-app-development')} className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold shadow-lg shadow-teal-500/20 border border-white/20 transition-all hover:scale-105">
+                            {t('newsCarousel.readFullArticle')}
+                        </Button>
+                    </div>
+                </div>
+            )
         }
     ];
 
@@ -154,7 +188,7 @@ const NewsCarousel = () => {
                                     {/* Glassmorphic Card Container for Imagery */}
                                     <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-3xl backdrop-blur-sm border border-white/10 shadow-2xl p-6 flex items-center justify-center overflow-hidden">
                                         <div className="absolute inset-0 bg-blue-600/10 mix-blend-overlay"></div>
-                                        {/* Abstract generic tech visualization if no specific image */}
+                                        {/* Abstract tech visualization */}
                                         {slide.id === 1 ? (
                                             <div className="relative w-full h-full flex flex-col items-center justify-center text-center">
                                                 <div className="w-24 h-24 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/40 animate-bounce mb-6">
@@ -163,7 +197,7 @@ const NewsCarousel = () => {
                                                 <h3 className="text-2xl font-bold text-white mb-2">D-MIND Application</h3>
                                                 <p className="text-blue-200">Coming to Android</p>
                                             </div>
-                                        ) : (
+                                        ) : slide.id === 2 ? (
                                             <div className="relative w-full h-full p-4">
                                                 <div className="grid grid-cols-2 gap-4 h-full">
                                                     <div className="bg-slate-800/80 rounded-xl p-4 border border-white/5 flex flex-col justify-end group/card hover:bg-slate-800 transition-colors">
@@ -184,6 +218,60 @@ const NewsCarousel = () => {
                                                             <p className="text-xs text-green-200">Offline Notifications Ready</p>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="relative w-full h-full p-4 flex flex-col justify-between">
+                                                {/* Native Android v2.0 Tech Mockup Visual */}
+                                                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-3 h-3 rounded-full bg-teal-400 animate-ping"></div>
+                                                        <span className="text-xs font-mono font-bold text-teal-300">Android Native v2.0</span>
+                                                    </div>
+                                                    <Badge className="bg-teal-500/20 text-teal-300 border-teal-500/30 text-[10px]">
+                                                        targetSdk 35
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-3 my-auto">
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-teal-500/20 flex items-center gap-3">
+                                                        <Layers className="w-6 h-6 text-cyan-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">MapLibre GIS</p>
+                                                            <p className="text-[10px] text-cyan-200">7 Data Layers</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-amber-500/20 flex items-center gap-3">
+                                                        <Bell className="w-6 h-6 text-amber-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">FCM HTTP v1</p>
+                                                            <p className="text-[10px] text-amber-200">3 Priority Channels</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-blue-500/20 flex items-center gap-3">
+                                                        <Cpu className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">Kotlin 2.3</p>
+                                                            <p className="text-[10px] text-blue-200">Jetpack Compose</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-emerald-500/20 flex items-center gap-3">
+                                                        <Shield className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">Room 2.8</p>
+                                                            <p className="text-[10px] text-emerald-200">100% Offline Ready</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-2.5 rounded-xl bg-gradient-to-r from-teal-500/20 via-cyan-500/20 to-blue-500/20 border border-teal-500/30 flex items-center justify-between text-xs">
+                                                    <span className="text-white font-medium">Build & Test Status:</span>
+                                                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                                                        <Sparkles className="w-3.5 h-3.5" /> All Tests Passed
+                                                    </span>
                                                 </div>
                                             </div>
                                         )}

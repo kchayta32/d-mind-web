@@ -38,12 +38,22 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     setWildfireTimeFilter,
     showBurnFreq,
     setShowBurnFreq,
+    showBurnScar,
+    setShowBurnScar,
+    wildfireMapMode,
+    setWildfireMapMode,
     droughtLayers,
     setDroughtLayers,
+    droughtMapMode,
+    setDroughtMapMode,
     floodTimeFilter,
     setFloodTimeFilter,
     showFloodFrequency,
     setShowFloodFrequency,
+    showWaterHyacinth,
+    setShowWaterHyacinth,
+    floodMapMode,
+    setFloodMapMode,
   } = useDisasterMapState();
 
   const {
@@ -91,10 +101,15 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           humidityFilter={humidityFilter}
           pm25Filter={pm25Filter}
           droughtLayers={droughtLayers}
+          droughtMapMode={droughtMapMode}
           floodTimeFilter={floodTimeFilter}
           showFloodFrequency={showFloodFrequency}
+          floodMapMode={floodMapMode}
+          showWaterHyacinth={showWaterHyacinth}
           wildfireTimeFilter={wildfireTimeFilter}
           showBurnFreq={showBurnFreq}
+          showBurnScar={showBurnScar}
+          wildfireMapMode={wildfireMapMode}
           isLoading={getCurrentLoading(selectedType)}
           onLocationSelect={onLocationSelect}
           onRefreshAll={refetchAll}
@@ -118,12 +133,22 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           onWildfireTimeFilterChange={setWildfireTimeFilter}
           showBurnFreq={showBurnFreq}
           onShowBurnFreqChange={setShowBurnFreq}
+          showBurnScar={showBurnScar}
+          onShowBurnScarChange={setShowBurnScar}
+          wildfireMapMode={wildfireMapMode}
+          onWildfireMapModeChange={setWildfireMapMode}
           droughtLayers={droughtLayers}
           onDroughtLayersChange={setDroughtLayers}
+          droughtMapMode={droughtMapMode}
+          onDroughtMapModeChange={setDroughtMapMode}
           floodTimeFilter={floodTimeFilter}
           onFloodTimeFilterChange={setFloodTimeFilter}
           showFloodFrequency={showFloodFrequency}
           onShowFloodFrequencyChange={setShowFloodFrequency}
+          showWaterHyacinth={showWaterHyacinth}
+          onShowWaterHyacinthChange={setShowWaterHyacinth}
+          floodMapMode={floodMapMode}
+          onFloodMapModeChange={setFloodMapMode}
         />
         
         {/* Statistics Panel */}

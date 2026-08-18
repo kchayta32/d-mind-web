@@ -1,67 +1,108 @@
-
-import { useEffect } from 'react';
-import { useMap } from 'react-leaflet';
-import L from 'leaflet';
+import React from 'react';
+import { WMSTileLayer, TileLayer } from 'react-leaflet';
+import { 
+  GISTDA_CONFIG, 
+  FloodTimeFilter, 
+  FloodMapProtocol, 
+  getGistdaFloodWmsUrl, 
+  getGistdaFloodWmtsUrl, 
+  getGistdaFloodTmsTileUrl 
+} from '@/services/gistdaService';
 
 interface FloodWMSLayersProps {
   timeFilter: '1day' | '3days' | '7days' | '30days';
   showFrequency: boolean;
-  opacity: number;
+  opacity?: number;
+  mapProtocol?: FloodMapProtocol;
 }
 
-const API_KEY = 'UIKDdatC5lgDcdrGxBJfyjHRlvRSvKQFGjY8A3mG00fj99MqcWCd2VxVTkcfkVX6';
+export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({ 
+  timeFilter = '3days', 
+  showFrequency = true, 
+  opacity = 0.7,
+  mapProtocol = 'wmts'
+}) => {
+  const safeTime: FloodTimeFilter = (timeFilter === '1day' || timeFilter === '3days' || timeFilter === '7days' || timeFilter === '30days')
+    ? timeFilter
+    : '3days';
 
-const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({ timeFilter, showFrequency, opacity }) => {
-  const map = useMap();
+  const apiKey = GISTDA_CONFIG.PRIMARY_API_KEY;
 
-  useEffect(() => {
-    const layers: L.Layer[] = [];
+  return (
+    <>
+      {/* 1. Main Flood Area Map Layer */}
+      {timeFilter && (
+        mapProtocol === 'tms' ? (
+          <TileLayer
+            key={`flood-tms-${safeTime}`}
+            url={getGistdaFloodTmsTileUrl('flood', safeTime, apiKey)}
+            opacity={opacity}
+            tms={true}
+            attribution={`GISTDA Flood (${safeTime}) TMS`}
+            maxZoom={18}
+          />
+        ) : mapProtocol === 'wms' ? (
+          <WMSTileLayer
+            key={`flood-wms-${safeTime}`}
+            url={getGistdaFloodWmsUrl('flood', safeTime, apiKey)}
+            layers="flood"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution={`GISTDA Flood (${safeTime}) WMS`}
+            maxZoom={18}
+          />
+        ) : (
+          <WMSTileLayer
+            key={`flood-wmts-${safeTime}`}
+            url={getGistdaFloodWmtsUrl('flood', safeTime, apiKey)}
+            layers="flood"
+            format="image/png"
+            transparent={true}
+            opacity={opacity}
+            attribution={`GISTDA Flood (${safeTime}) WMTS`}
+            maxZoom={18}
+          />
+        )
+      )}
 
-    // Map timeframes to available API endpoints
-    const apiTimeframe = timeFilter === '7days' || timeFilter === '30days' ? '3days' : timeFilter;
-
-    // Current flood areas using GISTDA API Gateway WMS
-    if (timeFilter) {
-      const wmsUrl = `https://api-gateway.gistda.or.th/api/2.0/resources/maps/flood/${apiTimeframe}/wms?api_key=${API_KEY}`;
-      
-      const floodLayer = L.tileLayer.wms(wmsUrl, {
-        layers: Object.keys({})[0] || '',
-        format: 'image/png',
-        transparent: true,
-        attribution: `GISTDA - พื้นที่น้ำท่วม ${timeFilter}`,
-        opacity,
-        maxZoom: 18,
-      });
-      
-      floodLayer.addTo(map);
-      layers.push(floodLayer);
-    }
-
-    // Recurrent flood areas
-    if (showFrequency) {
-      const freqUrl = `https://api-gateway.gistda.or.th/api/2.0/resources/maps/flood-freq/wms?api_key=${API_KEY}`;
-      
-      const freqLayer = L.tileLayer.wms(freqUrl, {
-        layers: Object.keys({})[0] || '',
-        format: 'image/png',
-        transparent: true,
-        attribution: 'GISTDA - พื้นที่น้ำท่วมซ้ำซาก',
-        opacity: opacity * 0.7,
-        maxZoom: 18,
-      });
-      
-      freqLayer.addTo(map);
-      layers.push(freqLayer);
-    }
-
-    return () => {
-      layers.forEach(layer => {
-        map.removeLayer(layer);
-      });
-    };
-  }, [map, timeFilter, showFrequency, opacity]);
-
-  return null;
+      {/* 2. Recurrent Flood Areas (พื้นที่น้ำท่วมซ้ำซาก) */}
+      {showFrequency && (
+        mapProtocol === 'tms' ? (
+          <TileLayer
+            key="flood-freq-tms"
+            url={getGistdaFloodTmsTileUrl('flood-freq', safeTime, apiKey)}
+            opacity={opacity * 0.75}
+            tms={true}
+            attribution="GISTDA Flood Frequency TMS"
+            maxZoom={18}
+          />
+        ) : mapProtocol === 'wms' ? (
+          <WMSTileLayer
+            key="flood-freq-wms"
+            url={getGistdaFloodWmsUrl('flood-freq', safeTime, apiKey)}
+            layers="flood-freq"
+            format="image/png"
+            transparent={true}
+            opacity={opacity * 0.75}
+            attribution="GISTDA Flood Frequency WMS"
+            maxZoom={18}
+          />
+        ) : (
+          <WMSTileLayer
+            key="flood-freq-wmts"
+            url={getGistdaFloodWmtsUrl('flood-freq', safeTime, apiKey)}
+            layers="flood-freq"
+            format="image/png"
+            transparent={true}
+            opacity={opacity * 0.75}
+            attribution="GISTDA Flood Frequency WMTS"
+            maxZoom={18}
+          />
+        )
+      )}
+    </>
+  );
 };
 
 export default FloodWMSLayers;

@@ -36,10 +36,15 @@ interface MapViewProps {
   humidityFilter?: number;
   pm25Filter?: number;
   droughtLayers?: string[];
+  droughtMapMode?: import('@/services/gistdaService').DroughtMapProtocol;
   floodTimeFilter?: string;
   showFloodFrequency?: boolean;
+  floodMapMode?: import('@/services/gistdaService').FloodMapProtocol;
+  showWaterHyacinth?: boolean;
   wildfireTimeFilter?: string;
   showBurnFreq?: boolean;
+  showBurnScar?: boolean;
+  wildfireMapMode?: import('@/services/gistdaService').WildfireMapProtocol;
   isLoading?: boolean;
   onLocationSelect?: (lat: number, lon: number, name: string) => void;
   onRefreshAll?: () => void;
@@ -89,10 +94,15 @@ export const MapView: React.FC<MapViewProps> = ({
   humidityFilter = 0,
   pm25Filter = 0,
   droughtLayers = [],
+  droughtMapMode = 'wmts',
   floodTimeFilter = '3days',
   showFloodFrequency = false,
+  floodMapMode = 'wmts',
+  showWaterHyacinth = false,
   wildfireTimeFilter = '1day',
   showBurnFreq = false,
+  showBurnScar = false,
+  wildfireMapMode = 'wmts',
   isLoading = false,
   onLocationSelect,
   onRefreshAll
@@ -164,14 +174,18 @@ export const MapView: React.FC<MapViewProps> = ({
           <MapLayers
             selectedType={selectedType}
             droughtLayers={droughtLayers}
+            droughtMapMode={droughtMapMode}
             floodTimeFilter={floodTimeFilter}
             showFloodFrequency={showFloodFrequency}
+            floodMapMode={floodMapMode}
             showRainOverlay={showRainOverlay}
             rainData={rainData}
             rainOverlayType={rainOverlayType}
             rainTimeType={rainTimeType}
             wildfireTimeFilter={wildfireTimeFilter}
             showBurnFreq={showBurnFreq}
+            showBurnScar={showBurnScar}
+            wildfireMapMode={wildfireMapMode}
             rainFrameIndex={rainFrameIndex}
           />
           

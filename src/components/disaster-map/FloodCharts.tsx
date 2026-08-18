@@ -32,7 +32,7 @@ const FloodCharts: React.FC<FloodChartsProps> = ({ stats }) => {
           <CardTitle className="text-base">สถิติย้อนหลัง</CardTitle>
         </CardHeader>
         <CardContent>
-          <FloodHistoricalChart data={[]} />
+          <FloodHistoricalChart />
         </CardContent>
       </Card>
 

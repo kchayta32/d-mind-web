@@ -11,6 +11,7 @@ import { useOpenMeteoFloodData } from './useOpenMeteoFloodData';
 import { useOpenMeteoRainData } from './useOpenMeteoRainData';
 import { useStormData } from './useStormData';
 import { useVolcanoData } from './useVolcanoData';
+import { useBurnFrequencyData, useBurnScarData } from './useBurnAreaData';
 import { 
   EarthquakeStats, 
   RainSensorStats, 
@@ -38,7 +39,9 @@ export const useDisasterMapData = (
 ) => {
   const { earthquakes, stats: earthquakeStats, isLoading: isLoadingEarthquakes, refetch: refetchEarthquakes } = useEarthquakeData(earthquakeTimeWindow, earthquakeFeedSource);
   const { sensors: rainSensors, stats: rainStats, isLoading: isLoadingRain } = useRainSensorData(rainTimeFilter);
-  const { hotspots, stats: wildfireStats, isLoading: isLoadingWildfire } = useGISTDAData(wildfireTimeFilter as any);
+  const { hotspots, stats: wildfireStats, isLoading: isLoadingWildfire, refetch: refetchWildfire } = useGISTDAData(wildfireTimeFilter as any);
+  const { data: burnFreqData } = useBurnFrequencyData();
+  const { data: burnScarData } = useBurnScarData();
   const { stations: airStations, stats: airStats, isLoading: isLoadingAir, refetch: refetchAir } = useAirPollutionData();
   const { rainData, isLoading: isLoadingRainViewer, refetch: refetchRainViewer } = useRainViewerData();
   const { stats: droughtStats, isLoading: isLoadingDrought } = useDroughtData();
@@ -108,12 +111,15 @@ export const useDisasterMapData = (
     refetchAir?.();
     refetchRainViewer?.();
     refetchOpenMeteoRain?.();
+    refetchWildfire?.();
   };
 
   return {
     earthquakes: earthquakes || [],
     rainSensors: rainSensors || [],
     hotspots: hotspots || [],
+    burnFreqFeatures: burnFreqData?.features || [],
+    burnScarFeatures: burnScarData?.features || [],
     airStations: airStations || [],
     rainData,
     gistdaFloodFeatures: gistdaFloodData?.features || [],

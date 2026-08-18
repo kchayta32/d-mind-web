@@ -92,11 +92,12 @@ export interface WildfireStats {
   };
 }
 
-// Time filter options in days
-type TimeFilter = '1day' | '3days' | '7days' | '30days' | 'all';
+import { GISTDA_CONFIG, getGistdaHeaders } from '@/services/gistdaService';
 
-const API_KEY = 'wFaHcoOyzK53pVqspkI9Mvobjm5vWzHVOwGOjzW4f2nAAvsVf8CETklHpX1peaDF';
-const API_BASE_URL = 'https://api-gateway.gistda.or.th/api/2.0/resources/features';
+// Time filter options in days
+export type TimeFilter = '1day' | '3days' | '7days' | '30days' | 'all';
+
+const API_BASE_URL = `${GISTDA_CONFIG.BASE_URL}/features`;
 
 const parseHotspotDate = (rawDate?: string, rawTime?: string): Date => {
   if (!rawDate) return new Date();
@@ -194,20 +195,18 @@ export const useGISTDAData = (timeFilter: TimeFilter = '3days') => {
       try {
         const limit = 1000;
         const countryParam = encodeURIComponent('ราชอาณาจักรไทย');
+        const targetPeriod = timeFilter === 'all' ? '30days' : timeFilter;
+        const endpoint = `${API_BASE_URL}/viirs/${targetPeriod}?limit=${limit}&offset=0&ct_tn=${countryParam}`;
         
-        let endpoint = '';
-        if (timeFilter === 'all') {
-          endpoint = `${API_BASE_URL}/viirs/30days?limit=${limit}&offset=0&ct_tn=${countryParam}`;
-        } else {
-          endpoint = `${API_BASE_URL}/viirs/${timeFilter}?limit=${limit}&offset=0&ct_tn=${countryParam}`;
-        }
-        
-        const response = await fetch(endpoint, {
-          headers: { 
-            'accept': 'application/json',
-            'API-Key': API_KEY
-          }
+        let response = await fetch(endpoint, {
+          headers: getGistdaHeaders(GISTDA_CONFIG.PRIMARY_API_KEY)
         });
+        
+        if (!response.ok) {
+          response = await fetch(endpoint, {
+            headers: getGistdaHeaders(GISTDA_CONFIG.BACKUP_API_KEY)
+          });
+        }
         
         if (!response.ok) {
           console.warn(`GISTDA API returned ${response.status}, using generated sample data`);
@@ -217,7 +216,7 @@ export const useGISTDAData = (timeFilter: TimeFilter = '3days') => {
         const data = await response.json();
         return data;
       } catch (error) {
-        console.warn('GISTDA API network error, using fallback data');
+        console.warn('GISTDA API network error, using fallback data', error);
         return null;
       }
     },

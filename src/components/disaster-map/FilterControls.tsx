@@ -8,6 +8,7 @@ import { AirPollutionFilters } from './filter-components/AirPollutionFilters';
 import { DroughtFilters } from './filter-components/DroughtFilters';
 import { FloodFilters } from './filter-components/FloodFilters';
 import { SlidersHorizontal } from 'lucide-react';
+import { WildfireMapProtocol, FloodMapProtocol, DroughtMapProtocol } from '@/services/gistdaService';
 
 interface FilterControlsProps {
   selectedType: DisasterType;
@@ -23,12 +24,22 @@ interface FilterControlsProps {
   onWildfireTimeFilterChange: (value: string) => void;
   showBurnFreq: boolean;
   onShowBurnFreqChange: (value: boolean) => void;
+  showBurnScar?: boolean;
+  onShowBurnScarChange?: (value: boolean) => void;
+  wildfireMapMode?: WildfireMapProtocol;
+  onWildfireMapModeChange?: (value: WildfireMapProtocol) => void;
   droughtLayers: string[];
   onDroughtLayersChange: (layers: string[]) => void;
+  droughtMapMode?: DroughtMapProtocol;
+  onDroughtMapModeChange?: (value: DroughtMapProtocol) => void;
   floodTimeFilter: string;
   onFloodTimeFilterChange: (value: string) => void;
   showFloodFrequency: boolean;
   onShowFloodFrequencyChange: (show: boolean) => void;
+  showWaterHyacinth?: boolean;
+  onShowWaterHyacinthChange?: (show: boolean) => void;
+  floodMapMode?: FloodMapProtocol;
+  onFloodMapModeChange?: (value: FloodMapProtocol) => void;
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -45,12 +56,22 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onWildfireTimeFilterChange,
   showBurnFreq,
   onShowBurnFreqChange,
+  showBurnScar = false,
+  onShowBurnScarChange,
+  wildfireMapMode = 'wmts',
+  onWildfireMapModeChange,
   droughtLayers,
   onDroughtLayersChange,
+  droughtMapMode = 'wmts',
+  onDroughtMapModeChange,
   floodTimeFilter,
   onFloodTimeFilterChange,
   showFloodFrequency,
   onShowFloodFrequencyChange,
+  showWaterHyacinth = false,
+  onShowWaterHyacinthChange,
+  floodMapMode = 'wmts',
+  onFloodMapModeChange,
 }) => {
   return (
     <Card className="bg-white shadow-sm border border-gray-200">
@@ -83,6 +104,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             onWildfireTimeFilterChange={onWildfireTimeFilterChange}
             showBurnFreq={showBurnFreq}
             onShowBurnFreqChange={onShowBurnFreqChange}
+            showBurnScar={showBurnScar}
+            onShowBurnScarChange={onShowBurnScarChange}
+            wildfireMapMode={wildfireMapMode}
+            onWildfireMapModeChange={onWildfireMapModeChange}
           />
         )}
 
@@ -97,6 +122,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           <DroughtFilters
             droughtLayers={droughtLayers}
             onDroughtLayersChange={onDroughtLayersChange}
+            droughtMapMode={droughtMapMode}
+            onDroughtMapModeChange={onDroughtMapModeChange}
           />
         )}
 
@@ -106,6 +133,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             onFloodTimeFilterChange={onFloodTimeFilterChange}
             showFloodFrequency={showFloodFrequency}
             onShowFloodFrequencyChange={onShowFloodFrequencyChange}
+            showWaterHyacinth={showWaterHyacinth}
+            onShowWaterHyacinthChange={onShowWaterHyacinthChange}
+            floodMapMode={floodMapMode}
+            onFloodMapModeChange={onFloodMapModeChange}
           />
         )}
 
