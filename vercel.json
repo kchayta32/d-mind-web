@@ -1,0 +1,26 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/rag-web",
+      "destination": "/rag-web/index.html"
+    },
+    {
+      "source": "/arena",
+      "destination": "/arena/index.html"
+    },
+    {
+      "source": "/news_web",
+      "destination": "/news_web/index.html"
+    },
+    {
+      "source": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\\\.ico|robots\\\\.txt|.*\\\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

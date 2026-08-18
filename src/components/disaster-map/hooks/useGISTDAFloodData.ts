@@ -9,16 +9,16 @@ export interface FloodFeature {
   type: 'Feature';
   geometry: {
     type: 'MultiPolygon' | 'Polygon';
-    coordinates: number[][][][];
+    coordinates: any;
   };
   properties: {
     _id: string;
-    _createdAt: string;
-    _updatedAt: string;
-    f_area: number;
-    pv_tn: string; // จังหวัด
-    ap_tn: string; // อำเภอ
-    tb_tn: string; // ตำบล
+    _createdAt?: string;
+    _updatedAt?: string;
+    f_area?: number;
+    pv_tn?: string; // จังหวัด
+    ap_tn?: string; // อำเภอ
+    tb_tn?: string; // ตำบล
     population?: number;
     population_2?: number;
     building?: number;
@@ -42,15 +42,15 @@ export interface RecurrentFloodFeature {
   id: string;
   type: 'Feature';
   geometry: {
-    type: 'MultiPolygon';
-    coordinates: number[][][][];
+    type: 'MultiPolygon' | 'Polygon';
+    coordinates: any;
   };
   properties: {
     _id: string;
-    freq: number;
-    LabelTH: string;
-    LabelEN: string;
-    shape_area: number;
+    freq?: number;
+    LabelTH?: string;
+    LabelEN?: string;
+    shape_area?: number;
     [key: string]: any;
   };
 }
@@ -86,7 +86,6 @@ async function fetchRecurrentFloodData(limit: number = 1000): Promise<FloodRespo
 }
 
 export const useGISTDAFloodData = (timeframe: '1day' | '3days' | '7days' | '30days' = '3days') => {
-  // Map timeframe to API endpoints
   const apiTimeframe = timeframe === '7days' || timeframe === '30days' ? '3days' : timeframe;
   
   return useQuery({
@@ -106,14 +105,42 @@ export const useRecurrentFloodData = () => {
   });
 };
 
-// Calculate center point of a polygon for marker placement
+// Calculate center point of a polygon safely for marker placement
 export const getFloodCenter = (feature: FloodFeature): [number, number] => {
-  const coords = feature.geometry.coordinates[0][0];
-  const lats = coords.map(c => c[1]);
-  const lngs = coords.map(c => c[0]);
-  
-  const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
-  const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-  
-  return [centerLat, centerLng];
+  try {
+    const coords = feature?.geometry?.coordinates;
+    if (!coords || !Array.isArray(coords) || coords.length === 0) {
+      return [13.7563, 100.5018];
+    }
+
+    let ring: any[] = [];
+    if (Array.isArray(coords[0]) && Array.isArray(coords[0][0]) && typeof coords[0][0][0] === 'number') {
+      // Polygon: coords[0] is array of [lng, lat]
+      ring = coords[0];
+    } else if (Array.isArray(coords[0]) && Array.isArray(coords[0][0]) && Array.isArray(coords[0][0][0])) {
+      // MultiPolygon: coords[0][0] is array of [lng, lat]
+      ring = coords[0][0];
+    } else if (Array.isArray(coords[0]) && typeof coords[0][0] === 'number') {
+      ring = coords;
+    }
+
+    const lats = ring.map(c => Number(c?.[1])).filter(v => typeof v === 'number' && !isNaN(v));
+    const lngs = ring.map(c => Number(c?.[0])).filter(v => typeof v === 'number' && !isNaN(v));
+
+    if (lats.length === 0 || lngs.length === 0) {
+      return [13.7563, 100.5018];
+    }
+
+    const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+    const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+
+    if (isNaN(centerLat) || isNaN(centerLng)) {
+      return [13.7563, 100.5018];
+    }
+
+    return [centerLat, centerLng];
+  } catch (err) {
+    console.warn('Error calculating flood center:', err);
+    return [13.7563, 100.5018];
+  }
 };

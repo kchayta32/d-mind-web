@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -8,12 +7,20 @@ interface RainOverlayProps {
   rainData: RainViewerData | null;
   overlayType: 'radar' | 'satellite';
   timeType: 'past' | 'future';
+  frameIndex?: number;
 }
 
-const RainOverlay: React.FC<RainOverlayProps> = ({ rainData, overlayType, timeType }) => {
+const RainOverlay: React.FC<RainOverlayProps> = ({ 
+  rainData, 
+  overlayType, 
+  timeType,
+  frameIndex: controlledFrameIndex 
+}) => {
   const map = useMap();
   const [currentLayer, setCurrentLayer] = useState<L.TileLayer | null>(null);
-  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [internalFrameIndex, setInternalFrameIndex] = useState(0);
+
+  const activeIndex = controlledFrameIndex !== undefined ? controlledFrameIndex : internalFrameIndex;
 
   useEffect(() => {
     if (!rainData || !map) return;
@@ -34,42 +41,29 @@ const RainOverlay: React.FC<RainOverlayProps> = ({ rainData, overlayType, timeTy
 
     if (frames.length === 0) return;
 
-    // Use the latest frame or current frame index
-    const frameIndex = Math.min(currentFrameIndex, frames.length - 1);
-    const frame = frames[frameIndex];
+    // Use the requested frame
+    const idx = Math.max(0, Math.min(activeIndex, frames.length - 1));
+    const frame = frames[idx];
     
     if (!frame) return;
 
     const tileUrl = `https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`;
     
     const layer = L.tileLayer(tileUrl, {
-      opacity: 0.6,
-      attribution: 'RainViewer'
+      opacity: 0.65,
+      zIndex: 400,
+      attribution: '&copy; <a href="https://www.rainviewer.com/">RainViewer</a>'
     });
 
     layer.addTo(map);
     setCurrentLayer(layer);
 
     return () => {
-      if (layer) {
+      if (layer && map) {
         map.removeLayer(layer);
       }
     };
-  }, [rainData, overlayType, timeType, currentFrameIndex, map]);
-
-  // Auto-animate through frames for past radar data
-  useEffect(() => {
-    if (!rainData || overlayType !== 'radar' || timeType !== 'past') return;
-
-    const frames = rainData.radar?.past || [];
-    if (frames.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentFrameIndex(prev => (prev + 1) % frames.length);
-    }, 500); // Change frame every 500ms
-
-    return () => clearInterval(interval);
-  }, [rainData, overlayType, timeType]);
+  }, [rainData, overlayType, timeType, activeIndex, map]);
 
   return null;
 };

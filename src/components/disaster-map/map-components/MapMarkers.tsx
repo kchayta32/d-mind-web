@@ -1,14 +1,15 @@
-
 import React from 'react';
 import ClusteredEarthquakeMarkers from '../ClusteredEarthquakeMarkers';
+import ClusteredHotspotMarkers from '../ClusteredHotspotMarkers';
 import RainSensorMarker from '../RainSensorMarker';
-import HotspotMarker from '../HotspotMarker';
 import AirStationMarker from '../AirStationMarker';
 import { FloodDataMarker } from '../FloodDataMarker';
 import { FloodMarker } from '../FloodMarker';
 import { OpenMeteoWeatherMarker } from '../OpenMeteoWeatherMarker';
 import SinkholeMarker from '../SinkholeMarker';
-import { Earthquake, RainSensor, AirPollutionData } from '../types';
+import { StormMarker } from './StormMarker';
+import { VolcanoMarker } from './VolcanoMarker';
+import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData } from '../types';
 import { GISTDAHotspot } from '../useGISTDAData';
 import { FloodDataPoint } from '../hooks/useOpenMeteoFloodData';
 import { FloodFeature, getFloodCenter } from '../hooks/useGISTDAFloodData';
@@ -25,6 +26,8 @@ interface MapMarkersProps {
   floodDataPoints?: FloodDataPoint[];
   gistdaFloodFeatures?: FloodFeature[];
   openMeteoRainData?: OpenMeteoRainDataPoint[];
+  storms?: StormData[];
+  volcanoes?: VolcanoData[];
   sinkholes: SinkholeData[];
 }
 
@@ -37,18 +40,10 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
   floodDataPoints = [],
   gistdaFloodFeatures = [],
   openMeteoRainData = [],
+  storms = [],
+  volcanoes = [],
   sinkholes
 }) => {
-  console.log('MapMarkers rendering with:', {
-    selectedType,
-    filteredRainSensors: filteredRainSensors.length,
-    filteredEarthquakes: filteredEarthquakes.length,
-    hotspots: hotspots.length,
-    filteredAirStations: filteredAirStations.length,
-    openMeteoRainData: openMeteoRainData.length,
-    gistdaFloodFeatures: gistdaFloodFeatures.length
-  });
-
   return (
     <>
       {/* Earthquake markers with clustering */}
@@ -56,15 +51,22 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         <ClusteredEarthquakeMarkers earthquakes={filteredEarthquakes} />
       )}
 
-      {/* Rain sensor markers */}
-      {selectedType === 'heavyrain' && filteredRainSensors.map((sensor) => {
-        console.log('Rendering rain sensor:', sensor.id, sensor.coordinates);
-        return (
-          <RainSensorMarker key={sensor.id} sensor={sensor} />
-        );
-      })}
+      {/* Storm & Tropical Cyclone markers */}
+      {selectedType === 'storm' && storms.map((storm) => (
+        <StormMarker key={storm.id} storm={storm} />
+      ))}
 
-      {/* Open-Meteo rain data markers */}
+      {/* Volcano markers */}
+      {selectedType === 'volcano' && volcanoes.map((volcano) => (
+        <VolcanoMarker key={volcano.id} volcano={volcano} />
+      ))}
+
+      {/* Rain sensor markers */}
+      {selectedType === 'heavyrain' && filteredRainSensors.map((sensor) => (
+        <RainSensorMarker key={sensor.id} sensor={sensor} />
+      ))}
+
+      {/* Open-Meteo rain and weather data markers */}
       {selectedType === 'openmeteorain' && openMeteoRainData.map((dataPoint, index) => (
         <OpenMeteoWeatherMarker 
           key={`openmeteo-${dataPoint.locationName}-${index}`} 
@@ -72,10 +74,10 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         />
       ))}
 
-      {/* Wildfire hotspot markers */}
-      {selectedType === 'wildfire' && hotspots.map((hotspot) => (
-        <HotspotMarker key={`${hotspot.geometry?.coordinates?.[1]}-${hotspot.geometry?.coordinates?.[0]}-${hotspot.ACQ_DATE}`} hotspot={hotspot} />
-      ))}
+      {/* Wildfire hotspot markers with clustering for high performance */}
+      {selectedType === 'wildfire' && (
+        <ClusteredHotspotMarkers hotspots={hotspots} />
+      )}
 
       {/* Air pollution station markers */}
       {selectedType === 'airpollution' && filteredAirStations.map((station) => (

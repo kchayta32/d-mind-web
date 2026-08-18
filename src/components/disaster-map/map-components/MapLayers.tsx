@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WildfireWMSLayers } from '../WildfireWMSLayers';
 import DroughtWMSLayers from '../DroughtWMSLayers';
@@ -18,6 +17,7 @@ interface MapLayersProps {
   rainTimeType: 'past' | 'future';
   wildfireTimeFilter: string;
   showBurnFreq: boolean;
+  rainFrameIndex?: number;
 }
 
 export const MapLayers: React.FC<MapLayersProps> = ({
@@ -30,7 +30,8 @@ export const MapLayers: React.FC<MapLayersProps> = ({
   rainOverlayType,
   rainTimeType,
   wildfireTimeFilter,
-  showBurnFreq
+  showBurnFreq,
+  rainFrameIndex
 }) => {
   return (
     <>
@@ -65,6 +66,7 @@ export const MapLayers: React.FC<MapLayersProps> = ({
           rainData={rainData}
           overlayType={rainOverlayType}
           timeType={rainTimeType}
+          frameIndex={rainFrameIndex}
         />
       )}
     </>

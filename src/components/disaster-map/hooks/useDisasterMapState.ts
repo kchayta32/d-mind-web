@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { DisasterType } from '../DisasterMap';
 
 export const useDisasterMapState = () => {
-  const [selectedType, setSelectedType] = useState<DisasterType>('wildfire');
+  const [selectedType, setSelectedType] = useState<DisasterType>('earthquake');
   const [magnitudeFilter, setMagnitudeFilter] = useState(1.0);
   const [humidityFilter, setHumidityFilter] = useState(0);
   const [rainTimeFilter, setRainTimeFilter] = useState('realtime');

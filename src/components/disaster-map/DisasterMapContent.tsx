@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MapView } from './MapView';
 import FilterControls from './FilterControls';
@@ -7,6 +6,8 @@ import WildfireCharts from './WildfireCharts';
 import AirPollutionCharts from './AirPollutionCharts';
 import DroughtCharts from './DroughtCharts';
 import FloodCharts from './FloodCharts';
+import { StormCharts } from './charts/StormCharts';
+import { VolcanoCharts } from './charts/VolcanoCharts';
 import SinkholeNews from './SinkholeNews';
 import { DisasterType } from './DisasterMap';
 import { useDisasterMapState } from './hooks/useDisasterMapState';
@@ -54,20 +55,25 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     gistdaFloodFeatures,
     floodDataPoints,
     openMeteoRainData,
+    storms,
+    volcanoes,
     wildfireStats,
     airStats,
     droughtStats,
     floodStats,
+    stormStats,
+    volcanoStats,
     getCurrentStats,
     getCurrentLoading,
+    refetchAll
   } = useDisasterMapData(rainTimeFilter, wildfireTimeFilter, floodTimeFilter);
 
   const { sinkholes, stats: sinkholeStats } = useSinkholeData();
 
   return (
-    <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
-      {/* Main Map */}
-      <div className="lg:col-span-3 h-[400px] md:h-[500px] lg:h-full [&:has([data-state=open])]:pointer-events-none">
+    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-0">
+      {/* Main Map Container (8 cols on desktop) */}
+      <div className="lg:col-span-8 xl:col-span-9 h-[480px] sm:h-[560px] lg:h-[calc(100vh-175px)] min-h-[440px] rounded-xl overflow-hidden shadow-sm border border-slate-200/90 dark:border-slate-800 [&:has([data-state=open])]:pointer-events-none">
         <MapView
           earthquakes={earthquakes}
           rainSensors={rainSensors}
@@ -77,6 +83,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           gistdaFloodFeatures={gistdaFloodFeatures}
           floodDataPoints={floodDataPoints}
           openMeteoRainData={openMeteoRainData}
+          storms={storms}
+          volcanoes={volcanoes}
           sinkholes={sinkholes}
           selectedType={selectedType}
           magnitudeFilter={magnitudeFilter}
@@ -89,11 +97,12 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           showBurnFreq={showBurnFreq}
           isLoading={getCurrentLoading(selectedType)}
           onLocationSelect={onLocationSelect}
+          onRefreshAll={refetchAll}
         />
       </div>
       
-      {/* Right Sidebar */}
-      <div className="lg:col-span-1 space-y-4 max-h-[600px] lg:max-h-full overflow-y-auto">
+      {/* Right Sidebar for Analytics & Controls (4 cols on desktop) */}
+      <div className="lg:col-span-4 xl:col-span-3 space-y-3.5 max-h-none lg:max-h-[calc(100vh-175px)] overflow-y-auto pr-1 pb-4">
         {/* Filter Controls */}
         <FilterControls
           selectedType={selectedType}
@@ -123,6 +132,22 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           isLoading={getCurrentLoading(selectedType)}
           disasterType={selectedType}
         />
+
+        {/* Specific Charts for Storms */}
+        {selectedType === 'storm' && (
+          <StormCharts
+            storms={storms}
+            stats={stormStats}
+          />
+        )}
+
+        {/* Specific Charts for Volcanoes */}
+        {selectedType === 'volcano' && (
+          <VolcanoCharts
+            volcanoes={volcanoes}
+            stats={volcanoStats}
+          />
+        )}
         
         {/* Specific Charts for Wildfire */}
         {selectedType === 'wildfire' && (

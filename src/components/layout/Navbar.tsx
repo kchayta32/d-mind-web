@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
     Moon, Sun, Globe, Menu, X, Search,
     Home, Phone, AlertTriangle, FileText,
-    Smile, BookOpen, Bot, Info, Mail
+    Smile, BookOpen, Bot, Info, Mail, CloudSun
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AnimatedLogo from '@/components/ui/AnimatedLogo';
@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageProvider';
 // Menu Items Configuration with Icons
 const MENU_ITEMS_CONFIG = [
     { key: 'home', route: '/', icon: Home, color: 'text-blue-400' },
+    { key: 'disasterNews', route: '/disaster-news', icon: CloudSun, color: 'text-sky-400' },
     { key: 'emergency', route: '/contacts', icon: Phone, color: 'text-red-400' },
     { key: 'victim', route: '/victim-reports', icon: AlertTriangle, color: 'text-orange-400' },
     { key: 'incident', route: '/incident-reports', icon: FileText, color: 'text-yellow-400' },
@@ -25,8 +26,8 @@ const MENU_ITEMS_CONFIG = [
 ];
 
 const Navbar: React.FC = () => {
-    const { theme, setTheme } = useTheme();
-    const { language, setLanguage, t } = useLanguage();
+    const { resolvedTheme, toggleTheme } = useTheme();
+    const { language, toggleLanguage, t } = useLanguage();
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -80,7 +81,7 @@ const Navbar: React.FC = () => {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-white/5"
+                className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm border-b border-white/10"
             >
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     {/* Logo Area */}
@@ -94,28 +95,34 @@ const Navbar: React.FC = () => {
                             variant="ghost"
                             size="icon"
                             className="text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            onClick={toggleTheme}
+                            title={t('theme.toggleTheme')}
                         >
                             <motion.div
                                 initial={false}
-                                animate={{ rotate: theme === 'dark' ? 180 : 0 }}
+                                animate={{ rotate: resolvedTheme === 'dark' ? 180 : 0 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                {theme === 'dark' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                                {resolvedTheme === 'dark' ? (
+                                    <Sun className="h-5 w-5 text-yellow-400" />
+                                ) : (
+                                    <Moon className="h-5 w-5 text-blue-200" />
+                                )}
                             </motion.div>
                         </Button>
 
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full hidden md:flex items-center gap-2"
-                            onClick={() => setLanguage(language === 'th' ? 'en' : 'th')}
+                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full flex items-center gap-1.5 px-3"
+                            onClick={toggleLanguage}
+                            title={t('menu.changeLanguage')}
                         >
-                            <Globe className="h-4 w-4" />
-                            <span className="text-sm font-medium">{language === 'th' ? 'TH' : 'EN'}</span>
+                            <Globe className="h-4 w-4 text-blue-400" />
+                            <span className="text-sm font-semibold">{language.toUpperCase()}</span>
                         </Button>
 
-                        <div className="w-px h-6 bg-white/20 mx-1 hidden md:block" />
+                        <div className="w-px h-6 bg-white/20 mx-1" />
 
                         {/* Burger Toggle */}
                         <motion.button

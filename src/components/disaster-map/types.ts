@@ -11,6 +11,11 @@ export interface Earthquake {
   place?: string;
   url?: string;
   isSignificant?: boolean;
+  tsunamiAlert?: boolean;
+  source?: 'USGS' | 'EMSC' | 'GDACS';
+  feltReports?: number;
+  alertColor?: 'green' | 'yellow' | 'orange' | 'red';
+  distanceFromUser?: number;
 }
 
 export interface EarthquakeStats {
@@ -21,6 +26,12 @@ export interface EarthquakeStats {
   averageDepth: number;
   last24Hours: number;
   significantCount: number;
+  tsunamiAlertsCount?: number;
+  sourceBreakdown?: {
+    usgs: number;
+    emsc: number;
+    gdacs: number;
+  };
 }
 
 export interface RainSensor {
@@ -64,11 +75,19 @@ export interface AirPollutionData {
   no2trop?: number;
   o3total?: number;
   uvai?: number;
+  usAqi?: number;
+  europeanAqi?: number;
+  uvIndex?: number;
+  dust?: number;
   timestamp: string;
   stationName?: string;
   province?: string;
   district?: string;
   subdistrict?: string;
+  source?: 'Open-Meteo' | 'GISTDA' | 'PCD';
+  aqiLevel?: 'good' | 'moderate' | 'unhealthy_sensitive' | 'unhealthy' | 'very_unhealthy' | 'hazardous';
+  hourlyPm25?: number[];
+  hourlyTimes?: string[];
 }
 
 export interface AirPollutionStats {
@@ -77,6 +96,16 @@ export interface AirPollutionStats {
   maxPM25: number;
   unhealthyStations: number;
   last24Hours: number;
+  averageAqi?: number;
+  maxAqi?: number;
+  aqiDistribution?: {
+    good: number;
+    moderate: number;
+    unhealthySensitive: number;
+    unhealthy: number;
+    veryUnhealthy: number;
+    hazardous: number;
+  };
 }
 
 export interface OpenMeteoRainStats {
@@ -86,3 +115,87 @@ export interface OpenMeteoRainStats {
   avgTemperature: number;
   lastUpdated: string;
 }
+
+// Storm & Tropical Cyclone Types
+export interface StormTrackPoint {
+  latitude: number;
+  longitude: number;
+  time: string;
+  windSpeedKmH?: number;
+  pressureHPa?: number;
+}
+
+export interface StormData {
+  id: string;
+  name: string;
+  category: 'Depression' | 'Tropical Storm' | 'Cat 1' | 'Cat 2' | 'Cat 3' | 'Cat 4' | 'Cat 5' | 'Unknown';
+  latitude: number;
+  longitude: number;
+  lat: number;
+  lng: number;
+  windSpeedKmH: number;
+  windSpeedKnots?: number;
+  pressureHPa: number;
+  movementSpeedKmH?: number;
+  movementDirection?: string;
+  alertLevel: 'Green' | 'Orange' | 'Red';
+  affectedCountries?: string[];
+  affectedPopulation?: number;
+  updatedAt: string;
+  source: 'NASA EONET' | 'GDACS' | 'JTWC';
+  trackHistory?: StormTrackPoint[];
+  description?: string;
+  link?: string;
+}
+
+export interface StormStats {
+  totalActiveStorms: number;
+  maxWindSpeedKmH: number;
+  severeStormsCount: number; // Cat 3+
+  tropicalStormsCount: number;
+  mostSevereStorm?: string;
+  alertBreakdown: {
+    red: number;
+    orange: number;
+    green: number;
+  };
+  lastUpdated: string;
+}
+
+// Volcano Types
+export interface VolcanoData {
+  id: string;
+  name: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  elevationMeters?: number;
+  status: 'Erupting' | 'Warning' | 'Unrest' | 'Normal';
+  alertLevel: 'Green' | 'Yellow' | 'Orange' | 'Red';
+  lastEruptionDate?: string;
+  source: 'NASA EONET' | 'GDACS' | 'Smithsonian';
+  description?: string;
+  link?: string;
+}
+
+export interface VolcanoStats {
+  totalActiveVolcanoes: number;
+  eruptingCount: number;
+  warningCount: number;
+  regionalCount: number; // In Asia-Pacific Ring of Fire
+  lastUpdated: string;
+}
+
+// API Health / Status types
+export interface ApiSourceStatus {
+  name: string;
+  category: string;
+  isFree: boolean;
+  status: 'online' | 'loading' | 'error';
+  latencyMs?: number;
+  lastUpdated?: string;
+  itemCount?: number;
+  url: string;
+}
+
+export type BaseMapLayerType = 'osm' | 'satellite' | 'dark' | 'light' | 'topo';

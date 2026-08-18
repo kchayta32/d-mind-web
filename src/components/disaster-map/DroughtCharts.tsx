@@ -1,15 +1,13 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DroughtStats } from './hooks/useDroughtData';
 
 interface DroughtChartsProps {
-  stats: DroughtStats;
+  stats: DroughtStats | null;
 }
 
 const DroughtCharts: React.FC<DroughtChartsProps> = ({ stats }) => {
-  // Pie chart data for national overview
   const pieData = [
     { name: 'ตะวันออกเฉียงเหนือ', value: 46.7, color: '#f59e0b' },
     { name: 'ตะวันออก', value: 41.6, color: '#eab308' },
@@ -19,29 +17,32 @@ const DroughtCharts: React.FC<DroughtChartsProps> = ({ stats }) => {
     { name: 'ใต้', value: 37.1, color: '#06b6d4' }
   ];
 
+  const nationalAvg = stats?.nationalAverage ?? 41.2;
+  const topProvinces = stats?.topProvinces || [];
+
   return (
     <div className="space-y-4">
       {/* National Average */}
-      <Card>
+      <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">ค่าเฉลี่ยพื้นที่เสี่ยงภัยแล้งทั่วประเทศ</CardTitle>
+          <CardTitle className="text-sm font-semibold">ค่าเฉลี่ยพื้นที่เสี่ยงภัยแล้งทั่วประเทศ</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center">
             <div className="text-3xl font-bold text-orange-600 mb-1">
-              {stats.nationalAverage.toFixed(1)}%
+              {Number(nationalAvg).toFixed(1)}%
             </div>
             <div className="text-xs text-gray-500">
-              6 มิ.ย. 68 อัปเดตล่าสุด
+              วิเคราะห์จากความชื้นในดิน 4 ระดับความลึก
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Regional Distribution */}
-      <Card>
+      <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">จำแนกค่าเฉลี่ยพื้นที่เสี่ยงภัยแล้งตามภูมิภาค (%)</CardTitle>
+          <CardTitle className="text-sm font-semibold">จำแนกค่าเฉลี่ยพื้นที่เสี่ยงภัยแล้งตามภูมิภาค (%)</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={180}>
@@ -78,33 +79,35 @@ const DroughtCharts: React.FC<DroughtChartsProps> = ({ stats }) => {
         </CardContent>
       </Card>
 
-      {/* Top 5 Provinces */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">5 จังหวัด ที่มีค่าเฉลี่ยพื้นที่เสี่ยงภัยแล้งสูงสุด (%)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {stats.topProvinces.map((province, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">{index + 1}.</span>
-                  <span>{province.province}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="px-2 py-1 rounded text-xs font-medium text-white"
-                    style={{ backgroundColor: province.color }}
-                  >
-                    {province.percentage}
+      {/* Top Provinces */}
+      {topProvinces.length > 0 && (
+        <Card className="bg-white shadow-sm border border-gray-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">5 จังหวัดเสี่ยงภัยแล้งสูงสุด (%)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {topProvinces.slice(0, 5).map((province, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-500">{index + 1}.</span>
+                    <span>{province.province}</span>
                   </div>
-                  <span className="text-xs text-gray-500">เสี่ยงสูง</span>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="px-2 py-1 rounded text-xs font-medium text-white"
+                      style={{ backgroundColor: province.color || '#ea580c' }}
+                    >
+                      {province.percentage}
+                    </div>
+                    <span className="text-xs text-gray-500">เสี่ยงสูง</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

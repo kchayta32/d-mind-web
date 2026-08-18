@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DisasterWatch TH 🌊 ศูนย์รวมข่าวภัยธรรมชาติ ภัยพิบัติ และพยากรณ์อากาศ</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom Bright Blue Theme CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="container nav-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-cloud-bolt"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">DisasterWatch <span class="brand-highlight">TH</span></span>
+                    <span class="brand-subtitle">ระบบข่าวภัยธรรมชาติ ภัยพิบัติ และพยากรณ์อากาศ</span>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <div class="live-clock" id="liveClock">
+                    <i class="fa-regular fa-clock"></i> <span id="clockText">--:--:--</span>
+                </div>
+                
+                <div class="db-status-pill" id="dbStatusPill" onclick="openDbModal()" title="คลิกดูสถานะ Supabase Database">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Supabase DB</span>
+                </div>
+
+                <button class="btn btn-primary btn-scrape" id="btnScrape" onclick="triggerManualScrape()">
+                    <i class="fa-solid fa-arrows-rotate" id="scrapeIcon"></i>
+                    <span>ดึงข้อมูลล่าสุด (Scrape Now)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container main-content">
+        
+        <!-- Hero & Quick Stats Section -->
+        <section class="hero-section">
+            <div class="hero-header">
+                <div class="hero-title-group">
+                    <div class="badge badge-sky">
+                        <i class="fa-solid fa-satellite-dish"></i> Real-time Disaster & Weather Aggregator
+                    </div>
+                    <h1 class="hero-headline">ศูนย์เฝ้าระวังและรายงานสถานการณ์ภัยพิบัติ</h1>
+                    <p class="hero-desc">
+                        รวบรวมและวิเคราะห์ข้อมูลจากกรมอุตุนิยมวิทยา (TMD), กรมควบคุมมลพิษ (Air4Thai), USGS, GDACS และสำนักข่าวชั้นนำ พร้อมเชื่อมต่อฐานข้อมูล Supabase อัตโนมัติ
+                    </p>
+                </div>
+                <div class="last-sync-badge" id="lastSyncTime">
+                    <i class="fa-solid fa-clock-rotate-left"></i> อัปเดตล่าสุด: กำลังโหลด...
+                </div>
+            </div>
+
+            <!-- 4 Quick Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="filterCategory('all')">
+                    <div class="stat-icon icon-blue">
+                        <i class="fa-solid fa-newspaper"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ข่าวสารทั้งหมด</span>
+                        <span class="stat-value" id="statTotal">--</span>
+                        <span class="stat-sub">จากทุกแหล่งข้อมูล</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterCategory('natural')">
+                    <div class="stat-icon icon-cyan">
+                        <i class="fa-solid fa-volcano"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ภัยธรรมชาติ</span>
+                        <span class="stat-value" id="statNatural">--</span>
+                        <span class="stat-sub">แผ่นดินไหว สึนามิ น้ำท่วม</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterCategory('hazard')">
+                    <div class="stat-icon icon-amber">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">ภัยพิบัติ & ฉุกเฉิน</span>
+                        <span class="stat-value" id="statHazard">--</span>
+                        <span class="stat-sub">อัคคีภัย ฝุ่น PM2.5 วิกฤต</span>
+                    </div>
+                </div>
+
+                <div class="stat-card" onclick="filterCategory('forecast')">
+                    <div class="stat-icon icon-sky">
+                        <i class="fa-solid fa-cloud-sun-rain"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">พยากรณ์อากาศ</span>
+                        <span class="stat-value" id="statForecast">--</span>
+                        <span class="stat-sub">พยากรณ์ 7 วัน & เตือนฝน</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency Urgent Ticker Banner -->
+        <div class="urgent-banner" id="urgentBanner" style="display: none;">
+            <div class="urgent-tag">
+                <i class="fa-solid fa-circle-exclamation fa-beat"></i> เตือนภัยด่วน
+            </div>
+            <div class="urgent-marquee" id="urgentMarquee">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="category-tabs">
+            <button class="tab-btn active" data-category="all" onclick="selectTab(this, 'all')">
+                <i class="fa-solid fa-globe"></i> ข้อมูลทั้งหมด
+            </button>
+            <button class="tab-btn" data-category="natural" onclick="selectTab(this, 'natural')">
+                <i class="fa-solid fa-water"></i> ภัยธรรมชาติ
+            </button>
+            <button class="tab-btn" data-category="hazard" onclick="selectTab(this, 'hazard')">
+                <i class="fa-solid fa-fire-flame-curved"></i> ภัยพิบัติและเหตุฉุกเฉิน
+            </button>
+            <button class="tab-btn" data-category="forecast" onclick="selectTab(this, 'forecast')">
+                <i class="fa-solid fa-cloud-sun"></i> พยากรณ์อากาศและเตือนภัย
+            </button>
+            <button class="tab-btn" data-category="map" onclick="selectTab(this, 'map')">
+                <i class="fa-solid fa-map-location-dot"></i> แผนที่พิกัดภัยพิบัติ
+            </button>
+            <button class="tab-btn" data-category="analytics" onclick="selectTab(this, 'analytics')">
+                <i class="fa-solid fa-chart-pie"></i> สถิติ & กราฟวิเคราะห์
+            </button>
+            <button class="tab-btn tab-db-btn" onclick="openDbModal()">
+                <i class="fa-solid fa-database"></i> จัดการ Supabase DB
+            </button>
+        </nav>
+
+        <!-- Search and Filter Bar -->
+        <section class="filter-section" id="filterSection">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" placeholder="ค้นหาเหตุการณ์, จังหวัด (เช่น เชียงใหม่, ภูเก็ต, แผ่นดินไหว, ฝนตก)..." oninput="onSearchChange()">
+                <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display: none;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="filter-controls">
+                <!-- Severity Filter -->
+                <div class="select-wrapper">
+                    <i class="fa-solid fa-layer-group select-icon"></i>
+                    <select id="severitySelect" onchange="onFilterChange()">
+                        <option value="">ทุกระดับความรุนแรง</option>
+                        <option value="วิกฤต/รุนแรง">🔴 วิกฤต / รุนแรงมาก</option>
+                        <option value="เตือนภัย">🟡 เตือนภัย / ปานกลาง</option>
+                        <option value="เฝ้าระวัง">🔵 เฝ้าระวัง / ข้อมูล</option>
+                        <option value="ปกติ">🟢 ปกติ</option>
+                    </select>
+                </div>
+
+                <!-- Source Filter -->
+                <div class="select-wrapper">
+                    <i class="fa-solid fa-tower-broadcast select-icon"></i>
+                    <select id="sourceSelect" onchange="onFilterChange()">
+                        <option value="">ทุกแหล่งข้อมูล</option>
+                        <option value="TMD">กรมอุตุนิยมวิทยา (TMD)</option>
+                        <option value="Air4Thai">กรมควบคุมมลพิษ (Air4Thai)</option>
+                        <option value="USGS">USGS Earthquakes</option>
+                        <option value="GDACS">GDACS Global Alert</option>
+                        <option value="Thai PBS">Thai PBS News</option>
+                        <option value="ข่าวสด">ข่าวสด (Khaosod)</option>
+                        <option value="Open-Meteo">Open-Meteo Weather</option>
+                    </select>
+                </div>
+
+                <!-- Refresh view button -->
+                <button class="btn btn-outline" onclick="loadNewsData()" title="รีเฟรชรายการ">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Content Area 1: News Grid View -->
+        <section id="newsView" class="view-content">
+            <div class="view-header">
+                <div class="view-title-group">
+                    <h2 class="view-title" id="currentCategoryTitle">รายการข่าวสารและแจ้งเตือนทั้งหมด</h2>
+                    <span class="count-badge" id="resultsCount">0 รายการ</span>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-state" id="loadingState">
+                <div class="spinner-blue"></div>
+                <p class="loading-text">กำลังโหลดข้อมูลสถานการณ์ภัยพิบัติล่าสุด...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+                <h3>ไม่พบข้อมูลข่าวสารที่ค้นหา</h3>
+                <p>ลองปรับคำค้นหาหรือตัวกรอง หรือกดปุ่ม "ดึงข้อมูลล่าสุด (Scrape Now)" ด้านบน</p>
+                <button class="btn btn-primary" onclick="clearAllFilters()">
+                    <i class="fa-solid fa-filter-circle-xmark"></i> ล้างตัวกรองทั้งหมด
+                </button>
+            </div>
+
+            <!-- News Cards Grid -->
+            <div class="news-grid" id="newsGrid">
+                <!-- Cards will be populated dynamically by app.js -->
+            </div>
+        </section>
+
+        <!-- Main Content Area 2: Interactive Map View -->
+        <section id="mapView" class="view-content" style="display: none;">
+            <div class="map-card-wrapper">
+                <div class="map-header">
+                    <div>
+                        <h2 class="view-title">🗺️ แผนที่พิกัดภัยพิบัติและจุดเกิดเหตุสด (Live Map)</h2>
+                        <p class="map-subtitle">แสดงตำแหน่งศูนย์กลางแผ่นดินไหว, จุดเสี่ยงภัยน้ำท่วม, และสถานีเฝ้าระวังมลพิษ</p>
+                    </div>
+                    <div class="map-legends">
+                        <span class="legend-item"><span class="dot dot-red"></span> วิกฤต/รุนแรง</span>
+                        <span class="legend-item"><span class="dot dot-orange"></span> เตือนภัย</span>
+                        <span class="legend-item"><span class="dot dot-blue"></span> เฝ้าระวัง</span>
+                    </div>
+                </div>
+                <div id="disasterMap" class="disaster-map-canvas"></div>
+            </div>
+        </section>
+
+        <!-- Main Content Area 3: Analytics & Statistics View -->
+        <section id="analyticsView" class="view-content" style="display: none;">
+            <div class="analytics-header">
+                <h2 class="view-title">📊 รายงานสถิติและการวิเคราะห์สถานการณ์ภัยพิบัติ</h2>
+                <p class="analytics-subtitle">สรุปความถี่ของการเกิดเหตุการณ์ ระดับความรุนแรง และการจำแนกตามประเภทตาราง</p>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-chart-pie"></i> สัดส่วนข้อมูลตามตาราง Supabase</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-chart-column"></i> จำแนกตามระดับความรุนแรง (Severity)</h3>
+                    <div class="chart-container">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: News Details Popup -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-badges" id="modalBadges"></div>
+                <h2 class="modal-title" id="modalTitle">--</h2>
+                <div class="modal-meta" id="modalMeta"></div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-wrapper" id="modalImageWrapper">
+                    <img id="modalImage" src="" alt="disaster-image">
+                </div>
+                <div class="modal-desc" id="modalDesc"></div>
+                <div class="modal-details-grid" id="modalDetailsGrid"></div>
+            </div>
+            <div class="modal-footer">
+                <a id="modalSourceLink" href="#" target="_blank" class="btn btn-primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> ไปยังแหล่งข่าวต้นฉบับ
+                </a>
+                <button class="btn btn-secondary" onclick="closeDetailModal()">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Supabase Database Manager & SQL Schema -->
+    <div class="modal-overlay" id="dbModal">
+        <div class="modal-card modal-lg">
+            <button class="modal-close" onclick="closeDbModal()">&times;</button>
+            <div class="modal-header">
+                <div class="badge badge-sky">
+                    <i class="fa-solid fa-database"></i> Supabase Integration
+                </div>
+                <h2 class="modal-title">โครงสร้างฐานข้อมูลและการเชื่อมต่อ Supabase</h2>
+                <p class="modal-subtitle">ข้อมูลถูกจัดเก็บแบบแยก 3 ตารางในฐานข้อมูล PostgreSQL ของ Supabase</p>
+            </div>
+            <div class="modal-body">
+                <!-- Status Row -->
+                <div class="supabase-info-box">
+                    <div class="info-row">
+                        <strong>Supabase Endpoint:</strong>
+                        <code id="sbUrlText">https://evxjnivabxdlgfvncdcu.supabase.co</code>
+                    </div>
+                    <div class="info-row">
+                        <strong>Project Ref:</strong>
+                        <code>evxjnivabxdlgfvncdcu</code>
+                    </div>
+                </div>
+
+                <!-- 3 Tables Overview -->
+                <h3 class="section-heading"><i class="fa-solid fa-table-cells"></i> ตารางฐานข้อมูลในระบบ (3 Tables)</h3>
+                <div class="tables-status-grid">
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <span class="table-name">1. natural_disasters</span>
+                            <span class="table-badge" id="tblStatusNatural">กำลังตรวจสอบ...</span>
+                        </div>
+                        <p class="table-desc">จัดเก็บข้อมูลแผ่นดินไหว, สึนามิ, น้ำท่วม, พายุ พร้อมพิกัดและระดับริกเตอร์</p>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <span class="table-name">2. disaster_hazards</span>
+                            <span class="table-badge" id="tblStatusHazard">กำลังตรวจสอบ...</span>
+                        </div>
+                        <p class="table-desc">จัดเก็บอัคคีภัย, วิกฤตฝุ่น PM2.5, สารเคมีรั่วไหล และอุบัติภัยร้ายแรง</p>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <span class="table-name">3. weather_forecasts</span>
+                            <span class="table-badge" id="tblStatusForecast">กำลังตรวจสอบ...</span>
+                        </div>
+                        <p class="table-desc">จัดเก็บพยากรณ์อากาศประจำวัน 7 วันรายภาค และประกาศเตือนภัยสภาพอากาศ</p>
+                    </div>
+                </div>
+
+                <!-- SQL DDL Viewer -->
+                <div class="sql-box-wrapper">
+                    <div class="sql-box-header">
+                        <span><i class="fa-solid fa-code"></i> SQL Schema สำหรับรันบน Supabase SQL Editor</span>
+                        <button class="btn btn-sm btn-outline" onclick="copySqlSchema()">
+                            <i class="fa-regular fa-copy"></i> <span id="copyBtnText">คัดลอก SQL</span>
+                        </button>
+                    </div>
+                    <pre class="sql-code-view" id="sqlCodeView">กำลังโหลด SQL Schema...</pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="syncSupabaseTables()" id="btnSyncDb">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> ตรวจสอบ & ซิงค์ข้อมูลเข้า Supabase
+                </button>
+                <a href="https://supabase.com/dashboard/project/evxjnivabxdlgfvncdcu/sql/new" target="_blank" class="btn btn-outline">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> เปิด Supabase SQL Editor
+                </a>
+                <button class="btn btn-secondary" onclick="closeDbModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

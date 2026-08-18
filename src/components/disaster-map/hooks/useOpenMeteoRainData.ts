@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { fetchWeatherApi } from 'openmeteo';
 
@@ -66,28 +65,55 @@ export interface OpenMeteoWeatherData {
 
 export interface OpenMeteoRainDataPoint {
   locationName: string;
+  province: string;
+  region: 'เหนือ' | 'ตะวันออกเฉียงเหนือ' | 'กลาง' | 'ตะวันออก' | 'ตะวันตก' | 'ใต้';
   lat: number;
   lon: number;
   weatherData: OpenMeteoWeatherData;
 }
 
-// อัปเดตตำแหน่งและชื่อจังหวัดให้ตรงกับตำแหน่งจริงในประเทศไทย
-const THAILAND_WEATHER_POINTS = [
-  { lat: 13.7563, lon: 100.5018, name: 'กรุงเทพมหานคร' },
-  { lat: 18.7883, lon: 98.9853, name: 'เชียงใหม่' },
-  { lat: 17.3514, lon: 104.8381, name: 'อุดรธานี' },
-  { lat: 16.4419, lon: 102.8360, name: 'ขอนแก่น' },
-  { lat: 15.2520, lon: 104.8569, name: 'หนองคาย' },
-  { lat: 12.6091, lon: 101.0828, name: 'ชลบุรี' },
-  { lat: 9.1326, lon: 99.3292, name: 'สุราษฎร์ธานี' },
-  { lat: 7.8804, lon: 98.3923, name: 'ภูเก็ต' },
-  { lat: 6.9955, lon: 100.4664, name: 'สงขลา' },
-  { lat: 14.3532, lon: 100.5706, name: 'นครปฐม' },
-  { lat: 19.9071, lon: 99.8831, name: 'เชียงราย' },
-  { lat: 15.7907, lon: 100.2925, name: 'เพชรบูรณ์' },
-  { lat: 14.0227, lon: 99.5283, name: 'กาญจนบุรี' },
-  { lat: 8.4304, lon: 99.9581, name: 'นครศรีธรรมราช' },
-  { lat: 11.8564, lon: 99.9605, name: 'ระนอง' }
+export const THAILAND_WEATHER_POINTS = [
+  // ภาคกลาง
+  { lat: 13.7563, lon: 100.5018, name: 'กรุงเทพมหานคร', province: 'กรุงเทพมหานคร', region: 'กลาง' as const },
+  { lat: 14.3532, lon: 100.5706, name: 'พระนครศรีอยุธยา', province: 'พระนครศรีอยุธยา', region: 'กลาง' as const },
+  { lat: 14.0208, lon: 100.5250, name: 'ปทุมธานี', province: 'ปทุมธานี', region: 'กลาง' as const },
+  { lat: 14.5289, lon: 100.9105, name: 'สระบุรี', province: 'สระบุรี', region: 'กลาง' as const },
+  { lat: 15.7047, lon: 100.1372, name: 'นครสวรรค์', province: 'นครสวรรค์', region: 'กลาง' as const },
+  // ภาคเหนือ
+  { lat: 18.7883, lon: 98.9853, name: 'เชียงใหม่', province: 'เชียงใหม่', region: 'เหนือ' as const },
+  { lat: 19.9071, lon: 99.8831, name: 'เชียงราย', province: 'เชียงราย', region: 'เหนือ' as const },
+  { lat: 19.3020, lon: 97.9654, name: 'แม่ฮ่องสอน', province: 'แม่ฮ่องสอน', region: 'เหนือ' as const },
+  { lat: 18.2816, lon: 99.4916, name: 'ลำปาง', province: 'ลำปาง', region: 'เหนือ' as const },
+  { lat: 18.7756, lon: 100.7730, name: 'น่าน', province: 'น่าน', region: 'เหนือ' as const },
+  { lat: 16.8211, lon: 100.2659, name: 'พิษณุโลก', province: 'พิษณุโลก', region: 'เหนือ' as const },
+  { lat: 16.4193, lon: 101.1609, name: 'เพชรบูรณ์', province: 'เพชรบูรณ์', region: 'เหนือ' as const },
+  // ภาคตะวันออกเฉียงเหนือ
+  { lat: 14.9799, lon: 102.0977, name: 'นครราชสีมา (โคราช)', province: 'นครราชสีมา', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 16.4419, lon: 102.8360, name: 'ขอนแก่น', province: 'ขอนแก่น', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 17.4138, lon: 102.7877, name: 'อุดรธานี', province: 'อุดรธานี', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 17.8782, lon: 102.7412, name: 'หนองคาย', province: 'หนองคาย', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 15.2448, lon: 104.8471, name: 'อุบลราชธานี', province: 'อุบลราชธานี', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 17.1547, lon: 104.1359, name: 'สกลนคร', province: 'สกลนคร', region: 'ตะวันออกเฉียงเหนือ' as const },
+  { lat: 14.9930, lon: 103.1029, name: 'บุรีรัมย์', province: 'บุรีรัมย์', region: 'ตะวันออกเฉียงเหนือ' as const },
+  // ภาคตะวันออก
+  { lat: 13.3611, lon: 100.9847, name: 'ชลบุรี (พัทยา)', province: 'ชลบุรี', region: 'ตะวันออก' as const },
+  { lat: 12.6868, lon: 101.2228, name: 'ระยอง', province: 'ระยอง', region: 'ตะวันออก' as const },
+  { lat: 12.6103, lon: 102.1038, name: 'จันทบุรี', province: 'จันทบุรี', region: 'ตะวันออก' as const },
+  { lat: 12.2436, lon: 102.5156, name: 'ตราด (เกาะช้าง)', province: 'ตราด', region: 'ตะวันออก' as const },
+  // ภาคตะวันตก
+  { lat: 14.0227, lon: 99.5283, name: 'กาญจนบุรี', province: 'กาญจนบุรี', region: 'ตะวันตก' as const },
+  { lat: 16.8684, lon: 99.1260, name: 'ตาก (แม่สอด)', province: 'ตาก', region: 'ตะวันตก' as const },
+  { lat: 12.5684, lon: 99.9577, name: 'ประจวบคีรีขันธ์ (หัวหิน)', province: 'ประจวบคีรีขันธ์', region: 'ตะวันตก' as const },
+  // ภาคใต้
+  { lat: 10.4930, lon: 99.1797, name: 'ชุมพร', province: 'ชุมพร', region: 'ใต้' as const },
+  { lat: 9.9558, lon: 98.6351, name: 'ระนอง', province: 'ระนอง', region: 'ใต้' as const },
+  { lat: 9.1326, lon: 99.3292, name: 'สุราษฎร์ธานี (สมุย)', province: 'สุราษฎร์ธานี', region: 'ใต้' as const },
+  { lat: 7.8804, lon: 98.3923, name: 'ภูเก็ต', province: 'ภูเก็ต', region: 'ใต้' as const },
+  { lat: 8.0863, lon: 98.9063, name: 'กระบี่', province: 'กระบี่', region: 'ใต้' as const },
+  { lat: 8.4304, lon: 99.9581, name: 'นครศรีธรรมราช', province: 'นครศรีธรรมราช', region: 'ใต้' as const },
+  { lat: 6.9955, lon: 100.4664, name: 'สงขลา (หาดใหญ่)', province: 'สงขลา', region: 'ใต้' as const },
+  { lat: 6.5410, lon: 101.2802, name: 'ยะลา (เบตง)', province: 'ยะลา', region: 'ใต้' as const },
+  { lat: 6.4254, lon: 101.8253, name: 'นราธิวาส', province: 'นราธิวาส', region: 'ใต้' as const }
 ];
 
 async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
@@ -129,21 +155,21 @@ async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
     const weatherData: OpenMeteoWeatherData = {
       current: {
         time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-        temperature2m: current.variables(0)!.value(),
-        relativeHumidity2m: current.variables(1)!.value(),
-        apparentTemperature: current.variables(2)!.value(),
+        temperature2m: Math.round(current.variables(0)!.value() * 10) / 10,
+        relativeHumidity2m: Math.round(current.variables(1)!.value()),
+        apparentTemperature: Math.round(current.variables(2)!.value() * 10) / 10,
         isDay: current.variables(3)!.value(),
         snowfall: current.variables(4)!.value(),
-        showers: current.variables(5)!.value(),
-        precipitation: current.variables(6)!.value(),
-        rain: current.variables(7)!.value(),
+        showers: Math.round(current.variables(5)!.value() * 10) / 10,
+        precipitation: Math.round(current.variables(6)!.value() * 10) / 10,
+        rain: Math.round(current.variables(7)!.value() * 10) / 10,
         weatherCode: current.variables(8)!.value(),
-        cloudCover: current.variables(9)!.value(),
-        pressureMsl: current.variables(10)!.value(),
-        surfacePressure: current.variables(11)!.value(),
-        windGusts10m: current.variables(12)!.value(),
-        windDirection10m: current.variables(13)!.value(),
-        windSpeed10m: current.variables(14)!.value(),
+        cloudCover: Math.round(current.variables(9)!.value()),
+        pressureMsl: Math.round(current.variables(10)!.value()),
+        surfacePressure: Math.round(current.variables(11)!.value()),
+        windGusts10m: Math.round(current.variables(12)!.value() * 10) / 10,
+        windDirection10m: Math.round(current.variables(13)!.value()),
+        windSpeed10m: Math.round(current.variables(14)!.value() * 10) / 10,
       },
       hourly: {
         time: [...Array((Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval())].map(
@@ -192,10 +218,20 @@ async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
       }
     };
 
+    const pointMeta = THAILAND_WEATHER_POINTS[index] || {
+      name: `Point ${index}`,
+      province: 'ไทย',
+      region: 'กลาง' as const,
+      lat: response.latitude(),
+      lon: response.longitude()
+    };
+
     return {
-      locationName: THAILAND_WEATHER_POINTS[index].name,
-      lat: THAILAND_WEATHER_POINTS[index].lat,
-      lon: THAILAND_WEATHER_POINTS[index].lon,
+      locationName: pointMeta.name,
+      province: pointMeta.province,
+      region: pointMeta.region,
+      lat: pointMeta.lat,
+      lon: pointMeta.lon,
       weatherData
     };
   });
@@ -203,9 +239,9 @@ async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
 
 export const useOpenMeteoRainData = () => {
   return useQuery({
-    queryKey: ['open-meteo-rain-data'],
+    queryKey: ['open-meteo-weather-points-v2'],
     queryFn: fetchOpenMeteoWeatherData,
-    refetchInterval: 1800000, // 30 minutes
-    staleTime: 900000, // 15 minutes
+    refetchInterval: 600000, // 10 minutes
+    staleTime: 300000, // 5 minutes
   });
 };

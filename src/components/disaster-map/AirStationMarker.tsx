@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -38,7 +37,7 @@ const createAirStationIcon = (pm25?: number) => {
 
 const AirStationMarker: React.FC<AirStationMarkerProps> = ({ station }) => {
   const getPM25Status = (pm25?: number) => {
-    if (!pm25) return 'ไม่มีข้อมูล';
+    if (!pm25 && pm25 !== 0) return 'ไม่มีข้อมูล';
     if (pm25 <= 25) return 'ดีมาก';
     if (pm25 <= 50) return 'ดี';
     if (pm25 <= 75) return 'ปานกลาง';
@@ -48,20 +47,30 @@ const AirStationMarker: React.FC<AirStationMarkerProps> = ({ station }) => {
   };
 
   const formatValue = (value?: number, unit: string = '') => {
-    return value !== undefined ? `${value.toFixed(2)} ${unit}` : 'ไม่มีข้อมูล';
+    return typeof value === 'number' && !isNaN(value) ? `${value.toFixed(1)} ${unit}` : 'ไม่มีข้อมูล';
   };
+
+  const lat = station.lat ?? station.latitude;
+  const lng = station.lng ?? station.longitude;
+
+  if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+    return null;
+  }
 
   return (
     <Marker
-      position={[station.lat, station.lng]}
+      position={[lat, lng]}
       icon={createAirStationIcon(station.pm25)}
     >
       <Popup>
-        <div className="p-2">
-          <h3 className="font-bold text-sm mb-2">สถานีตรวจวัดคุณภาพอากาศ</h3>
+        <div className="p-2 min-w-[200px]">
+          <h3 className="font-bold text-sm mb-1 text-gray-800">
+            {station.province || station.name || 'สถานีตรวจวัดคุณภาพอากาศ'}
+          </h3>
           <div className="space-y-1 text-xs">
-            <div><strong>ตำแหน่ง:</strong> {station.lat.toFixed(4)}, {station.lng.toFixed(4)}</div>
             <div><strong>PM2.5:</strong> {formatValue(station.pm25, 'μg/m³')}</div>
+            {station.pm10 && <div><strong>PM10:</strong> {formatValue(station.pm10, 'μg/m³')}</div>}
+            {station.usAqi && <div><strong>US AQI:</strong> <span className="font-bold text-blue-600">{station.usAqi}</span></div>}
             <div><strong>สถานะ:</strong> <span className={`font-semibold ${
               station.pm25 && station.pm25 > 75 ? 'text-red-600' : 
               station.pm25 && station.pm25 > 50 ? 'text-yellow-600' : 'text-green-600'
@@ -69,13 +78,9 @@ const AirStationMarker: React.FC<AirStationMarkerProps> = ({ station }) => {
               {getPM25Status(station.pm25)}
             </span></div>
             
-            <hr className="my-2" />
-            <div className="text-xs text-gray-600">
-              <div><strong>AOD443:</strong> {formatValue(station.aod443)}</div>
-              <div><strong>NO2:</strong> {formatValue(station.no2trop)}</div>
-              <div><strong>SO2:</strong> {formatValue(station.so2)}</div>
-              <div><strong>O3:</strong> {formatValue(station.o3total)}</div>
-              <div><strong>UVAI:</strong> {formatValue(station.uvai)}</div>
+            <div className="text-[11px] text-gray-400 border-t pt-1.5 mt-1.5 flex justify-between">
+              <span>พิกัด: {lat.toFixed(3)}, {lng.toFixed(3)}</span>
+              <span>Open-Meteo</span>
             </div>
           </div>
         </div>

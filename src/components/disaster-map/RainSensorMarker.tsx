@@ -1,52 +1,58 @@
-
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
-import { Icon } from 'leaflet';
+import L from 'leaflet';
 import { RainSensor } from './types';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CloudRain, Calendar, Gauge } from 'lucide-react';
-import { format } from 'date-fns';
-import { th } from 'date-fns/locale';
 
 interface RainSensorMarkerProps {
   sensor: RainSensor;
 }
 
 const RainSensorMarker: React.FC<RainSensorMarkerProps> = ({ sensor }) => {
-  console.log('Rendering RainSensorMarker for sensor:', sensor);
-
-  // Create custom icon based on rain status
   const createRainIcon = (isRaining: boolean | null, humidity: number | null) => {
     const humidityValue = humidity || 0;
-    let color = '#10b981'; // Default green
+    let color = '#10b981'; // Green
     
     if (isRaining) {
-      color = '#3b82f6'; // Blue for raining
+      color = '#3b82f6'; // Blue
     } else if (humidityValue > 80) {
-      color = '#eab308'; // Yellow for high humidity
+      color = '#eab308'; // Yellow
     }
     
-    const iconSvg = `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2"/>
-        <path d="M12 6v6l4 2" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-    
-    return new Icon({
-      iconUrl: `data:image/svg+xml;base64,${btoa(iconSvg)}`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, -12],
+    return L.divIcon({
+      html: `
+        <div style="
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background-color: ${color};
+          border: 2px solid white;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 11px;
+        ">
+          🌧️
+        </div>
+      `,
+      className: 'custom-rain-marker',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+      popupAnchor: [0, -11]
     });
   };
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return 'ไม่ระบุ';
     try {
-      return format(new Date(dateString), 'PPP p', { locale: th });
-    } catch (e) {
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return dateString;
+      return d.toLocaleString('th-TH');
+    } catch {
       return dateString;
     }
   };
@@ -64,14 +70,15 @@ const RainSensorMarker: React.FC<RainSensorMarkerProps> = ({ sensor }) => {
   };
 
   // Ensure coordinates exist and are valid
-  if (!sensor.coordinates || !Array.isArray(sensor.coordinates) || sensor.coordinates.length !== 2) {
-    console.warn('Invalid coordinates for sensor:', sensor);
-    return null;
+  let lat = sensor.latitude;
+  let lng = sensor.longitude;
+
+  if ((!lat || !lng) && sensor.coordinates && Array.isArray(sensor.coordinates) && sensor.coordinates.length === 2) {
+    lat = Number(sensor.coordinates[0]);
+    lng = Number(sensor.coordinates[1]);
   }
 
-  const [lat, lng] = sensor.coordinates;
   if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
-    console.warn('Invalid coordinate values for sensor:', sensor);
     return null;
   }
 
@@ -109,11 +116,9 @@ const RainSensorMarker: React.FC<RainSensorMarkerProps> = ({ sensor }) => {
               <span>อัพเดต: {formatDate(sensor.inserted_at || sensor.created_at)}</span>
             </div>
 
-            {sensor.latitude && sensor.longitude && (
-              <div className="text-xs text-gray-400 mt-2 pt-2 border-t">
-                พิกัด: {sensor.latitude.toFixed(4)}, {sensor.longitude.toFixed(4)}
-              </div>
-            )}
+            <div className="text-xs text-gray-400 mt-2 pt-2 border-t">
+              พิกัด: {lat.toFixed(4)}, {lng.toFixed(4)}
+            </div>
           </CardContent>
         </Card>
       </Popup>

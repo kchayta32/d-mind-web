@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Performance Comparison & RAG Analytics Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icon library (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i class="fa-solid fa-microchip logo-icon"></i>
+                    <h2>LLM Arena TH</h2>
+                </div>
+                <span class="version-tag">v1.0.0</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-tab="chat-tab">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>เปรียบเทียบแชทบอท</span>
+                </button>
+                <button class="nav-btn" data-tab="analytics-tab" id="analytics-nav-btn">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>การวิเคราะห์กราฟ</span>
+                </button>
+                <button class="nav-btn" data-tab="history-tab">
+                    <i class="fa-solid fa-history"></i>
+                    <span>ประวัติการถามตอบ</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="theme-toggle-btn" class="secondary-btn">
+                    <i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>
+                </button>
+                <button id="refresh-supabase-btn" class="secondary-btn">
+                    <i class="fa-solid fa-arrows-rotate"></i> อัปเดตฐานข้อมูล Supabase
+                </button>
+                <div class="footer-credit">Developed with Antigravity AI</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="content-header">
+                <div class="header-info">
+                    <h1 id="page-title">เปรียบเทียบประสิทธิภาพโมเดลภาษา (8 LLMs)</h1>
+                    <p id="page-subtitle">ประมวลผลพร้อมกันในเวลาเดียวกัน (Asynchronous Parallel Processing)</p>
+                </div>
+                <div class="stats-overview">
+                    <div class="stat-mini-card">
+                        <span class="stat-label">ถามตอบสะสม</span>
+                        <span class="stat-value" id="total-queries-badge">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label">Mode 1 (นอกระบบ)</span>
+                        <span class="stat-value" id="mode1-queries-badge">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label">Mode 2 (RAG)</span>
+                        <span class="stat-value" id="mode2-queries-badge">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB CONTENT: CHAT / COMPARISON -->
+            <section id="chat-tab" class="tab-panel active">
+                <div class="chat-layout">
+                    <!-- Control / Input Panel -->
+                    <div class="input-panel glassmorphism">
+                        <h3><i class="fa-solid fa-sliders-h"></i> ตั้งค่าการตั้งคำถาม</h3>
+                        
+                        <!-- Mode Selector Tiles -->
+                        <div class="mode-selector">
+                            <label class="mode-tile">
+                                <input type="radio" name="query-mode" value="mode1" checked>
+                                <div class="tile-content">
+                                    <div class="tile-icon"><i class="fa-solid fa-globe"></i></div>
+                                    <div class="tile-info">
+                                        <h4>1. ตอบคำถามทั่วไป</h4>
+                                        <p>ข้อมูลไม่มีใน Supabase</p>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="mode-tile">
+                                <input type="radio" name="query-mode" value="mode2">
+                                <div class="tile-content">
+                                    <div class="tile-icon"><i class="fa-solid fa-database"></i></div>
+                                    <div class="tile-info">
+                                        <h4>2. ตอบข้อมูล Supabase</h4>
+                                        <p>สืบค้นตารางข้อมูลทั้งหมด (RAG)</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- Input Box -->
+                        <div class="input-container">
+                            <label for="query-input">พิมพ์คำถามของคุณที่นี่</label>
+                            <textarea id="query-input" placeholder="พิมพ์คำถามของคุณ เช่น 'แนะนำวิธีเตรียมตัวรับมือน้ำท่วม' หรือ 'มีข้อมูลใครในตาราง victim_reports บ้าง'..." rows="4"></textarea>
+                            <button id="send-btn" class="primary-btn">
+                                <span>ส่งคำถาม (8 โมเดล)</span>
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+
+                        <!-- Suggestions -->
+                        <div class="suggestions-container">
+                            <h4><i class="fa-regular fa-lightbulb"></i> ตัวอย่างคำถามแนะนำ:</h4>
+                            <div class="suggestion-tags" id="suggestion-tags-container">
+                                <!-- Suggestions filled dynamically by mode selector -->
+                            </div>
+                        </div>
+
+                        <!-- RAG Matches Panel (Only visible in Mode 2 after querying) -->
+                        <div id="rag-matches-panel" class="rag-matches-panel hidden">
+                            <h4><i class="fa-solid fa-magnifying-glass-nodes"></i> ผลการค้นหาข้อมูลใน Supabase</h4>
+                            <div class="rag-matches-scroll" id="rag-matches-list">
+                                <!-- Matches go here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LLM Grid Responses Panel -->
+                    <div class="responses-panel">
+                        <div class="section-title-bar">
+                            <h3><i class="fa-solid fa-grid-2"></i> ผลลัพธ์การประมวลผลโมเดล (ประมวลผลขนานขนานกัน)</h3>
+                            <div class="time-elapsed-container hidden" id="timer-box">
+                                <i class="fa-regular fa-clock"></i> ใช้เวลารวม: <span id="total-timer">0.00</span> วินาที
+                            </div>
+                        </div>
+                        
+                        <div class="llm-grid" id="llm-grid-container">
+                            <!-- 8 LLM Cards populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB CONTENT: ANALYTICS / GRAPHS -->
+            <section id="analytics-tab" class="tab-panel">
+                <div class="analytics-layout">
+                    <!-- Metrics Cards -->
+                    <div class="analytics-cards-grid">
+                        <div class="analytic-card glassmorphism">
+                            <div class="analytic-icon icon-blue"><i class="fa-solid fa-crown"></i></div>
+                            <div class="analytic-info">
+                                <h4>โมเดลที่ความแม่นยำสูงสุด</h4>
+                                <h2 id="top-accuracy-model">-</h2>
+                                <p id="top-accuracy-value">ค่าเฉลี่ย: 0.0%</p>
+                            </div>
+                        </div>
+                        <div class="analytic-card glassmorphism">
+                            <div class="analytic-icon icon-green"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="analytic-info">
+                                <h4>โมเดลตอบเร็วที่สุด (Fastest)</h4>
+                                <h2 id="top-speed-model">-</h2>
+                                <p id="top-speed-value">ความเร็วเฉลี่ย: 0ms</p>
+                            </div>
+                        </div>
+                        <div class="analytic-card glassmorphism">
+                            <div class="analytic-icon icon-purple"><i class="fa-solid fa-chart-pie"></i></div>
+                            <div class="analytic-info">
+                                <h4>อัตราความถูกต้องโดยรวม</h4>
+                                <h2 id="overall-rating-avg">0 %</h2>
+                                <p>จากคำถามทั้งหมดในระบบ</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Criteria Board -->
+                    <div class="evaluation-panel glassmorphism">
+                        <div class="evaluation-header">
+                            <h3><i class="fa-solid fa-square-check"></i> ตารางสรุปผลการประเมินมาตรฐานโมเดลภาษา</h3>
+                            <p class="evaluation-criteria-desc">เกณฑ์ผ่าน: ความถูกต้องเฉลี่ย ≥ 85% | เวลาตอบกลับเฉลี่ย ≤ 5.00 วินาที | อัตราการหลอน ≤ 10%</p>
+                        </div>
+                        <div class="table-container">
+                            <table class="evaluation-table">
+                                <thead>
+                                    <tr>
+                                        <th>โมเดล</th>
+                                        <th>ความถูกต้องเฉลี่ย (%)</th>
+                                        <th>เวลาตอบกลับเฉลี่ย (วินาที)</th>
+                                        <th>อัตราการหลอนของเอไอ (%)</th>
+                                        <th>สรุปผลการประเมิน</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="evaluation-table-body">
+                                    <!-- Dynamic rows for each model -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Graph Panel -->
+                    <div class="graph-panel glassmorphism">
+                        <div class="graph-header">
+                            <h3><i class="fa-solid fa-chart-bar"></i> กราฟเปรียบเทียบประสิทธิภาพโมเดล</h3>
+                            <div class="graph-controls">
+                                <div class="control-group">
+                                    <label for="graph-metric">ตัวชี้วัด:</label>
+                                    <select id="graph-metric">
+                                        <option value="accuracy">ความแม่นยำเฉลี่ย (Average Accuracy)</option>
+                                        <option value="latency">ความเร็วเฉลี่ย (Average Speed)</option>
+                                        <option value="hallucination">อัตราการหลอนของเอไอ (AI Hallucination Rate)</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label for="graph-type">ประเภทกราฟ:</label>
+                                    <select id="graph-type">
+                                        <option value="bar">กราฟแท่ง (Bar Chart)</option>
+                                        <option value="radar">กราฟเรดาร์ (Radar Chart)</option>
+                                        <option value="line">กราฟเส้น (Line Chart)</option>
+                                        <option value="doughnut">กราฟวงกลมโดนัท (Doughnut Chart)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="performance-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB CONTENT: HISTORY -->
+            <section id="history-tab" class="tab-panel">
+                <div class="history-layout glassmorphism">
+                    <div class="history-header">
+                        <h3><i class="fa-solid fa-clock-rotate-left"></i> ประวัติการเปรียบเทียบย้อนหลัง</h3>
+                        <button id="clear-history-btn" class="danger-btn">
+                            <i class="fa-solid fa-trash-alt"></i> ล้างประวัติทั้งหมด
+                        </button>
+                    </div>
+                    
+                    <div class="history-content">
+                        <div class="history-list" id="history-list-container">
+                            <!-- List of past queries -->
+                        </div>
+                        
+                        <div class="history-detail-panel" id="history-detail-panel">
+                            <div class="empty-state" id="history-detail-empty">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <p>เลือกรายการคำถามย้อนหลังจากรายการทางซ้ายเพื่อดูรายละเอียดผลเปรียบเทียบและแก้ไขการประเมินผลคะแนน</p>
+                            </div>
+                            <div class="history-detail-content hidden" id="history-detail-content">
+                                <div class="detail-header">
+                                    <div class="detail-header-top">
+                                        <span class="mode-badge" id="detail-mode-badge">Mode 1</span>
+                                        <button id="delete-current-btn" class="danger-btn" style="padding: 6px 12px; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-trash-can"></i> ลบรายการนี้
+                                        </button>
+                                    </div>
+                                    <h4 id="detail-query-text">คำถามจะแสดงที่นี่</h4>
+                                    <span class="timestamp" id="detail-timestamp">เวลา...</span>
+                                </div>
+                                <div class="detail-grid" id="detail-responses-grid">
+                                    <!-- Saved responses -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i id="toast-icon" class="fa-solid fa-info-circle"></i>
+        <span id="toast-message">แจ้งเตือน...</span>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

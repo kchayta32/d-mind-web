@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageProvider';
 
 const NewsCarousel = () => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 30 });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -40,10 +42,10 @@ const NewsCarousel = () => {
     const slides = [
         {
             id: 1,
-            badge: "News",
-            title: 'เตรียมพบกับ "D-MIND"',
-            subtitle: 'นวัตกรรมการเรียนรู้สู่แอปพลิเคชันเตือนภัยอัจฉริยะ',
-            description: 'D-MIND ภูมิใจนำเสนอผลงานการพัฒนาแอปพลิเคชัน "เพื่อการศึกษา" (Educational Purpose) ที่มุ่งเน้นการนำเทคโนโลยี AI และ IoT มาประยุกต์ใช้ในการเฝ้าระวังภัยพิบัติ',
+            badge: t('newsCarousel.slide1Badge'),
+            title: t('newsCarousel.slide1Title'),
+            subtitle: t('newsCarousel.slide1Subtitle'),
+            description: t('newsCarousel.slide1Desc'),
             bgImage: '/images/hero-background.png',
             content: (
                 <div className="space-y-4">
@@ -51,21 +53,21 @@ const NewsCarousel = () => {
                         <div className="flex items-center gap-3 text-sm md:text-base text-blue-100 p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
                             <Smartphone className="w-6 h-6 text-green-400" />
                             <div>
-                                <p className="font-semibold text-white">Android Application</p>
-                                <p className="opacity-80">พร้อมให้ดาวน์โหลดเร็วๆ นี้ (Coming Soon)</p>
+                                <p className="font-semibold text-white">{t('newsCarousel.androidApp')}</p>
+                                <p className="opacity-80">{t('newsCarousel.androidSoon')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 text-sm md:text-base text-blue-100 p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
                             <Smartphone className="w-6 h-6 text-gray-400" />
                             <div>
-                                <p className="font-semibold text-white">iOS Application</p>
-                                <p className="opacity-80">อยู่ในระหว่างการพัฒนา (Coming Soon)</p>
+                                <p className="font-semibold text-white">{t('newsCarousel.iosApp')}</p>
+                                <p className="opacity-80">{t('newsCarousel.iosDev')}</p>
                             </div>
                         </div>
                     </div>
                     <div className="flex gap-3 pt-2">
                         <Button onClick={() => navigate('/article/dmind-app-launch')} className="bg-white text-blue-600 hover:bg-blue-50 font-bold shadow-lg transition-all hover:scale-105">
-                            อ่านรายละเอียดเพิ่มเติม
+                            {t('newsCarousel.readMore')}
                         </Button>
                     </div>
                 </div>
@@ -73,33 +75,33 @@ const NewsCarousel = () => {
         },
         {
             id: 2,
-            badge: "Update",
-            title: '2 วันแห่งการเปลี่ยนแปลง!',
-            subtitle: 'D-MIND ยกระดับสู่เวอร์ชันล่าสุด',
-            description: 'พลิกโฉมหน้าตาใหม่ (UI Overhaul) ด้วยดีไซน์ "Modern Blue-White Theme" | ระบบแจ้งเตือนภัยแม้ออฟไลน์ (Background Email Notifications) | ฮับเครื่องมือคำนวณครบวงจร',
-            bgImage: '/images/hero-background.png', // Fallback or distinct image
+            badge: t('newsCarousel.slide2Badge'),
+            title: t('newsCarousel.slide2Title'),
+            subtitle: t('newsCarousel.slide2Subtitle'),
+            description: t('newsCarousel.slide2Desc'),
+            bgImage: '/images/hero-background.png',
             content: (
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
                         <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
                             <Shield className="w-6 h-6 text-green-400 mb-2" />
-                            <h4 className="font-bold text-white text-sm">Background Alerts</h4>
-                            <p className="text-xs text-blue-100 mt-1">แจ้งเตือนผ่าน E-mail แม้ปิดแอป</p>
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.bgAlerts')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.bgAlertsDesc')}</p>
                         </div>
                         <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
                             <Map className="w-6 h-6 text-blue-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">Modern Map UI</h4>
-                            <p className="text-xs text-blue-100 mt-1">จุดเสี่ยง Risk Zones ดูง่ายขึ้น</p>
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.mapUi')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.mapUiDesc')}</p>
                         </div>
                         <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
                             <CloudRain className="w-6 h-6 text-yellow-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">Weather & Tools</h4>
-                            <p className="text-xs text-blue-100 mt-1">พยากรณ์อากาศ & เครื่องมือคำนวณ</p>
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.weatherTools')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.weatherToolsDesc')}</p>
                         </div>
                     </div>
                     <div className="flex gap-3 pt-2">
                         <Button onClick={() => navigate('/article/system-update-v2')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg border border-white/20 transition-all hover:scale-105">
-                            อ่านรายละเอียดเพิ่มเติม
+                            {t('newsCarousel.readMore')}
                         </Button>
                     </div>
                 </div>

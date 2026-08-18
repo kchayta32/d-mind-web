@@ -1,13 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { Earthquake, RainSensor, AirPollutionData } from './types';
+import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, BaseMapLayerType } from './types';
 import { GISTDAHotspot } from './useGISTDAData';
 import { RainViewerData } from './useRainViewerData';
 import { MapLayers } from './map-components/MapLayers';
 import { MapMarkers } from './map-components/MapMarkers';
-import { MapControls } from './MapControls';
+import { BaseLayerSelector } from './map-components/BaseLayerSelector';
+import { RadarPlayer } from './map-components/RadarPlayer';
+import { ApiStatusBadge } from './ApiStatusBadge';
+import { DisasterSummaryBanner } from './DisasterSummaryBanner';
 import { MapOverlays } from './MapOverlays';
-import { DebugInfo } from './DebugInfo';
 import { DisasterType } from './DisasterMap';
 import 'leaflet/dist/leaflet.css';
 import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
@@ -18,188 +20,215 @@ import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
 
 interface MapViewProps {
-  earthquakes: Earthquake[];
-  rainSensors: RainSensor[];
-  hotspots: GISTDAHotspot[];
-  airStations: AirPollutionData[];
-  rainData: RainViewerData | null;
-  gistdaFloodFeatures: FloodFeature[];
-  floodDataPoints: FloodDataPoint[];
-  openMeteoRainData: OpenMeteoRainDataPoint[];
-  sinkholes: SinkholeData[];
+  earthquakes?: Earthquake[];
+  rainSensors?: RainSensor[];
+  hotspots?: GISTDAHotspot[];
+  airStations?: AirPollutionData[];
+  rainData?: RainViewerData | null;
+  gistdaFloodFeatures?: FloodFeature[];
+  floodDataPoints?: FloodDataPoint[];
+  openMeteoRainData?: OpenMeteoRainDataPoint[];
+  storms?: StormData[];
+  volcanoes?: VolcanoData[];
+  sinkholes?: SinkholeData[];
   selectedType: DisasterType;
-  magnitudeFilter: number;
-  humidityFilter: number;
-  pm25Filter: number;
-  droughtLayers: string[];
-  floodTimeFilter: string;
-  showFloodFrequency: boolean;
-  wildfireTimeFilter: string;
-  showBurnFreq: boolean;
-  isLoading: boolean;
+  magnitudeFilter?: number;
+  humidityFilter?: number;
+  pm25Filter?: number;
+  droughtLayers?: string[];
+  floodTimeFilter?: string;
+  showFloodFrequency?: boolean;
+  wildfireTimeFilter?: string;
+  showBurnFreq?: boolean;
+  isLoading?: boolean;
   onLocationSelect?: (lat: number, lon: number, name: string) => void;
+  onRefreshAll?: () => void;
 }
 
+const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string; maxZoom?: number }> = {
+  osm: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  satellite: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    maxZoom: 18
+  },
+  dark: {
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19
+  },
+  light: {
+    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19
+  },
+  topo: {
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+    maxZoom: 17
+  }
+};
+
 export const MapView: React.FC<MapViewProps> = ({ 
-  earthquakes,
-  rainSensors,
-  hotspots,
-  airStations,
-  rainData,
-  gistdaFloodFeatures,
-  floodDataPoints,
-  openMeteoRainData,
-  sinkholes,
+  earthquakes = [],
+  rainSensors = [],
+  hotspots = [],
+  airStations = [],
+  rainData = null,
+  gistdaFloodFeatures = [],
+  floodDataPoints = [],
+  openMeteoRainData = [],
+  storms = [],
+  volcanoes = [],
+  sinkholes = [],
   selectedType,
-  magnitudeFilter,
-  humidityFilter,
-  pm25Filter,
-  droughtLayers,
-  floodTimeFilter,
-  showFloodFrequency,
-  wildfireTimeFilter,
-  showBurnFreq,
-  isLoading,
-  onLocationSelect
+  magnitudeFilter = 0,
+  humidityFilter = 0,
+  pm25Filter = 0,
+  droughtLayers = [],
+  floodTimeFilter = '3days',
+  showFloodFrequency = false,
+  wildfireTimeFilter = '1day',
+  showBurnFreq = false,
+  isLoading = false,
+  onLocationSelect,
+  onRefreshAll
 }) => {
+  const [baseLayer, setBaseLayer] = useState<BaseMapLayerType>('osm');
   const [rainOverlayType, setRainOverlayType] = useState<'radar' | 'satellite'>('radar');
   const [rainTimeType, setRainTimeType] = useState<'past' | 'future'>('past');
-  const [showRainOverlay, setShowRainOverlay] = useState(false);
-  const [showModisWMS, setShowModisWMS] = useState(true);
-  const [showViirsWMS, setShowViirsWMS] = useState(true);
-  const [showBurnScar, setShowBurnScar] = useState(false);
+  const [showRainOverlay, setShowRainOverlay] = useState(true);
+  const [rainFrameIndex, setRainFrameIndex] = useState(0);
   const [showUserLocation, setShowUserLocation] = useState(false);
   const mapRef = useRef<any>(null);
 
-  // Pass map reference to parent component for navigation control
-  useEffect(() => {
-    if (mapRef.current && onLocationSelect) {
-      // Store the map reference in the parent's callback context
-      const mapInstance = mapRef.current;
-      console.log('Map instance ready for navigation:', mapInstance);
+  const safeEarthquakes = Array.isArray(earthquakes) ? earthquakes : [];
+  const safeRainSensors = Array.isArray(rainSensors) ? rainSensors : [];
+  const safeAirStations = Array.isArray(airStations) ? airStations : [];
+  const safeHotspots = Array.isArray(hotspots) ? hotspots : [];
+  const safeFloodPoints = Array.isArray(floodDataPoints) ? floodDataPoints : [];
+  const safeOpenMeteoRain = Array.isArray(openMeteoRainData) ? openMeteoRainData : [];
+  const safeStorms = Array.isArray(storms) ? storms : [];
+  const safeVolcanoes = Array.isArray(volcanoes) ? volcanoes : [];
+  const safeSinkholes = Array.isArray(sinkholes) ? sinkholes : [];
+
+  // Filter data safely based on current filters
+  const filteredEarthquakes = safeEarthquakes.filter(eq => (eq?.magnitude ?? 0) >= magnitudeFilter);
+  const filteredRainSensors = safeRainSensors.filter(sensor => (sensor?.humidity ?? 0) >= humidityFilter);
+  const filteredAirStations = safeAirStations.filter(station => (station?.pm25 ?? 0) >= pm25Filter);
+
+  const handleNavigateTo = (lat: number, lng: number, zoom: number = 8) => {
+    if (mapRef.current && typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+      mapRef.current.setView([lat, lng], zoom, { animate: true });
     }
-  }, [mapRef.current, onLocationSelect]);
-
-  console.log('MapView props:', { 
-    earthquakes: earthquakes.length, 
-    rainSensors: rainSensors.length,
-    hotspots: hotspots.length,
-    airStations: airStations.length,
-    rainData: rainData ? 'loaded' : 'null',
-    floodDataPoints: floodDataPoints.length,
-    openMeteoRainData: openMeteoRainData.length,
-    selectedType, 
-    droughtLayers,
-    floodTimeFilter,
-    showFloodFrequency,
-    isLoading 
-  });
-
-  // Filter data based on current filters
-  const filteredEarthquakes = earthquakes.filter(eq => eq.magnitude >= magnitudeFilter);
-  const filteredRainSensors = rainSensors.filter(sensor => 
-    (sensor.humidity || 0) >= humidityFilter
-  );
-  const filteredAirStations = airStations.filter(station =>
-    (station.pm25 || 0) >= pm25Filter
-  );
-
-  console.log('Filtered data:', { 
-    filteredEarthquakes: filteredEarthquakes.length, 
-    filteredRainSensors: filteredRainSensors.length,
-    filteredAirStations: filteredAirStations.length,
-    hotspots: hotspots.length,
-    openMeteoRainData: openMeteoRainData.length
-  });
+  };
 
   // Thailand center coordinates
   const center: [number, number] = [13.7563, 100.5018];
+  const activeBaseConfig = baseLayerUrls[baseLayer] || baseLayerUrls.osm;
 
   return (
-    <div className="relative h-full w-full z-0">
-      <MapContainer
-        ref={mapRef}
-        center={center}
-        zoom={6}
-        style={{ height: '100%', width: '100%' }}
-        className="rounded-lg"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
-        {/* User Location Marker */}
-        <UserLocationMarker showLocation={showUserLocation} />
-        
-        <MapLayers
-          selectedType={selectedType}
-          droughtLayers={droughtLayers}
-          floodTimeFilter={floodTimeFilter}
-          showFloodFrequency={showFloodFrequency}
-          showRainOverlay={showRainOverlay}
-          rainData={rainData}
-          rainOverlayType={rainOverlayType}
-          rainTimeType={rainTimeType}
-          wildfireTimeFilter={wildfireTimeFilter}
-          showBurnFreq={showBurnFreq}
-        />
-        
-        {!isLoading && (
-          <MapMarkers
-            selectedType={selectedType}
-            filteredEarthquakes={filteredEarthquakes}
-            filteredRainSensors={filteredRainSensors}
-            hotspots={hotspots}
-            filteredAirStations={filteredAirStations}
-            gistdaFloodFeatures={gistdaFloodFeatures}
-            floodDataPoints={floodDataPoints}
-            openMeteoRainData={openMeteoRainData}
-            sinkholes={sinkholes}
+    <div className="relative h-full w-full z-0 flex flex-col">
+      {/* Real-time Disaster Urgent Alert Banner */}
+      <DisasterSummaryBanner
+        storms={safeStorms}
+        earthquakes={safeEarthquakes}
+        airStations={safeAirStations}
+        floodPoints={safeFloodPoints}
+        onNavigateTo={handleNavigateTo}
+      />
+
+      <div className="relative flex-1 w-full rounded-xl overflow-hidden shadow-lg border border-gray-200">
+        <MapContainer
+          ref={mapRef}
+          center={center}
+          zoom={6}
+          style={{ height: '100%', width: '100%' }}
+          className="rounded-xl z-0"
+        >
+          {/* Dynamic Base Layer */}
+          <TileLayer
+            key={baseLayer}
+            attribution={activeBaseConfig.attribution}
+            url={activeBaseConfig.url}
+            maxZoom={activeBaseConfig.maxZoom || 18}
           />
-        )}
-      </MapContainer>
-      
-      {/* Location Controls - Enhanced for mobile with higher z-index */}
-      <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-        <LocationControls
-          showUserLocation={showUserLocation}
-          onToggleLocation={setShowUserLocation}
-        />
-      </div>
-      
-      {/* Rain controls for heavy rain type - Inside map at top right */}
-      {selectedType === 'heavyrain' && (
-        <div className="absolute top-20 right-4 z-[1000]">
-          <MapControls
-            rainData={rainData}
+          
+          {/* User Location Marker */}
+          <UserLocationMarker showLocation={showUserLocation} />
+          
+          {/* Map Layer Overlays (WMS, Radar Tiles, Drought) */}
+          <MapLayers
+            selectedType={selectedType}
+            droughtLayers={droughtLayers}
+            floodTimeFilter={floodTimeFilter}
+            showFloodFrequency={showFloodFrequency}
             showRainOverlay={showRainOverlay}
-            setShowRainOverlay={setShowRainOverlay}
+            rainData={rainData}
             rainOverlayType={rainOverlayType}
-            setRainOverlayType={setRainOverlayType}
             rainTimeType={rainTimeType}
-            setRainTimeType={setRainTimeType}
+            wildfireTimeFilter={wildfireTimeFilter}
+            showBurnFreq={showBurnFreq}
+            rainFrameIndex={rainFrameIndex}
+          />
+          
+          {/* Disaster Data Markers */}
+          {!isLoading && (
+            <MapMarkers
+              selectedType={selectedType}
+              filteredEarthquakes={filteredEarthquakes}
+              filteredRainSensors={filteredRainSensors}
+              hotspots={safeHotspots}
+              filteredAirStations={filteredAirStations}
+              gistdaFloodFeatures={gistdaFloodFeatures}
+              floodDataPoints={safeFloodPoints}
+              openMeteoRainData={safeOpenMeteoRain}
+              storms={safeStorms}
+              volcanoes={safeVolcanoes}
+              sinkholes={safeSinkholes}
+            />
+          )}
+        </MapContainer>
+        
+        {/* Top-Left Floating Controls: API Status Badge */}
+        <div className="absolute top-4 left-14 z-[1000] flex items-center gap-2">
+          <ApiStatusBadge onRefreshAll={onRefreshAll} isLoading={isLoading} />
+        </div>
+
+        {/* Top-Right Floating Controls: Base Layer Selector & Location */}
+        <div className="absolute top-4 right-4 z-[1000] flex items-center gap-2">
+          <BaseLayerSelector
+            currentLayer={baseLayer}
+            onLayerChange={setBaseLayer}
+          />
+          <LocationControls
+            showUserLocation={showUserLocation}
+            onToggleLocation={setShowUserLocation}
           />
         </div>
-      )}
-      
-      {/* Overlays for loading */}
-      <MapOverlays selectedType={selectedType} isLoading={isLoading} />
-      
-      {/* Debug information - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <DebugInfo
-          selectedType={selectedType}
-          isLoading={isLoading}
-          rainSensors={rainSensors}
-          filteredRainSensors={filteredRainSensors}
-          humidityFilter={humidityFilter}
-          rainData={rainData}
-          hotspots={hotspots}
-          airStations={airStations}
-          filteredAirStations={filteredAirStations}
-          pm25Filter={pm25Filter}
-        />
+        
+        {/* Radar Player for Heavy Rain & Radar mode */}
+        {selectedType === 'heavyrain' && rainData && (
+          <div className="absolute bottom-6 left-4 z-[1000]">
+            <RadarPlayer
+              rainData={rainData}
+              showOverlay={showRainOverlay}
+              onToggleOverlay={setShowRainOverlay}
+              overlayType={rainOverlayType}
+              onOverlayTypeChange={setRainOverlayType}
+              timeType={rainTimeType}
+              onTimeTypeChange={setRainTimeType}
+              currentFrameIndex={rainFrameIndex}
+              onFrameIndexChange={setRainFrameIndex}
+            />
+          </div>
+        )}
+        
+        {/* Overlays for loading */}
+        <MapOverlays selectedType={selectedType} isLoading={isLoading} />
       </div>
     </div>
   );

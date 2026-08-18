@@ -7,10 +7,12 @@ import AlertsList from '@/components/disaster-alerts/AlertsList';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ArrowLeft } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/contexts/LanguageProvider';
 
 const Alerts: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const {
     alerts,
     isLoading,
@@ -22,16 +24,16 @@ const Alerts: React.FC = () => {
   } = useDisasterAlerts();
 
   if (isMobile) {
-    // Mobile layout (existing)
+    // Mobile layout
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 shadow-lg">
+        <header className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-md sticky top-0 z-40">
           <div className="container mx-auto max-w-7xl flex items-center">
             <Button
               variant="ghost"
               size="icon"
-              className="text-white mr-3 hover:bg-blue-400/30 rounded-full"
+              className="text-white mr-3 hover:bg-white/10 rounded-full"
               onClick={() => navigate('/')}
             >
               <ArrowLeft className="h-6 w-6" />
@@ -40,9 +42,9 @@ const Alerts: React.FC = () => {
               <img
                 src="/dmind-premium-icon.png"
                 alt="D-MIND Logo"
-                className="h-8 w-8 mr-3"
+                className="h-8 w-8 mr-3 drop-shadow-sm"
               />
-              <h1 className="text-xl font-bold">การแจ้งเตือนภัยพิบัติทั้งหมด</h1>
+              <h1 className="text-xl font-bold">{t('alerts.title')}</h1>
             </div>
           </div>
         </header>
@@ -58,10 +60,10 @@ const Alerts: React.FC = () => {
                   size="sm"
                   onClick={() => refetch()}
                   disabled={isLoading}
-                  className="flex items-center gap-2 bg-white hover:bg-blue-50 border-blue-200 text-blue-600 hover:text-blue-700"
+                  className="flex items-center gap-2 bg-card hover:bg-muted border-border text-foreground"
                 >
                   <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  รีเฟรช
+                  {t('alerts.refresh')}
                 </Button>
               </div>
 
@@ -88,26 +90,26 @@ const Alerts: React.FC = () => {
 
   // Desktop layout
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex">
+    <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
       {/* Sidebar */}
-      <aside className="w-80 bg-white shadow-xl border-r border-blue-100">
+      <aside className="w-80 bg-card shadow-xl border-r border-border">
         <div className="p-6">
           <Button
             variant="ghost"
-            className="mb-4 text-blue-600 hover:bg-blue-50"
+            className="mb-4 text-foreground hover:bg-muted"
             onClick={() => navigate('/')}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            กลับหน้าหลัก
+            {t('common.back')}
           </Button>
 
           <div className="flex items-center mb-6">
             <img
               src="/dmind-premium-icon.png"
               alt="D-MIND Logo"
-              className="h-8 w-8 mr-3"
+              className="h-8 w-8 mr-3 drop-shadow-sm"
             />
-            <h1 className="text-xl font-bold text-blue-700">การแจ้งเตือนภัยพิบัติ</h1>
+            <h1 className="text-xl font-bold text-foreground">{t('alerts.title')}</h1>
           </div>
 
           <div className="mb-4">
@@ -116,10 +118,10 @@ const Alerts: React.FC = () => {
               size="sm"
               onClick={() => refetch()}
               disabled={isLoading}
-              className="w-full flex items-center gap-2 bg-white hover:bg-blue-50 border-blue-200 text-blue-600 hover:text-blue-700"
+              className="w-full flex items-center justify-center gap-2 bg-card hover:bg-muted border-border text-foreground"
             >
               <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              รีเฟรชข้อมูล
+              {t('alerts.refresh')}
             </Button>
           </div>
 
@@ -134,16 +136,13 @@ const Alerts: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
-        <header className="bg-white shadow-sm border-b border-gray-200 p-6">
-          <h2 className="text-2xl font-semibold text-gray-800">การแจ้งเตือนภัยพิบัติ</h2>
-          <p className="text-gray-600 mt-2">ติดตามข้อมูลการแจ้งเตือนภัยพิบัติและสถานการณ์ฉุกเฉิน</p>
+        <header className="bg-card shadow-sm border-b border-border p-6">
+          <h2 className="text-2xl font-bold text-foreground">{t('alerts.title')}</h2>
+          <p className="text-muted-foreground mt-1 text-sm">{t('alerts.subtitle')}</p>
         </header>
 
         <div className="flex-1 p-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full">
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
-              <h3 className="font-semibold text-gray-800">รายการแจ้งเตือน</h3>
-            </div>
+          <div className="bg-card rounded-2xl shadow-sm border border-border h-full overflow-hidden">
             <div className="p-6 overflow-auto">
               <AlertsList
                 alerts={alerts}
@@ -158,3 +157,4 @@ const Alerts: React.FC = () => {
 };
 
 export default Alerts;
+

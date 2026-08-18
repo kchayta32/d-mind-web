@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -9,7 +8,6 @@ interface EarthquakeMarkerProps {
 }
 
 const createEarthquakeIcon = (magnitude: number) => {
-  // Modern gradient colors based on magnitude
   let color = '#22c55e'; // green for low magnitude
   let size = 12;
   
@@ -33,32 +31,24 @@ const createEarthquakeIcon = (magnitude: number) => {
         width: ${size}px;
         height: ${size}px;
         border-radius: 50%;
-        background: radial-gradient(circle, ${color}, ${color}dd);
+        background-color: ${color};
         border: 2px solid white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 0 0 2px ${color}33;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: bold;
-        font-size: ${Math.max(8, size * 0.4)}px;
+        font-size: ${Math.max(8, size * 0.45)}px;
         text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        position: relative;
-        animation: pulse 2s infinite;
       ">
         ${magnitude.toFixed(1)}
       </div>
-      <style>
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-      </style>
     `,
     className: 'earthquake-marker',
-    iconSize: [size + 8, size + 8],
-    iconAnchor: [size/2 + 4, size/2 + 4]
+    iconSize: [size + 4, size + 4],
+    iconAnchor: [(size + 4) / 2, (size + 4) / 2],
+    popupAnchor: [0, -(size + 4) / 2]
   });
 };
 
@@ -72,24 +62,23 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
     return 'แผ่นดินไหวรุนแรงมาก';
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'ไม่ระบุ';
     try {
       const date = new Date(dateString);
-      return date.toLocaleString('th-TH', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleString('th-TH');
     } catch {
       return dateString;
     }
   };
 
-  // Use latitude/longitude from the earthquake object
-  const lat = earthquake.latitude || earthquake.lat;
-  const lng = earthquake.longitude || earthquake.lng;
+  const lat = earthquake.latitude ?? earthquake.lat;
+  const lng = earthquake.longitude ?? earthquake.lng;
+
+  if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+    return null;
+  }
 
   return (
     <Marker
@@ -98,76 +87,29 @@ const EarthquakeMarker: React.FC<EarthquakeMarkerProps> = ({ earthquake }) => {
     >
       <Popup className="earthquake-popup">
         <div className="p-2 min-w-64">
-          <div className="flex items-center gap-2 mb-3">
-            <div 
-              className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
-              style={{ 
-                background: `radial-gradient(circle, ${
-                  earthquake.magnitude >= 7.0 ? '#dc2626' :
-                  earthquake.magnitude >= 6.0 ? '#ea580c' :
-                  earthquake.magnitude >= 5.0 ? '#eab308' :
-                  earthquake.magnitude >= 4.0 ? '#65a30d' : '#22c55e'
-                })`,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }}
-            >
-              {earthquake.magnitude.toFixed(1)}
-            </div>
-            <h3 className="font-bold text-lg text-gray-800">แผ่นดินไหว</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-bold text-sm text-gray-800">
+              {earthquake.location || earthquake.place || 'จุดเกิดแผ่นดินไหว'}
+            </h3>
+            <span className={`px-2 py-0.5 rounded text-xs font-bold text-white ${
+              earthquake.magnitude >= 6 ? 'bg-red-600' :
+              earthquake.magnitude >= 5 ? 'bg-orange-500' : 'bg-green-600'
+            }`}>
+              M {earthquake.magnitude.toFixed(1)}
+            </span>
           </div>
-          
-          <div className="space-y-2 text-sm">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <span className="font-semibold text-gray-600">ขนาด:</span>
-                <div className="text-lg font-bold text-red-600">{earthquake.magnitude.toFixed(1)} Mw</div>
-              </div>
-              <div>
-                <span className="font-semibold text-gray-600">ความลึก:</span>
-                <div className="text-lg font-bold text-blue-600">{earthquake.depth} กม.</div>
-              </div>
-            </div>
-            
-            <div>
-              <span className="font-semibold text-gray-600">ระดับ:</span>
-              <div className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ml-1 ${
-                earthquake.magnitude >= 6.0 ? 'bg-red-500' :
-                earthquake.magnitude >= 5.0 ? 'bg-orange-500' :
-                earthquake.magnitude >= 4.0 ? 'bg-yellow-500' : 'bg-green-500'
-              }`}>
-                {getMagnitudeDescription(earthquake.magnitude)}
-              </div>
-            </div>
-            
-            <div>
-              <span className="font-semibold text-gray-600">ตำแหน่ง:</span>
-              <div className="text-gray-700">{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</div>
-            </div>
-            
-            <div>
-              <span className="font-semibold text-gray-600">เวลา:</span>
-              <div className="text-gray-700">{formatDate(earthquake.time)}</div>
-            </div>
-            
-            {earthquake.location && (
-              <div>
-                <span className="font-semibold text-gray-600">สถานที่:</span>
-                <div className="text-gray-700">{earthquake.location}</div>
-              </div>
+
+          <div className="space-y-1 text-xs text-gray-600">
+            <div><strong>ระดับ:</strong> {getMagnitudeDescription(earthquake.magnitude)}</div>
+            <div><strong>ความลึก:</strong> {earthquake.depth ? `${earthquake.depth.toFixed(1)} กม.` : 'ไม่ระบุ'}</div>
+            <div><strong>เวลา:</strong> {formatDate(earthquake.time || earthquake.updated_at)}</div>
+            <div><strong>พิกัด:</strong> {lat.toFixed(4)}, {lng.toFixed(4)}</div>
+            {earthquake.tsunamiAlert && (
+              <div className="text-red-600 font-bold mt-1">⚠️ มีการแจ้งเตือนสึนามิ</div>
             )}
-            
-            {earthquake.url && (
-              <div className="mt-3 pt-2 border-t">
-                <a 
-                  href={earthquake.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-xs underline"
-                >
-                  ดูรายละเอียดเพิ่มเติม →
-                </a>
-              </div>
-            )}
+            <div className="text-[10px] text-gray-400 mt-2 pt-1 border-t">
+              แหล่งข้อมูล: {earthquake.source || 'USGS'}
+            </div>
           </div>
         </div>
       </Popup>

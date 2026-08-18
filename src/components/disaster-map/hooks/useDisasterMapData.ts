@@ -1,21 +1,24 @@
-
 import { DisasterType } from '../DisasterMap';
-import { useEarthquakeData } from '../useEarthquakeData';
+import { useEarthquakeData, EarthquakeTimeWindow, EarthquakeFeedSource } from '../useEarthquakeData';
 import { useRainSensorData } from '../useRainSensorData';
 import { useGISTDAData } from '../useGISTDAData';
 import { useAirPollutionData } from '../useAirPollutionData';
 import { useRainViewerData } from '../useRainViewerData';
 import { useDroughtData } from './useDroughtData';
-import { useFloodStatistics, useFloodData } from './useFloodData';
+import { useFloodStatistics } from './useFloodData';
 import { useGISTDAFloodData } from './useGISTDAFloodData';
 import { useOpenMeteoFloodData } from './useOpenMeteoFloodData';
 import { useOpenMeteoRainData } from './useOpenMeteoRainData';
+import { useStormData } from './useStormData';
+import { useVolcanoData } from './useVolcanoData';
 import { 
   EarthquakeStats, 
   RainSensorStats, 
   AirPollutionStats,
   RainViewerStats,
-  OpenMeteoRainStats
+  OpenMeteoRainStats,
+  StormStats,
+  VolcanoStats
 } from '../types';
 import { WildfireStats } from '../useGISTDAData';
 import { DroughtStats } from './useDroughtData';
@@ -29,18 +32,22 @@ interface StatisticsWithRainViewer extends RainSensorStats {
 export const useDisasterMapData = (
   rainTimeFilter: string,
   wildfireTimeFilter: string,
-  floodTimeFilter: string
+  floodTimeFilter: string,
+  earthquakeTimeWindow: EarthquakeTimeWindow = '7days',
+  earthquakeFeedSource: EarthquakeFeedSource = 'all'
 ) => {
-  const { earthquakes, stats: earthquakeStats, isLoading: isLoadingEarthquakes } = useEarthquakeData();
+  const { earthquakes, stats: earthquakeStats, isLoading: isLoadingEarthquakes, refetch: refetchEarthquakes } = useEarthquakeData(earthquakeTimeWindow, earthquakeFeedSource);
   const { sensors: rainSensors, stats: rainStats, isLoading: isLoadingRain } = useRainSensorData(rainTimeFilter);
   const { hotspots, stats: wildfireStats, isLoading: isLoadingWildfire } = useGISTDAData(wildfireTimeFilter as any);
-  const { stations: airStations, stats: airStats, isLoading: isLoadingAir } = useAirPollutionData();
-  const { rainData, isLoading: isLoadingRainViewer } = useRainViewerData();
+  const { stations: airStations, stats: airStats, isLoading: isLoadingAir, refetch: refetchAir } = useAirPollutionData();
+  const { rainData, isLoading: isLoadingRainViewer, refetch: refetchRainViewer } = useRainViewerData();
   const { stats: droughtStats, isLoading: isLoadingDrought } = useDroughtData();
   const { data: gistdaFloodData, isLoading: isLoadingGISTDAFlood } = useGISTDAFloodData(floodTimeFilter as any);
   const { data: floodStats, isLoading: isLoadingFlood } = useFloodStatistics();
-  const { data: floodDataPoints, isLoading: isLoadingOpenMeteoFlood } = useOpenMeteoFloodData();
-  const { data: openMeteoRainData, isLoading: isLoadingOpenMeteoRain } = useOpenMeteoRainData();
+  const { data: floodDataPoints, gdacsFloods, isLoading: isLoadingOpenMeteoFlood } = useOpenMeteoFloodData();
+  const { data: openMeteoRainData, isLoading: isLoadingOpenMeteoRain, refetch: refetchOpenMeteoRain } = useOpenMeteoRainData();
+  const { storms, stats: stormStats, isLoading: isLoadingStorms } = useStormData();
+  const { volcanoes, stats: volcanoStats, isLoading: isLoadingVolcanoes } = useVolcanoData();
 
   // Enhanced rain stats with RainViewer data
   const enhancedRainStats = rainData ? {
@@ -54,17 +61,18 @@ export const useDisasterMapData = (
   } : rainStats;
 
   // Get current stats and loading state
-  const getCurrentStats = (selectedType: DisasterType): EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | SinkholeStats | null => {
+  const getCurrentStats = (selectedType: DisasterType): EarthquakeStats | StatisticsWithRainViewer | WildfireStats | AirPollutionStats | DroughtStats | FloodStats | OpenMeteoRainStats | StormStats | VolcanoStats | SinkholeStats | null => {
     switch (selectedType) {
       case 'earthquake': return earthquakeStats;
       case 'heavyrain': return enhancedRainStats;
       case 'openmeteorain': {
+        const points = openMeteoRainData || [];
         const openMeteoStats: OpenMeteoRainStats = {
-          totalStations: openMeteoRainData?.length || 0,
-          activeRainStations: openMeteoRainData?.filter(d => d.weatherData.current.rain > 0).length || 0,
-          maxRainfall: Math.max(...(openMeteoRainData?.map(d => d.weatherData.current.rain) || [0])),
-          avgTemperature: openMeteoRainData?.reduce((sum, d) => sum + d.weatherData.current.temperature2m, 0) / (openMeteoRainData?.length || 1) || 0,
-          lastUpdated: openMeteoRainData?.[0]?.weatherData.current.time.toISOString() || new Date().toISOString()
+          totalStations: points.length,
+          activeRainStations: points.filter(d => (d?.weatherData?.current?.rain || 0) > 0 || (d?.weatherData?.current?.precipitation || 0) > 0).length,
+          maxRainfall: points.length > 0 ? Math.max(...points.map(d => Number(d?.weatherData?.current?.rain || d?.weatherData?.current?.precipitation || 0))) : 0,
+          avgTemperature: points.length > 0 ? Math.round((points.reduce((sum, d) => sum + Number(d?.weatherData?.current?.temperature2m || 0), 0) / points.length) * 10) / 10 : 0,
+          lastUpdated: new Date().toISOString()
         };
         return openMeteoStats;
       }
@@ -72,7 +80,9 @@ export const useDisasterMapData = (
       case 'airpollution': return airStats;
       case 'drought': return droughtStats;
       case 'flood': return floodStats;
-      case 'sinkhole': return null; // Will be handled by component directly
+      case 'storm': return stormStats;
+      case 'volcano': return volcanoStats;
+      case 'sinkhole': return null;
       default: return null;
     }
   };
@@ -86,25 +96,42 @@ export const useDisasterMapData = (
       case 'airpollution': return isLoadingAir;
       case 'drought': return isLoadingDrought;
       case 'flood': return isLoadingFlood || isLoadingOpenMeteoFlood || isLoadingGISTDAFlood;
+      case 'storm': return isLoadingStorms;
+      case 'volcano': return isLoadingVolcanoes;
       case 'sinkhole': return false;
       default: return false;
     }
   };
 
+  const refetchAll = () => {
+    refetchEarthquakes?.();
+    refetchAir?.();
+    refetchRainViewer?.();
+    refetchOpenMeteoRain?.();
+  };
+
   return {
-    earthquakes,
-    rainSensors,
-    hotspots,
-    airStations,
+    earthquakes: earthquakes || [],
+    rainSensors: rainSensors || [],
+    hotspots: hotspots || [],
+    airStations: airStations || [],
     rainData,
     gistdaFloodFeatures: gistdaFloodData?.features || [],
     floodDataPoints: floodDataPoints || [],
+    gdacsFloods: gdacsFloods || [],
     openMeteoRainData: openMeteoRainData || [],
+    storms: storms || [],
+    volcanoes: volcanoes || [],
+    earthquakeStats,
+    rainStats: enhancedRainStats,
     wildfireStats,
     airStats,
     droughtStats,
     floodStats,
+    stormStats,
+    volcanoStats,
     getCurrentStats,
     getCurrentLoading,
+    refetchAll
   };
 };

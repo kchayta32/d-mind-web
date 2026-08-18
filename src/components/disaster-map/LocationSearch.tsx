@@ -154,10 +154,10 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
                       <MapPin className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-900 truncate">
-                          {result.name.split(',')[0]}
+                          {typeof result.name === 'string' ? result.name.split(',')[0] : (result.name || '')}
                         </div>
                         <div className="text-xs text-gray-600 truncate">
-                          {result.name}
+                          {result.name || ''}
                         </div>
                       </div>
                     </div>
