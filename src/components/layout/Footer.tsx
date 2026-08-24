@@ -27,9 +27,10 @@ const Footer: React.FC = () => {
                 </p>
 
                 <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-400 dark:text-slate-500">
+                    <a href="https://d-mind.my.canva.site/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">{t('menu.about')}</a>
                     <a href="#" className="hover:text-blue-400 transition-colors">{t('common.privacyPolicy')}</a>
                     <a href="#" className="hover:text-blue-400 transition-colors">{t('common.termsOfService')}</a>
-                    <a href="#" className="hover:text-blue-400 transition-colors">{t('common.contactSupport')}</a>
+                    <a href="/contactme" className="hover:text-blue-400 transition-colors">{t('common.contactSupport')}</a>
                 </div>
             </div>
         </footer>

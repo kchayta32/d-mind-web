@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavButton from './NavButton';
-import { MessageSquare, Phone, BookOpen, Bell, Star, HelpCircle } from 'lucide-react';
+import { MessageSquare, Phone, BookOpen, Bell, Star, HelpCircle, Info } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavBarProps {
@@ -27,6 +27,10 @@ const NavBar: React.FC<NavBarProps> = ({
 
   const handleAppGuideClick = () => {
     navigate('/app-guide');
+  };
+
+  const handleAboutClick = () => {
+    window.open('https://d-mind.my.canva.site/', '_blank');
   };
 
   if (isMobile) {
@@ -55,10 +59,14 @@ const NavBar: React.FC<NavBarProps> = ({
             onClick={onAlertsClick}
           />
           <NavButton 
+            icon={<Info size={24} />}
+            label="เกี่ยวกับเรา"
+            onClick={handleAboutClick}
+          />
+          <NavButton 
             icon={<HelpCircle size={24} />}
             label="คู่มือการใช้งานแอพ"
             onClick={handleAppGuideClick}
-            className="col-span-2"
           />
         </div>
         
@@ -104,6 +112,12 @@ const NavBar: React.FC<NavBarProps> = ({
         icon={<HelpCircle size={20} />}
         label="คู่มือการใช้งานแอพ"
         onClick={handleAppGuideClick}
+        className="w-full justify-start text-left"
+      />
+      <NavButton 
+        icon={<Info size={20} />}
+        label="เกี่ยวกับเรา"
+        onClick={handleAboutClick}
         className="w-full justify-start text-left"
       />
       <NavButton 
