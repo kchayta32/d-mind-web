@@ -151,21 +151,21 @@ const ContactUs: React.FC = () => {
             orgTh: 'วิศวกรรมคอมพิวเตอร์ รุ่นที่ 14 มรภ.สวนสุนันทา',
             orgEn: 'Computer Engineering Class 14, SSRU'
         },
+        // Support Team
         {
             id: 'saknarin',
             nameTh: 'ศักดิ์นรินทร์ ศรีจันทร์',
             nameEn: 'Saknarin Srijan',
-            roleKey: 'contactUs.roleEngineer',
+            roleKey: 'contactUs.roleSupport',
             roleFallbackTh: 'วิศวกรรมคอมพิวเตอร์ มรภ.สวนสุนันทา',
             roleFallbackEn: 'SSRU Computer Engineering',
-            category: 'engineering',
-            categoryLabelTh: 'Engineering Team',
-            categoryLabelEn: 'Engineering Team',
+            category: 'support',
+            categoryLabelTh: 'Support Team',
+            categoryLabelEn: 'Support Team',
             image: '/images/about/saknarin-srijan.png',
             orgTh: 'วิศวกรรมคอมพิวเตอร์ รุ่นที่ 14 มรภ.สวนสุนันทา',
             orgEn: 'Computer Engineering Class 14, SSRU'
         },
-        // Support Team
         {
             id: 'apichai',
             nameTh: 'อภิชัย ประมาณ',
@@ -177,8 +177,8 @@ const ContactUs: React.FC = () => {
             categoryLabelTh: 'Support Team',
             categoryLabelEn: 'Support Team',
             image: '/images/about/apichai-praman.png',
-            orgTh: 'ทีมสนับสนุนวิศวกรรมคอมพิวเตอร์ มรภ.สวนสุนันทา',
-            orgEn: 'Support Team, Computer Engineering SSRU'
+            orgTh: 'วิศวกรรมคอมพิวเตอร์ รุ่นที่ 14 มรภ.สวนสุนันทา',
+            orgEn: 'Computer Engineering Class 14, SSRU'
         },
         {
             id: 'thanaporn',
@@ -191,8 +191,8 @@ const ContactUs: React.FC = () => {
             categoryLabelTh: 'Support Team',
             categoryLabelEn: 'Support Team',
             image: '/images/about/thanaporn-wiratchamongkolchai.png',
-            orgTh: 'ทีมสนับสนุนวิศวกรรมคอมพิวเตอร์ มรภ.สวนสุนันทา',
-            orgEn: 'Support Team, Computer Engineering SSRU'
+            orgTh: 'วิศวกรรมคอมพิวเตอร์ รุ่นที่ 14 มรภ.สวนสุนันทา',
+            orgEn: 'Computer Engineering Class 14, SSRU'
         }
     ];
 
