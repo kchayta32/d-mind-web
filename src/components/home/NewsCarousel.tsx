@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -140,6 +140,44 @@ const NewsCarousel = () => {
                     </div>
                 </div>
             )
+        },
+        {
+            id: 4,
+            badge: t('newsCarousel.slide4Badge'),
+            title: t('newsCarousel.slide4Title'),
+            subtitle: t('newsCarousel.slide4Subtitle'),
+            description: t('newsCarousel.slide4Desc'),
+            bgImage: '/images/hero-background.png',
+            content: (
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Waves className="w-6 h-6 text-cyan-400 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.gistdaSatellite')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.gistdaSatelliteDesc')}</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Radio className="w-6 h-6 text-blue-300 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.liveRadar')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.liveRadarDesc')}</p>
+                        </div>
+                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <BarChart3 className="w-6 h-6 text-amber-300 mb-2" />
+                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.realtimeAnalytics')}</h4>
+                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.realtimeAnalyticsDesc')}</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3 pt-2">
+                        <Button onClick={() => navigate('/article/disaster-map-system-update')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold shadow-lg shadow-blue-500/20 border border-white/20 transition-all hover:scale-105">
+                            {t('newsCarousel.readFullArticle')}
+                        </Button>
+                        <Button onClick={() => navigate('/disaster-map')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105">
+                            <Map className="w-4 h-4 mr-1.5" />
+                            {t('newsCarousel.openMap')}
+                        </Button>
+                    </div>
+                </div>
+            )
         }
     ];
 
@@ -220,7 +258,7 @@ const NewsCarousel = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        ) : (
+                                        ) : slide.id === 3 ? (
                                             <div className="relative w-full h-full p-4 flex flex-col justify-between">
                                                 {/* Native Android v2.0 Tech Mockup Visual */}
                                                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -271,6 +309,60 @@ const NewsCarousel = () => {
                                                     <span className="text-white font-medium">Build & Test Status:</span>
                                                     <span className="font-bold text-emerald-400 flex items-center gap-1">
                                                         <Sparkles className="w-3.5 h-3.5" /> All Tests Passed
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="relative w-full h-full p-4 flex flex-col justify-between">
+                                                {/* Disaster Map Web GIS Mockup Visual */}
+                                                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
+                                                        <span className="text-xs font-mono font-bold text-cyan-300">Web GIS Platform v2.0</span>
+                                                    </div>
+                                                    <Badge className="bg-blue-500/20 text-cyan-300 border-cyan-500/30 text-[10px]">
+                                                        GISTDA WMS Live
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-3 my-auto">
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-blue-500/20 flex items-center gap-3">
+                                                        <Waves className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">Sentinel-1 / SAR</p>
+                                                            <p className="text-[10px] text-blue-200">Flood Inundation</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-red-500/20 flex items-center gap-3">
+                                                        <Flame className="w-6 h-6 text-red-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">VIIRS 375m</p>
+                                                            <p className="text-[10px] text-red-200">Thermal Hotspots</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-cyan-500/20 flex items-center gap-3">
+                                                        <Radio className="w-6 h-6 text-cyan-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">RainViewer Radar</p>
+                                                            <p className="text-[10px] text-cyan-200">Animated Doppler</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3 rounded-xl bg-slate-800/80 border border-purple-500/20 flex items-center gap-3">
+                                                        <Activity className="w-6 h-6 text-purple-400 flex-shrink-0" />
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-bold text-white leading-tight">USGS Earthquakes</p>
+                                                            <p className="text-[10px] text-purple-200">Real-time Feed</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-2.5 rounded-xl bg-gradient-to-r from-blue-600/20 via-cyan-500/20 to-indigo-600/20 border border-cyan-500/30 flex items-center justify-between text-xs">
+                                                    <span className="text-white font-medium">GIS Multi-Feed Sync:</span>
+                                                    <span className="font-bold text-cyan-300 flex items-center gap-1">
+                                                        <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Operational & Synced
                                                     </span>
                                                 </div>
                                             </div>

@@ -9,6 +9,14 @@ const EmergencyArticles: React.FC = () => {
 
   const articles = [
     {
+      id: 'disaster-map-system-update',
+      title: 'อัปเดตใหญ่ระบบแผนที่ภัยพิบัติ D-MIND Web: ผสานรวมดาวเทียม GISTDA, เรดาร์ฝนสด และสถิติเชิงพื้นที่ Real-time',
+      subtitle: 'จาก ทีมพัฒนา D-MIND GIS & Engineering',
+      description: 'สรุปการพัฒนาระบบแผนที่ภัยพิบัติบนเว็บไซค์: เพิ่มชั้นข้อมูลดาวเทียม GISTDA WMS/WFS (น้ำท่วม/จุดความร้อน/รอยไหม้), เรดาร์ตรวจจับกลุ่มฝนสด RainViewer, เฝ้าระวังแผ่นดินไหว USGS และกราฟวิเคราะห์แนวโน้มครบวงจร',
+      image: '/dmind-premium-icon.png',
+      created_at: '2026-08-18'
+    },
+    {
       id: 'mobile-app-development',
       title: 'รายงานความก้าวหน้า D-MIND Mobile App: ยกระดับสู่ Native Android 2.0 สถาปัตยกรรม 5 ชั้น',
       subtitle: 'จาก ทีมพัฒนา D-MIND',

@@ -63,7 +63,18 @@ export const translations = {
             mapLayersDesc: 'GISTDA, USGS, แม่น้ำ & ความชื้นในดิน',
             fcmOffline: 'FCM 3 Levels & Offline',
             fcmOfflineDesc: 'Room DB + SOS Queue WorkManager',
-            readFullArticle: 'อ่านบทความเต็ม'
+            readFullArticle: 'อ่านบทความเต็ม',
+            slide4Badge: 'Disaster Map v2.0',
+            slide4Title: 'อัปเดตใหญ่! แผนที่ภัยพิบัติ Web GIS',
+            slide4Subtitle: 'เชื่อมโยงดาวเทียม GISTDA, เรดาร์ฝนสด และสถิติเชิงพื้นที่ Real-time',
+            slide4Desc: 'ยกระดับระบบแผนที่ภัยพิบัติบนเว็บไซค์ D-MIND: รวมข้อมูลดาวเทียม GISTDA (น้ำท่วม/จุดความร้อน/รอยไหม้), เรดาร์กลุ่มฝนสด RainViewer, พายุ & แผ่นดินไหว USGS พร้อมแดชบอร์ดวิเคราะห์แนวโน้มครบวงจร',
+            gistdaSatellite: 'GISTDA Satellites',
+            gistdaSatelliteDesc: 'น้ำท่วม, จุดความร้อน & รอยไหม้',
+            liveRadar: 'Live Rain Radar',
+            liveRadarDesc: 'เรดาร์ฝน Doppler แบบเคลื่อนไหว',
+            realtimeAnalytics: 'Real-time Analytics',
+            realtimeAnalyticsDesc: 'กราฟสถิติ & วิเคราะห์ความเสี่ยง',
+            openMap: 'เปิดแผนที่'
         },
 
         // Navigation Cards (Home Page)
@@ -493,7 +504,18 @@ export const translations = {
             mapLayersDesc: 'GISTDA, USGS, River & Soil Moisture',
             fcmOffline: 'FCM 3 Levels & Offline',
             fcmOfflineDesc: 'Room DB + SOS Queue WorkManager',
-            readFullArticle: 'Read Full Article'
+            readFullArticle: 'Read Full Article',
+            slide4Badge: 'Disaster Map v2.0',
+            slide4Title: 'Major Upgrade! Web GIS Disaster Map',
+            slide4Subtitle: 'Integrated GISTDA Satellites, Live Rain Radar & Real-time GIS Analytics',
+            slide4Desc: 'Massive upgrade to D-MIND Web Disaster Map: Integrated GISTDA satellite layers (Flood/Hotspots/Burn Scars), animated RainViewer Doppler radar, USGS earthquakes, storms, and real-time analytical charts.',
+            gistdaSatellite: 'GISTDA Satellites',
+            gistdaSatelliteDesc: 'Flood, Hotspots & Burn Scars',
+            liveRadar: 'Live Rain Radar',
+            liveRadarDesc: 'Animated Doppler radar player',
+            realtimeAnalytics: 'Real-time Analytics',
+            realtimeAnalyticsDesc: 'Trend charts & risk statistics',
+            openMap: 'Open Map'
         },
 
         // Navigation Cards (Home Page)

@@ -14,6 +14,7 @@ import ArticleNotFound from '@/components/articles/ArticleNotFound';
 import DMindLaunchArticle from '@/components/articles/DMindLaunchArticle';
 import SystemUpdateArticle from '@/components/articles/SystemUpdateArticle';
 import DMindMobileArticle from '@/components/articles/DMindMobileArticle';
+import DisasterMapUpdateArticle from '@/components/articles/DisasterMapUpdateArticle';
 import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
 import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
@@ -22,6 +23,10 @@ const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'disaster-map-update':
+    case 'disaster-map-v2':
+    case 'disaster-map-system-update':
+      return <DisasterMapUpdateArticle />;
     case 'mobile-app-development':
     case 'dmind-mobile-native':
     case 'dmind-mobile-update':
