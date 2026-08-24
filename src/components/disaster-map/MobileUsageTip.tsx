@@ -36,34 +36,34 @@ const MobileUsageTip: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm bg-white shadow-xl">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-sm bg-card text-card-foreground border-border shadow-2xl rounded-2xl">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <RotateCcw className="h-5 w-5 text-blue-600" />
+              <div className="bg-primary/10 p-2 rounded-xl text-primary">
+                <RotateCcw className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-gray-900">เคล็ดลับการใช้งาน</h3>
+              <h3 className="font-bold text-foreground">เคล็ดลับการใช้งาน</h3>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 rounded-full hover:bg-muted"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
           
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 leading-relaxed">
-              <strong>หมุนหน้าจอแนวนอน</strong> เพื่อประสบการณ์การดูแผนที่ที่ดีที่สุด
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">หมุนหน้าจอแนวนอน</strong> เพื่อประสบการณ์การดูแผนที่ที่ดีที่สุด
             </p>
             
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-xs text-blue-700">
-                💡 แผนที่จะแสดงรายละเอียดได้ชัดเจนมากขึ้นในโหมดแนวนอน
+            <div className="bg-primary/10 border border-primary/20 p-3 rounded-xl">
+              <p className="text-xs text-primary font-medium">
+                💡 แผนที่จะแสดงรายละเอียดและเลเยอร์ GIS ได้ชัดเจนมากขึ้นในโหมดแนวนอน
               </p>
             </div>
           </div>
@@ -73,14 +73,14 @@ const MobileUsageTip: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={handleDismiss}
-              className="flex-1"
+              className="flex-1 rounded-xl border-border"
             >
               ข้าม
             </Button>
             <Button
               size="sm"
               onClick={handleClose}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
             >
               เข้าใจแล้ว
             </Button>

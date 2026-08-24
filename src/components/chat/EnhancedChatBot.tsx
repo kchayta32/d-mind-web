@@ -190,16 +190,16 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
   };
 
   return (
-    <Card className={`w-full shadow-lg ${className}`}>
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-purple-50">
+    <Card className={`w-full shadow-lg flex flex-col ${className}`}>
+      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50/80 to-purple-50/80 dark:from-slate-800/80 dark:to-indigo-950/40 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
               <span className="text-white text-lg">👨‍⚕️</span>
             </div>
             <div>
-              <CardTitle className="text-lg font-medium text-gray-800">Dr.Mind - ผู้เชี่ยวชาญฉุกเฉิน</CardTitle>
-              <p className="text-sm text-gray-600">ภัยธรรมชาติ & แพทย์ฉุกเฉิน</p>
+              <CardTitle className="text-base sm:text-lg font-bold text-foreground">Dr.Mind - ผู้เชี่ยวชาญฉุกเฉิน</CardTitle>
+              <p className="text-xs text-muted-foreground">ภัยธรรมชาติ & แพทย์ฉุกเฉิน 24 ชม.</p>
             </div>
           </div>
           <div className="flex space-x-2">
@@ -207,7 +207,7 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
               variant={isVoiceMode ? "default" : "outline"}
               size="sm"
               onClick={() => setIsVoiceMode(!isVoiceMode)}
-              className="text-xs"
+              className="text-xs rounded-xl"
             >
               <Volume2 className="w-4 h-4 mr-1" />
               เสียง
@@ -217,16 +217,18 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
       </CardHeader>
 
       {/* Frequent Questions - Scrollable */}
-      <div className="px-4 py-3 bg-gray-50 border-b">
-        <p className="text-sm font-medium text-gray-700 mb-2">💡 คำถามที่พบบ่อย</p>
+      <div className="px-4 py-2.5 bg-muted/40 border-b border-border">
+        <p className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
+          <span>💡</span> คำถามที่พบบ่อย
+        </p>
         <ScrollArea className="w-full">
-          <div className="flex space-x-3 pb-2">
+          <div className="flex space-x-2 pb-1">
             {frequentQuestions.map((question, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                className="whitespace-nowrap bg-white hover:bg-blue-50 border-blue-200 text-blue-700 rounded-full px-4 py-2 text-xs"
+                className="whitespace-nowrap bg-card hover:bg-primary/10 border-border text-foreground hover:text-primary rounded-full px-3 py-1 text-xs transition-colors"
                 onClick={() => handleQuestionSelect(question)}
               >
                 {question}
@@ -236,7 +238,7 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
         </ScrollArea>
       </div>
 
-      <CardContent className="p-0 flex flex-col h-96">
+      <CardContent className="p-0 flex-1 flex flex-col min-h-[360px]">
         {/* Messages */}
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
@@ -246,16 +248,16 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`px-4 py-3 rounded-2xl max-w-[80%] ${
+                  className={`px-4 py-3 rounded-2xl max-w-[85%] sm:max-w-[75%] shadow-sm ${
                     msg.sender === 'user'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-md'
-                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 rounded-bl-md border'
+                      ? 'bg-primary text-primary-foreground rounded-br-sm'
+                      : 'bg-muted/70 text-foreground rounded-bl-sm border border-border'
                   }`}
                 >
                   {msg.sender === 'assistant' && (
-                    <div className="flex items-center mb-2">
-                      <span className="text-lg mr-2">👨‍⚕️</span>
-                      <span className="font-semibold text-blue-600">Dr.Mind</span>
+                    <div className="flex items-center mb-1.5">
+                      <span className="text-sm mr-1.5">👨‍⚕️</span>
+                      <span className="font-bold text-xs text-primary">Dr.Mind</span>
                     </div>
                   )}
                   <div 
@@ -269,14 +271,14 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="px-4 py-3 rounded-2xl bg-gray-100 border rounded-bl-md">
+                <div className="px-4 py-3 rounded-2xl bg-muted/70 border border-border rounded-bl-sm">
                   <div className="flex items-center">
-                    <span className="text-lg mr-2">👨‍⚕️</span>
-                    <span className="font-semibold text-blue-600 mr-2">Dr.Mind</span>
+                    <span className="text-sm mr-1.5">👨‍⚕️</span>
+                    <span className="font-bold text-xs text-primary mr-2">Dr.Mind</span>
                   </div>
-                  <div className="flex items-center mt-2">
-                    <Loader2 size={16} className="animate-spin mr-2 text-blue-500" />
-                    <span className="text-sm text-gray-600">กำลังพิมพ์...</span>
+                  <div className="flex items-center mt-1.5 gap-2">
+                    <Loader2 size={14} className="animate-spin text-primary" />
+                    <span className="text-xs text-muted-foreground">กำลังวิเคราะห์ข้อมูล...</span>
                   </div>
                 </div>
               </div>
@@ -286,13 +288,13 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
         </ScrollArea>
 
         {/* Input */}
-        <div className="p-4 border-t bg-white">
+        <div className="p-3 border-t border-border bg-card">
           <form onSubmit={handleSendMessage} className="flex gap-2">
             <Input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="ถามคำถามเกี่ยวกับภัยพิบัติหรือการปฐมพยาบาล..."
-              className="flex-1"
+              placeholder="พิมพ์คำถามภัยพิบัติหรือปฐมพยาบาล..."
+              className="flex-1 bg-background border-border text-foreground rounded-xl text-sm"
               disabled={isLoading}
             />
             <Button
@@ -301,13 +303,13 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
               size="icon"
               onClick={toggleVoiceListening}
               disabled={isLoading}
-              className={isListening ? 'bg-red-100 border-red-300' : ''}
+              className={`rounded-xl border-border ${isListening ? 'bg-red-500/20 text-red-500 border-red-500/50' : ''}`}
             >
-              {isListening ? <MicOff className="w-4 h-4 text-red-600" /> : <Mic className="w-4 h-4" />}
+              {isListening ? <MicOff className="w-4 h-4 text-red-500" /> : <Mic className="w-4 h-4" />}
             </Button>
             <Button 
               type="submit" 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4"
               disabled={isLoading}
             >
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

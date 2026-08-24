@@ -26,30 +26,9 @@ const Index = () => {
     }
   }, []);
 
-  // Additional scroll prevention with useEffect
+  // Force scroll to top on mount cleanly
   useEffect(() => {
-    const preventAutoScroll = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
-
-    // Multiple prevention methods
-    preventAutoScroll();
-    
-    const timeoutId = setTimeout(preventAutoScroll, 0);
-    const intervalId = setInterval(preventAutoScroll, 100);
-    
-    // Stop the interval after 1 second
-    const stopInterval = setTimeout(() => {
-      clearInterval(intervalId);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-      clearInterval(intervalId);
-      clearTimeout(stopInterval);
-    };
+    window.scrollTo(0, 0);
   }, []);
 
   // Request notification permission immediately on first load

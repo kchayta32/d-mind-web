@@ -48,25 +48,25 @@ const NewsCarousel = () => {
             description: t('newsCarousel.slide1Desc'),
             bgImage: '/images/hero-background.png',
             content: (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3 text-sm md:text-base text-blue-100 p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
-                            <Smartphone className="w-6 h-6 text-green-400" />
+                        <div className="flex items-center gap-3 text-xs sm:text-sm md:text-base text-blue-100 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
+                            <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-green-400 flex-shrink-0" />
                             <div>
-                                <p className="font-semibold text-white">{t('newsCarousel.androidApp')}</p>
-                                <p className="opacity-80">{t('newsCarousel.androidSoon')}</p>
+                                <p className="font-semibold text-white text-xs sm:text-sm md:text-base">{t('newsCarousel.androidApp')}</p>
+                                <p className="text-[11px] sm:text-xs opacity-80">{t('newsCarousel.androidSoon')}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 text-sm md:text-base text-blue-100 p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
-                            <Smartphone className="w-6 h-6 text-gray-400" />
+                        <div className="flex items-center gap-3 text-xs sm:text-sm md:text-base text-blue-100 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
+                            <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
                             <div>
-                                <p className="font-semibold text-white">{t('newsCarousel.iosApp')}</p>
-                                <p className="opacity-80">{t('newsCarousel.iosDev')}</p>
+                                <p className="font-semibold text-white text-xs sm:text-sm md:text-base">{t('newsCarousel.iosApp')}</p>
+                                <p className="text-[11px] sm:text-xs opacity-80">{t('newsCarousel.iosDev')}</p>
                             </div>
                         </div>
                     </div>
-                    <div className="flex gap-3 pt-2">
-                        <Button onClick={() => navigate('/article/dmind-app-launch')} className="bg-white text-blue-600 hover:bg-blue-50 font-bold shadow-lg transition-all hover:scale-105">
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                        <Button onClick={() => navigate('/article/dmind-app-launch')} className="bg-white text-blue-600 hover:bg-blue-50 font-bold shadow-lg transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
                             {t('newsCarousel.readMore')}
                         </Button>
                     </div>
@@ -81,26 +81,26 @@ const NewsCarousel = () => {
             description: t('newsCarousel.slide2Desc'),
             bgImage: '/images/hero-background.png',
             content: (
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Shield className="w-6 h-6 text-green-400 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.bgAlerts')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.bgAlertsDesc')}</p>
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-4">
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Shield className="w-5 h-5 text-green-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.bgAlerts')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bgAlertsDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Map className="w-6 h-6 text-blue-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.mapUi')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.mapUiDesc')}</p>
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Map className="w-5 h-5 text-blue-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.mapUi')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.mapUiDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <CloudRain className="w-6 h-6 text-yellow-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.weatherTools')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.weatherToolsDesc')}</p>
+                        <div className="col-span-2 sm:col-span-1 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <CloudRain className="w-5 h-5 text-yellow-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.weatherTools')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.weatherToolsDesc')}</p>
                         </div>
                     </div>
-                    <div className="flex gap-3 pt-2">
-                        <Button onClick={() => navigate('/article/system-update-v2')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg border border-white/20 transition-all hover:scale-105">
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                        <Button onClick={() => navigate('/article/system-update-v2')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
                             {t('newsCarousel.readMore')}
                         </Button>
                     </div>
@@ -115,26 +115,26 @@ const NewsCarousel = () => {
             description: t('newsCarousel.slide3Desc'),
             bgImage: '/images/hero-background.png',
             content: (
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Cpu className="w-6 h-6 text-teal-400 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.nativeTech')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.nativeTechDesc')}</p>
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-4">
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Cpu className="w-5 h-5 text-teal-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.nativeTech')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.nativeTechDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Layers className="w-6 h-6 text-cyan-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.mapLayers')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.mapLayersDesc')}</p>
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Layers className="w-5 h-5 text-cyan-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.mapLayers')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.mapLayersDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Bell className="w-6 h-6 text-amber-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.fcmOffline')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.fcmOfflineDesc')}</p>
+                        <div className="col-span-2 sm:col-span-1 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Bell className="w-5 h-5 text-amber-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.fcmOffline')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.fcmOfflineDesc')}</p>
                         </div>
                     </div>
-                    <div className="flex gap-3 pt-2">
-                        <Button onClick={() => navigate('/article/mobile-app-development')} className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold shadow-lg shadow-teal-500/20 border border-white/20 transition-all hover:scale-105">
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                        <Button onClick={() => navigate('/article/mobile-app-development')} className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold shadow-lg shadow-teal-500/20 border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
                             {t('newsCarousel.readFullArticle')}
                         </Button>
                     </div>
@@ -149,30 +149,30 @@ const NewsCarousel = () => {
             description: t('newsCarousel.slide4Desc'),
             bgImage: '/images/hero-background.png',
             content: (
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Waves className="w-6 h-6 text-cyan-400 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.gistdaSatellite')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.gistdaSatelliteDesc')}</p>
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-4">
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Waves className="w-5 h-5 text-cyan-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.gistdaSatellite')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.gistdaSatelliteDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Radio className="w-6 h-6 text-blue-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.liveRadar')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.liveRadarDesc')}</p>
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Radio className="w-5 h-5 text-blue-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.liveRadar')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.liveRadarDesc')}</p>
                         </div>
-                        <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <BarChart3 className="w-6 h-6 text-amber-300 mb-2" />
-                            <h4 className="font-bold text-white text-sm">{t('newsCarousel.realtimeAnalytics')}</h4>
-                            <p className="text-xs text-blue-100 mt-1">{t('newsCarousel.realtimeAnalyticsDesc')}</p>
+                        <div className="col-span-2 sm:col-span-1 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <BarChart3 className="w-5 h-5 text-amber-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.realtimeAnalytics')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.realtimeAnalyticsDesc')}</p>
                         </div>
                     </div>
-                    <div className="flex flex-wrap gap-3 pt-2">
-                        <Button onClick={() => navigate('/article/disaster-map-system-update')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold shadow-lg shadow-blue-500/20 border border-white/20 transition-all hover:scale-105">
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                        <Button onClick={() => navigate('/article/disaster-map-system-update')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold shadow-lg shadow-blue-500/20 border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
                             {t('newsCarousel.readFullArticle')}
                         </Button>
-                        <Button onClick={() => navigate('/disaster-map')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105">
-                            <Map className="w-4 h-4 mr-1.5" />
+                        <Button onClick={() => navigate('/disaster-map')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-3.5">
+                            <Map className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                             {t('newsCarousel.openMap')}
                         </Button>
                     </div>
@@ -182,36 +182,37 @@ const NewsCarousel = () => {
     ];
 
     return (
-        <div className="relative w-full overflow-hidden min-h-[550px] md:min-h-[600px] bg-slate-900 group">
+        <div className="relative w-full overflow-hidden min-h-[440px] md:min-h-[580px] bg-slate-900 group">
             {/* Background Decoration */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-slate-900 to-black opacity-90"></div>
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-slate-900 to-black opacity-95"></div>
                 <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-600/30 rounded-full blur-[100px] animate-pulse"></div>
                 <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-indigo-500/20 rounded-full blur-[80px]"></div>
             </div>
 
-            <div className="relative z-10 h-full py-12 md:py-20" ref={emblaRef}>
+            <div className="relative z-10 h-full py-8 sm:py-12 md:py-16" ref={emblaRef}>
                 <div className="flex h-full">
                     {slides.map((slide, index) => (
-                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 px-4 md:px-12 flex items-center justify-center h-full">
-                            <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 px-4 sm:px-6 md:px-12 flex items-center justify-center h-full">
+                            <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
 
                                 {/* Text Content */}
                                 <div className={cn(
-                                    "space-y-6 animate-in slide-in-from-left-8 fade-in duration-700 delay-100 fill-mode-both",
+                                    "space-y-3 sm:space-y-5 animate-in slide-in-from-left-8 fade-in duration-700 delay-100 fill-mode-both",
                                     index === selectedIndex ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
                                 )}>
-                                    <Badge variant="outline" className="text-blue-300 border-blue-400/50 px-4 py-1 text-sm bg-blue-500/10 backdrop-blur-md">
+                                    <Badge variant="outline" className="text-blue-300 border-blue-400/50 px-3 py-0.5 text-xs bg-blue-500/15 backdrop-blur-md inline-flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                                         {slide.badge}
                                     </Badge>
                                     <div>
-                                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-4 drop-shadow-xl">
+                                        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-2 sm:mb-3 drop-shadow-xl">
                                             {slide.title}
                                         </h1>
-                                        <h2 className="text-xl md:text-2xl text-blue-200 font-medium mb-4">
+                                        <h2 className="text-sm sm:text-lg md:text-2xl text-blue-200 font-semibold mb-2 sm:mb-3">
                                             {slide.subtitle}
                                         </h2>
-                                        <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl">
+                                        <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl line-clamp-3 sm:line-clamp-none">
                                             {slide.description}
                                         </p>
                                     </div>
@@ -220,7 +221,7 @@ const NewsCarousel = () => {
 
                                 {/* Visual/Image Side */}
                                 <div className={cn(
-                                    "relative hidden md:block h-[400px] animate-in zoom-in-50 fade-in duration-700 delay-200 fill-mode-both",
+                                    "relative hidden md:block h-[380px] lg:h-[400px] animate-in zoom-in-50 fade-in duration-700 delay-200 fill-mode-both",
                                     index === selectedIndex ? "opacity-100 scale-100" : "opacity-0 scale-95"
                                 )}>
                                     {/* Glassmorphic Card Container for Imagery */}
@@ -376,29 +377,32 @@ const NewsCarousel = () => {
                 </div>
             </div>
 
-            {/* Navigation Buttons */}
+            {/* Navigation Buttons (visible on sm+) */}
             <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white hover:bg-white/10 rounded-full backdrop-blur-sm transition-all md:opacity-0 group-hover:opacity-100"
+                className="hidden sm:flex absolute left-3 md:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 text-white/60 hover:text-white hover:bg-white/10 rounded-full backdrop-blur-sm transition-all md:opacity-0 group-hover:opacity-100 items-center justify-center"
                 onClick={scrollPrev}
+                aria-label="Previous slide"
             >
-                <ChevronLeft className="w-8 h-8" />
+                <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
 
             <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white hover:bg-white/10 rounded-full backdrop-blur-sm transition-all md:opacity-0 group-hover:opacity-100"
+                className="hidden sm:flex absolute right-3 md:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 text-white/60 hover:text-white hover:bg-white/10 rounded-full backdrop-blur-sm transition-all md:opacity-0 group-hover:opacity-100 items-center justify-center"
                 onClick={scrollNext}
+                aria-label="Next slide"
             >
-                <ChevronRight className="w-8 h-8" />
+                <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
 
             {/* Pagination Dots */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-20">
                 {slides.map((_, index) => (
                     <button
                         key={index}
+                        aria-label={`Go to slide ${index + 1}`}
                         className={cn(
-                            "w-3 h-1.5 rounded-full transition-all duration-300",
-                            index === selectedIndex ? "w-8 bg-blue-500" : "bg-white/30 hover:bg-white/50"
+                            "h-1.5 rounded-full transition-all duration-300",
+                            index === selectedIndex ? "w-6 sm:w-8 bg-blue-500 shadow-sm shadow-blue-500/50" : "w-2 sm:w-3 bg-white/30 hover:bg-white/60"
                         )}
                         onClick={() => emblaApi && emblaApi.scrollTo(index)}
                     />

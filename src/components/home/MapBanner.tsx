@@ -30,11 +30,11 @@ const MapBanner: React.FC = () => {
                             {t('mapBanner.description')}
                         </p>
 
-                        <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start pt-2 w-full sm:w-auto">
                             <Button
                                 size="lg"
                                 onClick={() => navigate('/disaster-map')}
-                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 group/btn font-semibold"
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 group/btn font-semibold rounded-xl"
                             >
                                 <Map className="mr-2 h-5 w-5" />
                                 {t('mapBanner.openMap')}
@@ -44,7 +44,7 @@ const MapBanner: React.FC = () => {
                                 variant="outline"
                                 size="lg"
                                 onClick={() => navigate('/incident-reports')}
-                                className="border-border text-foreground hover:bg-muted font-medium"
+                                className="w-full sm:w-auto border-border text-foreground hover:bg-muted font-medium rounded-xl"
                             >
                                 {t('mapBanner.reportIncident')}
                             </Button>

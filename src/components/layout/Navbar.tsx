@@ -228,7 +228,7 @@ const Navbar: React.FC = () => {
                                         variant="ghost"
                                         size="sm"
                                         className="text-slate-400 hover:text-white"
-                                        onClick={() => setLanguage(language === 'th' ? 'en' : 'th')}
+                                        onClick={toggleLanguage}
                                     >
                                         <Globe className="w-4 h-4 mr-2" />
                                         {t('menu.changeLanguage')}
