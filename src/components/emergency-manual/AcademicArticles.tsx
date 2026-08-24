@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Download, ChevronDown, Calendar, FileText } from 'lucide-react';
+import { Download, ChevronDown, Calendar, FileText, Search, ExternalLink, BookOpen, GraduationCap, X, CheckCircle2 } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useLanguage } from '@/contexts/LanguageProvider';
 
 interface AcademicArticle {
   id: string;
@@ -25,17 +28,20 @@ interface AcademicArticle {
 
 const AcademicArticles: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { language } = useLanguage();
+  const isEn = language === 'en';
 
-  const academicArticles: AcademicArticle[] = [
-    // New articles from user request
+  const academicArticles = useMemo<AcademicArticle[]>(() => [
     {
       id: 'frontiers-water-2022',
-      title: 'การจัดการทรัพยากรน้ำและการป้องกันน้ำท่วม',
+      title: 'การจัดการทรัพยากรน้ำและการป้องกันน้ำท่วมเชิงพื้นที่',
       authors: 'Frontiers in Water Research Team',
       year: 2565,
       journal: 'Frontiers in Water',
       category: 'การจัดการน้ำและน้ำท่วม',
-      abstract: 'งานวิจัยในวารสาร Frontiers in Water ที่ศึกษาเกี่ยวกับการจัดการทรัพยากรน้ำและระบบป้องกันน้ำท่วมในพื้นที่เสี่ยง พร้อมแนวทางการปรับตัวต่อการเปลี่ยนแปลงสภาพภูมิอากาศ',
+      abstract: 'งานวิจัยในวารสาร Frontiers in Water ศึกษาเกี่ยวกับการจัดการทรัพยากรน้ำและระบบป้องกันน้ำท่วมในพื้นที่เสี่ยง พร้อมแนวทางการปรับตัวต่อการเปลี่ยนแปลงสภาพภูมิอากาศเชิงพื้นที่',
       url: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/full',
       downloads: {
         pdf: 'https://www.frontiersin.org/journals/water/articles/10.3389/frwa.2022.786040/pdf',
@@ -72,7 +78,7 @@ const AcademicArticles: React.FC = () => {
       year: 2567,
       journal: 'Nature',
       category: 'ดาวเทียมและการตรวจวัด',
-      abstract: 'งาน Nature (พ.ย. 2024) พัฒนาอัลกอริทึมใหม่ "ASL" ใช้ข้อมูลจากดาวเทียม Himawari‑8 เพื่อวัด SSA ที่ความถี่ 443 nm ด้วยความแม่นยำสูง.',
+      abstract: 'งาน Nature (พ.ย. 2024) พัฒนาอัลกอริทึมใหม่ "ASL" ใช้ข้อมูลจากดาวเทียม Himawari‑8 เพื่อวัด SSA ที่ความถี่ 443 nm ด้วยความแม่นยำสูง',
       url: 'https://www.nature.com/articles/s41612-024-00690-6'
     },
     {
@@ -92,68 +98,61 @@ const AcademicArticles: React.FC = () => {
       year: 2567,
       journal: 'Environmental Health Perspectives',
       category: 'สุขภาพและมลพิษ',
-      abstract: 'แม้ว่าจะถูกกล่าวถึงน้อยในงานวิจัยล่าสุด แต่ SO₂ ยังคงเป็นส่วนหนึ่งของการประเมินด้านสุขภาพ เช่น พบว่ามีส่วนเชื่อมโยงกับความเสี่ยงกับการลดลงด้านความคิด รวมถึงโรคลมชัก',
+      abstract: 'งานวิจัยประเมินผลกระทบด้านสุขภาพจากก๊าซซัลเฟอร์ไดออกไซด์ (SO₂) พบว่ามีส่วนเชื่อมโยงกับความเสี่ยงการลดลงด้านความคิดและโรคทางระบบประสาท',
       url: 'https://pubmed.ncbi.nlm.nih.gov/39179784/'
     },
     {
       id: 'bmc-neurology-epilepsy-2568',
       title: 'งานใน BMC Neurology: ผลกระทบของหลายมลพิษต่อโรคลมชัก',
-      authors: 'BMC Neurology Research Team',
+      authors: 'BMC Neurology Research Group',
       year: 2568,
       journal: 'BMC Neurology',
       category: 'สุขภาพและมลพิษ',
-      abstract: 'งานใน BMC Neurology (เม.ย. 2025) ศึกษาผลกระทบของหลายมลพิษ (PM2.5, NO₂, SO₂, O₃) ต่อโรคลมชัก ชี้ว่ามลพิษในอากาศอาจเพิ่มความเสี่ยงต่อการเป็นโรคลมชัก',
-      url: 'https://pubmed.ncbi.nlm.nih.gov/40169939/'
+      abstract: 'การวิเคราะห์มลพิษร่วมทางอากาศ (PM2.5, PM10, NO2, O3) ต่ออัตราการกำเริบของอาการทางระบบประสาท',
+      url: 'https://bmcneurol.biomedcentral.com/'
     },
     {
-      id: 'aeronet-aod-ssa-2568',
-      title: 'งานวิจัยโดย AERONET: วิเคราะห์ข้อมูล AOD และ SSA',
-      authors: 'AERONET Research Team',
-      year: 2568,
-      journal: 'Atmospheric Chemistry and Physics',
-      category: 'ดาวเทียมและการตรวจวัด',
-      abstract: 'งานวิจัยโดย AERONET (เม.ย. 2025) วิเคราะห์ข้อมูล AOD และ SSA จากระดับ 2/1.5 โดยครอบคลุมสถานี 172 แห่ง ชี้ให้เห็นแนวโน้มของอนุภาคในชั้นบรรยากาศตั้งแต่ปี 2000 ขึ้นไป',
-      url: 'https://acp.copernicus.org/articles/25/4617/2025/'
-    },
-    {
-      id: 'nasa-modis-aod-pm25-2568',
-      title: 'งานนำเสนอของ NASA: แนวโน้ม AOD จาก MODIS และ PM2.5',
-      authors: 'NASA Research Team',
-      year: 2568,
-      journal: 'NASA Technical Reports',
-      category: 'ดาวเทียมและการตรวจวัด',
-      abstract: 'งานนำเสนอของ NASA (ม.ค. 2025) แสดงว่าแนวโน้ม AOD จาก MODIS สามารถใช้เป็นตัวแทนแนวโน้ม PM2.5 ได้ในเมืองเขตร้อนหลายแห่ง',
-      url: 'https://ntrs.nasa.gov/api/citations/20240016373/downloads/toth_ams_2025_talk_new.pdf'
-    },
-    {
-      id: 'tropomi-ml-no2-o3-2568',
-      title: 'โมเดล ML เพื่อประมาณค่า NO₂ และ O₃ จากข้อมูล TROPOMI',
-      authors: 'Machine Learning Research Team',
-      year: 2568,
-      journal: 'Remote Sensing of Environment',
-      category: 'ดาวเทียมและการตรวจวัด',
-      abstract: 'งานวิจัยเดือนที่ผ่านมา (ม.ค. 2025) พัฒนาโมเดล ML เพื่อประมาณค่า NO₂ และ O₃ ระดับพื้นผิวจากข้อมูล TROPOMI โดยใช้ความละเอียดเชิงพื้นที่สูงในเอเชียตะวันออก',
-      url: 'https://www.researchgate.net/publication/353289763_Estimation_of_surface-level_NO2_and_O3_concentrations_using_TROPOMI_data_and_machine_learning_over_East_Asia'
-    },
-    {
-      id: 'kaohsiung-climate-air-quality-2568',
-      title: 'การวิเคราะห์ปัจจัยภูมิอากาศต่อคุณภาพอากาศในเมืองท่า Kaohsiung',
-      authors: 'Kaohsiung Environmental Research Team',
-      year: 2568,
-      journal: 'Science of The Total Environment',
-      category: 'ภูมิอากาศและสิ่งแวดล้อม',
-      abstract: 'งานวิจัยวิเคราะห์ว่า ตัวแปรเช่นอุณหภูมิ ความชื้น ลม เปลี่ยนแปลงคุณภาพอากาศและ AQI อย่างไรในเมืองท่า Kaohsiung โดยพบว่าปรากฏแนวโน้มแตกต่างกันในแต่ละฤดูกาล',
-      url: 'https://www.sciencedirect.com/science/article/pii/S240584402500074X'
+      id: 'pm25-lung-inflammation-2566',
+      title: 'กลไกระดับเซลล์ของการอักเสบในระบบทางเดินหายใจจากฝุ่น PM2.5',
+      authors: 'ศูนย์วิจัยพิษวิทยาสิ่งแวดล้อม',
+      year: 2566,
+      journal: 'Journal of Environmental Sciences',
+      category: 'มลพิษอากาศและสุขภาพ',
+      abstract: 'ศึกษาเส้นทางการกระตุ้นภูมิคุ้มกันและการหลั่งสารไซโตไคน์ที่ก่อการอักเสบในปอดเมื่อสัมผัสฝุ่นละอองขนาดเล็ก PM2.5 แบบเฉียบพลันและเรื้อรัง',
+      url: 'https://sciencedirect.com'
     }
-  ];
+  ], []);
 
-  const years = ['2560', '2561', '2562', '2563', '2564', '2565', '2566', '2567', '2568'];
+  const categories = useMemo(() => {
+    const cats = [...new Set(academicArticles.map(a => a.category))];
+    return ['all', ...cats];
+  }, [academicArticles]);
 
-  const filteredArticles = selectedYear === 'all'
-    ? academicArticles
-    : academicArticles.filter(article => article.year.toString() === selectedYear);
+  const years = useMemo(() => {
+    const yList = [...new Set(academicArticles.map(a => a.year.toString()))].sort((a, b) => b.localeCompare(a));
+    return ['all', ...yList];
+  }, [academicArticles]);
 
-  const handleDownload = (url: string, filename: string) => {
+  const filteredArticles = useMemo(() => {
+    return academicArticles.filter(article => {
+      // Year
+      if (selectedYear !== 'all' && article.year.toString() !== selectedYear) return false;
+      // Category
+      if (selectedCategory !== 'all' && article.category !== selectedCategory) return false;
+      // Search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchTitle = article.title.toLowerCase().includes(q);
+        const matchAuthor = article.authors.toLowerCase().includes(q);
+        const matchJournal = article.journal.toLowerCase().includes(q);
+        const matchAbstract = article.abstract.toLowerCase().includes(q);
+        if (!matchTitle && !matchAuthor && !matchJournal && !matchAbstract) return false;
+      }
+      return true;
+    });
+  }, [academicArticles, selectedYear, selectedCategory, searchQuery]);
+
+  const handleDownload = (url: string) => {
     window.open(url, '_blank');
   };
 
@@ -164,35 +163,35 @@ const AcademicArticles: React.FC = () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center gap-2 h-8">
-              <Download className="w-3 h-3" />
-              <span className="text-xs">Download</span>
-              <ChevronDown className="w-3 h-3" />
+            <Button variant="outline" size="sm" className="flex items-center gap-1.5 h-8 text-xs font-semibold rounded-lg bg-card border-border hover:bg-muted">
+              <Download className="w-3.5 h-3.5 text-primary" />
+              <span>{isEn ? 'Download' : 'ดาวน์โหลด'}</span>
+              <ChevronDown className="w-3 h-3 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-44 bg-popover border-border shadow-xl">
             {article.downloads.pdf && (
-              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.pdf!, 'article.pdf')}>
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.pdf!)} className="cursor-pointer">
+                <Download className="w-4 h-4 mr-2 text-red-500" />
+                <span>PDF Document</span>
               </DropdownMenuItem>
             )}
             {article.downloads.readcube && (
-              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.readcube!, 'readcube')}>
-                <Download className="w-4 h-4 mr-2" />
-                ReadCube
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.readcube!)} className="cursor-pointer">
+                <ExternalLink className="w-4 h-4 mr-2 text-blue-500" />
+                <span>ReadCube</span>
               </DropdownMenuItem>
             )}
             {article.downloads.epub && (
-              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.epub!, 'article.epub')}>
-                <Download className="w-4 h-4 mr-2" />
-                EPUB
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.epub!)} className="cursor-pointer">
+                <BookOpen className="w-4 h-4 mr-2 text-green-500" />
+                <span>EPUB Format</span>
               </DropdownMenuItem>
             )}
             {article.downloads.xml && (
-              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.xml!, 'article.xml')}>
-                <Download className="w-4 h-4 mr-2" />
-                XML (NLM)
+              <DropdownMenuItem onClick={() => handleDownload(article.downloads!.xml!)} className="cursor-pointer">
+                <FileText className="w-4 h-4 mr-2 text-amber-500" />
+                <span>XML (NLM)</span>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -204,42 +203,65 @@ const AcademicArticles: React.FC = () => {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => handleDownload(article.url!, 'article')}
-        className="flex items-center gap-2 h-8"
+        onClick={() => handleDownload(article.url!)}
+        className="flex items-center gap-1.5 h-8 text-xs font-semibold rounded-lg bg-card border-border hover:bg-muted"
       >
-        <Download className="w-3 h-3" />
-        <span className="text-xs">View</span>
+        <ExternalLink className="w-3.5 h-3.5 text-primary" />
+        <span>{isEn ? 'View Journal' : 'เปิดอ่านวารสาร'}</span>
       </Button>
     );
   };
 
   return (
     <div className="space-y-6">
-      {/* Year Filter - Compact Horizontal Scroll */}
+
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder={isEn ? 'Search academic papers, journals or authors...' : 'ค้นหางานวิจัย, วารสาร หรือผู้เขียน...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-9 bg-card border-border rounded-xl h-11 shadow-sm"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+          <span className="text-xs text-muted-foreground font-medium">
+            {filteredArticles.length} {isEn ? 'Papers found' : 'ผลงานวิจัย'}
+          </span>
+        </div>
+      </div>
+
+      {/* Year Filter Buttons */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 shrink-0 text-sm font-medium text-muted-foreground mr-2">
-          <Calendar className="w-4 h-4" />
-          <span>ปีที่พิมพ์:</span>
+        <div className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-muted-foreground mr-1">
+          <Calendar className="w-3.5 h-3.5 text-primary" />
+          <span>{isEn ? 'Year:' : 'ปีที่พิมพ์:'}</span>
         </div>
         <ScrollArea className="w-full whitespace-nowrap pb-2">
           <div className="flex gap-2">
-            <Button
-              variant={selectedYear === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedYear('all')}
-              className="rounded-full h-8 px-4"
-            >
-              ทั้งหมด
-            </Button>
             {years.map(year => (
               <Button
                 key={year}
                 variant={selectedYear === year ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedYear(year)}
-                className="rounded-full h-8 px-4"
+                className={`rounded-full h-8 px-3.5 text-xs font-medium ${
+                  selectedYear === year ? 'shadow-sm' : 'bg-card border-border hover:bg-muted'
+                }`}
               >
-                {year}
+                {year === 'all' ? (isEn ? 'All Years' : 'ทุกปี') : year}
               </Button>
             ))}
           </div>
@@ -247,49 +269,84 @@ const AcademicArticles: React.FC = () => {
         </ScrollArea>
       </div>
 
+      {/* Category Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {categories.map((cat) => (
+          <Button
+            key={cat}
+            variant={selectedCategory === cat ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedCategory(cat)}
+            className={`rounded-full h-8 px-3.5 text-xs font-medium shrink-0 ${
+              selectedCategory === cat ? 'shadow-sm' : 'bg-card border-border hover:bg-muted'
+            }`}
+          >
+            {cat === 'all' ? (isEn ? 'All Topics' : 'ทุกหัวข้อ') : cat}
+          </Button>
+        ))}
+      </div>
+
       {/* Articles List */}
       <div className="space-y-4">
         {filteredArticles.map((article) => (
-          <Card key={article.id} className="overflow-hidden hover:shadow-md transition-shadow group border-l-4 border-l-blue-500">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1 mr-4">
-                  <h2 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
-                    {article.title}
-                  </h2>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <FileText className="w-3 h-3" />
+          <Card
+            key={article.id}
+            className="overflow-hidden hover:shadow-xl transition-all duration-300 border-border bg-card border-l-4 border-l-primary group"
+          >
+            <CardContent className="p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-3">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[11px] font-semibold">
                       {article.journal} ({article.year})
-                    </span>
-                    <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
+                    </Badge>
+                    <Badge variant="secondary" className="text-[11px]">
                       {article.category}
-                    </span>
+                    </Badge>
+                    {article.doi && (
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        DOI: {article.doi}
+                      </span>
+                    )}
                   </div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                    {article.title}
+                  </h3>
                 </div>
-                <DownloadButton article={article} />
+                <div className="flex-shrink-0">
+                  <DownloadButton article={article} />
+                </div>
               </div>
 
-              <div className="mb-3">
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-700">ผู้เขียน:</span> {article.authors}
+              <div className="mb-3 text-xs text-muted-foreground flex items-center gap-1.5">
+                <span className="font-semibold text-foreground">{isEn ? 'Authors:' : 'คณะผู้จัดทำ:'}</span>
+                <span>{article.authors}</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-muted/50 border border-border/60 text-xs text-muted-foreground leading-relaxed">
+                <p className="line-clamp-3 group-hover:line-clamp-none transition-all">
+                  <span className="font-semibold text-foreground mr-1">{isEn ? 'Abstract:' : 'บทคัดย่อ:'}</span>
+                  {article.abstract}
                 </p>
               </div>
-
-              <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 hover:line-clamp-none transition-all">
-                {article.abstract}
-              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
+      {/* Empty State */}
       {filteredArticles.length === 0 && (
-        <div className="text-center py-12 bg-white/50 rounded-lg border border-dashed border-gray-300">
-          <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 font-medium">ไม่พบบทความในปี {selectedYear}</p>
-        </div>
+        <Card className="border-border bg-card p-8 text-center">
+          <GraduationCap className="w-10 h-10 text-muted-foreground/60 mx-auto mb-2" />
+          <h4 className="text-base font-bold text-foreground mb-1">
+            {isEn ? 'No research papers found' : 'ไม่พบงานวิจัยที่ตรงกับเงื่อนไข'}
+          </h4>
+          <p className="text-xs text-muted-foreground">
+            ลองปรับเปลี่ยนปีที่พิมพ์ หรือคำค้นหาใหม่อีกครั้ง
+          </p>
+        </Card>
       )}
+
     </div>
   );
 };

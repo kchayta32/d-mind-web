@@ -141,7 +141,22 @@ export const translations = {
             readArticle: 'อ่านบทความ',
             views: 'ครั้งที่อ่าน',
             author: 'ผู้เขียน',
-            publishedDate: 'วันที่เผยแพร่'
+            publishedDate: 'วันที่เผยแพร่',
+            searchPlaceholder: 'ค้นหาบทความ, นวัตกรรม หรือหัวข้อภัยพิบัติ...',
+            featuredArticles: 'บทความเด่นจากแบนเนอร์',
+            allCategories: 'ทุกหมวดหมู่',
+            catBanners: '✨ แบนเนอร์ & ระบบ D-MIND',
+            catFlood: '🌊 น้ำท่วม & สภาพอากาศ',
+            catAir: '🌫️ ฝุ่น PM2.5 & คุณภาพอากาศ',
+            catEarthquake: '🏚️ แผ่นดินไหว & ธรณีพิบัติ',
+            guidelineSubtitle: 'คำแนะนำขั้นตอนการเอาชีวิตรอดและรับมือเหตุฉุกเฉินเฉพาะหน้า',
+            hotlineHelp: 'สายด่วนแจ้งเหตุฉุกเฉิน 24 ชั่วโมง',
+            readMore: 'อ่านบทความฉบับเต็ม',
+            filterYear: 'ปีที่เผยแพร่',
+            filterMonth: 'เดือน',
+            minRead: 'นาที',
+            noArticlesFound: 'ไม่พบบทความที่ตรงกับเงื่อนไขการค้นหา',
+            resetFilter: 'ล้างตัวกรอง'
         },
 
         // Emergency Contacts Page
@@ -568,7 +583,7 @@ export const translations = {
         // Emergency Manual Page
         manual: {
             title: 'Knowledge Center & Manuals',
-            subtitle: 'Guidelines, disaster warning articles, and academic research for preparedness',
+            subtitle: 'Guidelines, disaster warning articles, and academic research for disaster preparedness',
             guidelines: 'Guidelines',
             articles: 'Alert Articles',
             academic: 'Academic Research',
@@ -582,7 +597,22 @@ export const translations = {
             readArticle: 'Read Article',
             views: 'Views',
             author: 'Author',
-            publishedDate: 'Published Date'
+            publishedDate: 'Published Date',
+            searchPlaceholder: 'Search articles, innovations or topics...',
+            featuredArticles: 'Featured Banner Articles',
+            allCategories: 'All Categories',
+            catBanners: '✨ Banners & D-MIND System',
+            catFlood: '🌊 Flood & Weather',
+            catAir: '🌫️ PM2.5 & Air Quality',
+            catEarthquake: '🏚️ Earthquake & Geology',
+            guidelineSubtitle: 'Actionable survival guidelines and emergency procedures',
+            hotlineHelp: '24/7 Emergency Hotlines',
+            readMore: 'Read Full Article',
+            filterYear: 'Year',
+            filterMonth: 'Month',
+            minRead: 'min',
+            noArticlesFound: 'No articles match your search criteria',
+            resetFilter: 'Reset Filters'
         },
 
         // Emergency Contacts Page
