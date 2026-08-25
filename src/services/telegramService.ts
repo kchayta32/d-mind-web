@@ -223,9 +223,7 @@ export async function sendContactToTelegram(data: ContactFormData): Promise<Tele
 
   return {
     success: true,
-    message: deliveredCount > 0
-      ? `ส่งข้อความแจ้งเตือนไปยัง Telegram สำเร็จ (${deliveredCount} ช่องทาง)`
-      : `ส่งข้อความเรียบร้อยแล้ว ข้อมูลถูกจัดส่งไปยังระบบแจ้งเตือนทีมงาน (@drmind_alert_bot)`,
+    message: 'ส่งข้อความถึงทีมพัฒนา D-MIND เรียบร้อยแล้ว ขอบคุณที่ติดต่อเรา',
     chatCount: deliveredCount
   };
 }

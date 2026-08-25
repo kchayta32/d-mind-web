@@ -814,38 +814,6 @@ const ContactUs: React.FC = () => {
                                     </div>
                                 </Card>
 
-                                {/* Telegram Bot Card */}
-                                <Card className="border border-sky-200 dark:border-sky-800/60 shadow-md bg-gradient-to-br from-sky-500/5 via-white to-sky-500/10 dark:from-sky-950/40 dark:via-slate-900 dark:to-sky-900/20 rounded-2xl p-6 transition-all hover:shadow-lg">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-3 rounded-xl bg-sky-500/15 text-sky-500 border border-sky-500/20">
-                                                <Send className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className="font-bold text-slate-900 dark:text-white text-base">
-                                                        Telegram Alert Bot
-                                                    </h4>
-                                                    <Badge className="bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30 text-[10px] py-0 px-2">
-                                                        Live Alert
-                                                    </Badge>
-                                                </div>
-                                                <p className="text-sm font-semibold text-sky-600 dark:text-sky-400">
-                                                    @drmind_alert_bot
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-1.5">
-                                            <a href="https://t.me/drmind_alert_bot" target="_blank" rel="noopener noreferrer">
-                                                <Button size="sm" className="h-8 px-3 rounded-lg text-xs bg-sky-500 hover:bg-sky-600 text-white gap-1 shadow-sm">
-                                                    <Send className="w-3 h-3" />
-                                                    {language === 'th' ? 'เปิดบอท' : 'Open Bot'}
-                                                </Button>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </Card>
-
                                 {/* Social Links Card */}
                                 <Card className="border border-slate-200 dark:border-slate-800 shadow-md bg-white dark:bg-slate-900 rounded-2xl p-6 space-y-4">
                                     <h4 className="font-bold text-slate-900 dark:text-white text-sm">
@@ -902,21 +870,10 @@ const ContactUs: React.FC = () => {
                             {/* Interactive Contact Form */}
                             <div className="lg:col-span-7">
                                 <Card className="border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-10 space-y-6">
-                                    <div className="space-y-1.5">
-                                        <div className="flex items-center justify-between flex-wrap gap-2">
-                                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                                {t('contactUs.formTitle')}
-                                            </h3>
-                                            <a 
-                                                href="https://t.me/drmind_alert_bot" 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1.5 text-xs text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/50 px-2.5 py-1 rounded-full hover:underline"
-                                            >
-                                                <Send className="w-3 h-3" />
-                                                <span>Telegram Bot Alert</span>
-                                            </a>
-                                        </div>
+                                    <div className="space-y-1">
+                                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                                            {t('contactUs.formTitle')}
+                                        </h3>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
                                             {t('contactUs.formDesc')}
                                         </p>
