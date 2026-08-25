@@ -97,6 +97,76 @@ THAILLM_API_KEY = os.environ.get("THAILLM_API_KEY", "")
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY") or ""
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8686401520:AAHb2qFnN_t66av6OcwuTHDsZ_wWBVVpNXM")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+
+SUBJECT_MAP = {
+    "general": "สอบถามข้อมูลทั่วไป (General Inquiry)",
+    "bug": "รายงานปัญหาการใช้งาน / Bug (Report an Issue / Bug)",
+    "collaboration": "ความร่วมมือทางวิชาการ / องค์กร (Academic / Organizational Collaboration)",
+    "feedback": "ข้อเสนอแนะเพื่อการพัฒนา (Feedback & Feature Suggestions)"
+}
+
+def sync_telegram_subscribers():
+    """Fetch updates from Telegram Bot API and register new subscriber chat IDs."""
+    if not TELEGRAM_BOT_TOKEN:
+        return []
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
+        resp = requests.get(url, timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get("ok"):
+                for item in data.get("result", []):
+                    chat = None
+                    if "message" in item and "chat" in item["message"]:
+                        chat = item["message"]["chat"]
+                    elif "channel_post" in item and "chat" in item["channel_post"]:
+                        chat = item["channel_post"]["chat"]
+                    elif "my_chat_member" in item and "chat" in item["my_chat_member"]:
+                        chat = item["my_chat_member"]["chat"]
+                    elif "callback_query" in item and "message" in item["callback_query"]:
+                        chat = item["callback_query"]["message"].get("chat")
+                        
+                    if chat and "id" in chat:
+                        cid = str(chat["id"])
+                        first_name = chat.get("first_name") or chat.get("title") or ""
+                        username = chat.get("username") or ""
+                        db.save_telegram_subscriber(cid, first_name, username)
+    except Exception as e:
+        print(f"Error syncing Telegram subscribers: {e}")
+        
+    chats = set(db.get_telegram_subscribers())
+    if TELEGRAM_CHAT_ID:
+        for cid in TELEGRAM_CHAT_ID.split(","):
+            cid = cid.strip()
+            if cid:
+                chats.add(cid)
+    return list(chats)
+
+def send_telegram_alert(html_text):
+    """Send formatted alert message to all Telegram subscribers."""
+    subscribers = sync_telegram_subscribers()
+    sent_count = 0
+    if not TELEGRAM_BOT_TOKEN or not subscribers:
+        return 0
+        
+    for chat_id in subscribers:
+        try:
+            url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+            payload = {
+                "chat_id": chat_id,
+                "text": html_text,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True
+            }
+            resp = requests.post(url, json=payload, timeout=10)
+            if resp.status_code == 200 and resp.json().get("ok"):
+                sent_count += 1
+        except Exception as e:
+            print(f"Error sending message to Telegram chat {chat_id}: {e}")
+            
+    return sent_count
 
 
 # Serves frontend static files
@@ -446,6 +516,78 @@ def clear_data():
 def refresh_supabase():
     supabase_helper.refresh_cache()
     return jsonify({"success": True})
+
+@app.route('/api/contact', methods=['POST'])
+@app.route('/contact', methods=['POST'])
+def handle_contact():
+    import html
+    data = request.json or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    phone = (data.get("phone") or "").strip()
+    subject = (data.get("subject") or "general").strip()
+    message = (data.get("message") or "").strip()
+    custom_html = data.get("html_message")
+
+    if not name or not email or not message:
+        return jsonify({"error": "Missing required fields: name, email, message"}), 400
+
+    # Build HTML formatted Telegram message if not supplied
+    if not custom_html:
+        safe_name = html.escape(name)
+        safe_email = html.escape(email)
+        safe_phone = html.escape(phone) if phone else "ไม่ได้ระบุ"
+        subject_title = SUBJECT_MAP.get(subject, html.escape(subject))
+        safe_message = html.escape(message)
+        
+        from datetime import datetime, timezone, timedelta
+        bkk_tz = timezone(timedelta(hours=7))
+        now_str = datetime.now(bkk_tz).strftime("%d/%m/%Y %H:%M:%S")
+        
+        custom_html = (
+            f"🚨 <b>[D-MIND] มีข้อความติดต่อใหม่ถึงทีมพัฒนา</b>\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"👤 <b>ชื่อ - นามสกุล:</b> {safe_name}\n"
+            f"📧 <b>อีเมล:</b> {safe_email}\n"
+            f"📞 <b>เบอร์โทรศัพท์:</b> {safe_phone}\n"
+            f"📋 <b>หัวข้อการติดต่อ:</b> {subject_title}\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"📝 <b>ข้อความรายละเอียด:</b>\n"
+            f"{safe_message}\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"🕒 <b>วัน-เวลาที่ส่ง:</b> {now_str} (ICT)\n"
+            f"🌐 <b>แหล่งที่มา:</b> <a href=\"https://d-mind-six.vercel.app/contactme\">D-MIND Web Platform</a>"
+        )
+
+    # Broadcast to Telegram bot subscribers
+    sent_count = send_telegram_alert(custom_html)
+
+    # Save to SQLite database
+    msg_id = db.save_contact_message(
+        name=name,
+        email=email,
+        phone=phone,
+        subject=subject,
+        message=message,
+        sent_to_telegram=1 if sent_count > 0 else 0
+    )
+
+    return jsonify({
+        "success": True,
+        "message_id": msg_id,
+        "chat_count": sent_count,
+        "telegram_status": "sent" if sent_count > 0 else "saved_pending_subscriber"
+    })
+
+@app.route('/api/telegram_subscribers', methods=['GET'])
+@app.route('/telegram_subscribers', methods=['GET'])
+def get_telegram_subscribers():
+    subscribers = sync_telegram_subscribers()
+    return jsonify({
+        "bot_username": "drmind_alert_bot",
+        "subscribers_count": len(subscribers),
+        "subscribers": subscribers
+    })
 
 # Vercel Serverless WSGI entrypoint alias
 handler = app

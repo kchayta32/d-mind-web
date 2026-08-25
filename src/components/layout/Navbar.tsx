@@ -21,7 +21,7 @@ const MENU_ITEMS_CONFIG = [
     { key: 'survey', route: '/satisfaction-survey', icon: Smile, color: 'text-green-400' },
     { key: 'research', route: '/manual', icon: BookOpen, color: 'text-cyan-400' },
     { key: 'assistant', route: '/assistant', icon: Bot, color: 'text-violet-400' },
-    { key: 'about', href: 'https://d-mind.my.canva.site/', icon: Info, color: 'text-pink-400' },
+    { key: 'about', href: 'https://d-mind.my.canva.site/about-the-company', icon: Info, color: 'text-pink-400' },
     { key: 'contact', route: '/contactme', icon: Mail, color: 'text-indigo-400' },
 ];
 

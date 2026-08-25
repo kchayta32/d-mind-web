@@ -57,7 +57,7 @@ const NavigationCards: React.FC = () => {
       icon: <Info className="w-8 h-8" />,
       titleKey: 'menu.about',
       descKey: 'navCards.aboutDesc',
-      href: 'https://d-mind.my.canva.site/',
+      href: 'https://d-mind.my.canva.site/about-the-company',
       color: 'bg-purple-500'
     },
     {

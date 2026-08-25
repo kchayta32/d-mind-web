@@ -162,7 +162,7 @@ const NewMobileLayout: React.FC = () => {
           title: t('menu.about'),
           desc: t('navCards.aboutDesc'),
           icon: Info,
-          href: 'https://d-mind.my.canva.site/',
+          href: 'https://d-mind.my.canva.site/about-the-company',
           badge: isEn ? 'Canva Web' : 'รายละเอียดโครงการ',
           gradient: 'from-pink-500/15 via-pink-500/5 to-transparent',
           iconBg: 'bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/20',

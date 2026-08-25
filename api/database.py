@@ -53,6 +53,28 @@ class Database:
                     FOREIGN KEY (query_id) REFERENCES queries(id) ON DELETE CASCADE
                 )
             """)
+            # Table to store contact form messages
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS contact_messages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT,
+                    subject TEXT,
+                    message TEXT NOT NULL,
+                    sent_to_telegram INTEGER DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            # Table to store Telegram subscribers / active chat IDs
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS telegram_subscribers (
+                    chat_id TEXT PRIMARY KEY,
+                    first_name TEXT,
+                    username TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
             conn.commit()
 
             # Schema migration in case database already exists
@@ -282,3 +304,43 @@ class Database:
             conn.execute("DELETE FROM model_responses")
             conn.execute("DELETE FROM queries")
             conn.commit()
+
+    def save_contact_message(self, name, email, phone, subject, message, sent_to_telegram=0):
+        """Save a new contact message and return its ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """INSERT INTO contact_messages (name, email, phone, subject, message, sent_to_telegram)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (name, email, phone, subject, message, sent_to_telegram)
+            )
+            conn.commit()
+            return cursor.lastrowid
+
+    def save_telegram_subscriber(self, chat_id, first_name="", username=""):
+        """Register or update a Telegram subscriber."""
+        with self.get_connection() as conn:
+            conn.execute(
+                """INSERT INTO telegram_subscribers (chat_id, first_name, username)
+                   VALUES (?, ?, ?)
+                   ON CONFLICT(chat_id) DO UPDATE SET 
+                   first_name=excluded.first_name, 
+                   username=excluded.username""",
+                (str(chat_id), first_name or "", username or "")
+            )
+            conn.commit()
+
+    def get_telegram_subscribers(self):
+        """Get list of registered Telegram chat IDs."""
+        with self.get_connection() as conn:
+            rows = conn.execute("SELECT chat_id FROM telegram_subscribers").fetchall()
+            return [str(r["chat_id"]) for r in rows]
+
+    def get_contact_messages(self, limit=50):
+        """Get latest contact form submissions."""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                "SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT ?",
+                (limit,)
+            ).fetchall()
+            return [dict(r) for r in rows]

@@ -30,7 +30,7 @@ const NavBar: React.FC<NavBarProps> = ({
   };
 
   const handleAboutClick = () => {
-    window.open('https://d-mind.my.canva.site/', '_blank');
+    window.open('https://d-mind.my.canva.site/about-the-company', '_blank');
   };
 
   if (isMobile) {
