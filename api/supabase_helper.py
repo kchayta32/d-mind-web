@@ -113,18 +113,16 @@ class SupabaseHelper:
         self.tables = self.discover_tables()
         self.db_cache = {}
         self.table_row_counts = {}
+        from concurrent.futures import ThreadPoolExecutor
 
-        for table in self.tables:
+        def fetch_table(table):
             try:
-                # Fetch all rows (supporting pagination if table has >= 1000 rows)
                 all_rows = []
                 offset = 0
                 page_size = 1000
-                
                 while True:
                     table_url = f"{self.url}{table}?select=*&limit={page_size}&offset={offset}"
                     response = requests.get(table_url, headers=self.headers, timeout=15)
-                    
                     if response.status_code == 200:
                         rows = response.json()
                         if not rows:
@@ -134,23 +132,21 @@ class SupabaseHelper:
                             break
                         offset += page_size
                     else:
-                        print(f"[SupabaseHelper] Warning: Table {table} returned status {response.status_code}")
                         break
-
-                self.db_cache[table] = all_rows
-                self.table_row_counts[table] = len(all_rows)
-                if len(all_rows) > 0:
-                    print(f"  [+] Cached table '{table}': {len(all_rows)} rows")
-                else:
-                    print(f"  [-] Table '{table}' is empty (0 rows)")
-
+                return table, all_rows
             except Exception as e:
-                self.db_cache[table] = []
-                self.table_row_counts[table] = 0
                 print(f"[SupabaseHelper] Error caching table {table}: {e}")
+                return table, []
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            results = executor.map(fetch_table, self.tables)
+
+        for table, rows in results:
+            self.db_cache[table] = rows
+            self.table_row_counts[table] = len(rows)
 
         total_rows = sum(len(r) for r in self.db_cache.values())
-        print(f"[SupabaseHelper] Cache refreshed successfully: {len(self.db_cache)} tables, {total_rows} total rows.")
+        print(f"[SupabaseHelper] Cache refreshed successfully (parallel): {len(self.db_cache)} tables, {total_rows} total rows.")
 
     def tokenize_query(self, query):
         """
