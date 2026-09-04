@@ -41,3 +41,5 @@ ratings.db
 *.sln
 *.sw?
 .vercel
+.vercel_python_packages
+

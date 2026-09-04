@@ -1,55 +1,75 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "redirects": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/rag-web",
-      "destination": "/rag-web/",
-      "permanent": false
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     },
     {
-      "source": "/arena",
-      "destination": "/arena/",
-      "permanent": false
-    },
-    {
-      "source": "/news_web",
-      "destination": "/news_web/",
-      "permanent": false
+      "src": "api/index.py",
+      "use": "@vercel/python"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
     },
     {
-      "source": "/rag-web/",
-      "destination": "/rag-web/index.html"
+      "src": "/rag-web",
+      "status": 307,
+      "headers": {
+        "Location": "/rag-web/"
+      }
     },
     {
-      "source": "/rag-web",
-      "destination": "/rag-web/index.html"
+      "src": "/rag-web/(.*)",
+      "dest": "/rag-web/$1"
     },
     {
-      "source": "/arena/",
-      "destination": "/arena/index.html"
+      "src": "/rag-web/",
+      "dest": "/rag-web/index.html"
     },
     {
-      "source": "/arena",
-      "destination": "/arena/index.html"
+      "src": "/arena",
+      "status": 307,
+      "headers": {
+        "Location": "/arena/"
+      }
     },
     {
-      "source": "/news_web/",
-      "destination": "/news_web/index.html"
+      "src": "/arena/(.*)",
+      "dest": "/arena/$1"
     },
     {
-      "source": "/news_web",
-      "destination": "/news_web/index.html"
+      "src": "/arena/",
+      "dest": "/arena/index.html"
     },
     {
-      "source": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\.ico|robots\\.txt|.*\\..*).*)",
-      "destination": "/index.html"
+      "src": "/news_web",
+      "status": 307,
+      "headers": {
+        "Location": "/news_web/"
+      }
+    },
+    {
+      "src": "/news_web/(.*)",
+      "dest": "/news_web/$1"
+    },
+    {
+      "src": "/news_web/",
+      "dest": "/news_web/index.html"
+    },
+    {
+      "src": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\.ico|robots\\.txt|.*\\..*).*)",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }

@@ -234,7 +234,14 @@ function setupServerModal() {
     if (!modal || !settingsBtn) return;
 
     function openModal() {
-        input.value = getApiBaseUrl() || (window.location.protocol === "file:" ? "https://d-mind-six.vercel.app" : window.location.origin);
+        const savedUrl = localStorage.getItem("custom_api_base_url");
+        if (savedUrl) {
+            input.value = savedUrl;
+        } else if (window.location.protocol === "file:") {
+            input.value = "https://d-mind-six.vercel.app";
+        } else {
+            input.value = window.location.origin;
+        }
         statusMsg.textContent = "";
         statusMsg.className = "";
         modal.classList.remove("hidden");
@@ -252,29 +259,21 @@ function setupServerModal() {
         if (e.target === modal) closeModal();
     });
 
-    if (setCloudBtn) {
-        setCloudBtn.addEventListener("click", () => {
-            input.value = "https://d-mind-six.vercel.app";
-            statusMsg.textContent = "";
-        });
-    }
+    function testConnection(overrideUrl) {
+        const targetUrl = (overrideUrl !== undefined ? overrideUrl : input.value.trim()).replace(/\/+$/, "");
+        statusMsg.style.color = "var(--text-muted)";
+        statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังทดสอบการเชื่อมต่อ...';
+        
+        // Check for Mixed Content warning when testing http:// on https://
+        if (window.location.protocol === 'https:' && targetUrl.startsWith('http:')) {
+            statusMsg.style.color = "#f43f5e";
+            statusMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> เบราว์เซอร์บล็อกการเชื่อมต่อ HTTP จากหน้า HTTPS (Mixed Content) กรุณาใช้ Cloud Backend หรือเปิดผ่าน localhost';
+            return;
+        }
 
-    if (setLocalBtn) {
-        setLocalBtn.addEventListener("click", () => {
-            input.value = "http://localhost:8080";
-            statusMsg.textContent = "";
-        });
-    }
-
-    if (testBtn) {
-        testBtn.addEventListener("click", async () => {
-            const targetUrl = (input.value.trim() || "").replace(/\/+$/, "");
-            statusMsg.style.color = "var(--text-muted)";
-            statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังทดสอบการเชื่อมต่อ...';
-            
-            try {
-                const testEndpoint = targetUrl ? `${targetUrl}/api/health` : "/api/health";
-                const res = await fetch(testEndpoint, { method: "GET" });
+        const testEndpoint = targetUrl ? `${targetUrl}/api/health` : "/api/health";
+        fetch(testEndpoint, { method: "GET" })
+            .then(async (res) => {
                 if (res.ok) {
                     const data = await res.json();
                     statusMsg.style.color = "#10b981";
@@ -283,11 +282,29 @@ function setupServerModal() {
                     statusMsg.style.color = "#f43f5e";
                     statusMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ไม่สามารถเชื่อมต่อได้ (HTTP ${res.status})`;
                 }
-            } catch (err) {
+            })
+            .catch((err) => {
                 statusMsg.style.color = "#f43f5e";
                 statusMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> เชื่อมต่อล้มเหลว (${err.message})`;
-            }
+            });
+    }
+
+    if (setCloudBtn) {
+        setCloudBtn.addEventListener("click", () => {
+            input.value = "https://d-mind-six.vercel.app";
+            testConnection("https://d-mind-six.vercel.app");
         });
+    }
+
+    if (setLocalBtn) {
+        setLocalBtn.addEventListener("click", () => {
+            input.value = "http://localhost:8080";
+            testConnection("http://localhost:8080");
+        });
+    }
+
+    if (testBtn) {
+        testBtn.addEventListener("click", () => testConnection());
     }
 
     if (saveBtn) {
