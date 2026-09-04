@@ -31,10 +31,12 @@ const SUGGESTIONS = {
         "เขียนโค้ด Python เรียงลำดับตัวเลขแบบ Quicksort"
     ],
     mode2: [
+        "ใน schema public มีตารางอะไรบ้าง และมีข้อมูลอะไรบ้าง",
         "พยากรณ์อากาศในกรุงเทพมหานครและปริมณฑลเป็นอย่างไร",
+        "ข้อมูลค่าความชื้นและการตรวจจับฝนจากเซ็นเซอร์ from_rain_sensor เป็นอย่างไร",
+        "ค่าฝุ่นละออง PM2.5 และคุณภาพอากาศล่าสุดจากตาราง pm_logs มีเท่าไร",
         "มีรายงานแผ่นดินไหวล่าสุดเกิดขึ้นที่ไหนและขนาดเท่าไหร่บ้าง",
-        "ข้อมูลค่าความชื้นและการตรวจจับฝนจากเซ็นเซอร์เป็นอย่างไร",
-        "ขอข้อมูลผู้ประสบภัยจากตาราง victim_reports",
+        "ขอข้อมูลผู้ประสบภัยจากตาราง victim_reports และรายงานเหตุการณ์ incident_reports",
         "สรุปข้อมูลการเตรียมตัวรับมือภัยพิบัติในตาราง documents",
         "ข้อเสนอแนะในการปรับปรุงระบบจากแบบประเมิน satisfaction_surveys มีอะไรบ้าง",
         "ตาราง demo_app_surveys มีความคิดเห็นเกี่ยวกับ UX อย่างไรบ้าง"
@@ -45,6 +47,9 @@ const SUGGESTIONS = {
 let currentState = {
     activeTab: 'chat-tab',
     currentQueryId: null,
+    currentQueryText: "",
+    currentMode: "mode1",
+    currentContext: "",
     selectedHistoryQueryId: null,
     isQuerying: false,
     stats: null,
@@ -99,18 +104,21 @@ function setupTheme() {
 
 // Tab Navigation Manager
 function setupTabNavigation() {
-    const navButtons = document.querySelectorAll(".nav-btn");
+    const navButtons = document.querySelectorAll(".nav-btn[data-tab]");
     const tabPanels = document.querySelectorAll(".tab-panel");
 
     navButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const tabId = btn.getAttribute("data-tab");
+            if (!tabId) return;
+            const targetPanel = document.getElementById(tabId);
+            if (!targetPanel) return;
             
             navButtons.forEach(b => b.classList.remove("active"));
             tabPanels.forEach(p => p.classList.remove("active"));
             
             btn.classList.add("active");
-            document.getElementById(tabId).classList.add("active");
+            targetPanel.classList.add("active");
             
             currentState.activeTab = tabId;
             
@@ -359,6 +367,9 @@ async function handleSendQuery() {
         
         const startData = await startResponse.json();
         currentState.currentQueryId = startData.query_id;
+        currentState.currentQueryText = queryText;
+        currentState.currentMode = mode;
+        currentState.currentContext = startData.context || "";
         
         // Show RAG Matches if Mode 1 or Mode 2
         if (startData.matches && startData.matches.length > 0) {
@@ -380,9 +391,9 @@ async function handleSendQuery() {
             ragList.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">ไม่พบข้อมูลอ้างอิงตรงกับคำค้นหาใน Supabase</div>`;
         }
         
-        // Step 2: Query 10 LLM models in parallel (asynchronously)
+        // Step 2: Query 8 LLM models in parallel (asynchronously)
         const modelPromises = Object.keys(MODELS).map(idx => {
-            return askModel(currentState.currentQueryId, idx);
+            return askModel(currentState.currentQueryId, idx, queryText, mode, currentState.currentContext);
         });
         
         // Wait for all models to resolve
@@ -502,23 +513,51 @@ function initializeLLMGrid() {
     });
 }
 
+// Helper to escape HTML characters in text
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Request details for an individual model asynchronously
-async function askModel(queryId, modelIndex) {
+async function askModel(queryId, modelIndex, queryText = "", mode = "mode1", context = "") {
     const indicator = document.getElementById(`status-indicator-${modelIndex}`);
     const loaderText = document.querySelector(`#loader-${modelIndex} .loader-text`);
+    const modelStart = Date.now();
     
     // Set status to loading
     indicator.className = "status-indicator status-loading";
     loaderText.textContent = "กำลังพิมพ์คำตอบ...";
     
     try {
+        const payload = {
+            query_id: queryId,
+            model_index: modelIndex,
+            query: queryText || (currentState.currentQueryText || ""),
+            mode: mode || (currentState.currentMode || "mode1"),
+            context: context || (currentState.currentContext || "")
+        };
+
         const response = await apiFetch("/api/ask_model", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query_id: queryId, model_index: modelIndex })
+            body: JSON.stringify(payload)
         });
         
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = {
+                status_code: response.status,
+                error: `HTTP ${response.status}: ${response.statusText || 'Server Response Error'}`
+            };
+        }
         
         // Remove loader and placeholder
         const bodyDiv = document.getElementById(`card-body-${modelIndex}`);
@@ -527,34 +566,67 @@ async function askModel(queryId, modelIndex) {
         const footerLatency = document.querySelector(`#latency-${modelIndex} span`);
         const ratingWidget = document.getElementById(`rating-widget-${modelIndex}`);
         
-        // Format latency display (ms or seconds)
-        const latencySecs = data.latency_ms / 1000;
-        footerLatency.textContent = `${latencySecs.toFixed(2)}s`;
+        // Format latency display safely (NEVER NaN)
+        let latencySecs = "-";
+        if (typeof data.latency_ms === "number" && !isNaN(data.latency_ms) && data.latency_ms > 0) {
+            latencySecs = `${(data.latency_ms / 1000).toFixed(2)}s`;
+        } else {
+            latencySecs = `${((Date.now() - modelStart) / 1000).toFixed(2)}s`;
+        }
+        if (footerLatency) footerLatency.textContent = latencySecs;
         
-        if (data.status_code === 200) {
+        // Determine response text safely (NEVER undefined or null)
+        let text = data.response_text;
+        if (text === undefined || text === null || text === "") {
+            if (data.error) {
+                text = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
+            } else if (data.message) {
+                text = data.message;
+            } else if (!response.ok) {
+                text = `เกิดข้อผิดพลาดในการเชื่อมต่อ (HTTP ${response.status})`;
+            } else {
+                text = "(โมเดลไม่ส่งข้อความตอบกลับกลับมา)";
+            }
+        }
+        
+        if (response.ok && (data.status_code === 200 || !data.status_code)) {
             indicator.className = "status-indicator status-success";
             
             // Format response with highlighting for table references in RAG Mode
-            let text = data.response_text;
-            // Bold match table names in Thai (e.g. ตาราง documents หรือ ตาราง incident_reports)
-            text = text.replace(/(ตาราง\s+[a-zA-Z0-9_]+)/g, '<strong style="color:var(--primary-light);">$1</strong>');
+            let formattedText = String(text).replace(/(ตาราง\s+[a-zA-Z0-9_]+)/g, '<strong style="color:var(--primary-light);">$1</strong>');
             
-            bodyDiv.innerHTML = `<div class="response-text">${text}</div>`;
+            // Format <think> reasoning tags into collapsible block
+            if (formattedText.includes('<think>')) {
+                if (formattedText.includes('</think>')) {
+                    formattedText = formattedText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, p1) => {
+                        return `<details class="think-box"><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                    });
+                } else {
+                    formattedText = formattedText.replace(/<think>([\s\S]*)/gi, (match, p1) => {
+                        return `<details class="think-box" open><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                    });
+                }
+            }
+            
+            bodyDiv.innerHTML = `<div class="response-text">${formattedText}</div>`;
             
             // Show interactive ratings stars widget
-            ratingWidget.classList.remove("hidden");
-            setupEvaluationListeners(queryId, modelIndex, MODELS[modelIndex].name, data.is_correct, data.is_hallucinated);
+            if (ratingWidget) ratingWidget.classList.remove("hidden");
+            setupEvaluationListeners(queryId, modelIndex, MODELS[modelIndex].name, data.is_correct ?? 1, data.is_hallucinated ?? 0);
             
         } else {
             indicator.className = "status-indicator status-error";
-            bodyDiv.innerHTML = `<div class="error-text">${data.response_text}</div>`;
+            bodyDiv.innerHTML = `<div class="error-text">${escapeHtml(text)}</div>`;
         }
         
     } catch (err) {
         console.error(`Error with model ${modelIndex}:`, err);
         indicator.className = "status-indicator status-error";
         const bodyDiv = document.getElementById(`card-body-${modelIndex}`);
-        bodyDiv.innerHTML = `<div class="error-text">Network Error: ${err.message}</div>`;
+        const elapsed = ((Date.now() - modelStart) / 1000).toFixed(2);
+        const footerLatency = document.querySelector(`#latency-${modelIndex} span`);
+        if (footerLatency) footerLatency.textContent = `${elapsed}s`;
+        bodyDiv.innerHTML = `<div class="error-text">ข้อผิดพลาดในการเชื่อมต่อ: ${escapeHtml(err.message)}</div>`;
     }
 }
 
@@ -1011,16 +1083,28 @@ function renderHistoryDetails(historyItem) {
         const responseDiv = document.createElement("div");
         responseDiv.className = "detail-response-item";
         
-        const latencySecs = r.latency_ms / 1000;
+        const latencySecs = (typeof r.latency_ms === 'number' && !isNaN(r.latency_ms)) ? (r.latency_ms / 1000).toFixed(2) + 's' : '-';
+        let bodyText = r.response_text || '(ไม่มีข้อความตอบกลับ)';
+        if (bodyText.includes('<think>')) {
+            if (bodyText.includes('</think>')) {
+                bodyText = bodyText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, p1) => {
+                    return `<details class="think-box"><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                });
+            } else {
+                bodyText = bodyText.replace(/<think>([\s\S]*)/gi, (match, p1) => {
+                    return `<details class="think-box" open><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                });
+            }
+        }
         
         responseDiv.innerHTML = `
             <div class="detail-item-header">
                 <span class="detail-item-name">${display}</span>
                 <span class="detail-item-meta">
-                    ความเร็ว: ${latencySecs.toFixed(2)}s | สถานะ: HTTP ${r.status_code}
+                    ความเร็ว: ${latencySecs} | สถานะ: HTTP ${r.status_code || 200}
                 </span>
             </div>
-            <div class="detail-item-body">${r.response_text}</div>
+            <div class="detail-item-body">${bodyText}</div>
             <div class="card-footer" style="padding: 10px 0 0 0; border: none; background: transparent; flex-direction: column; align-items: stretch; gap: 8px;">
                 <div class="evaluation-widget">
                     <div class="eval-row">

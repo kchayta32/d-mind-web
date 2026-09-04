@@ -12,7 +12,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="index.css">
+    <!-- Main Style: Support /rag-web, /rag-web/, and file:/// seamlessly -->
+    <link rel="stylesheet" href="/rag-web/index.css" id="main-css" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.href='index.css';}">
+    <script>
+        // Ensure paths resolve correctly under all environments (Vercel /rag-web, subpaths, and file:///)
+        (function() {
+            var isFile = window.location.protocol === 'file:' || !window.location.host;
+            var isLocalFolder = window.location.pathname.indexOf('/rag-web') === -1;
+            if (isFile || isLocalFolder) {
+                var cssEl = document.getElementById('main-css');
+                if (cssEl) cssEl.href = 'index.css';
+            } else if (window.location.pathname === '/rag-web') {
+                window.history.replaceState(null, '', '/rag-web/' + window.location.search + window.location.hash);
+            }
+        })();
+    </script>
 </head>
 <body class="dark-mode">
     <div class="app-container">
@@ -26,6 +40,11 @@
                 <span class="version-tag">v1.0.0</span>
             </div>
             
+            <a href="/" class="home-portal-link" title="กลับสู่หน้าหลักระบบ D-Mind">
+                <i class="fa-solid fa-house"></i>
+                <span>กลับสู่หน้าหลัก D-Mind</span>
+            </a>
+
             <nav class="nav-menu">
                 <button class="nav-btn active" data-tab="chat-tab">
                     <i class="fa-solid fa-comments"></i>
@@ -36,7 +55,7 @@
                     <span>การวิเคราะห์กราฟ</span>
                 </button>
                 <button class="nav-btn" data-tab="history-tab">
-                    <i class="fa-solid fa-history"></i>
+                    <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>ประวัติการถามตอบ</span>
                 </button>
             </nav>
@@ -84,7 +103,7 @@
                 <div class="chat-layout">
                     <!-- Control / Input Panel -->
                     <div class="input-panel glassmorphism">
-                        <h3><i class="fa-solid fa-sliders-h"></i> ตั้งค่าการตั้งคำถาม</h3>
+                        <h3><i class="fa-solid fa-sliders"></i> ตั้งค่าการตั้งคำถาม</h3>
                         
                         <!-- Mode Selector Tiles -->
                         <div class="mode-selector">
@@ -141,7 +160,7 @@
                     <!-- LLM Grid Responses Panel -->
                     <div class="responses-panel">
                         <div class="section-title-bar">
-                            <h3><i class="fa-solid fa-grid-2"></i> ผลลัพธ์การประมวลผลโมเดล (ประมวลผลขนานขนานกัน)</h3>
+                            <h3><i class="fa-solid fa-table-cells-large"></i> ผลลัพธ์การประมวลผลโมเดล (ประมวลผลขนานขนานกัน)</h3>
                             <div class="time-elapsed-container hidden" id="timer-box">
                                 <i class="fa-regular fa-clock"></i> ใช้เวลารวม: <span id="total-timer">0.00</span> วินาที
                             </div>
@@ -247,7 +266,7 @@
                     <div class="history-header">
                         <h3><i class="fa-solid fa-clock-rotate-left"></i> ประวัติการเปรียบเทียบย้อนหลัง</h3>
                         <button id="clear-history-btn" class="danger-btn">
-                            <i class="fa-solid fa-trash-alt"></i> ล้างประวัติทั้งหมด
+                            <i class="fa-solid fa-trash-can"></i> ล้างประวัติทั้งหมด
                         </button>
                     </div>
                     
@@ -322,9 +341,29 @@
 
     <!-- Notification Toast -->
     <div id="toast" class="toast hidden">
-        <i id="toast-icon" class="fa-solid fa-info-circle"></i>
+        <i id="toast-icon" class="fa-solid fa-circle-info"></i>
         <span id="toast-message">แจ้งเตือน...</span>
     </div>
-    <script src="index.js"></script>
+    <script>
+        // Dynamic script loading with fallback support for all hosting routes and file:///
+        (function() {
+            var isFile = window.location.protocol === 'file:' || !window.location.host;
+            var isLocalFolder = window.location.pathname.indexOf('/rag-web') === -1;
+            var script = document.createElement('script');
+            script.src = (isFile || isLocalFolder) ? 'index.js' : '/rag-web/index.js';
+            script.onerror = function() {
+                if (!this.dataset.retried) {
+                    var fb = document.createElement('script');
+                    fb.dataset.retried = '1';
+                    fb.src = (isFile || isLocalFolder) ? '/rag-web/index.js' : 'index.js';
+                    document.body.appendChild(fb);
+                }
+            };
+            document.body.appendChild(script);
+        })();
+    </script>
+    <noscript>
+        <script src="/rag-web/index.js"></script>
+    </noscript>
 </body>
 </html>

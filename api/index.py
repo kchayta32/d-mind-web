@@ -198,7 +198,7 @@ def start_query():
     context = ""
     matches = []
     if mode in ["mode1", "mode2"]:
-        search_results = supabase_helper.search(query_text, limit=12)
+        search_results = supabase_helper.search(query_text, limit=16)
         context = supabase_helper.format_context_for_llm(search_results)
         
         # Prepare list of matches for reference in frontend UI
@@ -251,7 +251,27 @@ def auto_evaluate_response(response_text, is_context_empty, mode):
             return 0, 0
         else:
             # Successfully answered using retrieved context
-            return 1, 0
+def _clean_error_message(status_code, text, provider_name="API"):
+    if not text:
+        return f"Error {status_code}: ไม่ได้รับข้อความตอบกลับจากเซิร์ฟเวอร์ {provider_name}"
+    if "<!DOCTYPE" in text or "<html" in text:
+        if status_code in (502, 503, 504):
+            return f"Error {status_code}: บริการ {provider_name} ปิดปรับปรุงชั่วคราวหรือมีปัญหาการเชื่อมต่อเกตเวย์ (Bad Gateway / Service Unavailable)"
+        return f"Error {status_code}: ผู้ให้บริการ {provider_name} ตอบกลับหน้าเว็บข้อผิดพลาด HTML"
+    try:
+        import json
+        j = json.loads(text)
+        if isinstance(j, dict):
+            if "error" in j:
+                err = j["error"]
+                if isinstance(err, dict):
+                    return f"Error {status_code}: {err.get('message', str(err))}"
+                return f"Error {status_code}: {str(err)}"
+            if "message" in j:
+                return f"Error {status_code}: {j['message']}"
+    except Exception:
+        pass
+    return f"Error {status_code}: {text[:250]}"
 
 @app.route('/api/ask_model', methods=['POST'])
 @app.route('/ask_model', methods=['POST'])
@@ -260,52 +280,102 @@ def ask_model():
     query_id = data.get("query_id")
     model_index = data.get("model_index")
     
-    if not query_id or not model_index:
-        return jsonify({"error": "Missing query_id or model_index"}), 400
+    if not model_index:
+        return jsonify({
+            "error": "Missing model_index",
+            "response_text": "เกิดข้อผิดพลาด: ไม่พบ model_index",
+            "status_code": 400,
+            "latency_ms": 0
+        }), 400
         
-    model_index = int(model_index)
+    try:
+        model_index = int(model_index)
+    except (ValueError, TypeError):
+        return jsonify({
+            "error": "Invalid model_index",
+            "response_text": "เกิดข้อผิดพลาด: model_index ไม่ถูกต้อง",
+            "status_code": 400,
+            "latency_ms": 0
+        }), 400
+
     if model_index not in MODELS:
-        return jsonify({"error": "Invalid model index"}), 400
-        
-    # Retrieve query details
-    with db.get_connection() as conn:
-        q = conn.execute("SELECT * FROM queries WHERE id = ?", (query_id,)).fetchone()
-        
-    if not q:
-        return jsonify({"error": "Query not found"}), 404
-        
-    query_text = q["query_text"]
-    mode = q["mode"]
-    
+        return jsonify({
+            "error": "Invalid model index",
+            "response_text": f"เกิดข้อผิดพลาด: ไม่พบโมเดลลำดับที่ {model_index}",
+            "status_code": 400,
+            "latency_ms": 0
+        }), 400
+
     model_info = MODELS[model_index]
     model_name = model_info["name"]
     display_name = model_info["display"]
     provider = model_info["provider"]
     api_model = model_info["api_model"]
-    
-    # 1. Fetch RAG Context if Mode 1 or Mode 2
-    context = ""
-    if mode in ["mode1", "mode2"]:
-        search_results = supabase_helper.search(query_text, limit=12)
+
+    # 1. Retrieve query details: prioritize direct body parameters (resilient across serverless containers)
+    query_text = (data.get("query") or "").strip()
+    mode = data.get("mode") or ""
+    context = data.get("context") or ""
+
+    # If query or mode were not sent in payload, look up from DB
+    if not query_text or not mode:
+        if query_id:
+            try:
+                with db.get_connection() as conn:
+                    q = conn.execute("SELECT * FROM queries WHERE id = ?", (query_id,)).fetchone()
+                    if q:
+                        query_text = q["query_text"]
+                        mode = q["mode"]
+            except Exception as e:
+                print(f"DB query lookup error: {e}")
+
+    if not query_text:
+        return jsonify({
+            "error": "Query not found",
+            "response_text": "เกิดข้อผิดพลาด: ไม่พบข้อมูลคำถามในเซสชันนี้ กรุณาส่งคำถามใหม่อีกครั้ง",
+            "status_code": 404,
+            "latency_ms": 0,
+            "model_name": model_name,
+            "display_name": display_name
+        }), 404
+
+    # Ensure query exists in this instance's SQLite database to prevent foreign key errors
+    if query_id:
+        try:
+            with db.get_connection() as conn:
+                existing = conn.execute("SELECT id FROM queries WHERE id = ?", (query_id,)).fetchone()
+                if not existing:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO queries (id, query_text, mode) VALUES (?, ?, ?)",
+                        (query_id, query_text, mode)
+                    )
+                    conn.commit()
+        except Exception as e:
+            print(f"Warning syncing query into local DB: {e}")
+
+    # If context was not provided in request body, retrieve it now
+    if not context and mode in ["mode1", "mode2"]:
+        search_results = supabase_helper.search(query_text, limit=16)
         context = supabase_helper.format_context_for_llm(search_results)
-           # 2. Build LLM prompt
+
+    # 2. Build LLM prompt
     if mode == "mode2":
         prompt = (
             f"[คำสั่งควบคุมระบบ: สำคัญที่สุด]\n"
-            f"1. คุณต้องใช้เฉพาะข้อมูลสนับสนุนจากระบบฐานข้อมูล Supabase ที่เตรียมให้ต่อไปนี้เท่านั้นในการตอบคำถาม\n"
-            f"2. หากข้อมูลในตารางไม่เพียงพอหรือไม่พบคำตอบในฐานข้อมูลนี้ หรือข้อมูลมีค่าเป็น \"ไม่พบข้อมูลที่เกี่ยวข้องในฐานข้อมูล Supabase\" "
-            f"คุณต้องตอบกลับอย่างสุภาพว่า \"ไม่พบข้อมูลนี้ในฐานข้อมูล\" เท่านั้น และห้ามตอบข้อมูลอื่น ห้ามแต่งเรื่อง ห้ามคิดคำตอบเอง ห้ามคาดเดา หรืออิงความรู้ภายนอกระบบโดยเด็ดขาด\n"
-            f"3. ห้ามทำนอกเหนือจากคำสั่งนี้อย่างเด็ดขาด\n\n"
-            f"=== ข้อมูลสนับสนุนจากฐานข้อมูล Supabase ===\n"
+            f"1. คุณต้องใช้เฉพาะข้อมูลสนับสนุนจากระบบฐานข้อมูล Supabase (Schema Public) ทั้งหมด 30 ตารางที่เตรียมให้ต่อไปนี้ในการตอบคำถาม\n"
+            f"2. คุณสามารถอ่านข้อมูลได้ทั้งในระดับโครงสร้างตาราง (แคตตาล็อกตาราง, จำนวนแถว, คอลัมน์) และข้อมูลรายละเอียดแถวในแต่ละตาราง\n"
+            f"3. หากข้อมูลในตารางไม่เพียงพอหรือไม่พบคำตอบในฐานข้อมูลนี้ คุณต้องตอบกลับอย่างสุภาพว่า \"ไม่พบข้อมูลนี้ในฐานข้อมูล\" เท่านั้น และห้ามตอบข้อมูลอื่น ห้ามแต่งเรื่อง ห้ามคิดคำตอบเอง ห้ามคาดเดา หรืออิงความรู้ภายนอกระบบโดยเด็ดขาด\n"
+            f"4. หากผู้ใช้ถามถึงภาพรวม โครงสร้าง หรือสถานะของตารางใน Schema Public ให้ใช้ข้อมูลจากแคตตาล็อกตารางตอบได้ทันที\n\n"
+            f"=== ข้อมูลสนับสนุนจากฐานข้อมูล Supabase (Schema Public) ===\n"
             f"{context}\n\n"
             f"=== คำถามของผู้ใช้ ===\n"
             f"{query_text}\n\n"
             f"[ข้อกำหนดในการตอบกลับ]\n"
-            f"- หากพบข้อมูลและสามารถตอบได้: คุณต้องระบุด้วยว่าคุณอ้างอิงหรือใช้ข้อมูลจากตารางอะไรบ้างในการตอบคำถามนี้ โดยระบุชื่อตารางให้ชัดเจน (เช่น 'ข้อมูลนี้อยู่ในตาราง documents')\n"
+            f"- หากพบข้อมูลและสามารถตอบได้: คุณต้องระบุด้วยว่าคุณอ้างอิงหรือใช้ข้อมูลจากตารางอะไรบ้างใน Schema Public โดยระบุชื่อตารางให้ชัดเจน (เช่น 'ข้อมูลนี้อยู่ในตาราง documents' หรือ 'ตาราง from_rain_sensor มี 5 แถว')\n"
             f"- หากไม่พบข้อมูล: ให้ตอบว่า \"ไม่พบข้อมูลนี้ในฐานข้อมูล\" เท่านั้น ห้ามตอบอย่างอื่นเด็ดขาด"
         )
     else:
-        # mode1: ตอบคำถามที่ไม่มีใน Supabase (หรือคาดว่าจะไม่มี)
+        # mode1: ตอบคำถามที่ไม่มีใน Supabase
         prompt = (
             f"[คำสั่งควบคุมระบบ: สำคัญที่สุด]\n"
             f"1. คุณต้องใช้เฉพาะข้อมูลสนับสนุนจากระบบฐานข้อมูล Supabase ที่เตรียมให้ต่อไปนี้เท่านั้นในการตอบคำถาม\n"
@@ -345,9 +415,23 @@ def ask_model():
             status_code = resp.status_code
             if resp.status_code == 200:
                 resp_json = resp.json()
-                response_text = resp_json.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                choices = resp_json.get("choices") or []
+                if choices:
+                    msg = choices[0].get("message") or {}
+                    content = msg.get("content")
+                    reasoning = msg.get("reasoning_content") or msg.get("reasoning")
+                    if not content and reasoning:
+                        content = reasoning
+                    if isinstance(content, str):
+                        response_text = content.strip()
+                    elif content is not None:
+                        response_text = str(content).strip()
+                    else:
+                        response_text = ""
+                if not response_text:
+                    response_text = "(โมเดลไม่ส่งข้อความตอบกลับกลับมา)"
             else:
-                response_text = f"Error {resp.status_code}: {resp.text}"
+                response_text = _clean_error_message(resp.status_code, resp.text, "ThaiLLM")
                 
         elif provider == "ollama":
             ollama_success = False
@@ -365,7 +449,14 @@ def ask_model():
                 status_code = resp.status_code
                 if resp.status_code == 200:
                     resp_json = resp.json()
-                    response_text = resp_json.get("message", {}).get("content", "").strip()
+                    msg = resp_json.get("message") or {}
+                    content = msg.get("content")
+                    if isinstance(content, str):
+                        response_text = content.strip()
+                    elif content is not None:
+                        response_text = str(content).strip()
+                    else:
+                        response_text = ""
                     ollama_success = True
             except Exception:
                 ollama_success = False
@@ -387,10 +478,17 @@ def ask_model():
                     status_code = cloud_resp.status_code
                     if cloud_resp.status_code == 200:
                         cloud_json = cloud_resp.json()
-                        response_text = cloud_json.get("message", {}).get("content", "").strip()
+                        msg = cloud_json.get("message") or {}
+                        content = msg.get("content")
+                        if isinstance(content, str):
+                            response_text = content.strip()
+                        elif content is not None:
+                            response_text = str(content).strip()
+                        else:
+                            response_text = ""
                         ollama_success = True
                     else:
-                        response_text = f"Error {cloud_resp.status_code}: {cloud_resp.text}"
+                        response_text = _clean_error_message(cloud_resp.status_code, cloud_resp.text, "Ollama Cloud")
                 except Exception as ex:
                     response_text = f"Error connecting to Ollama Cloud: {str(ex)}"
 
@@ -406,7 +504,6 @@ def ask_model():
                 "HTTP-Referer": "https://d-mind.vercel.app",
                 "X-Title": "D-MIND RAG Evaluation"
             }
-            # Resilient models routing: requests primary requested model with active free fallbacks
             fallback_map = {
                 "deepseek/deepseek-r1:free": ["deepseek/deepseek-r1:free", "minimax/minimax-m3:free", "nvidia/nemotron-3-super-120b-a12b:free"],
                 "meta-llama/llama-3.3-70b-instruct:free": ["meta-llama/llama-3.3-70b-instruct:free", "nvidia/nemotron-3-super-120b-a12b:free", "minimax/minimax-m3:free"]
@@ -423,13 +520,23 @@ def ask_model():
             status_code = resp.status_code
             if resp.status_code == 200:
                 resp_json = resp.json()
-                response_text = resp_json.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                choices = resp_json.get("choices") or []
+                if choices:
+                    msg = choices[0].get("message") or {}
+                    content = msg.get("content")
+                    reasoning = msg.get("reasoning_content") or msg.get("reasoning")
+                    if not content and reasoning:
+                        content = reasoning
+                    if isinstance(content, str):
+                        response_text = content.strip()
+                    elif content is not None:
+                        response_text = str(content).strip()
+                    else:
+                        response_text = ""
+                if not response_text:
+                    response_text = "(โมเดลไม่ส่งข้อความตอบกลับกลับมา)"
             else:
-                try:
-                    err_json = resp.json()
-                    response_text = f"Error {resp.status_code}: {err_json.get('error', {}).get('message', resp.text)}"
-                except:
-                    response_text = f"Error {resp.status_code}: {resp.text}"
+                response_text = _clean_error_message(resp.status_code, resp.text, "OpenRouter")
                     
         elif provider == "google":
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{api_model}:generateContent?key={GOOGLE_API_KEY}"
@@ -457,19 +564,19 @@ def ask_model():
                 except (KeyError, IndexError):
                     response_text = f"Error: Unexpected Google API response format: {resp_json}"
             else:
-                response_text = f"Error {resp.status_code}: {resp.text}"
+                response_text = _clean_error_message(resp.status_code, resp.text, "Google Gemini")
                     
     except Exception as e:
         status_code = 500
         response_text = f"Failed to connect to API: {str(e)}"
         
     latency_ms = (time.time() - start_time) * 1000
+    response_text = str(response_text or "")
     
     # 3.5 Auto-evaluate response correctness & hallucination
     is_context_empty = True
     if mode in ["mode1", "mode2"]:
-        search_results = supabase_helper.search(query_text, limit=8)
-        if search_results and len(search_results) > 0:
+        if context and "ไม่พบข้อมูลที่เกี่ยวข้องในฐานข้อมูล" not in context:
             is_context_empty = False
 
     if status_code == 200:
@@ -477,16 +584,21 @@ def ask_model():
     else:
         is_correct, is_hallucinated = 0, 0
 
-    # 4. Save response to SQLite
-    response_id = db.save_model_response(
-        query_id=query_id,
-        model_name=model_name,
-        response_text=response_text,
-        latency_ms=latency_ms,
-        status_code=status_code,
-        is_correct=is_correct,
-        is_hallucinated=is_hallucinated
-    )
+    # 4. Save response to SQLite (with safety wrapper)
+    response_id = None
+    try:
+        effective_query_id = query_id or 0
+        response_id = db.save_model_response(
+            query_id=effective_query_id,
+            model_name=model_name,
+            response_text=response_text,
+            latency_ms=latency_ms,
+            status_code=status_code,
+            is_correct=is_correct,
+            is_hallucinated=is_hallucinated
+        )
+    except Exception as e:
+        print(f"Warning saving response to DB: {e}")
     
     return jsonify({
         "response_id": response_id,

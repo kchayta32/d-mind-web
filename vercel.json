@@ -1,25 +1,54 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/rag-web",
+      "destination": "/rag-web/",
+      "permanent": false
+    },
+    {
+      "source": "/arena",
+      "destination": "/arena/",
+      "permanent": false
+    },
+    {
+      "source": "/news_web",
+      "destination": "/news_web/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.py"
     },
     {
+      "source": "/rag-web/",
+      "destination": "/rag-web/index.html"
+    },
+    {
       "source": "/rag-web",
       "destination": "/rag-web/index.html"
+    },
+    {
+      "source": "/arena/",
+      "destination": "/arena/index.html"
     },
     {
       "source": "/arena",
       "destination": "/arena/index.html"
     },
     {
+      "source": "/news_web/",
+      "destination": "/news_web/index.html"
+    },
+    {
       "source": "/news_web",
       "destination": "/news_web/index.html"
     },
     {
-      "source": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\\\.ico|robots\\\\.txt|.*\\\\..*).*)",
+      "source": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\.ico|robots\\.txt|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]

@@ -12,7 +12,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="index.css">
+    <!-- Main Style: Support /arena, /arena/, and file:/// seamlessly -->
+    <link rel="stylesheet" href="/arena/index.css" id="main-css" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.href='index.css';}">
+    <script>
+        // Ensure paths resolve correctly under all environments (Vercel /arena, subpaths, and file:///)
+        (function() {
+            var isFile = window.location.protocol === 'file:' || !window.location.host;
+            var isLocalFolder = window.location.pathname.indexOf('/arena') === -1;
+            if (isFile || isLocalFolder) {
+                var cssEl = document.getElementById('main-css');
+                if (cssEl) cssEl.href = 'index.css';
+            } else if (window.location.pathname === '/arena') {
+                window.history.replaceState(null, '', '/arena/' + window.location.search + window.location.hash);
+            }
+        })();
+    </script>
 </head>
 <body class="dark-mode">
     <div class="app-container">
@@ -285,6 +299,26 @@
         <i id="toast-icon" class="fa-solid fa-info-circle"></i>
         <span id="toast-message">แจ้งเตือน...</span>
     </div>
-    <script src="index.js"></script>
+    <script>
+        // Dynamic script loading with fallback support for all hosting routes and file:///
+        (function() {
+            var isFile = window.location.protocol === 'file:' || !window.location.host;
+            var isLocalFolder = window.location.pathname.indexOf('/arena') === -1;
+            var script = document.createElement('script');
+            script.src = (isFile || isLocalFolder) ? 'index.js' : '/arena/index.js';
+            script.onerror = function() {
+                if (!this.dataset.retried) {
+                    var fb = document.createElement('script');
+                    fb.dataset.retried = '1';
+                    fb.src = (isFile || isLocalFolder) ? '/arena/index.js' : 'index.js';
+                    document.body.appendChild(fb);
+                }
+            };
+            document.body.appendChild(script);
+        })();
+    </script>
+    <noscript>
+        <script src="/arena/index.js"></script>
+    </noscript>
 </body>
 </html>

@@ -1460,3 +1460,171 @@ body.light-mode .eval-progress-bar {
     color: #fff;
     background: rgba(255, 255, 255, 0.08);
 }
+
+/* Reasoning & Thinking Box */
+.think-box {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+}
+.think-box summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--primary-light);
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.think-box summary:hover {
+    filter: brightness(1.2);
+}
+.think-content {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Home Portal Navigation Link */
+.home-portal-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+.home-portal-link:hover {
+    color: #fff;
+    background: rgba(37, 99, 235, 0.15);
+    border-color: var(--primary-light);
+    transform: translateX(-2px);
+}
+.home-portal-link i {
+    color: var(--primary-light);
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints & Mobile Adaptability
+   ========================================================================== */
+@media (max-width: 1280px) {
+    .chat-layout {
+        grid-template-columns: 340px 1fr;
+        gap: 20px;
+    }
+    .llm-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 992px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-glass);
+        padding: 16px 20px;
+    }
+    .sidebar-header {
+        margin-bottom: 12px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .nav-menu {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .sidebar-footer {
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        gap: 8px;
+    }
+    .main-content {
+        padding: 20px;
+        height: auto;
+        overflow-y: visible;
+    }
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .chat-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        height: auto;
+    }
+    .analytics-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .history-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        height: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        padding: 14px;
+    }
+    .header-info h1 {
+        font-size: 1.35rem;
+    }
+    .header-info p {
+        font-size: 0.85rem;
+    }
+    .stats-overview {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .stat-mini-card {
+        flex: 1 1 calc(33.333% - 10px);
+        min-width: 80px;
+        padding: 6px 10px;
+    }
+    .llm-grid {
+        grid-template-columns: 1fr;
+    }
+    .graph-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .graph-controls {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    .control-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
