@@ -9,6 +9,29 @@ api_dir = os.path.dirname(os.path.abspath(__file__))
 if api_dir not in sys.path:
     sys.path.insert(0, api_dir)
 
+# Load environment variables if .env exists
+def _load_env():
+    current = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(3):
+        env_file = os.path.join(current, ".env")
+        if os.path.isfile(env_file):
+            try:
+                with open(env_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            k = k.strip()
+                            v = v.strip().strip('"\'')
+                            if k not in os.environ:
+                                os.environ[k] = v
+            except Exception:
+                pass
+            break
+        current = os.path.dirname(current)
+
+_load_env()
+
 from database import Database
 from supabase_helper import SupabaseHelper
 
@@ -69,29 +92,6 @@ MODELS = {
         "api_model": "meta-llama/llama-3.3-70b-instruct:free"
     }
 }
-
-# Load environment variables if .env exists
-def _load_env():
-    current = os.path.dirname(os.path.abspath(__file__))
-    for _ in range(3):
-        env_file = os.path.join(current, ".env")
-        if os.path.isfile(env_file):
-            try:
-                with open(env_file, "r", encoding="utf-8") as f:
-                    for line in f:
-                        line = line.strip()
-                        if line and not line.startswith("#") and "=" in line:
-                            k, v = line.split("=", 1)
-                            k = k.strip()
-                            v = v.strip().strip('"\'')
-                            if k not in os.environ:
-                                os.environ[k] = v
-            except Exception:
-                pass
-            break
-        current = os.path.dirname(current)
-
-_load_env()
 
 THAILLM_API_KEY = os.environ.get("THAILLM_API_KEY", "")
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")

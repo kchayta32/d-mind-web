@@ -172,6 +172,28 @@ if (document.readyState === "loading") {
     initApp();
 }
 
+// Live listener for Firebase Realtime Database
+window.addEventListener("firebase-ready", () => {
+    console.log("[RAG Web] Firebase RTDB connected, synchronizing...");
+    if (window.FirebaseRTDB && window.firebaseDb) {
+        try {
+            const { ref, onValue } = window.FirebaseRTDB;
+            const queriesRef = ref(window.firebaseDb, "queries");
+            onValue(queriesRef, () => {
+                if (currentState.activeTab === "history-tab") {
+                    loadHistory();
+                } else if (currentState.activeTab === "analytics-tab") {
+                    loadStats().then(() => renderChart());
+                } else {
+                    loadStats();
+                }
+            });
+        } catch (e) {
+            console.warn("[Firebase RTDB Sync]", e);
+        }
+    }
+});
+
 // Theme Manager (Dark/Light mode toggle initialization)
 function setupTheme() {
     const themeBtn = document.getElementById("theme-toggle-btn");

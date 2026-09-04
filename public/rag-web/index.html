@@ -344,6 +344,36 @@
         <i id="toast-icon" class="fa-solid fa-circle-info"></i>
         <span id="toast-message">แจ้งเตือน...</span>
     </div>
+    <!-- Firebase App & Realtime Database SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getDatabase, ref, get, set, child, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB14mzwqqDgifaySBF93DOC2yLDSDjyl58",
+            authDomain: "d-mind-e11fc.firebaseapp.com",
+            databaseURL: "https://d-mind-e11fc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "d-mind-e11fc",
+            storageBucket: "d-mind-e11fc.firebasestorage.app",
+            messagingSenderId: "167116374407",
+            appId: "1:167116374407:web:342dd6206c57b5e0c71322",
+            measurementId: "G-CBV8ZXP0NF"
+        };
+
+        try {
+            window.firebaseApp = initializeApp(firebaseConfig);
+            window.firebaseDb = getDatabase(window.firebaseApp);
+            if (typeof window !== "undefined" && window.location.protocol.startsWith("http")) {
+                window.firebaseAnalytics = getAnalytics(window.firebaseApp);
+            }
+            window.FirebaseRTDB = { ref, get, set, child, onValue };
+            window.dispatchEvent(new CustomEvent("firebase-ready", { detail: { db: window.firebaseDb } }));
+            console.log("[Firebase] Initialized with Realtime Database:", firebaseConfig.databaseURL);
+        } catch (err) {
+            console.warn("[Firebase] Initialization notice:", err);
+        }
+    </script>
     <!-- Core Application Script -->
     <script src="/rag-web/index.js" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='index.js';}"></script>
     <script>
