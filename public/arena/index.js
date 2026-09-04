@@ -55,7 +55,7 @@ let currentState = {
 };
 
 // Initialize Application
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
     setupTheme();
     setupTabNavigation();
     setupModeSelector();
@@ -63,7 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshSuggestions();
     loadStats();
     loadHistory();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
+} else {
+    initApp();
+}
 
 // Theme Manager (Dark/Light mode toggle initialization)
 function setupTheme() {

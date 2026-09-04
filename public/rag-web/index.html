@@ -344,26 +344,14 @@
         <i id="toast-icon" class="fa-solid fa-circle-info"></i>
         <span id="toast-message">แจ้งเตือน...</span>
     </div>
+    <!-- Core Application Script -->
+    <script src="/rag-web/index.js" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='index.js';}"></script>
     <script>
-        // Dynamic script loading with fallback support for all hosting routes and file:///
-        (function() {
-            var isFile = window.location.protocol === 'file:' || !window.location.host;
-            var isLocalFolder = window.location.pathname.indexOf('/rag-web') === -1;
-            var script = document.createElement('script');
-            script.src = (isFile || isLocalFolder) ? 'index.js' : '/rag-web/index.js';
-            script.onerror = function() {
-                if (!this.dataset.retried) {
-                    var fb = document.createElement('script');
-                    fb.dataset.retried = '1';
-                    fb.src = (isFile || isLocalFolder) ? '/rag-web/index.js' : 'index.js';
-                    document.body.appendChild(fb);
-                }
-            };
-            document.body.appendChild(script);
-        })();
+        // Fallback for file:/// direct filesystem preview
+        if (window.location.protocol === 'file:' || !window.location.host) {
+            var currentScript = document.querySelector('script[src="/rag-web/index.js"]');
+            if (currentScript) currentScript.src = 'index.js';
+        }
     </script>
-    <noscript>
-        <script src="/rag-web/index.js"></script>
-    </noscript>
 </body>
 </html>
