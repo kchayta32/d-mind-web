@@ -54,12 +54,29 @@ let currentState = {
     overallStartTime: null
 };
 
+// Base URL resolution for both Web server and file:/// direct browsing
+function getApiBaseUrl() {
+    const customUrl = localStorage.getItem("custom_api_base_url");
+    if (customUrl) return customUrl.replace(/\/+$/, "");
+    if (window.location.protocol === "file:") {
+        return "https://d-mind-six.vercel.app";
+    }
+    return "";
+}
+
+async function apiFetch(endpoint, options = {}) {
+    const baseUrl = getApiBaseUrl();
+    const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint;
+    return fetch(url, options);
+}
+
 // Initialize Application
 document.addEventListener("DOMContentLoaded", () => {
     setupTheme();
     setupTabNavigation();
     setupModeSelector();
     setupEventListeners();
+    setupServerModal();
     refreshSuggestions();
     loadStats();
     loadHistory();
@@ -187,6 +204,94 @@ function setupEventListeners() {
     });
 }
 
+// Setup Server Configuration Modal
+function setupServerModal() {
+    const modal = document.getElementById("server-modal");
+    const settingsBtn = document.getElementById("server-settings-btn");
+    const closeBtn = document.getElementById("close-modal-btn");
+    const cancelBtn = document.getElementById("cancel-modal-btn");
+    const saveBtn = document.getElementById("save-modal-btn");
+    const setCloudBtn = document.getElementById("set-cloud-btn");
+    const setLocalBtn = document.getElementById("set-local-btn");
+    const testBtn = document.getElementById("test-connection-btn");
+    const input = document.getElementById("server-url-input");
+    const statusMsg = document.getElementById("connection-status-msg");
+
+    if (!modal || !settingsBtn) return;
+
+    function openModal() {
+        input.value = getApiBaseUrl() || (window.location.protocol === "file:" ? "https://d-mind-six.vercel.app" : window.location.origin);
+        statusMsg.textContent = "";
+        statusMsg.className = "";
+        modal.classList.remove("hidden");
+    }
+
+    function closeModal() {
+        modal.classList.add("hidden");
+    }
+
+    settingsBtn.addEventListener("click", openModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+    
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    if (setCloudBtn) {
+        setCloudBtn.addEventListener("click", () => {
+            input.value = "https://d-mind-six.vercel.app";
+            statusMsg.textContent = "";
+        });
+    }
+
+    if (setLocalBtn) {
+        setLocalBtn.addEventListener("click", () => {
+            input.value = "http://localhost:8080";
+            statusMsg.textContent = "";
+        });
+    }
+
+    if (testBtn) {
+        testBtn.addEventListener("click", async () => {
+            const targetUrl = (input.value.trim() || "").replace(/\/+$/, "");
+            statusMsg.style.color = "var(--text-muted)";
+            statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังทดสอบการเชื่อมต่อ...';
+            
+            try {
+                const testEndpoint = targetUrl ? `${targetUrl}/api/health` : "/api/health";
+                const res = await fetch(testEndpoint, { method: "GET" });
+                if (res.ok) {
+                    const data = await res.json();
+                    statusMsg.style.color = "#10b981";
+                    statusMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> เชื่อมต่อสำเร็จ! (สถานะ: ${data.status || 'OK'})`;
+                } else {
+                    statusMsg.style.color = "#f43f5e";
+                    statusMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ไม่สามารถเชื่อมต่อได้ (HTTP ${res.status})`;
+                }
+            } catch (err) {
+                statusMsg.style.color = "#f43f5e";
+                statusMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> เชื่อมต่อล้มเหลว (${err.message})`;
+            }
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener("click", () => {
+            const url = (input.value.trim() || "").replace(/\/+$/, "");
+            if (url) {
+                localStorage.setItem("custom_api_base_url", url);
+            } else {
+                localStorage.removeItem("custom_api_base_url");
+            }
+            showToast("บันทึกการตั้งค่า API Base URL เรียบร้อยแล้ว", "success");
+            closeModal();
+            loadStats();
+            loadHistory();
+        });
+    }
+}
+
 // Toast System
 function showToast(message, type = 'info') {
     const toast = document.getElementById("toast");
@@ -242,7 +347,7 @@ async function handleSendQuery() {
     
     try {
         // Step 1: Start Query on server
-        const startResponse = await fetch("/api/start_query", {
+        const startResponse = await apiFetch("/api/start_query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query: queryText, mode: mode })
@@ -407,7 +512,7 @@ async function askModel(queryId, modelIndex) {
     loaderText.textContent = "กำลังพิมพ์คำตอบ...";
     
     try {
-        const response = await fetch("/api/ask_model", {
+        const response = await apiFetch("/api/ask_model", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query_id: queryId, model_index: modelIndex })
@@ -496,7 +601,7 @@ async function saveEvaluation(queryId, modelName, isCorrect, isHallucinated, onS
     if (isHallucinated !== null) payload.is_hallucinated = isHallucinated;
 
     try {
-        const response = await fetch("/api/rate_response", {
+        const response = await apiFetch("/api/rate_response", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -519,7 +624,7 @@ async function saveEvaluation(queryId, modelName, isCorrect, isHallucinated, onS
 // Load statistics from database
 async function loadStats() {
     try {
-        const resp = await fetch("/api/stats");
+        const resp = await apiFetch("/api/stats");
         const stats = await resp.json();
         currentState.stats = stats;
         
@@ -817,7 +922,7 @@ function renderChart() {
 // Fetch query logs from server
 async function loadHistory() {
     try {
-        const response = await fetch("/api/history");
+        const response = await apiFetch("/api/history");
         const history = await response.json();
         currentState.history = history;
         
@@ -991,7 +1096,7 @@ async function handleDeleteQuery(queryId, queryText) {
     }
     
     try {
-        const response = await fetch("/api/delete_query", {
+        const response = await apiFetch("/api/delete_query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query_id: queryId })
@@ -1022,7 +1127,7 @@ async function handleClearHistory() {
     }
     
     try {
-        const response = await fetch("/api/clear", { method: "POST" });
+        const response = await apiFetch("/api/clear", { method: "POST" });
         if (response.ok) {
             showToast("ล้างประวัติคำถามและการประเมินโมเดลสำเร็จ", "success");
             
@@ -1047,7 +1152,7 @@ async function handleRefreshSupabase() {
     btnIcon.classList.add("fa-spin");
     
     try {
-        const response = await fetch("/api/refresh_supabase", { method: "POST" });
+        const response = await apiFetch("/api/refresh_supabase", { method: "POST" });
         if (response.ok) {
             showToast("อัปเดตและแคชตารางข้อมูลทั้งหมดจาก Supabase สำเร็จ", "success");
         } else {

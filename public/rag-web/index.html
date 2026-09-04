@@ -42,6 +42,9 @@
             </nav>
             
             <div class="sidebar-footer">
+                <button id="server-settings-btn" class="secondary-btn">
+                    <i class="fa-solid fa-server"></i> <span>ตั้งค่าเซิร์ฟเวอร์</span>
+                </button>
                 <button id="theme-toggle-btn" class="secondary-btn">
                     <i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>
                 </button>
@@ -278,6 +281,43 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Server Configuration Modal -->
+    <div id="server-modal" class="modal-overlay hidden">
+        <div class="modal-card glassmorphism">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-network-wired"></i> ตั้งค่าการเชื่อมต่อ API เซิร์ฟเวอร์</h3>
+                <button id="close-modal-btn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">
+                    เมื่อเปิดหน้าเว็บผ่าน <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;">file:///</code> ระบบจะเชื่อมต่อไปยัง Cloud Backend อัตโนมัติ หรือท่านสามารถสลับเป็น Local Server ได้:
+                </p>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:0.85rem;margin-bottom:6px;font-weight:600;">API Base URL:</label>
+                        <input id="server-url-input" type="text" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border-card);background:var(--textarea-bg);color:var(--text-main);font-size:0.95rem;" placeholder="https://d-mind-six.vercel.app">
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+                        <button type="button" id="set-cloud-btn" class="secondary-btn" style="padding:6px 12px;font-size:0.8rem;">
+                            <i class="fa-solid fa-cloud"></i> ใช้ Cloud Backend (Vercel)
+                        </button>
+                        <button type="button" id="set-local-btn" class="secondary-btn" style="padding:6px 12px;font-size:0.8rem;">
+                            <i class="fa-solid fa-laptop"></i> ใช้ Local (localhost:8080)
+                        </button>
+                        <button type="button" id="test-connection-btn" class="primary-btn" style="padding:6px 14px;font-size:0.8rem;">
+                            <i class="fa-solid fa-bolt"></i> ทดสอบการเชื่อมต่อ
+                        </button>
+                    </div>
+                    <div id="connection-status-msg" style="font-size:0.85rem;min-height:20px;margin-top:4px;"></div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border-card);">
+                <button type="button" id="cancel-modal-btn" class="secondary-btn" style="padding:8px 16px;">ปิด</button>
+                <button type="button" id="save-modal-btn" class="primary-btn" style="padding:8px 20px;">บันทึกและใช้งาน</button>
+            </div>
+        </div>
     </div>
 
     <!-- Notification Toast -->

@@ -169,6 +169,14 @@ def send_telegram_alert(html_text):
     return sent_count
 
 
+# Enable CORS for file:// protocol, localhost and web origins
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+    return response
+
 # Serves frontend static files
 @app.route('/')
 @app.route('/api/health', methods=['GET'])
