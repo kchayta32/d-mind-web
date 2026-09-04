@@ -89,6 +89,10 @@ class Database:
             if "is_hallucinated" not in columns:
                 conn.execute("ALTER TABLE model_responses ADD COLUMN is_hallucinated INTEGER DEFAULT 0")
                 altered = True
+            # Add indexes for query and history performance
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_model_responses_query_id ON model_responses(query_id)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_model_responses_model_name ON model_responses(model_name)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_queries_mode ON queries(mode)")
             
             if altered:
                 conn.commit()

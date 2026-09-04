@@ -1,13 +1,13 @@
-// Model Dictionary to match indices (8 Models remaining after deletion and replacement)
+// Model Dictionary to match indices (8 Models)
 const MODELS = {
-    1: { name: "OpenThaiGPT-ThaiLLM-8B-Instruct-v7.2", display: "OpenThaiGPT 8B v7.2", provider: "thaillm" },
-    2: { name: "Pathumma-ThaiLLM-qwen3-8b-think-3.0.0", display: "Pathumma 8B Think 3.0", provider: "thaillm" },
-    3: { name: "Typhoon-S-ThaiLLM-8B-Instruct", display: "Typhoon-S 8B Instruct", provider: "thaillm" },
-    4: { name: "THaLLE-0.2-ThaiLLM-8B-fa", display: "THaLLE 0.2 8B FA", provider: "thaillm" },
-    5: { name: "ollama/nemotron-3-super:cloud", display: "Nemotron-3 Super (Local)", provider: "ollama" },
-    6: { name: "ollama/gemma4", display: "Gemma 4 31B (Local)", provider: "ollama" },
-    7: { name: "gemini-flash-latest", display: "Gemini Flash Latest", provider: "google" },
-    8: { name: "ollama/gpt-oss:20b-cloud", display: "GPT-OSS 20B (Local)", provider: "ollama" }
+    1: { name: "openthaigpt-thaillm-8b-instruct-v7.2", display: "OpenThaiGPT 8B v7.2", provider: "thaillm" },
+    2: { name: "pathumma-thaillm-qwen3-8b-think-3.0.0", display: "Pathumma 8B Think 3.0", provider: "thaillm" },
+    3: { name: "typhoon-s-thaillm-8b-instruct", display: "Typhoon-S 8B Instruct", provider: "thaillm" },
+    4: { name: "ollama/gpt-oss:120b-cloud", display: "GPT-OSS 120B (Ollama)", provider: "ollama" },
+    5: { name: "ollama/nemotron-3-super:cloud", display: "Nemotron-3 Super (Ollama)", provider: "ollama" },
+    6: { name: "ollama/gemma4", display: "Gemma 4 31B (Ollama)", provider: "ollama" },
+    7: { name: "openrouter/deepseek-r1:free", display: "DeepSeek R1 (OpenRouter)", provider: "openrouter" },
+    8: { name: "openrouter/llama-3.3-70b:free", display: "Llama 3.3 70B (OpenRouter)", provider: "openrouter" }
 };
 
 // Distinct premium colors for each of the 8 models
@@ -15,11 +15,11 @@ const MODEL_COLORS = {
     1: { border: '#f97316', bg: 'rgba(249, 115, 22, 0.75)' }, // OpenThaiGPT: Orange
     2: { border: '#eab308', bg: 'rgba(234, 179, 8, 0.75)' },  // Pathumma: Yellow
     3: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.75)' }, // Typhoon: Green
-    4: { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.75)' },  // THaLLE: Cyan
+    4: { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.75)' },  // GPT-OSS: Cyan
     5: { border: '#6366f1', bg: 'rgba(99, 102, 241, 0.75)' }, // Nemotron: Indigo
     6: { border: '#f43f5e', bg: 'rgba(244, 63, 94, 0.75)' },  // Gemma: Rose
-    7: { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.75)' }, // Gemini: Lime
-    8: { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.75)' }  // GPT-OSS: Violet
+    7: { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.75)' }, // DeepSeek R1: Purple
+    8: { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.75)' }  // Llama 3.3: Sky Blue
 };
 
 // Suggestions Data
@@ -356,7 +356,7 @@ function initializeLLMGrid() {
             <div class="card-header">
                 <div class="model-title-block">
                     <h4>${model.display}</h4>
-                    <span class="provider-badge badge-${model.provider}">${model.provider === 'thaillm' ? 'ThaiLLM API' : model.provider === 'openrouter' ? 'OpenRouter' : model.provider === 'google' ? 'Google API' : 'Ollama (Local)'}</span>
+                    <span class="provider-badge badge-${model.provider}">${model.provider === 'thaillm' ? 'ThaiLLM API' : model.provider === 'openrouter' ? 'OpenRouter' : model.provider === 'google' ? 'Google API' : 'Ollama Cloud'}</span>
                 </div>
                 <div class="card-status-block">
                     <span class="status-indicator status-waiting" id="status-indicator-${idx}"></span>
