@@ -251,6 +251,8 @@ def auto_evaluate_response(response_text, is_context_empty, mode):
             return 0, 0
         else:
             # Successfully answered using retrieved context
+            return 1, 0
+
 def _clean_error_message(status_code, text, provider_name="API"):
     if not text:
         return f"Error {status_code}: ไม่ได้รับข้อความตอบกลับจากเซิร์ฟเวอร์ {provider_name}"
