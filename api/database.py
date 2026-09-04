@@ -229,20 +229,21 @@ class Database:
             
             for row in model_stats:
                 m_name = row["model_name"]
+                total_resp = row["total_responses"] or 1
                 sum_correct = row["sum_correct"] if row["sum_correct"] is not None else 0
                 sum_hallucinated = row["sum_hallucinated"] if row["sum_hallucinated"] is not None else 0
                 sum_latency_ms = row["sum_latency_ms"] if row["sum_latency_ms"] is not None else 0
                 
                 # Formulas:
-                # 1. ความถูกต้องเฉลี่ย (%) = จำนวนคำตอบที่ถูกต้อง ÷ จำนวนคำถามทั้งหมด × 100
-                avg_accuracy = (sum_correct / total_questions) * 100
+                # 1. ความถูกต้องเฉลี่ย (%) = จำนวนคำตอบที่ถูกต้อง ÷ จำนวนคำตอบของโมเดล × 100
+                avg_accuracy = (sum_correct / total_resp) * 100
                 
-                # 2. เวลาตอบกลับเฉลี่ย (วินาที) = ผลรวมเวลาตอบกลับของทุกคำถาม ÷ จำนวนคำถามทั้งหมด
+                # 2. เวลาตอบกลับเฉลี่ย (วินาที) = ผลรวมเวลาตอบกลับ ÷ จำนวนคำตอบของโมเดล
                 # Note: We return avg_latency in ms for front-end compatibility, which divides by 1000 in index.js
-                avg_latency = (sum_latency_ms / total_questions)
+                avg_latency = (sum_latency_ms / total_resp)
                 
-                # 3. อัตราการหลอนของเอไอ (%) = จำนวนคำตอบที่สร้างข้อมูลเองโดยไม่มีแหล่งอ้างอิง ÷ จำนวนคำถามทั้งหมด × 100
-                avg_hallucination = (sum_hallucinated / total_questions) * 100
+                # 3. อัตราการหลอนของเอไอ (%) = จำนวนคำตอบที่สร้างข้อมูลเองโดยไม่มีแหล่งอ้างอิง ÷ จำนวนคำตอบของโมเดล × 100
+                avg_hallucination = (sum_hallucinated / total_resp) * 100
                 
                 stats["models"][m_name] = {
                     "avg_rating": round(avg_accuracy, 2), # for compatibility with old components
@@ -257,6 +258,7 @@ class Database:
                 SELECT 
                     r.model_name,
                     q.mode,
+                    COUNT(*) as mode_resp_count,
                     SUM(r.is_correct) as sum_correct,
                     SUM(r.is_hallucinated) as sum_hallucinated,
                     SUM(r.latency_ms) as sum_latency_ms
@@ -269,19 +271,14 @@ class Database:
             for row in model_stats_by_mode:
                 model = row["model_name"]
                 mode = row["mode"]
+                mode_resp_count = row["mode_resp_count"] or 1
                 sum_correct = row["sum_correct"] if row["sum_correct"] is not None else 0
                 sum_hallucinated = row["sum_hallucinated"] if row["sum_hallucinated"] is not None else 0
                 sum_latency_ms = row["sum_latency_ms"] if row["sum_latency_ms"] is not None else 0
                 
-                mode_total = mode1_count if mode == 'mode1' else mode2_count
-                if mode_total == 0:
-                    avg_accuracy = 0.0
-                    avg_latency = 0.0
-                    avg_hallucination = 0.0
-                else:
-                    avg_accuracy = (sum_correct / mode_total) * 100
-                    avg_latency = (sum_latency_ms / mode_total)
-                    avg_hallucination = (sum_hallucinated / mode_total) * 100
+                avg_accuracy = (sum_correct / mode_resp_count) * 100
+                avg_latency = (sum_latency_ms / mode_resp_count)
+                avg_hallucination = (sum_hallucinated / mode_resp_count) * 100
                     
                 if model not in stats["models_by_mode"]:
                     stats["models_by_mode"][model] = {}
@@ -289,7 +286,8 @@ class Database:
                     "avg_rating": round(avg_accuracy, 2),
                     "avg_accuracy": round(avg_accuracy, 2),
                     "avg_latency": round(avg_latency, 1),
-                    "avg_hallucination": round(avg_hallucination, 2)
+                    "avg_hallucination": round(avg_hallucination, 2),
+                    "count": row["mode_resp_count"]
                 }
                 
             return stats

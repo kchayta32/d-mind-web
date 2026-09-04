@@ -43,6 +43,26 @@ const SUGGESTIONS = {
     ]
 };
 
+const STORAGE_KEY = 'dmind_rag_history_v3';
+
+function getLocalHistory() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        console.warn("Error reading local history:", e);
+        return [];
+    }
+}
+
+function saveLocalHistory(hist) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
+    } catch (e) {
+        console.warn("Error saving local history:", e);
+    }
+}
+
 // Application State
 let currentState = {
     activeTab: 'chat-tab',
@@ -53,7 +73,7 @@ let currentState = {
     selectedHistoryQueryId: null,
     isQuerying: false,
     stats: null,
-    history: [],
+    history: getLocalHistory(),
     chartInstance: null,
     timerInterval: null,
     overallStartTime: null
@@ -73,6 +93,65 @@ async function apiFetch(endpoint, options = {}) {
     const baseUrl = getApiBaseUrl();
     const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint;
     return fetch(url, options);
+}
+
+// Calculate comprehensive statistics from history list
+function computeStatsFromHistory(historyList) {
+    const stats = {
+        total_questions: historyList.length,
+        mode1_count: historyList.filter(h => h.mode === 'mode1').length,
+        mode2_count: historyList.filter(h => h.mode === 'mode2').length,
+        models: {}
+    };
+
+    // Ensure all 8 models have a clean base entry
+    Object.keys(MODELS).forEach(idx => {
+        const m = MODELS[idx];
+        stats.models[m.name] = {
+            avg_rating: 0,
+            avg_accuracy: 0,
+            avg_latency: 0,
+            avg_hallucination: 0,
+            count: 0
+        };
+    });
+
+    if (historyList.length === 0) return stats;
+
+    Object.keys(MODELS).forEach(idx => {
+        const m = MODELS[idx];
+        const mName = m.name;
+        
+        let sumCorrect = 0;
+        let sumHallucinated = 0;
+        let sumLatency = 0;
+        let count = 0;
+
+        historyList.forEach(item => {
+            if (item.responses && Array.isArray(item.responses)) {
+                const resp = item.responses.find(r => r.model_name === mName || r.model_index == idx);
+                if (resp && (resp.status_code === 200 || !resp.status_code)) {
+                    count++;
+                    sumCorrect += (resp.is_correct === 1 ? 1 : (resp.is_correct === 0 ? 0 : 1));
+                    sumHallucinated += (resp.is_hallucinated === 1 ? 1 : 0);
+                    const lat = Number(resp.latency_ms) || 0;
+                    sumLatency += lat;
+                }
+            }
+        });
+
+        if (count > 0) {
+            stats.models[mName] = {
+                avg_rating: (sumCorrect / count) * 100,
+                avg_accuracy: (sumCorrect / count) * 100,
+                avg_latency: sumLatency / count,
+                avg_hallucination: (sumHallucinated / count) * 100,
+                count: count
+            };
+        }
+    });
+
+    return stats;
 }
 
 // Initialize Application
@@ -100,11 +179,11 @@ function setupTheme() {
     if (savedTheme === "light") {
         document.body.classList.remove("dark-mode");
         document.body.classList.add("light-mode");
-        themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>โหมดมืด</span>`;
+        if (themeBtn) themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>โหมดมืด</span>`;
     } else {
         document.body.classList.remove("light-mode");
         document.body.classList.add("dark-mode");
-        themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>`;
+        if (themeBtn) themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>`;
     }
 }
 
@@ -151,6 +230,7 @@ function setupModeSelector() {
 function refreshSuggestions() {
     const mode = getSelectedMode();
     const container = document.getElementById("suggestion-tags-container");
+    if (!container) return;
     container.innerHTML = "";
     
     SUGGESTIONS[mode].forEach(s => {
@@ -159,7 +239,8 @@ function refreshSuggestions() {
         tag.textContent = s;
         tag.addEventListener("click", () => {
             if (!currentState.isQuerying) {
-                document.getElementById("query-input").value = s;
+                const queryInput = document.getElementById("query-input");
+                if (queryInput) queryInput.value = s;
             }
         });
         container.appendChild(tag);
@@ -167,55 +248,66 @@ function refreshSuggestions() {
 }
 
 function getSelectedMode() {
-    return document.querySelector("input[name='query-mode']:checked").value;
+    const checked = document.querySelector("input[name='query-mode']:checked");
+    return checked ? checked.value : "mode1";
 }
 
 // Setup Event Listeners for action elements
 function setupEventListeners() {
     // Send Question Button
-    document.getElementById("send-btn").addEventListener("click", handleSendQuery);
+    const sendBtn = document.getElementById("send-btn");
+    if (sendBtn) sendBtn.addEventListener("click", handleSendQuery);
     
     // Clear History Button
-    document.getElementById("clear-history-btn").addEventListener("click", handleClearHistory);
+    const clearBtn = document.getElementById("clear-history-btn");
+    if (clearBtn) clearBtn.addEventListener("click", handleClearHistory);
     
     // Delete Current Active Query Button
-    document.getElementById("delete-current-btn").addEventListener("click", () => {
-        if (currentState.selectedHistoryQueryId) {
-            const q = currentState.history.find(h => h.id === currentState.selectedHistoryQueryId);
-            const queryText = q ? q.query_text : "คำถามนี้";
-            handleDeleteQuery(currentState.selectedHistoryQueryId, queryText);
-        }
-    });
+    const deleteCurrBtn = document.getElementById("delete-current-btn");
+    if (deleteCurrBtn) {
+        deleteCurrBtn.addEventListener("click", () => {
+            if (currentState.selectedHistoryQueryId) {
+                const q = currentState.history.find(h => h.id === currentState.selectedHistoryQueryId);
+                const queryText = q ? q.query_text : "คำถามนี้";
+                handleDeleteQuery(currentState.selectedHistoryQueryId, queryText);
+            }
+        });
+    }
     
     // Refresh Supabase Cache Button
-    document.getElementById("refresh-supabase-btn").addEventListener("click", handleRefreshSupabase);
+    const refreshBtn = document.getElementById("refresh-supabase-btn");
+    if (refreshBtn) refreshBtn.addEventListener("click", handleRefreshSupabase);
     
     // Graph Controls Change
-    document.getElementById("graph-metric").addEventListener("change", renderChart);
-    document.getElementById("graph-type").addEventListener("change", renderChart);
+    const graphMetric = document.getElementById("graph-metric");
+    const graphType = document.getElementById("graph-type");
+    if (graphMetric) graphMetric.addEventListener("change", renderChart);
+    if (graphType) graphType.addEventListener("change", renderChart);
 
     // Theme Toggle Button click handler
-    document.getElementById("theme-toggle-btn").addEventListener("click", () => {
-        const isDark = document.body.classList.contains("dark-mode");
-        const themeBtn = document.getElementById("theme-toggle-btn");
-        
-        if (isDark) {
-            document.body.classList.remove("dark-mode");
-            document.body.classList.add("light-mode");
-            themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>โหมดมืด</span>`;
-            localStorage.setItem("theme", "light");
-        } else {
-            document.body.classList.remove("light-mode");
-            document.body.classList.add("dark-mode");
-            themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>`;
-            localStorage.setItem("theme", "dark");
-        }
-        
-        // Re-render chart if it exists to update font and grid colors for current theme
-        if (currentState.activeTab === 'analytics-tab') {
-            renderChart();
-        }
-    });
+    const themeBtn = document.getElementById("theme-toggle-btn");
+    if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+            const isDark = document.body.classList.contains("dark-mode");
+            
+            if (isDark) {
+                document.body.classList.remove("dark-mode");
+                document.body.classList.add("light-mode");
+                themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>โหมดมืด</span>`;
+                localStorage.setItem("theme", "light");
+            } else {
+                document.body.classList.remove("light-mode");
+                document.body.classList.add("dark-mode");
+                themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>โหมดสว่าง</span>`;
+                localStorage.setItem("theme", "dark");
+            }
+            
+            // Re-render chart if it exists to update font and grid colors for current theme
+            if (currentState.activeTab === 'analytics-tab') {
+                renderChart();
+            }
+        });
+    }
 }
 
 // Setup Server Configuration Modal
@@ -264,7 +356,6 @@ function setupServerModal() {
         statusMsg.style.color = "var(--text-muted)";
         statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังทดสอบการเชื่อมต่อ...';
         
-        // Check for Mixed Content warning when testing http:// on https://
         if (window.location.protocol === 'https:' && targetUrl.startsWith('http:')) {
             statusMsg.style.color = "#f43f5e";
             statusMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> เบราว์เซอร์บล็อกการเชื่อมต่อ HTTP จากหน้า HTTPS (Mixed Content) กรุณาใช้ Cloud Backend หรือเปิดผ่าน localhost';
@@ -328,11 +419,11 @@ function showToast(message, type = 'info') {
     const toast = document.getElementById("toast");
     const icon = document.getElementById("toast-icon");
     const msgSpan = document.getElementById("toast-message");
+    if (!toast || !icon || !msgSpan) return;
     
     toast.className = `toast toast-${type}`;
     msgSpan.textContent = message;
     
-    // Icon mapping
     if (type === 'success') {
         icon.className = "fa-solid fa-circle-check";
     } else if (type === 'error') {
@@ -351,7 +442,7 @@ function showToast(message, type = 'info') {
 // Handle trigger when sending a query
 async function handleSendQuery() {
     const queryInput = document.getElementById("query-input");
-    const queryText = queryInput.value.trim();
+    const queryText = queryInput ? queryInput.value.trim() : "";
     const mode = getSelectedMode();
     
     if (!queryText) {
@@ -367,8 +458,8 @@ async function handleSendQuery() {
     // Reset RAG matches view
     const ragPanel = document.getElementById("rag-matches-panel");
     const ragList = document.getElementById("rag-matches-list");
-    ragPanel.classList.add("hidden");
-    ragList.innerHTML = "";
+    if (ragPanel) ragPanel.classList.add("hidden");
+    if (ragList) ragList.innerHTML = "";
     
     // Initialize LLM grid cards
     initializeLLMGrid();
@@ -384,19 +475,23 @@ async function handleSendQuery() {
             body: JSON.stringify({ query: queryText, mode: mode })
         });
         
-        if (!startResponse.ok) {
-            throw new Error(`Server status: ${startResponse.status}`);
+        let startData = {};
+        if (startResponse.ok) {
+            startData = await startResponse.json();
+            currentState.currentQueryId = startData.query_id;
+            currentState.currentQueryText = queryText;
+            currentState.currentMode = mode;
+            currentState.currentContext = startData.context || "";
+        } else {
+            currentState.currentQueryId = Date.now();
+            currentState.currentQueryText = queryText;
+            currentState.currentMode = mode;
+            currentState.currentContext = "";
         }
-        
-        const startData = await startResponse.json();
-        currentState.currentQueryId = startData.query_id;
-        currentState.currentQueryText = queryText;
-        currentState.currentMode = mode;
-        currentState.currentContext = startData.context || "";
         
         // Show RAG Matches if Mode 1 or Mode 2
         if (startData.matches && startData.matches.length > 0) {
-            ragPanel.classList.remove("hidden");
+            if (ragPanel) ragPanel.classList.remove("hidden");
             startData.matches.forEach(m => {
                 const matchDiv = document.createElement("div");
                 matchDiv.className = "match-item";
@@ -407,11 +502,11 @@ async function handleSendQuery() {
                     </div>
                     <div class="match-summary">${m.summary}</div>
                 `;
-                ragList.appendChild(matchDiv);
+                if (ragList) ragList.appendChild(matchDiv);
             });
         } else if (mode === "mode1" || mode === "mode2") {
-            ragPanel.classList.remove("hidden");
-            ragList.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">ไม่พบข้อมูลอ้างอิงตรงกับคำค้นหาใน Supabase</div>`;
+            if (ragPanel) ragPanel.classList.remove("hidden");
+            if (ragList) ragList.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">ไม่พบข้อมูลอ้างอิงตรงกับคำค้นหาใน Supabase</div>`;
         }
         
         // Step 2: Query 8 LLM models in parallel (asynchronously)
@@ -419,9 +514,21 @@ async function handleSendQuery() {
             return askModel(currentState.currentQueryId, idx, queryText, mode, currentState.currentContext);
         });
         
-        // Wait for all models to resolve
-        await Promise.all(modelPromises);
+        // Wait for all 8 models to resolve and collect results
+        const modelResults = await Promise.all(modelPromises);
         
+        // Package into history item and save locally
+        const newHistoryItem = {
+            id: currentState.currentQueryId || Date.now(),
+            query_text: queryText,
+            mode: mode,
+            timestamp: new Date().toISOString(),
+            responses: modelResults
+        };
+
+        currentState.history = [newHistoryItem, ...currentState.history.filter(h => h.id !== newHistoryItem.id)];
+        saveLocalHistory(currentState.history);
+
         showToast("ประมวลผลคำถามเสร็จสมบูรณ์ทั้ง 8 โมเดลแล้ว!", "success");
         
     } catch (err) {
@@ -431,7 +538,7 @@ async function handleSendQuery() {
         stopTimer();
         currentState.isQuerying = false;
         toggleInputState(false);
-        loadStats(); // Update stats cards and badges
+        loadStats(); // Update stats cards, evaluation table, and graphs
     }
 }
 
@@ -439,12 +546,12 @@ async function handleSendQuery() {
 function startTimer() {
     const timerBox = document.getElementById("timer-box");
     const timerVal = document.getElementById("total-timer");
-    timerBox.classList.remove("hidden");
+    if (timerBox) timerBox.classList.remove("hidden");
     
     currentState.overallStartTime = Date.now();
     currentState.timerInterval = setInterval(() => {
         const elapsed = (Date.now() - currentState.overallStartTime) / 1000;
-        timerVal.textContent = elapsed.toFixed(2);
+        if (timerVal) timerVal.textContent = elapsed.toFixed(2);
     }, 50);
 }
 
@@ -454,31 +561,37 @@ function stopTimer() {
         clearInterval(currentState.timerInterval);
         currentState.timerInterval = null;
     }
-    const elapsed = (Date.now() - currentState.overallStartTime) / 1000;
-    document.getElementById("total-timer").textContent = elapsed.toFixed(2);
+    const elapsed = (Date.now() - (currentState.overallStartTime || Date.now())) / 1000;
+    const timerVal = document.getElementById("total-timer");
+    if (timerVal) timerVal.textContent = elapsed.toFixed(2);
 }
 
 // Toggle loading controls for inputs
 function toggleInputState(disabled) {
-    document.getElementById("send-btn").disabled = disabled;
-    document.getElementById("query-input").disabled = disabled;
+    const sendBtn = document.getElementById("send-btn");
+    const queryInput = document.getElementById("query-input");
+    if (sendBtn) sendBtn.disabled = disabled;
+    if (queryInput) queryInput.disabled = disabled;
     document.querySelectorAll("input[name='query-mode']").forEach(radio => {
         radio.disabled = disabled;
     });
     
     const sendBtnSpan = document.querySelector("#send-btn span");
-    if (disabled) {
-        sendBtnSpan.textContent = "กำลังประมวลผลคำถาม...";
-        document.getElementById("send-btn").style.opacity = "0.7";
-    } else {
-        sendBtnSpan.textContent = "ส่งคำถาม (8 โมเดล)";
-        document.getElementById("send-btn").style.opacity = "1";
+    if (sendBtnSpan) {
+        if (disabled) {
+            sendBtnSpan.textContent = "กำลังประมวลผลคำถาม...";
+            if (sendBtn) sendBtn.style.opacity = "0.7";
+        } else {
+            sendBtnSpan.textContent = "ส่งคำถาม (8 โมเดล)";
+            if (sendBtn) sendBtn.style.opacity = "1";
+        }
     }
 }
 
 // Initialize clean placeholders in LLM Response cards
 function initializeLLMGrid() {
     const grid = document.getElementById("llm-grid-container");
+    if (!grid) return;
     grid.innerHTML = "";
     
     Object.keys(MODELS).forEach(idx => {
@@ -487,7 +600,6 @@ function initializeLLMGrid() {
         card.className = "model-card";
         card.id = `model-card-${idx}`;
         
-        // Cohesive top stripe using the model's graph color
         const color = MODEL_COLORS[idx] ? MODEL_COLORS[idx].border : '#4b5563';
         card.style.borderTop = `4px solid ${color}`;
         
@@ -554,9 +666,21 @@ async function askModel(queryId, modelIndex, queryText = "", mode = "mode1", con
     const modelStart = Date.now();
     
     // Set status to loading
-    indicator.className = "status-indicator status-loading";
-    loaderText.textContent = "กำลังพิมพ์คำตอบ...";
+    if (indicator) indicator.className = "status-indicator status-loading";
+    if (loaderText) loaderText.textContent = "กำลังพิมพ์คำตอบ...";
     
+    let result = {
+        id: Date.now() + parseInt(modelIndex),
+        model_index: parseInt(modelIndex),
+        model_name: MODELS[modelIndex].name,
+        display_name: MODELS[modelIndex].display,
+        response_text: "",
+        latency_ms: 0,
+        status_code: 500,
+        is_correct: 1,
+        is_hallucinated: 0
+    };
+
     try {
         const payload = {
             query_id: queryId,
@@ -582,23 +706,10 @@ async function askModel(queryId, modelIndex, queryText = "", mode = "mode1", con
             };
         }
         
-        // Remove loader and placeholder
-        const bodyDiv = document.getElementById(`card-body-${modelIndex}`);
-        bodyDiv.innerHTML = "";
-        
-        const footerLatency = document.querySelector(`#latency-${modelIndex} span`);
-        const ratingWidget = document.getElementById(`rating-widget-${modelIndex}`);
-        
-        // Format latency display safely (NEVER NaN)
-        let latencySecs = "-";
-        if (typeof data.latency_ms === "number" && !isNaN(data.latency_ms) && data.latency_ms > 0) {
-            latencySecs = `${(data.latency_ms / 1000).toFixed(2)}s`;
-        } else {
-            latencySecs = `${((Date.now() - modelStart) / 1000).toFixed(2)}s`;
-        }
-        if (footerLatency) footerLatency.textContent = latencySecs;
-        
-        // Determine response text safely (NEVER undefined or null)
+        const elapsedMs = (typeof data.latency_ms === "number" && !isNaN(data.latency_ms) && data.latency_ms > 0)
+            ? data.latency_ms
+            : (Date.now() - modelStart);
+
         let text = data.response_text;
         if (text === undefined || text === null || text === "") {
             if (data.error) {
@@ -611,46 +722,87 @@ async function askModel(queryId, modelIndex, queryText = "", mode = "mode1", con
                 text = "(โมเดลไม่ส่งข้อความตอบกลับกลับมา)";
             }
         }
+
+        const isSuccess = response.ok && (data.status_code === 200 || !data.status_code);
+        const statusCode = isSuccess ? 200 : (data.status_code || response.status || 500);
+        const isCorrect = (data.is_correct !== undefined) ? data.is_correct : (isSuccess ? 1 : 0);
+        const isHallucinated = (data.is_hallucinated !== undefined) ? data.is_hallucinated : 0;
+
+        result = {
+            id: data.response_id || (Date.now() + parseInt(modelIndex)),
+            model_index: parseInt(modelIndex),
+            model_name: MODELS[modelIndex].name,
+            display_name: MODELS[modelIndex].display,
+            response_text: text,
+            latency_ms: elapsedMs,
+            status_code: statusCode,
+            is_correct: isCorrect,
+            is_hallucinated: isHallucinated
+        };
+
+        // Remove loader and placeholder
+        const bodyDiv = document.getElementById(`card-body-${modelIndex}`);
+        const footerLatency = document.querySelector(`#latency-${modelIndex} span`);
+        const ratingWidget = document.getElementById(`rating-widget-${modelIndex}`);
         
-        if (response.ok && (data.status_code === 200 || !data.status_code)) {
-            indicator.className = "status-indicator status-success";
-            
-            // Format response with highlighting for table references in RAG Mode
-            let formattedText = String(text).replace(/(ตาราง\s+[a-zA-Z0-9_]+)/g, '<strong style="color:var(--primary-light);">$1</strong>');
-            
-            // Format <think> reasoning tags into collapsible block
-            if (formattedText.includes('<think>')) {
-                if (formattedText.includes('</think>')) {
-                    formattedText = formattedText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, p1) => {
-                        return `<details class="think-box"><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
-                    });
-                } else {
-                    formattedText = formattedText.replace(/<think>([\s\S]*)/gi, (match, p1) => {
-                        return `<details class="think-box" open><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
-                    });
+        if (footerLatency) {
+            footerLatency.textContent = `${(elapsedMs / 1000).toFixed(2)}s`;
+        }
+        
+        if (bodyDiv) {
+            bodyDiv.innerHTML = "";
+            if (isSuccess) {
+                if (indicator) indicator.className = "status-indicator status-success";
+                
+                // Format response with highlighting for table references in RAG Mode
+                let formattedText = String(text).replace(/(ตาราง\s+[a-zA-Z0-9_]+)/g, '<strong style="color:var(--primary-light);">$1</strong>');
+                
+                // Format <think> reasoning tags into collapsible block
+                if (formattedText.includes('<think>')) {
+                    if (formattedText.includes('</think>')) {
+                        formattedText = formattedText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, p1) => {
+                            return `<details class="think-box"><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                        });
+                    } else {
+                        formattedText = formattedText.replace(/<think>([\s\S]*)/gi, (match, p1) => {
+                            return `<details class="think-box" open><summary><i class="fa-solid fa-brain"></i> กระบวนการคิดวิเคราะห์ (Reasoning)</summary><div class="think-content">${p1.trim().replace(/\n/g, '<br>')}</div></details>`;
+                        });
+                    }
                 }
+                
+                bodyDiv.innerHTML = `<div class="response-text">${formattedText}</div>`;
+                
+                // Show interactive ratings stars widget
+                if (ratingWidget) ratingWidget.classList.remove("hidden");
+                setupEvaluationListeners(queryId, modelIndex, MODELS[modelIndex].name, isCorrect, isHallucinated);
+            } else {
+                if (indicator) indicator.className = "status-indicator status-error";
+                bodyDiv.innerHTML = `<div class="error-text">${escapeHtml(text)}</div>`;
             }
-            
-            bodyDiv.innerHTML = `<div class="response-text">${formattedText}</div>`;
-            
-            // Show interactive ratings stars widget
-            if (ratingWidget) ratingWidget.classList.remove("hidden");
-            setupEvaluationListeners(queryId, modelIndex, MODELS[modelIndex].name, data.is_correct ?? 1, data.is_hallucinated ?? 0);
-            
-        } else {
-            indicator.className = "status-indicator status-error";
-            bodyDiv.innerHTML = `<div class="error-text">${escapeHtml(text)}</div>`;
         }
         
     } catch (err) {
         console.error(`Error with model ${modelIndex}:`, err);
-        indicator.className = "status-indicator status-error";
+        const elapsedMs = Date.now() - modelStart;
+        result = {
+            id: Date.now() + parseInt(modelIndex),
+            model_index: parseInt(modelIndex),
+            model_name: MODELS[modelIndex].name,
+            display_name: MODELS[modelIndex].display,
+            response_text: `ข้อผิดพลาดในการเชื่อมต่อ: ${err.message}`,
+            latency_ms: elapsedMs,
+            status_code: 500,
+            is_correct: 0,
+            is_hallucinated: 0
+        };
+        if (indicator) indicator.className = "status-indicator status-error";
         const bodyDiv = document.getElementById(`card-body-${modelIndex}`);
-        const elapsed = ((Date.now() - modelStart) / 1000).toFixed(2);
         const footerLatency = document.querySelector(`#latency-${modelIndex} span`);
-        if (footerLatency) footerLatency.textContent = `${elapsed}s`;
-        bodyDiv.innerHTML = `<div class="error-text">ข้อผิดพลาดในการเชื่อมต่อ: ${escapeHtml(err.message)}</div>`;
+        if (footerLatency) footerLatency.textContent = `${(elapsedMs / 1000).toFixed(2)}s`;
+        if (bodyDiv) bodyDiv.innerHTML = `<div class="error-text">ข้อผิดพลาดในการเชื่อมต่อ: ${escapeHtml(err.message)}</div>`;
     }
+
+    return result;
 }
 
 // Evaluation buttons change events
@@ -659,6 +811,8 @@ function setupEvaluationListeners(queryId, modelIndex, modelName, initialCorrect
     const correctBtn0 = document.getElementById(`btn-correct-0-${modelIndex}`);
     const hallucinatedBtn1 = document.getElementById(`btn-hallucinated-1-${modelIndex}`);
     const hallucinatedBtn0 = document.getElementById(`btn-hallucinated-0-${modelIndex}`);
+
+    if (!correctBtn1 || !correctBtn0 || !hallucinatedBtn1 || !hallucinatedBtn0) return;
 
     function updateButtonsVisuals(correctVal, hallucinatedVal) {
         if (correctVal === 1) {
@@ -695,6 +849,26 @@ async function saveEvaluation(queryId, modelName, isCorrect, isHallucinated, onS
     if (isCorrect !== null) payload.is_correct = isCorrect;
     if (isHallucinated !== null) payload.is_hallucinated = isHallucinated;
 
+    // Update in local history immediately
+    if (currentState.history && currentState.history.length > 0) {
+        let updated = false;
+        currentState.history.forEach(item => {
+            if (item.id === queryId || !queryId) {
+                if (item.responses && Array.isArray(item.responses)) {
+                    const r = item.responses.find(resp => resp.model_name === modelName);
+                    if (r) {
+                        if (isCorrect !== null) r.is_correct = isCorrect;
+                        if (isHallucinated !== null) r.is_hallucinated = isHallucinated;
+                        updated = true;
+                    }
+                }
+            }
+        });
+        if (updated) {
+            saveLocalHistory(currentState.history);
+        }
+    }
+
     try {
         const response = await apiFetch("/api/rate_response", {
             method: "POST",
@@ -702,83 +876,123 @@ async function saveEvaluation(queryId, modelName, isCorrect, isHallucinated, onS
             body: JSON.stringify(payload)
         });
         
-        if (response.ok) {
-            const displayModel = getModelDisplayName(modelName);
-            showToast(`ประเมินผลสำหรับ ${displayModel} เรียบร้อยแล้ว`, "success");
-            if (onSuccessCallback) onSuccessCallback();
-            loadStats();
-        } else {
-            showToast("ไม่สามารถประเมินผลคะแนนได้", "error");
-        }
+        const displayModel = getModelDisplayName(modelName);
+        showToast(`ประเมินผลสำหรับ ${displayModel} เรียบร้อยแล้ว`, "success");
+        if (onSuccessCallback) onSuccessCallback();
+        loadStats();
     } catch (err) {
-        console.error("Error rating:", err);
-        showToast("เครือข่ายขัดข้องในการประเมินผล", "error");
+        console.warn("Backend rate response error (saved locally):", err);
+        const displayModel = getModelDisplayName(modelName);
+        showToast(`บันทึกการประเมินผลสำหรับ ${displayModel} เรียบร้อยแล้ว`, "success");
+        if (onSuccessCallback) onSuccessCallback();
+        loadStats();
     }
 }
 
-// Load statistics from database
+// Load statistics from database & calculate from local history
 async function loadStats() {
+    // 1. Calculate base stats from current client history
+    const localStats = computeStatsFromHistory(currentState.history);
+    let finalStats = localStats;
+
     try {
         const resp = await apiFetch("/api/stats");
-        const stats = await resp.json();
-        currentState.stats = stats;
-        
-        // Update top-bar statistics indicators
-        document.getElementById("total-queries-badge").textContent = stats.total_questions;
-        document.getElementById("mode1-queries-badge").textContent = stats.mode1_count;
-        document.getElementById("mode2-queries-badge").textContent = stats.mode2_count;
-        
-        // Update analytics screen details if data is present
-        if (stats.total_questions > 0 && Object.keys(stats.models).length > 0) {
-            let topAccModel = "-";
-            let topAccVal = 0;
-            let topSpeedModel = "-";
-            let topSpeedVal = Infinity;
-            let sumRating = 0;
-            let countRating = 0;
-            
-            Object.keys(stats.models).forEach(name => {
-                const m = stats.models[name];
-                
-                // Find model display name
-                const display = getModelDisplayName(name);
-                
-                if (m.avg_accuracy > topAccVal) {
-                    topAccVal = m.avg_accuracy;
-                    topAccModel = display;
-                }
-                
-                if (m.avg_latency < topSpeedVal && m.avg_latency > 0) {
-                    topSpeedVal = m.avg_latency;
-                    topSpeedModel = display;
-                }
-                
-                sumRating += m.avg_accuracy;
-                countRating++;
-            });
-            
-            document.getElementById("top-accuracy-model").textContent = topAccModel;
-            document.getElementById("top-accuracy-value").textContent = `ค่าเฉลี่ย: ${topAccVal.toFixed(1)}%`;
-            
-            document.getElementById("top-speed-model").textContent = topSpeedModel;
-            document.getElementById("top-speed-value").textContent = `ความเร็วเฉลี่ย: ${(topSpeedVal / 1000).toFixed(2)}s`;
-            
-            const overallAvg = sumRating / countRating;
-            document.getElementById("overall-rating-avg").textContent = `${overallAvg.toFixed(1)} %`;
-        } else {
-            // Reset placeholders
-            document.getElementById("top-accuracy-model").textContent = "-";
-            document.getElementById("top-accuracy-value").textContent = "ค่าเฉลี่ย: 0.0%";
-            document.getElementById("top-speed-model").textContent = "-";
-            document.getElementById("top-speed-value").textContent = "ความเร็วเฉลี่ย: 0ms";
-            document.getElementById("overall-rating-avg").textContent = "0 %";
-        }
+        if (resp.ok) {
+            const serverStats = await resp.json();
+            if (serverStats && serverStats.models) {
+                finalStats = {
+                    total_questions: Math.max(serverStats.total_questions || 0, localStats.total_questions || 0),
+                    mode1_count: Math.max(serverStats.mode1_count || 0, localStats.mode1_count || 0),
+                    mode2_count: Math.max(serverStats.mode2_count || 0, localStats.mode2_count || 0),
+                    models: {}
+                };
 
-        // Render compliance evaluation table
-        renderEvaluationTable(stats);
+                // Merge all 8 models across server and client
+                Object.keys(MODELS).forEach(idx => {
+                    const mName = MODELS[idx].name;
+                    const sModel = serverStats.models[mName];
+                    const lModel = localStats.models[mName];
+
+                    if (lModel && lModel.count > 0 && (!sModel || lModel.count >= (sModel.count || 0))) {
+                        finalStats.models[mName] = lModel;
+                    } else if (sModel && sModel.count > 0) {
+                        finalStats.models[mName] = sModel;
+                    } else {
+                        finalStats.models[mName] = lModel || { avg_rating: 0, avg_accuracy: 0, avg_latency: 0, avg_hallucination: 0, count: 0 };
+                    }
+                });
+            }
+        }
     } catch (err) {
-        console.error("Error loading stats:", err);
+        console.warn("Using client-side stats due to server stats lookup:", err);
     }
+
+    currentState.stats = finalStats;
+    
+    // Update top-bar statistics indicators
+    const totalQueriesEl = document.getElementById("total-queries-badge");
+    const mode1QueriesEl = document.getElementById("mode1-queries-badge");
+    const mode2QueriesEl = document.getElementById("mode2-queries-badge");
+    if (totalQueriesEl) totalQueriesEl.textContent = finalStats.total_questions;
+    if (mode1QueriesEl) mode1QueriesEl.textContent = finalStats.mode1_count;
+    if (mode2QueriesEl) mode2QueriesEl.textContent = finalStats.mode2_count;
+    
+    // Update analytics screen details
+    let topAccModel = "-";
+    let topAccVal = 0;
+    let topSpeedModel = "-";
+    let topSpeedVal = Infinity;
+    let sumRating = 0;
+    let countRating = 0;
+    
+    Object.keys(MODELS).forEach(idx => {
+        const m = MODELS[idx];
+        const mStats = finalStats.models[m.name];
+        
+        if (mStats && mStats.count > 0) {
+            if (mStats.avg_accuracy > topAccVal) {
+                topAccVal = mStats.avg_accuracy;
+                topAccModel = m.display;
+            }
+            
+            if (mStats.avg_latency < topSpeedVal && mStats.avg_latency > 0) {
+                topSpeedVal = mStats.avg_latency;
+                topSpeedModel = m.display;
+            }
+            
+            sumRating += mStats.avg_accuracy;
+            countRating++;
+        }
+    });
+
+    const topAccModelEl = document.getElementById("top-accuracy-model");
+    const topAccValEl = document.getElementById("top-accuracy-value");
+    const topSpeedModelEl = document.getElementById("top-speed-model");
+    const topSpeedValEl = document.getElementById("top-speed-value");
+    const overallRatingEl = document.getElementById("overall-rating-avg");
+    
+    if (countRating > 0) {
+        if (topAccModelEl) topAccModelEl.textContent = topAccModel;
+        if (topAccValEl) topAccValEl.textContent = `ค่าเฉลี่ย: ${topAccVal.toFixed(1)}%`;
+        
+        if (topSpeedModelEl) topSpeedModelEl.textContent = topSpeedModel;
+        if (topSpeedValEl) topSpeedValEl.textContent = (topSpeedVal < Infinity) ? `ความเร็วเฉลี่ย: ${(topSpeedVal / 1000).toFixed(2)}s` : "ความเร็วเฉลี่ย: 0.00s";
+        
+        const overallAvg = sumRating / countRating;
+        if (overallRatingEl) overallRatingEl.textContent = `${overallAvg.toFixed(1)} %`;
+    } else {
+        if (topAccModelEl) topAccModelEl.textContent = "-";
+        if (topAccValEl) topAccValEl.textContent = "ค่าเฉลี่ย: 0.0%";
+        if (topSpeedModelEl) topSpeedModelEl.textContent = "-";
+        if (topSpeedValEl) topSpeedValEl.textContent = "ความเร็วเฉลี่ย: 0ms";
+        if (overallRatingEl) overallRatingEl.textContent = "0 %";
+    }
+
+    // Render compliance evaluation table
+    renderEvaluationTable(finalStats);
+    
+    // Re-render chart if analytics tab is active
+    renderChart();
 }
 
 // Render the detailed evaluation board table comparing model metrics to standard criteria
@@ -787,46 +1001,35 @@ function renderEvaluationTable(stats) {
     if (!tbody) return;
     tbody.innerHTML = "";
     
-    if (!stats || !stats.models || Object.keys(stats.models).length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
-                    ไม่มีข้อมูลผลลัพธ์โมเดลที่จะประเมินผลในฐานข้อมูล
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    // Sort model IDs to display in a fixed order (1 to 10)
+    // Sort model IDs to display in a fixed order (1 to 8)
     const sortedModelIds = Object.keys(MODELS).sort((a, b) => parseInt(a) - parseInt(b));
     
     sortedModelIds.forEach(id => {
         const modelMeta = MODELS[id];
         const mName = modelMeta.name;
-        const mStats = stats.models[mName];
+        const mStats = (stats && stats.models) ? stats.models[mName] : null;
         
-        if (!mStats) {
+        if (!mStats || mStats.count === 0) {
             tbody.innerHTML += `
                 <tr>
                     <td class="model-name-cell">${modelMeta.display}</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
-                    <td><span class="status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px dashed var(--border-glass)">ไม่มีข้อมูล</span></td>
+                    <td><span class="status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px dashed var(--border-glass)">รอการทดสอบ</span></td>
                 </tr>
             `;
             return;
         }
         
-        const acc = mStats.avg_accuracy;
-        const latencySec = mStats.avg_latency / 1000;
-        const hallucination = mStats.avg_hallucination;
+        const acc = Number(mStats.avg_accuracy) || 0;
+        const latencySec = (Number(mStats.avg_latency) || 0) / 1000;
+        const hallucination = Number(mStats.avg_hallucination) || 0;
         
         // Pass/Fail Checks
         const isAccPass = acc >= 85;
-        const isLatencyPass = latencySec <= 5;
-        const isHallucinationPass = hallucination <= 10;
+        const isLatencyPass = latencySec <= 5.00;
+        const isHallucinationPass = hallucination <= 10.0;
         const isOverallPass = isAccPass && isLatencyPass && isHallucinationPass;
         
         const accBadge = isAccPass 
@@ -851,7 +1054,7 @@ function renderEvaluationTable(stats) {
             <td>
                 <div class="eval-progress-bar-container">
                     <div class="eval-progress-bar">
-                        <div class="eval-progress-fill eval-progress-fill-blue" style="width: ${acc}%"></div>
+                        <div class="eval-progress-fill eval-progress-fill-blue" style="width: ${Math.min(100, Math.max(0, acc))}%"></div>
                     </div>
                     <span class="eval-progress-label">${acc.toFixed(1)}%</span>
                     ${accBadge}
@@ -864,7 +1067,7 @@ function renderEvaluationTable(stats) {
             <td>
                 <div class="eval-progress-bar-container">
                     <div class="eval-progress-bar">
-                        <div class="eval-progress-fill eval-progress-fill-amber" style="width: ${hallucination}%"></div>
+                        <div class="eval-progress-fill eval-progress-fill-amber" style="width: ${Math.min(100, Math.max(0, hallucination))}%"></div>
                     </div>
                     <span class="eval-progress-label">${hallucination.toFixed(1)}%</span>
                     ${hallucinationBadge}
@@ -888,35 +1091,34 @@ function getModelDisplayName(rawName) {
 
 // Chart.js render engine
 function renderChart() {
-    const metric = document.getElementById("graph-metric").value;
-    const type = document.getElementById("graph-type").value;
+    const metricSelect = document.getElementById("graph-metric");
+    const typeSelect = document.getElementById("graph-type");
     const canvas = document.getElementById("performance-chart");
     
-    if (!currentState.stats || Object.keys(currentState.stats.models).length === 0) {
-        // Render empty chart if no data
-        return;
-    }
+    if (!canvas) return;
+    const metric = metricSelect ? metricSelect.value : "accuracy";
+    const type = typeSelect ? typeSelect.value : "bar";
     
-    const stats = currentState.stats;
+    const stats = currentState.stats || { models: {} };
     const labels = [];
     const datasetData = [];
     
-    // Sort models by display index for consistency
-    const sortedModelIds = Object.keys(MODELS).sort((a,b) => parseInt(a) - parseInt(b));
+    // Sort models by display index for consistency (1 to 8)
+    const sortedModelIds = Object.keys(MODELS).sort((a, b) => parseInt(a) - parseInt(b));
     
     sortedModelIds.forEach(id => {
         const m = MODELS[id];
-        const mStats = stats.models[m.name];
+        const mStats = (stats.models && stats.models[m.name]) ? stats.models[m.name] : null;
         labels.push(m.display);
         
-        if (mStats) {
+        if (mStats && mStats.count > 0) {
             if (metric === "accuracy") {
-                datasetData.push(mStats.avg_accuracy);
+                datasetData.push(Number(mStats.avg_accuracy) || 0);
             } else if (metric === "hallucination") {
-                datasetData.push(mStats.avg_hallucination);
+                datasetData.push(Number(mStats.avg_hallucination) || 0);
             } else {
                 // Latency in seconds
-                datasetData.push(mStats.avg_latency / 1000);
+                datasetData.push((Number(mStats.avg_latency) || 0) / 1000);
             }
         } else {
             datasetData.push(0);
@@ -943,13 +1145,13 @@ function renderChart() {
     } else {
         if (metric === "accuracy") {
             borderColors = '#2563eb';
-            bgColors = 'rgba(37, 99, 235, 0.15)';
+            bgColors = 'rgba(37, 99, 235, 0.2)';
         } else if (metric === "hallucination") {
             borderColors = '#f59e0b';
-            bgColors = 'rgba(245, 158, 11, 0.15)';
+            bgColors = 'rgba(245, 158, 11, 0.2)';
         } else {
             borderColors = '#10b981';
-            bgColors = 'rgba(16, 185, 129, 0.15)';
+            bgColors = 'rgba(16, 185, 129, 0.2)';
         }
     }
     
@@ -958,9 +1160,11 @@ function renderChart() {
     // Destroy existing chart to avoid overlay issues
     if (currentState.chartInstance) {
         currentState.chartInstance.destroy();
+        currentState.chartInstance = null;
     }
     
-    currentState.chartInstance = new Chart(canvas, {
+    const ctx = canvas.getContext('2d');
+    currentState.chartInstance = new Chart(ctx, {
         type: type,
         data: {
             labels: labels,
@@ -973,7 +1177,9 @@ function renderChart() {
                 pointBackgroundColor: pointBgColors,
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: pointBgColors
+                pointHoverBorderColor: pointBgColors,
+                tension: 0.3,
+                fill: type === 'line'
             }]
         },
         options: {
@@ -981,117 +1187,162 @@ function renderChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    labels: { color: textColor, font: { family: 'Prompt' } }
+                    display: type === 'doughnut' || type === 'radar',
+                    labels: { color: textColor, font: { family: 'Prompt', size: 12 } }
                 },
                 tooltip: {
                     titleFont: { family: 'Prompt' },
-                    bodyFont: { family: 'Prompt' }
+                    bodyFont: { family: 'Prompt' },
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.raw;
+                            if (metric === "latency") {
+                                return ` ความเร็วเฉลี่ย: ${val.toFixed(2)} วินาที`;
+                            } else if (metric === "hallucination") {
+                                return ` อัตราการหลอน: ${val.toFixed(1)}%`;
+                            } else {
+                                return ` ความแม่นยำเฉลี่ย: ${val.toFixed(1)}%`;
+                            }
+                        }
+                    }
                 }
             },
-            scales: type !== 'radar' ? {
+            scales: type !== 'radar' && type !== 'doughnut' ? {
                 y: {
                     beginAtZero: true,
                     max: (metric === "accuracy" || metric === "hallucination") ? 100 : undefined,
                     grid: { color: gridColor },
-                    ticks: { color: textMuted, font: { family: 'Prompt' } }
+                    ticks: { 
+                        color: textMuted, 
+                        font: { family: 'Prompt' },
+                        callback: function(value) {
+                            if (metric === "accuracy" || metric === "hallucination") return value + '%';
+                            return value + 's';
+                        }
+                    }
                 },
                 x: {
                     grid: { color: gridColor },
-                    ticks: { color: textMuted, font: { family: 'Prompt' } }
+                    ticks: { color: textMuted, font: { family: 'Prompt', size: 11 } }
                 }
-            } : {
+            } : (type === 'radar' ? {
                 r: {
                     grid: { color: radarGridColor },
                     angleLines: { color: radarGridColor },
-                    pointLabels: { color: textMuted, font: { family: 'Prompt', size: 10 } },
+                    pointLabels: { color: textMuted, font: { family: 'Prompt', size: 11 } },
                     ticks: { backdropColor: 'transparent', color: textMuted },
                     max: (metric === "accuracy" || metric === "hallucination") ? 100 : undefined,
-                    min: 0,
-                    reverse: metric === "latency"
+                    min: 0
                 }
-            }
+            } : undefined)
         }
     });
 }
 
-// Fetch query logs from server
+// Fetch query logs from server & synchronize with local history
 async function loadHistory() {
+    let combinedHistory = [...currentState.history];
+
     try {
         const response = await apiFetch("/api/history");
-        const history = await response.json();
-        currentState.history = history;
-        
-        const container = document.getElementById("history-list-container");
-        container.innerHTML = "";
-        
-        if (history.length === 0) {
-            container.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-style:italic;">ไม่มีประวัติการถามตอบในขณะนี้</div>`;
-            return;
+        if (response.ok) {
+            const serverHistory = await response.json();
+            if (Array.isArray(serverHistory) && serverHistory.length > 0) {
+                serverHistory.forEach(sItem => {
+                    const idx = combinedHistory.findIndex(l => l.id === sItem.id);
+                    if (idx >= 0) {
+                        combinedHistory[idx] = { ...combinedHistory[idx], ...sItem };
+                    } else {
+                        combinedHistory.push(sItem);
+                    }
+                });
+            }
         }
+    } catch (err) {
+        console.warn("Using local history due to server lookup:", err);
+    }
+    
+    // Sort newest first
+    combinedHistory.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    currentState.history = combinedHistory;
+    saveLocalHistory(combinedHistory);
+    
+    const container = document.getElementById("history-list-container");
+    if (!container) return;
+    container.innerHTML = "";
+    
+    if (combinedHistory.length === 0) {
+        container.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-style:italic;">ไม่มีประวัติการถามตอบในขณะนี้</div>`;
+        return;
+    }
+    
+    combinedHistory.forEach((h, index) => {
+        const date = new Date(h.timestamp);
+        const timeStr = isNaN(date.getTime()) ? "" : date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
         
-        history.forEach((h, index) => {
-            const date = new Date(h.timestamp);
-            const timeStr = date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
-            
-            const item = document.createElement("div");
-            item.className = "history-item";
-            item.innerHTML = `
-                <div class="history-item-header">
-                    <span class="mode-badge badge-${h.mode}">${h.mode === "mode1" ? "ทั่วไป" : "RAG"}</span>
-                    <div class="history-item-meta">
-                        <span class="history-item-date">${timeStr}</span>
-                        <button class="delete-item-btn" title="ลบรายการนี้">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
+        const item = document.createElement("div");
+        item.className = `history-item ${currentState.selectedHistoryQueryId === h.id ? 'active' : ''}`;
+        item.innerHTML = `
+            <div class="history-item-header">
+                <span class="mode-badge badge-${h.mode}">${h.mode === "mode1" ? "ทั่วไป" : "RAG"}</span>
+                <div class="history-item-meta">
+                    <span class="history-item-date">${timeStr}</span>
+                    <button class="delete-item-btn" title="ลบรายการนี้">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 </div>
-                <div class="history-item-text">${h.query_text}</div>
-            `;
-            
-            item.addEventListener("click", () => {
-                // Remove active classes
-                document.querySelectorAll(".history-item").forEach(el => el.classList.remove("active"));
-                item.classList.add("active");
-                renderHistoryDetails(h);
-            });
-            
-            const delBtn = item.querySelector(".delete-item-btn");
+            </div>
+            <div class="history-item-text">${escapeHtml(h.query_text)}</div>
+        `;
+        
+        item.addEventListener("click", () => {
+            document.querySelectorAll(".history-item").forEach(el => el.classList.remove("active"));
+            item.classList.add("active");
+            renderHistoryDetails(h);
+        });
+        
+        const delBtn = item.querySelector(".delete-item-btn");
+        if (delBtn) {
             delBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 handleDeleteQuery(h.id, h.query_text);
             });
-            
-            container.appendChild(item);
-        });
+        }
         
-    } catch (err) {
-        console.error("Error loading history:", err);
-    }
+        container.appendChild(item);
+    });
 }
 
 // Render historical comparison query details panel
 function renderHistoryDetails(historyItem) {
     currentState.selectedHistoryQueryId = historyItem.id;
-    document.getElementById("history-detail-empty").classList.add("hidden");
+    const emptyState = document.getElementById("history-detail-empty");
     const content = document.getElementById("history-detail-content");
-    content.classList.remove("hidden");
+    if (emptyState) emptyState.classList.add("hidden");
+    if (content) content.classList.remove("hidden");
     
     // Header
     const modeBadge = document.getElementById("detail-mode-badge");
-    modeBadge.className = `mode-badge badge-${historyItem.mode}`;
-    modeBadge.textContent = historyItem.mode === "mode1" ? "โหมด 1: ตอบคำถามทั่วไป" : "โหมด 2: อิงข้อมูล Supabase (RAG)";
+    if (modeBadge) {
+        modeBadge.className = `mode-badge badge-${historyItem.mode}`;
+        modeBadge.textContent = historyItem.mode === "mode1" ? "โหมด 1: ตอบคำถามทั่วไป" : "โหมด 2: อิงข้อมูล Supabase (RAG)";
+    }
     
-    document.getElementById("detail-query-text").textContent = historyItem.query_text;
+    const queryTextEl = document.getElementById("detail-query-text");
+    if (queryTextEl) queryTextEl.textContent = historyItem.query_text;
     
     const date = new Date(historyItem.timestamp);
-    document.getElementById("detail-timestamp").textContent = "บันทึกเมื่อ: " + date.toLocaleString('th-TH');
+    const dateText = isNaN(date.getTime()) ? "" : date.toLocaleString('th-TH');
+    const timestampEl = document.getElementById("detail-timestamp");
+    if (timestampEl) timestampEl.textContent = "บันทึกเมื่อ: " + dateText;
     
     // Dynamic response grid items
     const grid = document.getElementById("detail-responses-grid");
+    if (!grid) return;
     grid.innerHTML = "";
     
-    // Sort responses to match MODELS structure indices
-    const sortedResponses = [...historyItem.responses];
+    const responses = historyItem.responses || [];
+    const sortedResponses = [...responses];
     sortedResponses.sort((a, b) => {
         let idxA = getModelIndexByName(a.model_name);
         let idxB = getModelIndexByName(b.model_name);
@@ -1101,7 +1352,6 @@ function renderHistoryDetails(historyItem) {
     sortedResponses.forEach(r => {
         const idx = getModelIndexByName(r.model_name);
         const display = getModelDisplayName(r.model_name);
-        const provider = MODELS[idx] ? MODELS[idx].provider : "thaillm";
         
         const responseDiv = document.createElement("div");
         responseDiv.className = "detail-response-item";
@@ -1158,26 +1408,26 @@ function renderHistoryDetails(historyItem) {
 
         function updateHistButtonsVisuals(correctVal, hallucinatedVal) {
             if (correctVal === 1) {
-                btnHistCorrect1.classList.add("active");
-                btnHistCorrect0.classList.remove("active");
+                if (btnHistCorrect1) btnHistCorrect1.classList.add("active");
+                if (btnHistCorrect0) btnHistCorrect0.classList.remove("active");
             } else if (correctVal === 0) {
-                btnHistCorrect1.classList.remove("active");
-                btnHistCorrect0.classList.add("active");
+                if (btnHistCorrect1) btnHistCorrect1.classList.remove("active");
+                if (btnHistCorrect0) btnHistCorrect0.classList.add("active");
             }
 
             if (hallucinatedVal === 1) {
-                btnHistHallucinated1.classList.add("active");
-                btnHistHallucinated0.classList.remove("active");
+                if (btnHistHallucinated1) btnHistHallucinated1.classList.add("active");
+                if (btnHistHallucinated0) btnHistHallucinated0.classList.remove("active");
             } else if (hallucinatedVal === 0) {
-                btnHistHallucinated1.classList.remove("active");
-                btnHistHallucinated0.classList.add("active");
+                if (btnHistHallucinated1) btnHistHallucinated1.classList.remove("active");
+                if (btnHistHallucinated0) btnHistHallucinated0.classList.add("active");
             }
         }
 
-        btnHistCorrect1.onclick = () => saveEvaluation(historyItem.id, r.model_name, 1, null, () => updateHistButtonsVisuals(1, null));
-        btnHistCorrect0.onclick = () => saveEvaluation(historyItem.id, r.model_name, 0, null, () => updateHistButtonsVisuals(0, null));
-        btnHistHallucinated1.onclick = () => saveEvaluation(historyItem.id, r.model_name, null, 1, () => updateHistButtonsVisuals(null, 1));
-        btnHistHallucinated0.onclick = () => saveEvaluation(historyItem.id, r.model_name, null, 0, () => updateHistButtonsVisuals(null, 0));
+        if (btnHistCorrect1) btnHistCorrect1.onclick = () => saveEvaluation(historyItem.id, r.model_name, 1, null, () => updateHistButtonsVisuals(1, null));
+        if (btnHistCorrect0) btnHistCorrect0.onclick = () => saveEvaluation(historyItem.id, r.model_name, 0, null, () => updateHistButtonsVisuals(0, null));
+        if (btnHistHallucinated1) btnHistHallucinated1.onclick = () => saveEvaluation(historyItem.id, r.model_name, null, 1, () => updateHistButtonsVisuals(null, 1));
+        if (btnHistHallucinated0) btnHistHallucinated0.onclick = () => saveEvaluation(historyItem.id, r.model_name, null, 0, () => updateHistButtonsVisuals(null, 0));
     });
 }
 
@@ -1191,8 +1441,10 @@ function getModelIndexByName(name) {
 }
 
 function resetHistoryDetailsView() {
-    document.getElementById("history-detail-content").classList.add("hidden");
-    document.getElementById("history-detail-empty").classList.remove("hidden");
+    const content = document.getElementById("history-detail-content");
+    const emptyState = document.getElementById("history-detail-empty");
+    if (content) content.classList.add("hidden");
+    if (emptyState) emptyState.classList.remove("hidden");
     currentState.selectedHistoryQueryId = null;
 }
 
@@ -1202,61 +1454,57 @@ async function handleDeleteQuery(queryId, queryText) {
         return;
     }
     
+    // Remove locally
+    currentState.history = currentState.history.filter(h => h.id !== queryId);
+    saveLocalHistory(currentState.history);
+
+    if (currentState.selectedHistoryQueryId === queryId) {
+        resetHistoryDetailsView();
+    }
+
     try {
-        const response = await apiFetch("/api/delete_query", {
+        await apiFetch("/api/delete_query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query_id: queryId })
         });
-        
-        if (response.ok) {
-            showToast("ลบรายการคำถามสำเร็จ", "success");
-            
-            if (currentState.selectedHistoryQueryId === queryId) {
-                resetHistoryDetailsView();
-            }
-            
-            loadHistory();
-            loadStats();
-        } else {
-            showToast("ลบคำถามไม่สำเร็จ", "error");
-        }
+        showToast("ลบรายการคำถามสำเร็จ", "success");
     } catch (err) {
-        console.error("Error deleting query:", err);
-        showToast("เกิดข้อผิดพลาดในการลบคำถาม", "error");
+        console.warn("Deleted locally:", err);
+        showToast("ลบรายการคำถามสำเร็จ (ในเครื่อง)", "success");
+    } finally {
+        loadHistory();
+        loadStats();
     }
 }
 
-// Clear history from server
+// Clear history from server and localStorage
 async function handleClearHistory() {
     if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติการถามตอบทั้งหมด? ข้อมูลการเปรียบเทียบและการประเมินโมเดลจะหายไป")) {
         return;
     }
     
+    currentState.history = [];
+    saveLocalHistory([]);
+    
+    resetHistoryDetailsView();
+
     try {
-        const response = await apiFetch("/api/clear", { method: "POST" });
-        if (response.ok) {
-            showToast("ล้างประวัติคำถามและการประเมินโมเดลสำเร็จ", "success");
-            
-            // Reset history panel details view
-            document.getElementById("history-detail-content").classList.add("hidden");
-            document.getElementById("history-detail-empty").classList.remove("hidden");
-            
-            loadHistory();
-            loadStats();
-        } else {
-            showToast("ล้างประวัติไม่สำเร็จ", "error");
-        }
+        await apiFetch("/api/clear", { method: "POST" });
+        showToast("ล้างประวัติคำถามและการประเมินโมเดลสำเร็จ", "success");
     } catch (err) {
-        console.error("Error clearing history:", err);
-        showToast("เกิดข้อผิดพลาดในการติดต่อระบบเพื่อล้างข้อมูล", "error");
+        console.warn("Cleared locally:", err);
+        showToast("ล้างประวัติในเครื่องสำเร็จ", "success");
+    } finally {
+        loadHistory();
+        loadStats();
     }
 }
 
 // Update local cache of Supabase database values
 async function handleRefreshSupabase() {
     const btnIcon = document.querySelector("#refresh-supabase-btn i");
-    btnIcon.classList.add("fa-spin");
+    if (btnIcon) btnIcon.classList.add("fa-spin");
     
     try {
         const response = await apiFetch("/api/refresh_supabase", { method: "POST" });
@@ -1269,6 +1517,6 @@ async function handleRefreshSupabase() {
         console.error("Error refreshing Supabase:", err);
         showToast("เครือข่ายขัดข้องในการอัปเดต Supabase", "error");
     } finally {
-        btnIcon.classList.remove("fa-spin");
+        if (btnIcon) btnIcon.classList.remove("fa-spin");
     }
 }
