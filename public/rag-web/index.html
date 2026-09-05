@@ -330,6 +330,26 @@
                         </button>
                     </div>
                     <div id="connection-status-msg" style="font-size:0.85rem;min-height:20px;margin-top:4px;"></div>
+                    <div style="margin-top:10px;padding-top:12px;border-top:1px dashed var(--border-card);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <label style="font-size:0.85rem;font-weight:600;"><i class="fa-solid fa-key"></i> การกำหนด API Keys (ระบุเพิ่มหรือใช้ค่าเริ่มต้น):</label>
+                            <span style="font-size:0.75rem;color:#10b981;"><i class="fa-solid fa-circle-check"></i> มีคีย์พร้อมใช้งาน</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div>
+                                <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:3px;">ThaiLLM API Key (OpenThaiGPT, Pathumma, Typhoon):</label>
+                                <input id="thaillm-key-input" type="password" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border-card);background:var(--textarea-bg);color:var(--text-main);font-size:0.88rem;" placeholder="ใช้ค่าเริ่มต้นจากระบบ (หรือกรอกคีย์ของท่าน)">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:3px;">OpenRouter API Key (DeepSeek R1, Llama 3.3):</label>
+                                <input id="openrouter-key-input" type="password" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border-card);background:var(--textarea-bg);color:var(--text-main);font-size:0.88rem;" placeholder="ใช้ค่าเริ่มต้นจากระบบ (หรือกรอกคีย์ของท่าน)">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:3px;">Ollama Cloud API Key (GPT-OSS, Nemotron, Gemma):</label>
+                                <input id="ollama-key-input" type="password" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border-card);background:var(--textarea-bg);color:var(--text-main);font-size:0.88rem;" placeholder="ใช้ค่าเริ่มต้นจากระบบ (หรือกรอกคีย์ของท่าน)">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:14px;border-top:1px solid var(--border-card);">

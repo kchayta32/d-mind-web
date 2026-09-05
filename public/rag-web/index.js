@@ -343,6 +343,9 @@ function setupServerModal() {
     const setLocalBtn = document.getElementById("set-local-btn");
     const testBtn = document.getElementById("test-connection-btn");
     const input = document.getElementById("server-url-input");
+    const thaiLlmInput = document.getElementById("thaillm-key-input");
+    const openRouterInput = document.getElementById("openrouter-key-input");
+    const ollamaInput = document.getElementById("ollama-key-input");
     const statusMsg = document.getElementById("connection-status-msg");
 
     if (!modal || !settingsBtn) return;
@@ -356,6 +359,9 @@ function setupServerModal() {
         } else {
             input.value = window.location.origin;
         }
+        if (thaiLlmInput) thaiLlmInput.value = localStorage.getItem("custom_thaillm_key") || "";
+        if (openRouterInput) openRouterInput.value = localStorage.getItem("custom_openrouter_key") || "";
+        if (ollamaInput) ollamaInput.value = localStorage.getItem("custom_ollama_key") || "";
         statusMsg.textContent = "";
         statusMsg.className = "";
         modal.classList.remove("hidden");
@@ -428,7 +434,24 @@ function setupServerModal() {
             } else {
                 localStorage.removeItem("custom_api_base_url");
             }
-            showToast("บันทึกการตั้งค่า API Base URL เรียบร้อยแล้ว", "success");
+
+            if (thaiLlmInput) {
+                const k = thaiLlmInput.value.trim();
+                if (k) localStorage.setItem("custom_thaillm_key", k);
+                else localStorage.removeItem("custom_thaillm_key");
+            }
+            if (openRouterInput) {
+                const k = openRouterInput.value.trim();
+                if (k) localStorage.setItem("custom_openrouter_key", k);
+                else localStorage.removeItem("custom_openrouter_key");
+            }
+            if (ollamaInput) {
+                const k = ollamaInput.value.trim();
+                if (k) localStorage.setItem("custom_ollama_key", k);
+                else localStorage.removeItem("custom_ollama_key");
+            }
+
+            showToast("บันทึกการตั้งค่าการเชื่อมต่อและ API Keys เรียบร้อยแล้ว", "success");
             closeModal();
             loadStats();
             loadHistory();
@@ -712,9 +735,27 @@ async function askModel(queryId, modelIndex, queryText = "", mode = "mode1", con
             context: context || (currentState.currentContext || "")
         };
 
+        const headers = { "Content-Type": "application/json" };
+        const customThaiKey = localStorage.getItem("custom_thaillm_key");
+        const customOpenRouterKey = localStorage.getItem("custom_openrouter_key");
+        const customOllamaKey = localStorage.getItem("custom_ollama_key");
+
+        if (customThaiKey) {
+            payload.thaillm_api_key = customThaiKey;
+            headers["X-ThaiLLM-Key"] = customThaiKey;
+        }
+        if (customOpenRouterKey) {
+            payload.openrouter_api_key = customOpenRouterKey;
+            headers["X-OpenRouter-Key"] = customOpenRouterKey;
+        }
+        if (customOllamaKey) {
+            payload.ollama_api_key = customOllamaKey;
+            headers["X-Ollama-Key"] = customOllamaKey;
+        }
+
         const response = await apiFetch("/api/ask_model", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: headers,
             body: JSON.stringify(payload)
         });
         

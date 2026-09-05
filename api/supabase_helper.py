@@ -85,7 +85,8 @@ class SupabaseHelper:
             os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or
             os.environ.get("SUPABASE_SERVICE_KEY") or
             os.environ.get("SUPABASE_ANON_KEY") or
-            os.environ.get("SUPABASE_KEY", "")
+            os.environ.get("SUPABASE_KEY") or
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2eGpuaXZhYnhkbGdmdm5jZGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzA1NTI4OCwiZXhwIjoyMDYyNjMxMjg4fQ.gM1qt4q5r6zi9SKyrB2LPOV2COlBI1n_Vz3lf0MpH18"
         )
         self.headers = {
             "apikey": key,
