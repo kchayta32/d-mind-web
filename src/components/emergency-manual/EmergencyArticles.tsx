@@ -53,6 +53,25 @@ const EmergencyArticles: React.FC = () => {
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date } | null>(null);
 
   const articles = useMemo<EmergencyArticleItem[]>(() => [
+    // Banner 5: System Architecture & Data Model Diagrams
+    {
+      id: 'architecture-diagrams',
+      title: isEn
+        ? 'D-MIND System Architecture Blueprint: IoT Multi-Tier, Telemetry ER, Sankey Flows & Database Schema'
+        : 'พิมพ์เขียวสถาปัตยกรรมระบบ D-MIND: สถาปัตยกรรม IoT, แบบจำลอง ER, Sankey 4 มิติ และ Database Schema',
+      subtitle: isEn ? 'D-MIND Core Architecture & Engineering Team' : 'จาก ทีมสถาปัตยกรรมระบบ D-MIND Core',
+      description: isEn
+        ? 'Complete technical diagram collection: Multi-tier IoT & Edge Gateway architecture, Telemetry partitioning ER model, 4 dynamic Sankey data pipelines, and Physical Database Schema compliant with complexity budget.'
+        : 'รวบรวมแผนภาพสถาปัตยกรรมระบบแบบ Vector SVG ครบชุด: ระบบ IoT 4 เซนเซอร์ & Edge Gateway, แบบจำลอง ER โทรมาตรพร้อมทริกเกอร์, แผนภาพ Sankey 4 เส้นทางข้อมูล และโครงสร้างฐานข้อมูล 5 ตารางหลัก',
+      image: '/dmind-premium-icon.png',
+      created_at: '2026-09-05',
+      category: 'banner',
+      categoryLabel: isEn ? 'Architecture Diagrams' : 'สถาปัตยกรรมระบบ',
+      readTime: isEn ? '10 min read' : '10 นาที',
+      isBanner: true,
+      bannerBadge: isEn ? 'Banner #5 • System Diagrams' : 'แบนเนอร์ที่ 5 • ไดอะแกรมระบบ',
+      icon: <Layers className="w-5 h-5 text-indigo-400" />
+    },
     // Banner 4: Disaster Map Platform Upgrade
     {
       id: 'disaster-map-system-update',

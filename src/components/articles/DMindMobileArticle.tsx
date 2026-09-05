@@ -535,19 +535,27 @@ const DMindMobileArticle: React.FC = () => {
                             <h4 className="font-bold text-foreground">พร้อมสัมผัสประสบการณ์ D-MIND</h4>
                             <p className="text-xs text-muted-foreground">ติดตามการอัปเดตเวอร์ชันพร้อมใช้งานอย่างเป็นทางการได้ที่นี่</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap gap-2.5">
+                            <Button
+                                variant="outline"
+                                className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
+                                onClick={() => navigate('/article/architecture-diagrams')}
+                            >
+                                <Layers className="w-4 h-4 mr-2" />
+                                {isEn ? 'View System Diagrams' : 'ดูไดอะแกรมสถาปัตยกรรม (7 Diagrams)'}
+                            </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => navigate('/disaster-map')}
                             >
                                 <MapPin className="w-4 h-4 mr-2 text-primary" />
-                                ดูแผนที่ภัยพิบัติ
+                                {isEn ? 'Disaster Map' : 'ดูแผนที่ภัยพิบัติ'}
                             </Button>
                             <Button
                                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
                                 onClick={() => navigate('/')}
                             >
-                                กลับสู่หน้าหลัก
+                                {isEn ? 'Home' : 'กลับสู่หน้าหลัก'}
                             </Button>
                         </div>
                     </div>

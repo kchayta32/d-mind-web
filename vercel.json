@@ -64,7 +64,7 @@
       "dest": "/news_web/index.html"
     },
     {
-      "src": "/((?!api|rag-web|arena|news_web|assets|images|lovable-uploads|favicon\\.ico|robots\\.txt|.*\\..*).*)",
+      "src": "/((?!api|rag-web|arena|news_web|diagrams|assets|images|lovable-uploads|favicon\\.ico|robots\\.txt|.*\\..*).*)",
       "dest": "/index.html"
     },
     {

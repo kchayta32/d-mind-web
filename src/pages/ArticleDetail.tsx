@@ -15,6 +15,7 @@ import DMindLaunchArticle from '@/components/articles/DMindLaunchArticle';
 import SystemUpdateArticle from '@/components/articles/SystemUpdateArticle';
 import DMindMobileArticle from '@/components/articles/DMindMobileArticle';
 import DisasterMapUpdateArticle from '@/components/articles/DisasterMapUpdateArticle';
+import DMindDiagramsArticle from '@/components/articles/DMindDiagramsArticle';
 import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
 import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
@@ -23,6 +24,14 @@ const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'architecture-diagrams':
+    case 'dmind-diagrams':
+    case 'system-diagrams':
+    case 'mobile-app-diagrams':
+    case 'iot-architecture-diagrams':
+    case 'database-schema':
+    case 'diagrams':
+      return <DMindDiagramsArticle />;
     case 'disaster-map-update':
     case 'disaster-map-v2':
     case 'disaster-map-system-update':
