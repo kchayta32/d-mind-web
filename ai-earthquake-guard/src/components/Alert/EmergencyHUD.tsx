@@ -89,7 +89,7 @@ export const EmergencyHUD: React.FC<EmergencyHUDProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
       {/* Tactical Emergency HUD Card */}
       <div className={`relative w-full max-w-4xl bg-[#0d1322] border-2 ${isImminent ? 'border-rose-500 shadow-[0_0_60px_rgba(244,63,94,0.45)]' : 'border-amber-500 shadow-[0_0_40px_rgba(245,158,11,0.35)]'} rounded-2xl overflow-hidden text-slate-100 flex flex-col max-h-[95vh]`}>
         

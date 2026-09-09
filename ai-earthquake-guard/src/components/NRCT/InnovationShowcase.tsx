@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Award, 
   Cpu, 
@@ -16,7 +16,8 @@ import {
   HeartHandshake, 
   ExternalLink,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { NRCTInnovationMetric } from '../../types/seismic';
 
@@ -33,6 +34,16 @@ export const InnovationShowcase: React.FC<InnovationShowcaseProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'abstract' | 'ai_novelty' | 'benchmarks' | 'smart_city' | 'sdgs' | 'export'>('abstract');
   const [copied, setCopied] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const keyMetrics: NRCTInnovationMetric[] = [
     {
@@ -131,11 +142,11 @@ export const InnovationShowcase: React.FC<InnovationShowcaseProps> = ({
   };
 
   return (
-    <div className={`bg-seismic-card border border-seismic-border rounded-xl p-4 sm:p-6 shadow-2xl flex flex-col space-y-6 ${className}`}>
+    <div className={`bg-[#0d1322] border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col space-y-6 relative z-10 ${className}`}>
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-seismic-border/70">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-400/20 border border-amber-500/30 text-amber-400">
+          <div className="p-3 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-400/20 border border-amber-500/30 text-amber-400 shrink-0">
             <Award className="w-6 h-6" />
           </div>
           <div>
@@ -153,31 +164,48 @@ export const InnovationShowcase: React.FC<InnovationShowcaseProps> = ({
           </div>
         </div>
 
-        {/* Quick Action Export Buttons */}
+        {/* Quick Action Export Buttons & Close Button */}
         <div className="flex items-center gap-2 font-mono text-xs">
           <button
             onClick={handleCopySummary}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-colors active:scale-95"
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
+            title="คัดลอกบทสรุปผลงาน"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'คัดลอกแล้ว!' : 'คัดลอกบทสรุป'}</span>
+            <span className="hidden sm:inline">{copied ? 'คัดลอกแล้ว!' : 'คัดลอกบทสรุป'}</span>
           </button>
 
           <button
             onClick={handleDownloadJSON}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-colors active:scale-95"
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
+            title="ดาวน์โหลด JSON"
           >
             <Download className="w-3.5 h-3.5 text-cyan-400" />
-            <span>ดาวน์โหลด JSON</span>
+            <span className="hidden sm:inline">ดาวน์โหลด JSON</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold flex items-center gap-1.5 transition-colors active:scale-95"
+            className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold flex items-center gap-1.5 transition-colors active:scale-95 cursor-pointer"
+            title="พิมพ์เอกสาร วช."
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>พิมพ์เอกสาร วช.</span>
+            <span className="hidden sm:inline">พิมพ์เอกสาร วช.</span>
           </button>
+
+          {/* Close Button (X) */}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 hover:border-rose-500 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer ml-1 shadow-lg shadow-rose-950/40"
+              title="ปิดหน้านี้ (Close / ESC)"
+              aria-label="ปิดหน้านี้"
+            >
+              <X className="w-5 h-5" />
+              <span className="font-sans text-xs font-bold">ปิด</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -503,6 +531,26 @@ export const InnovationShowcase: React.FC<InnovationShowcaseProps> = ({
           </div>
         </div>
       )}
+
+      {/* Footer Close & Actions Bar */}
+      <div className="pt-4 mt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>ผลงานวิจัยพัฒนาระดับชาติตามมาตรฐาน วช. (NRCT Innovation Award 2026)</span>
+        </div>
+        
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-rose-600/20 text-slate-200 hover:text-rose-300 border border-slate-700 hover:border-rose-500/50 flex items-center gap-2 transition-all font-sans font-semibold cursor-pointer active:scale-95"
+            title="ปิดหน้าต่างนี้"
+          >
+            <X className="w-4 h-4 text-rose-400" />
+            <span>ปิดหน้าต่างนี้ (ESC)</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 };

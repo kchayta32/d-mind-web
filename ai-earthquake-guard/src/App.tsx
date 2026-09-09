@@ -609,8 +609,13 @@ export const App: React.FC = () => {
 
       {/* NRCT Innovation Showcase Modal (when launched via Header Award Button) */}
       {isNRCTShowcaseOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-          <div className="relative w-full max-w-5xl my-8">
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsNRCTShowcaseOpen(false);
+          }}
+        >
+          <div className="relative w-full max-w-5xl my-auto animate-in fade-in zoom-in-95 duration-200">
             <InnovationShowcase 
               isOpen={true}
               onClose={() => setIsNRCTShowcaseOpen(false)}
