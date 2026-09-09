@@ -210,14 +210,140 @@ export const useGISTDAData = (timeFilter: TimeFilter = '3days') => {
         }
         
         if (!response.ok) {
-          console.warn(`GISTDA API returned ${response.status}, using generated sample data`);
+          console.info(`GISTDA API returned ${response.status}, attempting live NASA EONET wildfire fallback...`);
+          try {
+            const nasaRes = await fetch('https://eonet.gsfc.nasa.gov/api/v3/events?category=wildfires&status=open&limit=100');
+            if (nasaRes.ok) {
+              const nasaData = await nasaRes.json();
+              if (nasaData?.events && Array.isArray(nasaData.events) && nasaData.events.length > 0) {
+                const features = nasaData.events.map((ev: any, idx: number) => {
+                  const geo = ev.geometry?.[ev.geometry.length - 1] || ev.geometry?.[0];
+                  const coords = geo?.coordinates || [100.5, 13.7];
+                  const lng = Number(coords[0]);
+                  const lat = Number(coords[1]);
+                  const country = getCountryFromCoordinates(lat, lng);
+                  const title = ev.title || 'ไฟป่า (NASA EONET)';
+                  const dateStr = geo?.date ? geo.date.split('T')[0] : new Date().toISOString().split('T')[0];
+                  const timeStr = geo?.date ? (geo.date.split('T')[1]?.substring(0, 5) || '12:00') : '12:00';
+                  const frp = Math.min(250, Math.max(15, Math.round((geo?.magnitudeValue || 40) / 10)));
+
+                  return {
+                    LATITUDE: lat,
+                    LONGITUDE: lng,
+                    BRIGHTNESS: 325,
+                    SCAN: 1.0,
+                    TRACK: 1.0,
+                    ACQ_DATE: dateStr,
+                    ACQ_TIME: timeStr,
+                    SATELLITE: 'NASA EONET / MODIS',
+                    CONFIDENCE: 85,
+                    VERSION: '3.0',
+                    BRIGHT_T31: 295,
+                    FRP: frp,
+                    DAYNIGHT: 'D',
+                    TYPE: 0,
+                    province: country === 'Thailand' ? 'ประเทศไทย' : country,
+                    country,
+                    geometry: {
+                      coordinates: [lng, lat],
+                      type: 'Point'
+                    },
+                    properties: {
+                      confidence: 85,
+                      instrument: 'NASA EONET',
+                      frp,
+                      satellite: 'Terra / Aqua / VIIRS',
+                      pv_tn: country === 'Thailand' ? 'ประเทศไทย' : country,
+                      ap_tn: title,
+                      th_date: dateStr,
+                      th_time: timeStr,
+                      village: '',
+                      lu_name: 'พื้นที่ป่าไม้และพืชพรรณธรรมชาติ',
+                      acq_date: dateStr,
+                      acq_time: timeStr,
+                      changwat: country,
+                      area_rai: Math.round(frp * 2.5),
+                      risk_level: frp >= 50 ? 'very_high' : frp >= 30 ? 'high' : 'medium'
+                    },
+                    id: `nasa-fire-${ev.id || idx}`
+                  };
+                });
+                return { features };
+              }
+            }
+          } catch (nasaErr) {
+            console.warn('NASA EONET wildfire fetch failed, falling back to simulated data', nasaErr);
+          }
           return null;
         }
         
         const data = await response.json();
         return data;
       } catch (error) {
-        console.warn('GISTDA API network error, using fallback data', error);
+        console.warn('GISTDA API network error, trying NASA EONET fallback', error);
+        try {
+          const nasaRes = await fetch('https://eonet.gsfc.nasa.gov/api/v3/events?category=wildfires&status=open&limit=100');
+          if (nasaRes.ok) {
+            const nasaData = await nasaRes.json();
+            if (nasaData?.events && Array.isArray(nasaData.events) && nasaData.events.length > 0) {
+              const features = nasaData.events.map((ev: any, idx: number) => {
+                const geo = ev.geometry?.[ev.geometry.length - 1] || ev.geometry?.[0];
+                const coords = geo?.coordinates || [100.5, 13.7];
+                const lng = Number(coords[0]);
+                const lat = Number(coords[1]);
+                const country = getCountryFromCoordinates(lat, lng);
+                const title = ev.title || 'ไฟป่า (NASA EONET)';
+                const dateStr = geo?.date ? geo.date.split('T')[0] : new Date().toISOString().split('T')[0];
+                const timeStr = geo?.date ? (geo.date.split('T')[1]?.substring(0, 5) || '12:00') : '12:00';
+                const frp = Math.min(250, Math.max(15, Math.round((geo?.magnitudeValue || 40) / 10)));
+
+                return {
+                  LATITUDE: lat,
+                  LONGITUDE: lng,
+                  BRIGHTNESS: 325,
+                  SCAN: 1.0,
+                  TRACK: 1.0,
+                  ACQ_DATE: dateStr,
+                  ACQ_TIME: timeStr,
+                  SATELLITE: 'NASA EONET / MODIS',
+                  CONFIDENCE: 85,
+                  VERSION: '3.0',
+                  BRIGHT_T31: 295,
+                  FRP: frp,
+                  DAYNIGHT: 'D',
+                  TYPE: 0,
+                  province: country === 'Thailand' ? 'ประเทศไทย' : country,
+                  country,
+                  geometry: {
+                    coordinates: [lng, lat],
+                    type: 'Point'
+                  },
+                  properties: {
+                    confidence: 85,
+                    instrument: 'NASA EONET',
+                    frp,
+                    satellite: 'Terra / Aqua / VIIRS',
+                    pv_tn: country === 'Thailand' ? 'ประเทศไทย' : country,
+                    ap_tn: title,
+                    th_date: dateStr,
+                    th_time: timeStr,
+                    village: '',
+                    lu_name: 'พื้นที่ป่าไม้และพืชพรรณธรรมชาติ',
+                    acq_date: dateStr,
+                    acq_time: timeStr,
+                    changwat: country,
+                    area_rai: Math.round(frp * 2.5),
+                    risk_level: frp >= 50 ? 'very_high' : frp >= 30 ? 'high' : 'medium'
+                  },
+                  id: `nasa-fire-${ev.id || idx}`
+                };
+              });
+              return { features };
+            }
+          }
+        } catch {
+          // fallback to null
+        }
         return null;
       }
     },

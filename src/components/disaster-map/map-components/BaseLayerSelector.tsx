@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BaseMapLayerType } from '../types';
 import { Button } from '@/components/ui/button';
-import { Layers, Map, Moon, Sun, Mountain, Satellite } from 'lucide-react';
+import { Layers, Map, Moon, Sun, Mountain, Satellite, Globe } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,21 +23,45 @@ const baseLayers: Array<{
   icon: React.ReactNode;
 }> = [
   {
-    id: 'osm',
-    label: 'OpenStreetMap',
-    sublabel: 'แผนที่ถนนมาตรฐาน',
+    id: 'google-hybrid',
+    label: 'Google Hybrid',
+    sublabel: 'ดาวเทียมกูเกิล + ป้ายชื่อถนนและจังหวัด',
+    icon: <Globe className="w-4 h-4 text-emerald-500" />
+  },
+  {
+    id: 'google-satellite',
+    label: 'Google Satellite',
+    sublabel: 'ภาพถ่ายดาวเทียมกูเกิลความละเอียดสูง',
+    icon: <Satellite className="w-4 h-4 text-cyan-500" />
+  },
+  {
+    id: 'google-streets',
+    label: 'Google Streets',
+    sublabel: 'แผนที่ถนนมาตรฐานกูเกิล',
     icon: <Map className="w-4 h-4 text-blue-500" />
+  },
+  {
+    id: 'google-terrain',
+    label: 'Google Terrain',
+    sublabel: 'แผนที่ภูมิประเทศและระดับความสูงกูเกิล',
+    icon: <Mountain className="w-4 h-4 text-amber-600" />
   },
   {
     id: 'satellite',
     label: 'ESRI World Imagery',
-    sublabel: 'ภาพถ่ายดาวเทียมความละเอียดสูง',
-    icon: <Satellite className="w-4 h-4 text-emerald-500" />
+    sublabel: 'ภาพถ่ายดาวเทียมระดับโลก ESRI',
+    icon: <Satellite className="w-4 h-4 text-green-600" />
+  },
+  {
+    id: 'osm',
+    label: 'OpenStreetMap',
+    sublabel: 'แผนที่ถนนโอเพนซอร์สสากล',
+    icon: <Map className="w-4 h-4 text-blue-400" />
   },
   {
     id: 'dark',
     label: 'CartoDB Dark Matter',
-    sublabel: 'แผนที่โทนมืด (กลางคืน)',
+    sublabel: 'แผนที่โทนมืด แทคติคอล (กลางคืน)',
     icon: <Moon className="w-4 h-4 text-indigo-400" />
   },
   {

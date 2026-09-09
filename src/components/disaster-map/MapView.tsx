@@ -50,10 +50,35 @@ interface MapViewProps {
   onRefreshAll?: () => void;
 }
 
-const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string; maxZoom?: number }> = {
+const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string; maxZoom?: number; subdomains?: string[] }> = {
   osm: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: ['a', 'b', 'c']
+  },
+  'google-hybrid': {
+    url: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    attribution: '&copy; Google Maps (Satellite & Road Labels)',
+    maxZoom: 20,
+    subdomains: ['0', '1', '2', '3']
+  },
+  'google-satellite': {
+    url: 'https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+    attribution: '&copy; Google Maps Satellite',
+    maxZoom: 20,
+    subdomains: ['0', '1', '2', '3']
+  },
+  'google-streets': {
+    url: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    attribution: '&copy; Google Maps Streets',
+    maxZoom: 20,
+    subdomains: ['0', '1', '2', '3']
+  },
+  'google-terrain': {
+    url: 'https://mt{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+    attribution: '&copy; Google Maps Terrain',
+    maxZoom: 20,
+    subdomains: ['0', '1', '2', '3']
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -63,17 +88,20 @@ const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string
   dark: {
     url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
+    maxZoom: 19,
+    subdomains: ['a', 'b', 'c', 'd']
   },
   light: {
     url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
+    maxZoom: 19,
+    subdomains: ['a', 'b', 'c', 'd']
   },
   topo: {
     url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-    maxZoom: 17
+    maxZoom: 17,
+    subdomains: ['a', 'b', 'c']
   }
 };
 
@@ -165,6 +193,7 @@ export const MapView: React.FC<MapViewProps> = ({
             attribution={activeBaseConfig.attribution}
             url={activeBaseConfig.url}
             maxZoom={activeBaseConfig.maxZoom || 18}
+            subdomains={activeBaseConfig.subdomains || ['a', 'b', 'c']}
           />
           
           {/* User Location Marker */}

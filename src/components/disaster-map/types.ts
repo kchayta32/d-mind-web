@@ -204,4 +204,13 @@ export interface ApiSourceStatus {
   url: string;
 }
 
-export type BaseMapLayerType = 'osm' | 'satellite' | 'dark' | 'light' | 'topo';
+export type BaseMapLayerType = 
+  | 'osm' 
+  | 'satellite' 
+  | 'dark' 
+  | 'light' 
+  | 'topo' 
+  | 'google-satellite' 
+  | 'google-hybrid' 
+  | 'google-streets' 
+  | 'google-terrain';

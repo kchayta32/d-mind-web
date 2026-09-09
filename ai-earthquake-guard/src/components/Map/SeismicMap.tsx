@@ -103,7 +103,12 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   const mapRef = useRef<L.Map | null>(null);
 
   // Layer groups refs
-  const baseTilesRef = useRef<{ dark: L.TileLayer; satellite: L.TileLayer } | null>(null);
+  const baseTilesRef = useRef<{ 
+    dark: L.TileLayer; 
+    googleHybrid: L.TileLayer; 
+    googleSatellite: L.TileLayer; 
+    satellite: L.TileLayer; 
+  } | null>(null);
   const faultLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const stationLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const eventLayerGroupRef = useRef<L.LayerGroup | null>(null);
@@ -116,7 +121,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   const feltCircleRef = useRef<L.Circle | null>(null);
 
   // UI Layer Toggle States
-  const [activeTile, setActiveTile] = useState<'dark' | 'satellite'>('dark');
+  const [activeTile, setActiveTile] = useState<'dark' | 'google-hybrid' | 'google-satellite' | 'satellite'>('dark');
   const [showFaults, setShowFaults] = useState<boolean>(true);
   const [showStations, setShowStations] = useState<boolean>(true);
   const [showWavefronts, setShowWavefronts] = useState<boolean>(true);
@@ -207,6 +212,22 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
       minZoom: 4
     });
 
+    // Google Hybrid layer (Satellite imagery + road and boundary labels)
+    const googleHybridTile = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps Hybrid',
+      subdomains: ['0', '1', '2', '3'],
+      maxZoom: 20,
+      minZoom: 3
+    });
+
+    // Google Satellite layer (Pure satellite imagery)
+    const googleSatelliteTile = L.tileLayer('https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps Satellite',
+      subdomains: ['0', '1', '2', '3'],
+      maxZoom: 20,
+      minZoom: 3
+    });
+
     const map = L.map(mapContainerRef.current, {
       center: initialCenter,
       zoom: initialZoom,
@@ -228,7 +249,12 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     const waveLayer = L.layerGroup().addTo(map);
     const userLayer = L.layerGroup().addTo(map);
 
-    baseTilesRef.current = { dark: darkTile, satellite: satelliteTile };
+    baseTilesRef.current = { 
+      dark: darkTile, 
+      googleHybrid: googleHybridTile, 
+      googleSatellite: googleSatelliteTile, 
+      satellite: satelliteTile 
+    };
     faultLayerGroupRef.current = faultLayer;
     stationLayerGroupRef.current = stationLayer;
     eventLayerGroupRef.current = eventLayer;
@@ -257,12 +283,18 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     const baseTiles = baseTilesRef.current;
     if (!map || !baseTiles) return;
 
+    Object.values(baseTiles).forEach(layer => {
+      if (map.hasLayer(layer)) map.removeLayer(layer);
+    });
+
     if (activeTile === 'dark') {
-      if (map.hasLayer(baseTiles.satellite)) map.removeLayer(baseTiles.satellite);
-      if (!map.hasLayer(baseTiles.dark)) map.addLayer(baseTiles.dark);
+      map.addLayer(baseTiles.dark);
+    } else if (activeTile === 'google-hybrid') {
+      map.addLayer(baseTiles.googleHybrid);
+    } else if (activeTile === 'google-satellite') {
+      map.addLayer(baseTiles.googleSatellite);
     } else {
-      if (map.hasLayer(baseTiles.dark)) map.removeLayer(baseTiles.dark);
-      if (!map.hasLayer(baseTiles.satellite)) map.addLayer(baseTiles.satellite);
+      map.addLayer(baseTiles.satellite);
     }
   }, [activeTile]);
 
@@ -974,19 +1006,31 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
 
         {/* Right Side: Tactical Controls Bar */}
         <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-800/90 shadow-2xl pointer-events-auto">
-          {/* Tile Switcher: Dark vs Satellite */}
+          {/* Tile Switcher: Dark vs Google Hybrid vs Google Sat vs ESRI */}
           <button
             type="button"
-            onClick={() => setActiveTile(activeTile === 'dark' ? 'satellite' : 'dark')}
+            onClick={() => {
+              const tileCycle: Array<'dark' | 'google-hybrid' | 'google-satellite' | 'satellite'> = [
+                'dark',
+                'google-hybrid',
+                'google-satellite',
+                'satellite'
+              ];
+              const currentIndex = tileCycle.indexOf(activeTile);
+              const nextTile = tileCycle[(currentIndex + 1) % tileCycle.length];
+              setActiveTile(nextTile);
+            }}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              activeTile === 'satellite'
+              activeTile !== 'dark'
                 ? 'bg-cyan-500 text-slate-950 font-bold shadow-[0_0_10px_#00f2fe]'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800'
             }`}
-            title="สลับโหมดแผนที่ ดาวเทียม / โหมดมืด (Toggle Satellite / Dark Mode)"
+            title="สลับโหมดแผนที่: มืด / Google Hybrid / Google Satellite / ESRI"
           >
             <Globe className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">{activeTile === 'dark' ? 'Dark' : 'Sat'}</span>
+            <span className="hidden md:inline">
+              {activeTile === 'dark' ? 'Dark' : activeTile === 'google-hybrid' ? 'G-Hybrid' : activeTile === 'google-satellite' ? 'G-Sat' : 'ESRI'}
+            </span>
           </button>
 
           {/* Fault Lines Toggle */}

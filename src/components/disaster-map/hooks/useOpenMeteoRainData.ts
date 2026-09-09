@@ -143,98 +143,112 @@ async function fetchOpenMeteoWeatherData(): Promise<OpenMeteoRainDataPoint[]> {
     timezone: "Asia/Bangkok"
   };
 
-  const url = "https://api.open-meteo.com/v1/forecast";
-  const responses = await fetchWeatherApi(url, params);
+  try {
+    const url = "https://api.open-meteo.com/v1/forecast";
+    const responses = await fetchWeatherApi(url, params);
 
-  return responses.map((response, index) => {
-    const utcOffsetSeconds = response.utcOffsetSeconds();
-    const current = response.current()!;
-    const hourly = response.hourly()!;
-    const daily = response.daily()!;
+    return responses.map((response, index) => {
+      try {
+        const utcOffsetSeconds = response.utcOffsetSeconds();
+        const current = response.current();
+        const hourly = response.hourly();
+        const daily = response.daily();
 
-    const weatherData: OpenMeteoWeatherData = {
-      current: {
-        time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-        temperature2m: Math.round(current.variables(0)!.value() * 10) / 10,
-        relativeHumidity2m: Math.round(current.variables(1)!.value()),
-        apparentTemperature: Math.round(current.variables(2)!.value() * 10) / 10,
-        isDay: current.variables(3)!.value(),
-        snowfall: current.variables(4)!.value(),
-        showers: Math.round(current.variables(5)!.value() * 10) / 10,
-        precipitation: Math.round(current.variables(6)!.value() * 10) / 10,
-        rain: Math.round(current.variables(7)!.value() * 10) / 10,
-        weatherCode: current.variables(8)!.value(),
-        cloudCover: Math.round(current.variables(9)!.value()),
-        pressureMsl: Math.round(current.variables(10)!.value()),
-        surfacePressure: Math.round(current.variables(11)!.value()),
-        windGusts10m: Math.round(current.variables(12)!.value() * 10) / 10,
-        windDirection10m: Math.round(current.variables(13)!.value()),
-        windSpeed10m: Math.round(current.variables(14)!.value() * 10) / 10,
-      },
-      hourly: {
-        time: [...Array((Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval())].map(
-          (_, i) => new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
-        ),
-        temperature2m: hourly.variables(0)!.valuesArray()!,
-        relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
-        dewPoint2m: hourly.variables(2)!.valuesArray()!,
-        apparentTemperature: hourly.variables(3)!.valuesArray()!,
-        precipitation: hourly.variables(4)!.valuesArray()!,
-        rain: hourly.variables(5)!.valuesArray()!,
-        showers: hourly.variables(6)!.valuesArray()!,
-        windSpeed10m: hourly.variables(7)!.valuesArray()!,
-        windDirection10m: hourly.variables(8)!.valuesArray()!,
-        windGusts10m: hourly.variables(9)!.valuesArray()!,
-        soilMoisture0To1cm: hourly.variables(10)!.valuesArray()!,
-        soilMoisture1To3cm: hourly.variables(11)!.valuesArray()!,
-        soilMoisture3To9cm: hourly.variables(12)!.valuesArray()!,
-        precipitationProbability: hourly.variables(13)!.valuesArray()!,
-        cloudCover: hourly.variables(14)!.valuesArray()!,
-        surfacePressure: hourly.variables(15)!.valuesArray()!,
-        pressureMsl: hourly.variables(16)!.valuesArray()!,
-        weatherCode: hourly.variables(17)!.valuesArray()!,
-      },
-      daily: {
-        time: [...Array((Number(daily.timeEnd()) - Number(daily.time())) / daily.interval())].map(
-          (_, i) => new Date((Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) * 1000)
-        ),
-        temperature2mMax: daily.variables(0)!.valuesArray()!,
-        temperature2mMin: daily.variables(1)!.valuesArray()!,
-        weatherCode: daily.variables(2)!.valuesArray()!,
-        rainSum: daily.variables(3)!.valuesArray()!,
-        showersSum: daily.variables(4)!.valuesArray()!,
-        precipitationSum: daily.variables(5)!.valuesArray()!,
-        precipitationHours: daily.variables(6)!.valuesArray()!,
-        precipitationProbabilityMax: daily.variables(7)!.valuesArray()!,
-        windDirection10mDominant: daily.variables(8)!.valuesArray()!,
-        windGusts10mMax: daily.variables(9)!.valuesArray()!,
-        windSpeed10mMax: daily.variables(10)!.valuesArray()!,
-      },
-      location: {
-        latitude: response.latitude(),
-        longitude: response.longitude(),
-        timezone: response.timezone(),
-        timezoneAbbreviation: response.timezoneAbbreviation(),
+        if (!current || !hourly || !daily) {
+          return null;
+        }
+
+        const weatherData: OpenMeteoWeatherData = {
+          current: {
+            time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
+            temperature2m: Math.round((current.variables(0)?.value() ?? 28) * 10) / 10,
+            relativeHumidity2m: Math.round(current.variables(1)?.value() ?? 70),
+            apparentTemperature: Math.round((current.variables(2)?.value() ?? 30) * 10) / 10,
+            isDay: current.variables(3)?.value() ?? 1,
+            snowfall: current.variables(4)?.value() ?? 0,
+            showers: Math.round((current.variables(5)?.value() ?? 0) * 10) / 10,
+            precipitation: Math.round((current.variables(6)?.value() ?? 0) * 10) / 10,
+            rain: Math.round((current.variables(7)?.value() ?? 0) * 10) / 10,
+            weatherCode: current.variables(8)?.value() ?? 0,
+            cloudCover: Math.round(current.variables(9)?.value() ?? 20),
+            pressureMsl: Math.round(current.variables(10)?.value() ?? 1010),
+            surfacePressure: Math.round(current.variables(11)?.value() ?? 1008),
+            windGusts10m: Math.round((current.variables(12)?.value() ?? 10) * 10) / 10,
+            windDirection10m: Math.round(current.variables(13)?.value() ?? 180),
+            windSpeed10m: Math.round((current.variables(14)?.value() ?? 8) * 10) / 10,
+          },
+          hourly: {
+            time: [...Array(Math.max(0, (Number(hourly.timeEnd()) - Number(hourly.time())) / (hourly.interval() || 3600)))].map(
+              (_, i) => new Date((Number(hourly.time()) + i * (hourly.interval() || 3600) + utcOffsetSeconds) * 1000)
+            ),
+            temperature2m: hourly.variables(0)?.valuesArray() || new Float32Array(),
+            relativeHumidity2m: hourly.variables(1)?.valuesArray() || new Float32Array(),
+            dewPoint2m: hourly.variables(2)?.valuesArray() || new Float32Array(),
+            apparentTemperature: hourly.variables(3)?.valuesArray() || new Float32Array(),
+            precipitation: hourly.variables(4)?.valuesArray() || new Float32Array(),
+            rain: hourly.variables(5)?.valuesArray() || new Float32Array(),
+            showers: hourly.variables(6)?.valuesArray() || new Float32Array(),
+            windSpeed10m: hourly.variables(7)?.valuesArray() || new Float32Array(),
+            windDirection10m: hourly.variables(8)?.valuesArray() || new Float32Array(),
+            windGusts10m: hourly.variables(9)?.valuesArray() || new Float32Array(),
+            soilMoisture0To1cm: hourly.variables(10)?.valuesArray() || new Float32Array(),
+            soilMoisture1To3cm: hourly.variables(11)?.valuesArray() || new Float32Array(),
+            soilMoisture3To9cm: hourly.variables(12)?.valuesArray() || new Float32Array(),
+            precipitationProbability: hourly.variables(13)?.valuesArray() || new Float32Array(),
+            cloudCover: hourly.variables(14)?.valuesArray() || new Float32Array(),
+            surfacePressure: hourly.variables(15)?.valuesArray() || new Float32Array(),
+            pressureMsl: hourly.variables(16)?.valuesArray() || new Float32Array(),
+            weatherCode: hourly.variables(17)?.valuesArray() || new Float32Array(),
+          },
+          daily: {
+            time: [...Array(Math.max(0, (Number(daily.timeEnd()) - Number(daily.time())) / (daily.interval() || 86400)))].map(
+              (_, i) => new Date((Number(daily.time()) + i * (daily.interval() || 86400) + utcOffsetSeconds) * 1000)
+            ),
+            temperature2mMax: daily.variables(0)?.valuesArray() || new Float32Array(),
+            temperature2mMin: daily.variables(1)?.valuesArray() || new Float32Array(),
+            weatherCode: daily.variables(2)?.valuesArray() || new Float32Array(),
+            rainSum: daily.variables(3)?.valuesArray() || new Float32Array(),
+            showersSum: daily.variables(4)?.valuesArray() || new Float32Array(),
+            precipitationSum: daily.variables(5)?.valuesArray() || new Float32Array(),
+            precipitationHours: daily.variables(6)?.valuesArray() || new Float32Array(),
+            precipitationProbabilityMax: daily.variables(7)?.valuesArray() || new Float32Array(),
+            windDirection10mDominant: daily.variables(8)?.valuesArray() || new Float32Array(),
+            windGusts10mMax: daily.variables(9)?.valuesArray() || new Float32Array(),
+            windSpeed10mMax: daily.variables(10)?.valuesArray() || new Float32Array(),
+          },
+          location: {
+            latitude: response.latitude(),
+            longitude: response.longitude(),
+            timezone: response.timezone(),
+            timezoneAbbreviation: response.timezoneAbbreviation(),
+          }
+        };
+
+        const pointMeta = THAILAND_WEATHER_POINTS[index] || {
+          name: `Point ${index}`,
+          province: 'ไทย',
+          region: 'กลาง' as const,
+          lat: response.latitude(),
+          lon: response.longitude()
+        };
+
+        return {
+          locationName: pointMeta.name,
+          province: pointMeta.province,
+          region: pointMeta.region,
+          lat: pointMeta.lat,
+          lon: pointMeta.lon,
+          weatherData
+        };
+      } catch (e) {
+        console.warn(`Error parsing weather response ${index}:`, e);
+        return null;
       }
-    };
-
-    const pointMeta = THAILAND_WEATHER_POINTS[index] || {
-      name: `Point ${index}`,
-      province: 'ไทย',
-      region: 'กลาง' as const,
-      lat: response.latitude(),
-      lon: response.longitude()
-    };
-
-    return {
-      locationName: pointMeta.name,
-      province: pointMeta.province,
-      region: pointMeta.region,
-      lat: pointMeta.lat,
-      lon: pointMeta.lon,
-      weatherData
-    };
-  });
+    }).filter(Boolean) as OpenMeteoRainDataPoint[];
+  } catch (err) {
+    console.warn('Open-Meteo weather API call failed:', err);
+    return [];
+  }
 }
 
 export const useOpenMeteoRainData = () => {

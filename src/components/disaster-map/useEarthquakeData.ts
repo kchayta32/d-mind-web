@@ -47,7 +47,7 @@ export const useEarthquakeData = (
   });
 
   // 2. Fetch from EMSC Seismic Portal (Europe-Mediterranean & Global)
-  const { data: emscData, isLoading: isEmscLoading } = useQuery({
+  const { data: emscData, isLoading: isEmscLoading, refetch: refetchEmsc } = useQuery({
     queryKey: ['earthquake-emsc'],
     queryFn: async () => {
       try {
@@ -64,7 +64,7 @@ export const useEarthquakeData = (
   });
 
   // 3. Fetch from GDACS Earthquake Alerts
-  const { data: gdacsData, isLoading: isGdacsLoading } = useQuery({
+  const { data: gdacsData, isLoading: isGdacsLoading, refetch: refetchGdacs } = useQuery({
     queryKey: ['earthquake-gdacs'],
     queryFn: async () => {
       try {
@@ -93,6 +93,7 @@ export const useEarthquakeData = (
       usgsData.features.forEach((feature: any) => {
         const p = feature.properties || {};
         const coords = feature.geometry?.coordinates || [0, 0, 0];
+        if (!Array.isArray(coords) || typeof coords[1] !== 'number' || typeof coords[0] !== 'number' || isNaN(coords[1]) || isNaN(coords[0])) return;
         const mag = p.mag !== null && p.mag !== undefined ? Math.round(p.mag * 10) / 10 : 0;
         const depth = coords[2] !== undefined ? Math.round(coords[2]) : 10;
         const id = `usgs-${feature.id}`;
@@ -126,6 +127,7 @@ export const useEarthquakeData = (
       emscData.features.forEach((feature: any) => {
         const p = feature.properties || {};
         const coords = feature.geometry?.coordinates || [0, 0, 0];
+        if (!Array.isArray(coords) || typeof coords[1] !== 'number' || typeof coords[0] !== 'number' || isNaN(coords[1]) || isNaN(coords[0])) return;
         const mag = p.mag !== null && p.mag !== undefined ? Math.round(p.mag * 10) / 10 : 0;
         const depth = coords[2] !== undefined ? Math.round(Math.abs(coords[2])) : 10;
         const emscId = `emsc-${p.unid || feature.id || Math.random()}`;
@@ -166,6 +168,7 @@ export const useEarthquakeData = (
       gdacsData.features.forEach((feature: any) => {
         const p = feature.properties || {};
         const coords = feature.geometry?.coordinates || [0, 0];
+        if (!Array.isArray(coords) || typeof coords[1] !== 'number' || typeof coords[0] !== 'number' || isNaN(coords[1]) || isNaN(coords[0])) return;
         const mag = p.severitydata?.severity !== undefined ? Number(p.severitydata.severity) : (Number(p.magnitude) || 5.0);
         const depth = Number(p.depth || 10);
         const gdacsId = `gdacs-eq-${p.eventid || Math.random()}`;
@@ -249,6 +252,8 @@ export const useEarthquakeData = (
     isLoading: isUsgsLoading || isEmscLoading || isGdacsLoading,
     refetch: () => {
       refetchUsgs();
+      refetchEmsc();
+      refetchGdacs();
     }
   };
 };

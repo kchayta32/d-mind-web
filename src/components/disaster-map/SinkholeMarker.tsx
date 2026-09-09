@@ -117,11 +117,18 @@ const SinkholeMarker: React.FC<SinkholeMarkerProps> = ({ sinkhole }) => {
     }
   };
 
-  const allImages = [sinkhole.mainImage, ...sinkhole.additionalImages];
+  const lat = sinkhole?.latitude;
+  const lng = sinkhole?.longitude;
+
+  if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+    return null;
+  }
+
+  const allImages = [sinkhole.mainImage, ...(sinkhole.additionalImages || [])];
 
   return (
     <>
-      <Marker position={[sinkhole.latitude, sinkhole.longitude]} icon={sinkholeIcon}>
+      <Marker position={[lat, lng]} icon={sinkholeIcon}>
         <Popup maxWidth={300} className="sinkhole-popup">
           <div className="space-y-3 p-2">
             {/* Header */}
