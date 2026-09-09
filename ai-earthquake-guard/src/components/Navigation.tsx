@@ -8,26 +8,33 @@ import {
   Layers
 } from 'lucide-react';
 
+import { DisasterType } from '../types/disaster';
+import { getDisasterLabel } from '../services/naturalDisastersData';
+
 export type ActiveTab = 'map' | 'telemetry' | 'simulator' | 'evacuation' | 'nrct';
 
 interface NavigationProps {
   activeTab: ActiveTab;
   onChangeTab: (tab: ActiveTab) => void;
   isTriggered?: boolean;
+  selectedDisaster?: DisasterType;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   activeTab,
   onChangeTab,
-  isTriggered = false
+  isTriggered = false,
+  selectedDisaster = 'earthquake'
 }) => {
+  const isNonEarthquake = selectedDisaster !== 'earthquake';
+
   const navItems = [
     {
       id: 'map' as ActiveTab,
-      label: 'แผนที่วิกฤต GIS',
+      label: isNonEarthquake ? `แผนที่ (${getDisasterLabel(selectedDisaster)})` : 'แผนที่วิกฤต GIS',
       sublabel: 'Tactical Map',
       icon: MapIcon,
-      badge: isTriggered ? 'ALERT' : undefined,
+      badge: isTriggered ? 'ALERT' : isNonEarthquake ? getDisasterLabel(selectedDisaster) : undefined,
     },
     {
       id: 'telemetry' as ActiveTab,

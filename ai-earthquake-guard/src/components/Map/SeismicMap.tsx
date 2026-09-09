@@ -7,6 +7,14 @@ import {
   ActiveFault 
 } from '../../types/seismic';
 import { THAI_ACTIVE_FAULTS, THAI_SEISMIC_STATIONS } from '../../services/thaiFaultData';
+import { DisasterType, DisasterIncident } from '../../types/disaster';
+import { 
+  NATURAL_DISASTER_INCIDENTS, 
+  getIncidentsByType, 
+  getDisasterColor, 
+  getDisasterLabel 
+} from '../../services/naturalDisastersData';
+import { DisasterFilterSubmenu } from './DisasterFilterSubmenu';
 import MapLegend from './MapLegend';
 import StationListModal from './StationListModal';
 import { 
@@ -28,7 +36,10 @@ import {
   EyeOff,
   Globe,
   Sliders,
-  AlertTriangle
+  AlertTriangle,
+  Droplets,
+  Wind,
+  Mountain
 } from 'lucide-react';
 
 // Wave propagation velocities (average continental crust speeds)
@@ -81,6 +92,10 @@ export interface SeismicMapProps {
   height?: string | number;
   initialCenter?: [number, number];
   initialZoom?: number;
+  selectedDisaster?: DisasterType;
+  onSelectDisaster?: (disaster: DisasterType) => void;
+  activeDisasterIncident?: DisasterIncident | null;
+  onSelectDisasterIncident?: (incident: DisasterIncident) => void;
 }
 
 export const SeismicMap: React.FC<SeismicMapProps> = ({
@@ -96,11 +111,26 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   className = '',
   height = '100%',
   initialCenter = THAILAND_CENTER,
-  initialZoom = DEFAULT_ZOOM
+  initialZoom = DEFAULT_ZOOM,
+  selectedDisaster,
+  onSelectDisaster,
+  activeDisasterIncident,
+  onSelectDisasterIncident,
 }) => {
   // Container ref
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+
+  // Natural Disaster Single-Select State
+  const [internalDisaster, setInternalDisaster] = useState<DisasterType>('earthquake');
+  const activeDisaster = selectedDisaster !== undefined ? selectedDisaster : internalDisaster;
+
+  const handleDisasterChange = (disaster: DisasterType) => {
+    setInternalDisaster(disaster);
+    if (onSelectDisaster) {
+      onSelectDisaster(disaster);
+    }
+  };
 
   // Layer groups refs
   const baseTilesRef = useRef<{ 
@@ -114,6 +144,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   const eventLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const waveLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const userLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const disasterLayerGroupRef = useRef<L.LayerGroup | null>(null);
 
   // Wave circles refs
   const pWaveCircleRef = useRef<L.Circle | null>(null);
@@ -248,6 +279,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     const eventLayer = L.layerGroup().addTo(map);
     const waveLayer = L.layerGroup().addTo(map);
     const userLayer = L.layerGroup().addTo(map);
+    const disasterLayer = L.layerGroup().addTo(map);
 
     baseTilesRef.current = { 
       dark: darkTile, 
@@ -260,6 +292,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     eventLayerGroupRef.current = eventLayer;
     waveLayerGroupRef.current = waveLayer;
     userLayerGroupRef.current = userLayer;
+    disasterLayerGroupRef.current = disasterLayer;
     mapRef.current = map;
 
     // ResizeObserver for automatic map invalidateSize on container resize
@@ -308,7 +341,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
 
     faultLayer.clearLayers();
 
-    if (!showFaults) return;
+    if (!showFaults || activeDisaster !== 'earthquake') return;
 
     faults.forEach((fault) => {
       const isHighRisk = fault.riskLevel === 'high';
@@ -381,7 +414,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
       faultLayer.addLayer(glowPolyline);
       faultLayer.addLayer(corePolyline);
     });
-  }, [faults, showFaults]);
+  }, [faults, showFaults, activeDisaster]);
 
   // -------------------------------------------------------------
   // 4. Render Regional Seismic Stations
@@ -512,6 +545,10 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     if (!map || !eventLayer) return;
 
     eventLayer.clearLayers();
+
+    if (activeDisaster !== 'earthquake') {
+      return;
+    }
 
     // Render list of background / recent events
     events.forEach((evt) => {
@@ -648,7 +685,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
 
       eventLayer.addLayer(activeMarker);
     }
-  }, [events, activeEvent, onSelectEvent]);
+  }, [events, activeEvent, onSelectEvent, activeDisaster]);
 
   // -------------------------------------------------------------
   // 6. Real-Time Animated Shockwave Rings (P-Wave, S-Wave, Felt)
@@ -659,7 +696,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
     if (!map || !waveLayer) return;
 
     // If no active event or wave toggle turned off, clear layers
-    if (!activeEvent || !showWavefronts) {
+    if (!activeEvent || !showWavefronts || activeDisaster !== 'earthquake') {
       waveLayer.clearLayers();
       pWaveCircleRef.current = null;
       sWaveCircleRef.current = null;
@@ -732,7 +769,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
       sWaveCircleRef.current.setLatLng(center);
       sWaveCircleRef.current.setRadius(sRadiusMeters);
     }
-  }, [activeEvent, showWavefronts, currentElapsedSec]);
+  }, [activeEvent, showWavefronts, currentElapsedSec, activeDisaster]);
 
   // -------------------------------------------------------------
   // 7. User Location Marker & Warning Radius & Geodesic Vector
@@ -877,6 +914,164 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   }, [userLocation, activeEvent, showUserVector, currentElapsedSec]);
 
   // -------------------------------------------------------------
+  // 8. Render Multi-Hazard Natural Disaster Layer (Tsunami, Flood, Landslide, Storm, Wildfire, Volcano)
+  // -------------------------------------------------------------
+  useEffect(() => {
+    const map = mapRef.current;
+    const disasterLayer = disasterLayerGroupRef.current;
+    if (!map || !disasterLayer) return;
+
+    disasterLayer.clearLayers();
+
+    // If earthquake is selected, natural hazards layer is cleared
+    if (activeDisaster === 'earthquake') {
+      return;
+    }
+
+    const incidents = getIncidentsByType(activeDisaster);
+    const primaryColor = getDisasterColor(activeDisaster);
+
+    incidents.forEach((incident) => {
+      const isSelected = activeDisasterIncident?.id === incident.id;
+      const isCritical = incident.severity === 'critical';
+      const isWarning = incident.severity === 'warning';
+      const badgeColor = isCritical ? '#ef4444' : isWarning ? '#f59e0b' : primaryColor;
+
+      let iconEmoji = '●';
+      if (incident.type === 'tsunami') iconEmoji = '🌊';
+      else if (incident.type === 'flood') iconEmoji = '💧';
+      else if (incident.type === 'landslide') iconEmoji = '⛰️';
+      else if (incident.type === 'storm') iconEmoji = '🌪️';
+      else if (incident.type === 'wildfire') iconEmoji = '🔥';
+      else if (incident.type === 'volcano') iconEmoji = '🌋';
+
+      const customIcon = L.divIcon({
+        className: 'custom-disaster-marker',
+        html: `
+          <div class="relative flex items-center justify-center cursor-pointer group" style="width: 40px; height: 40px;">
+            ${isCritical || isSelected ? `
+              <div class="absolute inset-0 rounded-2xl animate-ping opacity-60" style="background-color: ${badgeColor};"></div>
+            ` : ''}
+            <div class="relative z-10 w-9 h-9 rounded-2xl border-2 flex items-center justify-center text-base shadow-2xl transition-transform group-hover:scale-125"
+                 style="background-color: #0b101c; border-color: ${badgeColor}; box-shadow: 0 0 16px ${badgeColor}90;">
+              <span>${iconEmoji}</span>
+            </div>
+            <div class="absolute -bottom-4 px-2 py-0.5 bg-slate-950/95 border border-slate-700/90 rounded-md text-[9px] font-mono font-bold text-slate-200 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-xl">
+              ${incident.province}
+            </div>
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -22]
+      });
+
+      const marker = L.marker([incident.latitude, incident.longitude], { icon: customIcon });
+
+      const metricsHtml = incident.metrics.map(m => `
+        <div class="bg-slate-950/90 p-1.5 rounded-lg border border-slate-800">
+          <span class="text-slate-400 block text-[9px] font-mono">${m.label}</span>
+          <span class="font-mono font-bold text-xs ${m.trend === 'up' ? 'text-rose-400' : 'text-cyan-300'}">
+            ${m.value} <span class="text-[10px] font-normal text-slate-400">${m.unit}</span>
+          </span>
+        </div>
+      `).join('');
+
+      const popupHtml = `
+        <div class="p-3 font-sans min-w-[270px] max-w-xs text-slate-100 bg-[#0d1322] rounded-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+            <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" 
+                  style="background-color: ${badgeColor}25; color: ${badgeColor}; border: 1px solid ${badgeColor}60;">
+              ● ${incident.status}
+            </span>
+            <span class="text-[9px] font-mono text-slate-400">${incident.source.split('/')[0]}</span>
+          </div>
+
+          <h4 class="text-xs font-bold text-white mb-0.5 leading-snug">${incident.titleTh}</h4>
+          <p class="text-[10px] text-slate-400 mb-2">
+            📍 ${incident.location}, <span class="text-slate-300 font-medium">${incident.province}</span>
+          </p>
+
+          <p class="text-[11px] text-slate-300 bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 leading-relaxed mb-2.5">
+            ${incident.description}
+          </p>
+
+          <div class="grid grid-cols-2 gap-1.5 mb-2">
+            ${metricsHtml}
+          </div>
+
+          <div class="text-[9px] font-mono text-slate-500 pt-1 border-t border-slate-800 flex justify-between">
+            <span>${incident.latitude.toFixed(3)}°N, ${incident.longitude.toFixed(3)}°E</span>
+            <span>แหล่งข้อมูล: ${incident.source}</span>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, {
+        className: 'tactical-dark-popup',
+        maxWidth: 320
+      });
+
+      marker.on('click', () => {
+        if (onSelectDisasterIncident) {
+          onSelectDisasterIncident(incident);
+        }
+      });
+
+      disasterLayer.addLayer(marker);
+
+      // Render hazard radius circle if present
+      if (incident.radiusKm) {
+        const hazardCircle = L.circle([incident.latitude, incident.longitude], {
+          radius: incident.radiusKm * 1000,
+          color: badgeColor,
+          fillColor: badgeColor,
+          fillOpacity: 0.08,
+          weight: 1.5,
+          dashArray: '5, 5'
+        });
+        disasterLayer.addLayer(hazardCircle);
+      }
+
+      // Render storm trajectory line if present
+      if (incident.pathCoordinates && incident.pathCoordinates.length > 1) {
+        const pathLine = L.polyline(incident.pathCoordinates, {
+          color: '#c084fc',
+          weight: 3.5,
+          opacity: 0.85,
+          dashArray: '6, 6'
+        });
+        disasterLayer.addLayer(pathLine);
+
+        incident.pathCoordinates.forEach((coord, idx) => {
+          const nodeMarker = L.circleMarker(coord, {
+            radius: idx === 0 ? 5 : 3.5,
+            color: '#a855f7',
+            fillColor: idx === 0 ? '#ef4444' : '#c084fc',
+            fillOpacity: 0.9,
+            weight: 1.5
+          });
+          disasterLayer.addLayer(nodeMarker);
+        });
+      }
+    });
+
+    // Fit bounds on disaster change
+    if (incidents.length > 0) {
+      const bounds = L.latLngBounds(incidents.map(i => [i.latitude, i.longitude]));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8 });
+    }
+  }, [activeDisaster, activeDisasterIncident, onSelectDisasterIncident]);
+
+  // Center camera on active disaster incident when selected from list
+  useEffect(() => {
+    if (!activeDisasterIncident || !mapRef.current) return;
+    mapRef.current.flyTo([activeDisasterIncident.latitude, activeDisasterIncident.longitude], 9, {
+      duration: 1.2
+    });
+  }, [activeDisasterIncident]);
+
+  // -------------------------------------------------------------
   // Camera Control Actions
   // -------------------------------------------------------------
   const handleCenterThailand = useCallback(() => {
@@ -959,12 +1154,14 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
             <span className="font-bold text-slate-100 tracking-wider">SEISMOGUARD GIS</span>
             <span className="text-slate-500">|</span>
             <span className="text-cyan-400 font-semibold hidden sm:inline">
-              {activeTile === 'dark' ? 'CARTO DARK TACTICAL' : 'SATELLITE HIGH-RES'}
+              {activeDisaster === 'earthquake'
+                ? (activeTile === 'dark' ? 'CARTO DARK TACTICAL' : 'SATELLITE HIGH-RES')
+                : `${getDisasterLabel(activeDisaster).toUpperCase()}`}
             </span>
           </div>
 
-          {/* Active Earthquake Alert & Countdown Pill (if event exists) */}
-          {activeEvent && userImpactTelemetry && (
+          {/* Active Earthquake Alert & Countdown Pill (if earthquake mode) */}
+          {activeDisaster === 'earthquake' && activeEvent && userImpactTelemetry && (
             <div className={`px-3.5 py-2 rounded-xl backdrop-blur-md border shadow-2xl transition-all max-w-sm sm:max-w-md ${
               userImpactTelemetry.hasSArrived
                 ? 'bg-rose-950/90 border-rose-500/80 text-rose-100 shadow-[0_0_20px_rgba(244,63,94,0.4)] animate-pulse'
@@ -1002,10 +1199,57 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
               </div>
             </div>
           )}
+
+          {/* Active Disaster Alert Banner (when non-earthquake disaster is selected) */}
+          {activeDisaster !== 'earthquake' && (
+            <div className="px-3.5 py-2 rounded-xl backdrop-blur-md border shadow-2xl transition-all max-w-sm sm:max-w-md bg-slate-900/95 border-cyan-500/70 text-slate-100 animate-in fade-in">
+              {(() => {
+                const currentIncidents = getIncidentsByType(activeDisaster);
+                const featured = activeDisasterIncident || currentIncidents[0];
+                if (!featured) return null;
+                const pColor = getDisasterColor(activeDisaster);
+                return (
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-wide" style={{ color: pColor }}>
+                        <span>● {getDisasterLabel(activeDisaster)}</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded font-mono text-slate-300 bg-slate-950 border border-slate-800">
+                          {featured.severity.toUpperCase()}
+                        </span>
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800">
+                        {currentIncidents.length} จุดเฝ้าระวัง
+                      </span>
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-[11px] text-slate-200 font-semibold truncate block">
+                        {featured.titleTh}
+                      </span>
+                      <div className="flex items-center justify-between mt-1 text-[10px] font-mono text-slate-400">
+                        <span className="truncate max-w-[140px]">{featured.province}</span>
+                        <span className="text-cyan-400 font-semibold">
+                          {featured.metrics[0]?.label}: {featured.metrics[0]?.value} {featured.metrics[0]?.unit}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
 
         {/* Right Side: Tactical Controls Bar */}
         <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-800/90 shadow-2xl pointer-events-auto">
+          {/* Natural Disaster Filter Submenu (Single-select only) */}
+          <DisasterFilterSubmenu 
+            selectedDisaster={activeDisaster}
+            onSelectDisaster={handleDisasterChange}
+            earthquakeCount={events.length}
+          />
+
+          <div className="w-[1px] h-5 bg-slate-800 my-auto mx-0.5" />
+
           {/* Tile Switcher: Dark vs Google Hybrid vs Google Sat vs ESRI */}
           <button
             type="button"
@@ -1147,13 +1391,14 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
         <MapLegend 
           className="pointer-events-auto"
           defaultExpanded={showLegend}
+          activeDisaster={activeDisaster}
         />
       </div>
 
       {/* -------------------------------------------------------------
           Bottom Center HUD: Shockwave Simulation Player Control Bar
       ------------------------------------------------------------- */}
-      {activeEvent && showWavefronts && (
+      {activeEvent && showWavefronts && activeDisaster === 'earthquake' && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-slate-900/95 backdrop-blur-md border border-slate-800 shadow-2xl text-xs font-mono">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />

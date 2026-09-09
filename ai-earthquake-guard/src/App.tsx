@@ -40,6 +40,14 @@ import {
   TriggerResult
 } from './types/seismic';
 
+import { DisasterType, DisasterIncident } from './types/disaster';
+import { 
+  NATURAL_DISASTER_INCIDENTS, 
+  getIncidentsByType, 
+  getDisasterLabel, 
+  getDisasterColor 
+} from './services/naturalDisastersData';
+
 import { THAI_SEISMIC_STATIONS, THAI_ACTIVE_FAULTS } from './services/thaiFaultData';
 import { LiveSeismicFeedService } from './services/liveSeismicFeed';
 import { WavePhysicsEngine } from './services/wavePhysicsEngine';
@@ -61,7 +69,12 @@ import {
   ChevronRight,
   ShieldCheck,
   ShieldAlert,
-  Flame
+  Flame,
+  Waves,
+  Droplets,
+  Mountain,
+  Wind,
+  Filter
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -75,6 +88,10 @@ export const App: React.FC = () => {
   const [stations, setStations] = useState<SeismicStation[]>(THAI_SEISMIC_STATIONS);
   const [isLoadingFeed, setIsLoadingFeed] = useState<boolean>(true);
   const [selectedStation, setSelectedStation] = useState<SeismicStation | null>(null);
+
+  // Natural Disaster Filter Mode (Single Select: 'earthquake' | 'tsunami' | 'flood' | 'landslide' | 'storm' | 'wildfire' | 'volcano')
+  const [selectedDisaster, setSelectedDisaster] = useState<DisasterType>('earthquake');
+  const [activeDisasterIncident, setActiveDisasterIncident] = useState<DisasterIncident | null>(null);
 
   // User Target Location (Default: Bangkok City Center)
   const [userLocation, setUserLocation] = useState<[number, number]>([13.7563, 100.5018]);
@@ -301,6 +318,7 @@ export const App: React.FC = () => {
           if (tab !== 'map') setIsFullscreenMap(false);
         }}
         isTriggered={isSimulating || currentAlertLevel === 'critical' || currentAlertLevel === 'warning'}
+        selectedDisaster={selectedDisaster}
       />
 
       {/* Main Body Content Container */}
@@ -395,6 +413,7 @@ export const App: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               
               {/* Map Panel (8 cols on desktop) */}
+              {/* Map Panel (8 cols on desktop) */}
               <div className="lg:col-span-8 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 relative min-h-[460px] md:min-h-[580px]">
                 <SeismicMap 
                   events={events}
@@ -405,122 +424,295 @@ export const App: React.FC = () => {
                   onSelectStation={(s) => setSelectedStation(s)}
                   isSimulating={isSimulating}
                   simulationElapsedSec={simulationElapsedSec}
+                  selectedDisaster={selectedDisaster}
+                  onSelectDisaster={(disaster) => {
+                    setSelectedDisaster(disaster);
+                    if (disaster !== 'earthquake') {
+                      const incs = getIncidentsByType(disaster);
+                      setActiveDisasterIncident(incs[0] || null);
+                    } else {
+                      setActiveDisasterIncident(null);
+                    }
+                  }}
+                  activeDisasterIncident={activeDisasterIncident}
+                  onSelectDisasterIncident={(inc) => setActiveDisasterIncident(inc)}
                   className="w-full h-full min-h-[460px] md:min-h-[580px]"
                 />
               </div>
 
-              {/* Right Sidebar: Active Event Telemetry & Recent Quakes List (4 cols on desktop) */}
+              {/* Right Sidebar: Active Telemetry & Incident List (4 cols on desktop) */}
               <div className="lg:col-span-4 space-y-4">
                 
-                {/* Active Event Card */}
-                {activeEvent ? (
-                  <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Activity className="w-3.5 h-3.5" />
-                        ข้อมูลเหตุการณ์ที่เลือก
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
-                        activeEvent.alertLevel === 'critical' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50' :
-                        activeEvent.alertLevel === 'warning' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50' :
-                        'bg-slate-800 text-slate-300'
-                      }`}>
-                        {activeEvent.source}
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-base text-slate-100 leading-snug">
-                        {activeEvent.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-slate-500" />
-                        <span>{activeEvent.epicenter}</span>
-                      </p>
-                    </div>
-
-                    {/* Magnitude & Depth Matrix */}
-                    <div className="grid grid-cols-3 gap-2 text-center pt-2">
-                      <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 font-mono block">MAGNITUDE</span>
-                        <span className="text-lg font-bold font-mono text-amber-400">
-                          M {activeEvent.magnitude}
+                {/* When Disaster Mode is NOT Earthquake */}
+                {selectedDisaster !== 'earthquake' ? (
+                  <>
+                    {/* Active Mode Header & Switcher */}
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono shadow-lg">
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className="w-2.5 h-2.5 rounded-full animate-pulse shadow-sm"
+                          style={{ backgroundColor: getDisasterColor(selectedDisaster) }} 
+                        />
+                        <span className="font-bold text-white uppercase">
+                          {getDisasterLabel(selectedDisaster)}
                         </span>
                       </div>
-                      <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 font-mono block">DEPTH</span>
-                        <span className="text-lg font-bold font-mono text-cyan-400">
-                          {activeEvent.depthKm} <span className="text-xs font-normal">km</span>
-                        </span>
-                      </div>
-                      <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 font-mono block">EST. PGA</span>
-                        <span className="text-lg font-bold font-mono text-rose-400">
-                          {activeEvent.pga} <span className="text-xs font-normal">Gal</span>
-                        </span>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedDisaster('earthquake');
+                          setActiveDisasterIncident(null);
+                        }}
+                        className="px-2.5 py-1 rounded-lg text-[10px] bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition-all active:scale-95 cursor-pointer"
+                      >
+                        กลับสู่แผ่นดินไหว
+                      </button>
                     </div>
 
-                    {/* Coordinates & Time */}
-                    <div className="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-950/40 p-2.5 rounded-lg">
-                      <div className="flex justify-between">
-                        <span>พิกัดศูนย์กลาง:</span>
-                        <span className="text-slate-200">{activeEvent.latitude.toFixed(3)}°N, {activeEvent.longitude.toFixed(3)}°E</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>เวลาตรวจวัด:</span>
-                        <span className="text-slate-200">{new Date(activeEvent.time).toLocaleTimeString('th-TH')} ICT</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
+                    {/* Featured Disaster Incident Card */}
+                    {(() => {
+                      const currentIncidents = getIncidentsByType(selectedDisaster);
+                      const featured = activeDisasterIncident || currentIncidents[0];
+                      if (!featured) return null;
 
-                {/* Recent Earthquakes List */}
-                <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-mono font-semibold uppercase text-slate-300">
-                      รายการแผ่นดินไหวล่าสุด ({events.length})
-                    </h4>
-                    <span className="text-[10px] text-slate-500 font-mono">LIVE FEED</span>
-                  </div>
+                      const isCrit = featured.severity === 'critical';
+                      const isWarn = featured.severity === 'warning';
+                      const statusBadgeColor = isCrit ? '#ef4444' : isWarn ? '#f59e0b' : '#10b981';
 
-                  <div className="max-h-[280px] overflow-y-auto space-y-1.5 pr-1">
-                    {events.map((evt) => {
-                      const isSelected = activeEvent?.id === evt.id;
                       return (
-                        <button
-                          key={evt.id}
-                          onClick={() => handleSelectEvent(evt)}
-                          className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 cursor-pointer ${
-                            isSelected
-                              ? 'bg-cyan-500/15 border-cyan-500/50 shadow-sm'
-                              : 'bg-slate-950/50 border-slate-800/80 hover:bg-slate-800/60'
-                          }`}
-                        >
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono ${
-                                evt.magnitude >= 6.5 ? 'bg-rose-500 text-white' :
-                                evt.magnitude >= 5.0 ? 'bg-amber-500 text-slate-950' :
-                                'bg-cyan-500/20 text-cyan-300'
-                              }`}>
-                                M {evt.magnitude}
-                              </span>
-                              <span className="text-xs font-medium text-slate-200 truncate">
-                                {evt.epicenter}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
-                              {new Date(evt.time).toLocaleTimeString('th-TH')} | ลึก {evt.depthKm} กม.
+                        <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                              <Activity className="w-3.5 h-3.5" />
+                              ข้อมูลจุดเฝ้าระวังที่เลือก
+                            </span>
+                            <span 
+                              className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase"
+                              style={{ 
+                                backgroundColor: `${statusBadgeColor}20`, 
+                                color: statusBadgeColor, 
+                                border: `1px solid ${statusBadgeColor}50` 
+                              }}
+                            >
+                              ● {featured.status}
                             </span>
                           </div>
 
-                          <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-600'}`} />
-                        </button>
+                          <div>
+                            <h3 className="font-bold text-base text-slate-100 leading-snug">
+                              {featured.titleTh}
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-slate-500" />
+                              <span>{featured.location}, {featured.province}</span>
+                            </p>
+                          </div>
+
+                          {/* Dynamic Telemetry Matrix */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center pt-1">
+                            {featured.metrics.slice(0, 3).map((m, idx) => (
+                              <div key={idx} className="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+                                <span className="text-[9px] text-slate-400 font-mono block truncate">{m.label}</span>
+                                <span className="text-xs sm:text-sm font-bold font-mono text-cyan-300 block mt-0.5 truncate">
+                                  {m.value} <span className="text-[10px] font-normal text-slate-400">{m.unit}</span>
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Description */}
+                          <p className="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
+                            {featured.description}
+                          </p>
+
+                          {/* Coordinates & Agency */}
+                          <div className="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-950/40 p-2.5 rounded-lg">
+                            <div className="flex justify-between">
+                              <span>พิกัดตรวจวัด:</span>
+                              <span className="text-slate-200">{featured.latitude.toFixed(3)}°N, {featured.longitude.toFixed(3)}°E</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>หน่วยงานข้อมูล:</span>
+                              <span className="text-cyan-400 truncate max-w-[180px]">{featured.source}</span>
+                            </div>
+                          </div>
+                        </div>
                       );
-                    })}
-                  </div>
-                </div>
+                    })()}
+
+                    {/* Incidents List for Selected Disaster */}
+                    {(() => {
+                      const currentIncidents = getIncidentsByType(selectedDisaster);
+                      const featured = activeDisasterIncident || currentIncidents[0];
+
+                      return (
+                        <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-mono font-semibold uppercase text-slate-300">
+                              จุดเฝ้าระวัง{getDisasterLabel(selectedDisaster)} ({currentIncidents.length})
+                            </h4>
+                            <span className="text-[10px] text-cyan-400 font-mono">LIVE TELEMETRY</span>
+                          </div>
+
+                          <div className="max-h-[280px] overflow-y-auto space-y-1.5 pr-1">
+                            {currentIncidents.map((inc) => {
+                              const isSelected = featured?.id === inc.id;
+                              const isCrit = inc.severity === 'critical';
+                              const isWarn = inc.severity === 'warning';
+                              return (
+                                <button
+                                  key={inc.id}
+                                  type="button"
+                                  onClick={() => setActiveDisasterIncident(inc)}
+                                  className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                                    isSelected
+                                      ? 'bg-cyan-500/15 border-cyan-500/50 shadow-sm'
+                                      : 'bg-slate-950/50 border-slate-800/80 hover:bg-slate-800/60'
+                                  }`}
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono ${
+                                        isCrit ? 'bg-rose-500 text-white' :
+                                        isWarn ? 'bg-amber-500 text-slate-950' :
+                                        'bg-cyan-500/20 text-cyan-300'
+                                      }`}>
+                                        {inc.severity.toUpperCase()}
+                                      </span>
+                                      <span className="text-xs font-medium text-slate-200 truncate">
+                                        {inc.titleTh}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1">
+                                      <span>📍 {inc.province}</span>
+                                      <span className="text-cyan-400 font-semibold truncate max-w-[120px]">
+                                        {inc.metrics[0]?.value} {inc.metrics[0]?.unit}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-600'}`} />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </>
+                ) : (
+                  <>
+                    {/* Active Earthquake Event Card */}
+                    {activeEvent ? (
+                      <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Activity className="w-3.5 h-3.5" />
+                            ข้อมูลเหตุการณ์ที่เลือก
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                            activeEvent.alertLevel === 'critical' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50' :
+                            activeEvent.alertLevel === 'warning' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50' :
+                            'bg-slate-800 text-slate-300'
+                          }`}>
+                            {activeEvent.source}
+                          </span>
+                        </div>
+
+                        <div>
+                          <h3 className="font-bold text-base text-slate-100 leading-snug">
+                            {activeEvent.title}
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-slate-500" />
+                            <span>{activeEvent.epicenter}</span>
+                          </p>
+                        </div>
+
+                        {/* Magnitude & Depth Matrix */}
+                        <div className="grid grid-cols-3 gap-2 text-center pt-2">
+                          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span className="text-[10px] text-slate-400 font-mono block">MAGNITUDE</span>
+                            <span className="text-lg font-bold font-mono text-amber-400">
+                              M {activeEvent.magnitude}
+                            </span>
+                          </div>
+                          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span className="text-[10px] text-slate-400 font-mono block">DEPTH</span>
+                            <span className="text-lg font-bold font-mono text-cyan-400">
+                              {activeEvent.depthKm} <span className="text-xs font-normal">km</span>
+                            </span>
+                          </div>
+                          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                            <span className="text-[10px] text-slate-400 font-mono block">EST. PGA</span>
+                            <span className="text-lg font-bold font-mono text-rose-400">
+                              {activeEvent.pga} <span className="text-xs font-normal">Gal</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Coordinates & Time */}
+                        <div className="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-950/40 p-2.5 rounded-lg">
+                          <div className="flex justify-between">
+                            <span>พิกัดศูนย์กลาง:</span>
+                            <span className="text-slate-200">{activeEvent.latitude.toFixed(3)}°N, {activeEvent.longitude.toFixed(3)}°E</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>เวลาตรวจวัด:</span>
+                            <span className="text-slate-200">{new Date(activeEvent.time).toLocaleTimeString('th-TH')} ICT</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {/* Recent Earthquakes List */}
+                    <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-mono font-semibold uppercase text-slate-300">
+                          รายการแผ่นดินไหวล่าสุด ({events.length})
+                        </h4>
+                        <span className="text-[10px] text-slate-500 font-mono">LIVE FEED</span>
+                      </div>
+
+                      <div className="max-h-[280px] overflow-y-auto space-y-1.5 pr-1">
+                        {events.map((evt) => {
+                          const isSelected = activeEvent?.id === evt.id;
+                          return (
+                            <button
+                              key={evt.id}
+                              onClick={() => handleSelectEvent(evt)}
+                              className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-cyan-500/15 border-cyan-500/50 shadow-sm'
+                                  : 'bg-slate-950/50 border-slate-800/80 hover:bg-slate-800/60'
+                              }`}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono ${
+                                    evt.magnitude >= 6.5 ? 'bg-rose-500 text-white' :
+                                    evt.magnitude >= 5.0 ? 'bg-amber-500 text-slate-950' :
+                                    'bg-cyan-500/20 text-cyan-300'
+                                  }`}>
+                                    M {evt.magnitude}
+                                  </span>
+                                  <span className="text-xs font-medium text-slate-200 truncate">
+                                    {evt.epicenter}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
+                                  {new Date(evt.time).toLocaleTimeString('th-TH')} | ลึก {evt.depthKm} กม.
+                                </span>
+                              </div>
+
+                              <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-600'}`} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
 
               </div>
             </div>
