@@ -43,7 +43,8 @@ const ContactUs: React.FC = () => {
         email: '',
         phone: '',
         subject: 'general',
-        message: ''
+        message: '',
+        hp_website: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -227,24 +228,32 @@ const ContactUs: React.FC = () => {
                 email: formData.email,
                 phone: formData.phone,
                 subject: formData.subject,
-                message: formData.message
+                message: formData.message,
+                hp_website: formData.hp_website
             });
 
-            toast.success(t('contactUs.formSuccessTitle') || 'ส่งข้อความเรียบร้อยแล้ว!', {
-                description: result.message || (t('contactUs.formSuccessDesc') || 'ขอบคุณที่ติดต่อทีมงาน D-MIND')
-            });
+            if (result.success) {
+                toast.success(t('contactUs.formSuccessTitle') || 'ส่งข้อความเรียบร้อยแล้ว!', {
+                    description: result.message || (t('contactUs.formSuccessDesc') || 'ขอบคุณที่ติดต่อทีมงาน D-MIND')
+                });
 
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                subject: 'general',
-                message: ''
-            });
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    subject: 'general',
+                    message: '',
+                    hp_website: ''
+                });
+            } else {
+                toast.error(language === 'th' ? 'ไม่สามารถส่งข้อความได้' : 'Failed to send message', {
+                    description: result.message
+                });
+            }
         } catch (err) {
             console.error('Error submitting contact form:', err);
-            toast.success(t('contactUs.formSuccessTitle') || 'ส่งข้อความเรียบร้อยแล้ว!', {
-                description: t('contactUs.formSuccessDesc') || 'ขอบคุณที่ติดต่อทีมงาน D-MIND'
+            toast.error(language === 'th' ? 'เกิดข้อผิดพลาด' : 'Error', {
+                description: language === 'th' ? 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง' : 'Failed to connect to server. Please try again.'
             });
         } finally {
             setIsSubmitting(false);
@@ -880,6 +889,18 @@ const ContactUs: React.FC = () => {
                                     </div>
 
                                     <form onSubmit={handleFormSubmit} className="space-y-5">
+                                        {/* Anti-spam Honeypot Field (hidden from genuine users) */}
+                                        <div className="hidden" style={{ display: 'none' }} aria-hidden="true">
+                                            <input
+                                                type="text"
+                                                name="hp_website"
+                                                tabIndex={-1}
+                                                autoComplete="off"
+                                                value={formData.hp_website}
+                                                onChange={e => setFormData({ ...formData, hp_website: e.target.value })}
+                                            />
+                                        </div>
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">

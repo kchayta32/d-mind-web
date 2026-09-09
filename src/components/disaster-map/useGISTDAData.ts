@@ -34,6 +34,7 @@ export interface GISTDAHotspot {
     village: string;
     lu_name: string;
     acq_date: string;
+    acq_time?: string;
     changwat?: string;
     tambon?: string;
     area_rai?: number;

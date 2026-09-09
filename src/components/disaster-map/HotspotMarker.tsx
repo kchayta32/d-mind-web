@@ -143,7 +143,7 @@ export const HotspotMarker: React.FC<HotspotMarkerProps> = ({ hotspot }) => {
     return null;
   }
 
-  const props = hotspot.properties || {};
+  const props: Partial<NonNullable<GISTDAHotspot['properties']>> = hotspot.properties || {};
   const instrument = props.instrument || hotspot.SATELLITE || 'VIIRS';
   const riskLevel = props.risk_level || 'medium';
   const province = props.changwat || props.pv_tn || hotspot.province || 'ไม่ระบุ';

@@ -16,6 +16,7 @@ export interface Earthquake {
   feltReports?: number;
   alertColor?: 'green' | 'yellow' | 'orange' | 'red';
   distanceFromUser?: number;
+  updated_at?: string;
 }
 
 export interface EarthquakeStats {
@@ -64,6 +65,9 @@ export interface AirPollutionData {
   id: string;
   lat: number;
   lng: number;
+  latitude?: number;
+  longitude?: number;
+  name?: string;
   pm25?: number;
   pm10?: number;
   o3?: number;
@@ -169,6 +173,8 @@ export interface VolcanoData {
   country: string;
   latitude: number;
   longitude: number;
+  lat?: number;
+  lng?: number;
   elevationMeters?: number;
   status: 'Erupting' | 'Warning' | 'Unrest' | 'Normal';
   alertLevel: 'Green' | 'Yellow' | 'Orange' | 'Red';

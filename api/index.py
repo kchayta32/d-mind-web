@@ -105,8 +105,9 @@ THAILLM_API_KEY = os.environ.get("THAILLM_API_KEY") or _safe_b64("VGU1bjhzY3JsRz
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY") or _safe_b64("NTdlZDUwYTViZTdmNDc4MDgzZjNjZjBkNjNlNWIzY2YuUXdwcHBlOU5zS09YTnB2WGlwMmIwS1Jf")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY") or _safe_b64("c2stb3ItdjEtZDQ0NWMyMmY1M2E4MjY1N2QyYjFiNGI1ZWQzMGFiYWU4MTNhNTgyZjBmNzJmODViMTkyOGEyMGU3NTFmZTA4MA==")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY") or _safe_b64("QVEuQWI4Uk42S1A4TXNOV2xhVDlFSjBuTUFyQl93VFB0cmxXVkRIeXFxeGNieExTVTVMMlE=")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8686401520:AAHb2qFnN_t66av6OcwuTHDsZ_wWBVVpNXM")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY", "")
 
 SUBJECT_MAP = {
     "general": "สอบถามข้อมูลทั่วไป (General Inquiry)",
@@ -115,51 +116,49 @@ SUBJECT_MAP = {
     "feedback": "ข้อเสนอแนะเพื่อการพัฒนา (Feedback & Feature Suggestions)"
 }
 
-def sync_telegram_subscribers():
-    """Fetch updates from Telegram Bot API and register new subscriber chat IDs."""
+# In-memory sliding window rate limiter for contact form submissions
+_contact_rate_limit = {}
+
+def is_contact_rate_limited(ip, max_requests=5, window_seconds=300):
+    """Rate limit form submissions per IP address (max 5 per 5 minutes)."""
+    now = time.time()
+    timestamps = _contact_rate_limit.get(ip, [])
+    timestamps = [t for t in timestamps if now - t < window_seconds]
+    if len(timestamps) >= max_requests:
+        _contact_rate_limit[ip] = timestamps
+        return True
+    timestamps.append(now)
+    _contact_rate_limit[ip] = timestamps
+    return False
+
+def is_admin_authorized():
+    """Verify admin authorization secret header for protected endpoints."""
+    if not ADMIN_SECRET_KEY:
+        if os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV"):
+            return False
+        return True
+    auth_header = request.headers.get("X-Admin-Token") or request.headers.get("Authorization", "").replace("Bearer ", "")
+    return auth_header == ADMIN_SECRET_KEY
+
+def send_telegram_alert(html_text):
+    """Send formatted alert message strictly to configured admin/team chat IDs."""
     if not TELEGRAM_BOT_TOKEN:
-        return []
-    try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
-        resp = requests.get(url, timeout=10)
-        if resp.status_code == 200:
-            data = resp.json()
-            if data.get("ok"):
-                for item in data.get("result", []):
-                    chat = None
-                    if "message" in item and "chat" in item["message"]:
-                        chat = item["message"]["chat"]
-                    elif "channel_post" in item and "chat" in item["channel_post"]:
-                        chat = item["channel_post"]["chat"]
-                    elif "my_chat_member" in item and "chat" in item["my_chat_member"]:
-                        chat = item["my_chat_member"]["chat"]
-                    elif "callback_query" in item and "message" in item["callback_query"]:
-                        chat = item["callback_query"]["message"].get("chat")
-                        
-                    if chat and "id" in chat:
-                        cid = str(chat["id"])
-                        first_name = chat.get("first_name") or chat.get("title") or ""
-                        username = chat.get("username") or ""
-                        db.save_telegram_subscriber(cid, first_name, username)
-    except Exception as e:
-        print(f"Error syncing Telegram subscribers: {e}")
-        
-    chats = set(db.get_telegram_subscribers())
+        print("[Telegram Alert] TELEGRAM_BOT_TOKEN not configured. Skipping alert.")
+        return 0
+
+    recipient_chats = []
     if TELEGRAM_CHAT_ID:
         for cid in TELEGRAM_CHAT_ID.split(","):
             cid = cid.strip()
             if cid:
-                chats.add(cid)
-    return list(chats)
+                recipient_chats.append(cid)
 
-def send_telegram_alert(html_text):
-    """Send formatted alert message to all Telegram subscribers."""
-    subscribers = sync_telegram_subscribers()
-    sent_count = 0
-    if not TELEGRAM_BOT_TOKEN or not subscribers:
+    if not recipient_chats:
+        print("[Telegram Alert] Warning: No TELEGRAM_CHAT_ID configured in environment variables.")
         return 0
-        
-    for chat_id in subscribers:
+
+    sent_count = 0
+    for chat_id in set(recipient_chats):
         try:
             url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
             payload = {
@@ -171,18 +170,24 @@ def send_telegram_alert(html_text):
             resp = requests.post(url, json=payload, timeout=10)
             if resp.status_code == 200 and resp.json().get("ok"):
                 sent_count += 1
+            else:
+                print(f"[Telegram Alert] Failed to send to chat {chat_id}: {resp.text}")
         except Exception as e:
-            print(f"Error sending message to Telegram chat {chat_id}: {e}")
-            
+            print(f"[Telegram Alert] Error sending message to chat {chat_id}: {e}")
+
     return sent_count
 
 
-# Enable CORS for file:// protocol, localhost and web origins
+# Enable CORS and Security Headers
 @app.after_request
-def add_cors_headers(response):
+def add_cors_and_security_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, X-Admin-Token'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
 
 # Serves frontend static files
@@ -685,6 +690,8 @@ def get_history():
 @app.route('/api/delete_query', methods=['POST'])
 @app.route('/delete_query', methods=['POST'])
 def delete_query():
+    if not is_admin_authorized():
+        return jsonify({"error": "Unauthorized"}), 401
     data = request.json or {}
     query_id = data.get("query_id")
     if not query_id:
@@ -698,6 +705,8 @@ def delete_query():
 @app.route('/api/clear', methods=['POST'])
 @app.route('/clear', methods=['POST'])
 def clear_data():
+    if not is_admin_authorized():
+        return jsonify({"error": "Unauthorized"}), 401
     db.clear_history()
     return jsonify({"success": True})
 
@@ -711,48 +720,79 @@ def refresh_supabase():
 @app.route('/contact', methods=['POST'])
 def handle_contact():
     import html
+    import re
+    from datetime import datetime, timezone, timedelta
+
     data = request.json or {}
-    name = (data.get("name") or "").strip()
-    email = (data.get("email") or "").strip()
-    phone = (data.get("phone") or "").strip()
+
+    # 1. Honeypot check (anti-spambot)
+    hp_website = (data.get("hp_website") or data.get("website_url") or "").strip()
+    if hp_website:
+        # Silently drop bot submission
+        return jsonify({
+            "success": True,
+            "message_id": "spambot_blocked",
+            "chat_count": 0,
+            "telegram_status": "ignored"
+        })
+
+    # 2. Rate limiting per IP address
+    client_ip = (
+        request.headers.get("CF-Connecting-IP") or
+        request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or
+        request.remote_addr or
+        "unknown"
+    )
+    if is_contact_rate_limited(client_ip, max_requests=5, window_seconds=300):
+        return jsonify({"error": "คุณส่งข้อความถี่เกินไป กรุณารอสักครู่ (ประมาณ 5 นาที) แล้วลองใหม่อีกครั้ง"}), 429
+
+    # 3. Input validation and sanitization
+    name = (data.get("name") or "").strip()[:100]
+    email = (data.get("email") or "").strip()[:100]
+    phone = (data.get("phone") or "").strip()[:30]
     subject = (data.get("subject") or "general").strip()
-    message = (data.get("message") or "").strip()
-    custom_html = data.get("html_message")
+    message = (data.get("message") or "").strip()[:3000]
 
     if not name or not email or not message:
-        return jsonify({"error": "Missing required fields: name, email, message"}), 400
+        return jsonify({"error": "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อ, อีเมล, ข้อความ)"}), 400
 
-    # Build HTML formatted Telegram message if not supplied
-    if not custom_html:
-        safe_name = html.escape(name)
-        safe_email = html.escape(email)
-        safe_phone = html.escape(phone) if phone else "ไม่ได้ระบุ"
-        subject_title = SUBJECT_MAP.get(subject, html.escape(subject))
-        safe_message = html.escape(message)
-        
-        from datetime import datetime, timezone, timedelta
-        bkk_tz = timezone(timedelta(hours=7))
-        now_str = datetime.now(bkk_tz).strftime("%d/%m/%Y %H:%M:%S")
-        
-        custom_html = (
-            f"🚨 <b>[D-MIND] มีข้อความติดต่อใหม่ถึงทีมพัฒนา</b>\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"👤 <b>ชื่อ - นามสกุล:</b> {safe_name}\n"
-            f"📧 <b>อีเมล:</b> {safe_email}\n"
-            f"📞 <b>เบอร์โทรศัพท์:</b> {safe_phone}\n"
-            f"📋 <b>หัวข้อการติดต่อ:</b> {subject_title}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"📝 <b>ข้อความรายละเอียด:</b>\n"
-            f"{safe_message}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"🕒 <b>วัน-เวลาที่ส่ง:</b> {now_str} (ICT)\n"
-            f"🌐 <b>แหล่งที่มา:</b> <a href=\"https://d-mind-six.vercel.app/contactme\">D-MIND Web Platform</a>"
-        )
+    if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+        return jsonify({"error": "รูปแบบอีเมลไม่ถูกต้อง"}), 400
 
-    # Broadcast to Telegram bot subscribers
-    sent_count = send_telegram_alert(custom_html)
+    # Whitelist subject
+    if subject not in SUBJECT_MAP:
+        subject = "general"
 
-    # Save to SQLite database
+    # Always safely escape user inputs on server (NEVER trust client-provided HTML)
+    safe_name = html.escape(name)
+    safe_email = html.escape(email)
+    safe_phone = html.escape(phone) if phone else "ไม่ได้ระบุ"
+    subject_title = SUBJECT_MAP.get(subject, "สอบถามข้อมูลทั่วไป (General Inquiry)")
+    safe_message = html.escape(message)
+
+    bkk_tz = timezone(timedelta(hours=7))
+    now_str = datetime.now(bkk_tz).strftime("%d/%m/%Y %H:%M:%S")
+
+    # Securely assembled server-side HTML message
+    telegram_html = (
+        f"🚨 <b>[D-MIND] มีข้อความติดต่อใหม่ถึงทีมพัฒนา</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"👤 <b>ชื่อ - นามสกุล:</b> {safe_name}\n"
+        f"📧 <b>อีเมล:</b> {safe_email}\n"
+        f"📞 <b>เบอร์โทรศัพท์:</b> {safe_phone}\n"
+        f"📋 <b>หัวข้อการติดต่อ:</b> {subject_title}\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"📝 <b>ข้อความรายละเอียด:</b>\n"
+        f"{safe_message}\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🕒 <b>วัน-เวลาที่ส่ง:</b> {now_str} (ICT)\n"
+        f"🌐 <b>แหล่งที่มา:</b> <a href=\"https://d-mind-six.vercel.app/contactme\">D-MIND Web Platform</a>"
+    )
+
+    # 4. Dispatch Telegram alert strictly to configured admin chat(s)
+    sent_count = send_telegram_alert(telegram_html)
+
+    # 5. Persist to database
     msg_id = db.save_contact_message(
         name=name,
         email=email,
@@ -766,17 +806,18 @@ def handle_contact():
         "success": True,
         "message_id": msg_id,
         "chat_count": sent_count,
-        "telegram_status": "sent" if sent_count > 0 else "saved_pending_subscriber"
+        "telegram_status": "sent" if sent_count > 0 else "saved_pending_configuration"
     })
 
 @app.route('/api/telegram_subscribers', methods=['GET'])
 @app.route('/telegram_subscribers', methods=['GET'])
 def get_telegram_subscribers():
-    subscribers = sync_telegram_subscribers()
+    if not is_admin_authorized():
+        return jsonify({"error": "Unauthorized. Admin credentials required."}), 401
     return jsonify({
-        "bot_username": "drmind_alert_bot",
-        "subscribers_count": len(subscribers),
-        "subscribers": subscribers
+        "status": "active",
+        "bot_configured": bool(TELEGRAM_BOT_TOKEN),
+        "admin_chat_configured": bool(TELEGRAM_CHAT_ID)
     })
 
 # Vercel Serverless WSGI entrypoint alias

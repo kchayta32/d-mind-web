@@ -9,7 +9,7 @@ interface FloodHistoricalData {
 }
 
 interface FloodHistoricalChartProps {
-  data: FloodHistoricalData[];
+  data?: FloodHistoricalData[];
 }
 
 const chartConfig = {

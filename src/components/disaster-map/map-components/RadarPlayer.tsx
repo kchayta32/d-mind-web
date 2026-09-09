@@ -14,7 +14,7 @@ interface RadarPlayerProps {
   timeType: 'past' | 'future';
   onTimeTypeChange: (type: 'past' | 'future') => void;
   currentFrameIndex: number;
-  onFrameIndexChange: (index: number) => void;
+  onFrameIndexChange: (index: number | ((prev: number) => number)) => void;
 }
 
 export const RadarPlayer: React.FC<RadarPlayerProps> = ({

@@ -39,6 +39,13 @@
 
 ---
 
+> 🌟 **โครงการนวัตกรรมภาคแยกเพื่อการแข่งขันระดับชาติ วช. (NRCT Innovation Candidate):**  
+> **[SeismoGuard AI — ระบบแจ้งเตือนแผ่นดินไหวด้วยระบบปัญญาประดิษฐ์แบบเรียลไทม์](./ai-earthquake-guard)**  
+> 🚀 Production URL: [https://d-mind-ai-earthquake-guard.vercel.app](https://d-mind-ai-earthquake-guard.vercel.app)  
+> 📐 สถาปัตยกรรมระบบ: [System Architecture Diagram (Editorial SVG)](./ai-earthquake-guard/docs/diagrams/seismoguard-architecture.svg) | [เอกสารประกอบฉบับเต็ม](./ai-earthquake-guard/README.md)
+
+---
+
 ## ✨ Features (คุณสมบัติเด่น)
 
 ### 🗺️ 1. Interactive Disaster Map & Remote Sensing (แผนที่ภัยพิบัติแบบไดนามิก)
