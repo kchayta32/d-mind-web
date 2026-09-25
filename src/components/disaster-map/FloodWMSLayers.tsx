@@ -21,10 +21,10 @@ interface FloodWMSLayersProps {
 export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({ 
   timeFilter = '3days', 
   showFrequency = true, 
-  opacity = 0.75,
-  mapProtocol = 'wmts',
+  opacity = 0.8,
+  mapProtocol = 'tms',
   showSentinel2TrueColor = false,
-  showSentinel1Sar = false
+  showSentinel1Sar = true
 }) => {
   const safeTime: FloodTimeFilter = (timeFilter === '1day' || timeFilter === '3days' || timeFilter === '7days' || timeFilter === '30days')
     ? timeFilter
@@ -34,12 +34,12 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
 
   return (
     <>
-      {/* 0. Optional Copernicus Sentinel-2 True Color / Cloudless Base Imagery */}
+      {/* 0. Copernicus Sentinel-2 True Color / Cloudless Base Imagery (10m Resolution) */}
       {showSentinel2TrueColor && (
         <WMSTileLayer
           key="sentinel2-cloudless-wms"
           url="https://tiles.maps.eox.at/wms"
-          layers="s2cloudless-2020"
+          layers="s2cloudless-2024"
           format="image/jpeg"
           transparent={false}
           opacity={0.85}
@@ -48,7 +48,7 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
         />
       )}
 
-      {/* 0.1 Optional Copernicus Sentinel-1 Synthetic Aperture Radar (SAR) Water Backscatter Layer */}
+      {/* 0.1 Copernicus Sentinel-1 Synthetic Aperture Radar (SAR) Water Backscatter / Hydrography Layer */}
       {showSentinel1Sar && (
         <WMSTileLayer
           key="sentinel1-sar-wms"
@@ -57,81 +57,33 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
           format="image/png"
           transparent={true}
           opacity={0.7}
-          attribution="&copy; Copernicus Sentinel-1 C-SAR Flood Detection"
+          attribution="&copy; Copernicus Sentinel-1 C-SAR Flood & Water Surface Backscatter"
           maxZoom={18}
         />
       )}
 
       {/* 1. Main Sentinel Satellite Flood Area Layer (Processed by GISTDA API 2.0 from Sentinel-1 SAR & Sentinel-2) */}
       {timeFilter && (
-        mapProtocol === 'tms' ? (
-          <TileLayer
-            key={`flood-sentinel-tms-${safeTime}`}
-            url={getGistdaFloodTmsTileUrl('flood', safeTime, apiKey)}
-            opacity={opacity}
-            tms={true}
-            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) TMS`}
-            maxZoom={18}
-          />
-        ) : mapProtocol === 'wms' ? (
-          <WMSTileLayer
-            key={`flood-sentinel-wms-${safeTime}`}
-            url={getGistdaFloodWmsUrl('flood', safeTime, apiKey)}
-            layers="flood"
-            format="image/png"
-            transparent={true}
-            opacity={opacity}
-            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) WMS`}
-            maxZoom={18}
-          />
-        ) : (
-          <WMSTileLayer
-            key={`flood-sentinel-wmts-${safeTime}`}
-            url={getGistdaFloodWmtsUrl('flood', safeTime, apiKey)}
-            layers="flood"
-            format="image/png"
-            transparent={true}
-            opacity={opacity}
-            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) WMTS`}
-            maxZoom={18}
-          />
-        )
+        <TileLayer
+          key={`flood-sentinel-tms-${safeTime}`}
+          url={getGistdaFloodTmsTileUrl('flood', safeTime, apiKey)}
+          opacity={opacity}
+          tms={true}
+          attribution={`GISTDA Sentinel-1/2 Satellite Flood Inspection (${safeTime})`}
+          maxZoom={18}
+        />
       )}
 
       {/* 2. Recurrent Flood Areas (พื้นที่น้ำท่วมซ้ำซาก สถิติจากดาวเทียมย้อนหลัง) */}
       {showFrequency && (
-        mapProtocol === 'tms' ? (
-          <TileLayer
-            key="flood-freq-tms"
-            url={getGistdaFloodTmsTileUrl('flood-freq', safeTime, apiKey)}
-            opacity={opacity * 0.75}
-            tms={true}
-            attribution="GISTDA Sentinel Historical Flood Frequency TMS"
-            maxZoom={18}
-          />
-        ) : mapProtocol === 'wms' ? (
-          <WMSTileLayer
-            key="flood-freq-wms"
-            url={getGistdaFloodWmsUrl('flood-freq', safeTime, apiKey)}
-            layers="flood-freq"
-            format="image/png"
-            transparent={true}
-            opacity={opacity * 0.75}
-            attribution="GISTDA Sentinel Historical Flood Frequency WMS"
-            maxZoom={18}
-          />
-        ) : (
-          <WMSTileLayer
-            key="flood-freq-wmts"
-            url={getGistdaFloodWmtsUrl('flood-freq', safeTime, apiKey)}
-            layers="flood-freq"
-            format="image/png"
-            transparent={true}
-            opacity={opacity * 0.75}
-            attribution="GISTDA Sentinel Historical Flood Frequency WMTS"
-            maxZoom={18}
-          />
-        )
+        <TileLayer
+          key="flood-freq-tms"
+          url={getGistdaFloodTmsTileUrl('flood-freq', safeTime, apiKey)}
+          opacity={opacity * 0.75}
+          tms={true}
+          attribution="GISTDA Sentinel Historical Flood Frequency TMS"
+          maxZoom={18}
+        />
       )}
     </>
   );

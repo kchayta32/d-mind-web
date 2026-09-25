@@ -23,10 +23,10 @@ export const useDisasterMapState = () => {
   const [floodTimeFilter, setFloodTimeFilter] = useState('3days');
   const [showFloodFrequency, setShowFloodFrequency] = useState(true);
   const [showWaterHyacinth, setShowWaterHyacinth] = useState(false);
-  const [floodMapMode, setFloodMapMode] = useState<FloodMapProtocol>('wmts');
+  const [floodMapMode, setFloodMapMode] = useState<FloodMapProtocol>('tms');
   const [showRainRadarOnFlood, setShowRainRadarOnFlood] = useState(true);
   const [showSentinel2TrueColor, setShowSentinel2TrueColor] = useState(false);
-  const [showSentinel1Sar, setShowSentinel1Sar] = useState(false);
+  const [showSentinel1Sar, setShowSentinel1Sar] = useState(true);
   const [isCrowdsourceModalOpen, setIsCrowdsourceModalOpen] = useState(false);
 
   return {

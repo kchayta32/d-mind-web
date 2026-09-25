@@ -19,11 +19,18 @@ import DMindDiagramsArticle from '@/components/articles/DMindDiagramsArticle';
 import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle';
 import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
+import TodayUpdateArticle from '@/components/articles/TodayUpdateArticle';
 
 const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'today-update':
+    case 'daily-update':
+    case 'sentinel-satellite-update':
+    case 'sentinel-crowdsource-update':
+    case 'sentinel-radar-fcm-update':
+      return <TodayUpdateArticle />;
     case 'architecture-diagrams':
     case 'dmind-diagrams':
     case 'system-diagrams':

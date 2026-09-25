@@ -22,6 +22,7 @@ import {
   Shield,
   Activity,
   Wind,
+  Satellite,
   X
 } from 'lucide-react';
 import { ImprovedArticleTimeline } from './ImprovedArticleTimeline';
@@ -53,6 +54,25 @@ const EmergencyArticles: React.FC = () => {
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date } | null>(null);
 
   const articles = useMemo<EmergencyArticleItem[]>(() => [
+    // Today's Major Update: Sentinel Satellites, Crowdsourcing & FCM
+    {
+      id: 'today-update',
+      title: isEn
+        ? 'Today’s Major Upgrades: Sentinel Satellite Flood Inspection, Ground Truth Crowdsourcing & 1-Minute Architecture Tour'
+        : 'สรุปการอัปเดตระบบ D-MIND วันนี้: ตรวจจับน้ำท่วมด้วยดาวเทียม Sentinel, ผสานพลังประชาชน Crowdsourcing และเปิดตัววิดีโอสถาปัตยกรรมระบบ',
+      subtitle: isEn ? 'D-MIND Core Engineering Team' : 'จาก ทีมพัฒนา D-MIND Core Engineering',
+      description: isEn
+        ? 'In-depth overview of today’s major upgrades: Copernicus Sentinel-1 SAR and Sentinel-2 satellite imagery, live citizen flood reporting with automatic satellite cross-referencing, TMD Doppler weather radar composite, FCM Web Push key upgrade, and a 1-minute video tour on the homepage.'
+        : 'รายงานสรุปการอัปเดตใหญ่ประจำวันนี้: ตรวจจับน้ำท่วมทะลุเมฆด้วยดาวเทียม Copernicus Sentinel-1 C-SAR และ Sentinel-2, ระบบรายงานน้ำท่วมแบบ Real-time โดยประชาชนพร้อมระบบยืนยันความถูกต้องด้วยดาวเทียม, ซ้อนทับเรดาร์น้ำฝน TMD และวิดีโอแนะนำระบบ 1 นาที',
+      image: '/dmind-premium-icon.png',
+      created_at: '2026-09-25',
+      category: 'banner',
+      categoryLabel: isEn ? 'Today’s Upgrades' : 'อัปเดตระบบวันนี้',
+      readTime: isEn ? '5 min read' : '5 นาที',
+      isBanner: true,
+      bannerBadge: isEn ? 'Latest Update • Sept 25, 2026' : 'อัปเดตล่าสุด • 25 ก.ย. 2569',
+      icon: <Satellite className="w-5 h-5 text-sky-400" />
+    },
     // Banner 5: System Architecture & Data Model Diagrams
     {
       id: 'architecture-diagrams',

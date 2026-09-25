@@ -26,6 +26,7 @@ import { useTheme } from '@/contexts/ThemeProvider';
 import { useLanguage } from '@/contexts/LanguageProvider';
 import NewsCarousel from './NewsCarousel';
 import MapBanner from './MapBanner';
+import VideoTourSection from './VideoTourSection';
 import AppDownloadSection from './AppDownloadSection';
 import Footer from '@/components/layout/Footer';
 
@@ -313,6 +314,11 @@ const NewMobileLayout: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Watch a one-minute video tour of d-mind-web */}
+      <div className="px-2">
+        <VideoTourSection />
       </div>
 
       {/* Map Banner Section */}

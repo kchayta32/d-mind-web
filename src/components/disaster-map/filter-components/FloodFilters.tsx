@@ -160,9 +160,9 @@ export const FloodFilters: React.FC<FloodFiltersProps> = ({
               <SelectValue placeholder="เลือกรูปแบบแผนที่" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="wmts" className="text-xs">WMTS (Web Map Tile Service - แนะนำ)</SelectItem>
-              <SelectItem value="tms" className="text-xs">TMS (Tile Map Service - Slippy Tiles)</SelectItem>
-              <SelectItem value="wms" className="text-xs">WMS (Web Map Service - มาตรฐาน OGC)</SelectItem>
+              <SelectItem value="tms" className="text-xs">TMS (Tile Map Service - แนะนำสำหรับแผนที่ดาวเทียม)</SelectItem>
+              <SelectItem value="wmts" className="text-xs">WMTS (Web Map Tile Service)</SelectItem>
+              <SelectItem value="wms" className="text-xs">WMS (Web Map Service - OGC)</SelectItem>
             </SelectContent>
           </Select>
         </div>

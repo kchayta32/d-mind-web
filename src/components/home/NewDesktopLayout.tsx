@@ -3,6 +3,7 @@ import NewsCarousel from './NewsCarousel';
 import AppDownloadSection from './AppDownloadSection';
 import NavigationCards from './NavigationCards';
 import MapBanner from './MapBanner';
+import VideoTourSection from './VideoTourSection';
 import MainLayout from '@/components/layout/MainLayout';
 
 const NewDesktopLayout: React.FC = () => {
@@ -13,6 +14,9 @@ const NewDesktopLayout: React.FC = () => {
 
       {/* Navigation Cards */}
       <NavigationCards />
+
+      {/* Watch a one-minute video tour of d-mind-web */}
+      <VideoTourSection />
 
       {/* Map Banner */}
       <MapBanner />

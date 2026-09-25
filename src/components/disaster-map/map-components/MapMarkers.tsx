@@ -5,6 +5,7 @@ import RainSensorMarker from '../RainSensorMarker';
 import AirStationMarker from '../AirStationMarker';
 import { FloodDataMarker } from '../FloodDataMarker';
 import { FloodMarker } from '../FloodMarker';
+import { ClusteredFloodMarkers } from '../ClusteredFloodMarkers';
 import { OpenMeteoWeatherMarker } from '../OpenMeteoWeatherMarker';
 import SinkholeMarker from '../SinkholeMarker';
 import { StormMarker } from './StormMarker';
@@ -87,13 +88,10 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         <AirStationMarker key={station.id} station={station} />
       ))}
 
-      {/* GISTDA Sentinel Flood markers */}
-      {selectedType === 'flood' && gistdaFloodFeatures.map((feature, index) => {
-        const center = getFloodCenter(feature);
-        return (
-          <FloodMarker key={`gistda-flood-${feature.id}-${index}`} feature={feature} center={center} />
-        );
-      })}
+      {/* GISTDA Sentinel Flood markers with clustering and polygon overlays */}
+      {selectedType === 'flood' && gistdaFloodFeatures.length > 0 && (
+        <ClusteredFloodMarkers features={gistdaFloodFeatures} />
+      )}
 
       {/* Open-Meteo Flood data markers (river discharge) */}
       {selectedType === 'flood' && floodDataPoints.map((floodPoint, index) => (

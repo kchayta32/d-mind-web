@@ -111,6 +111,11 @@ async function fetchFloodData(timeframe: FloodTimeFilter, limit: number = 1000):
       if (data && Array.isArray(data.features) && data.features.length > 0) {
         return data as FloodResponse;
       }
+      // If 1day pass has 0 detections due to Sentinel satellite orbital revisit cycle, fallback to 3days
+      if (timeframe === '1day') {
+        console.info('GISTDA 1day pass has 0 detections; automatically fetching 3days Sentinel satellite pass...');
+        return fetchFloodData('3days', limit);
+      }
     }
 
     // Try backup API key
@@ -123,9 +128,27 @@ async function fetchFloodData(timeframe: FloodTimeFilter, limit: number = 1000):
       if (data && Array.isArray(data.features) && data.features.length > 0) {
         return data as FloodResponse;
       }
+      if (timeframe === '1day') {
+        return fetchFloodData('3days', limit);
+      }
     }
   } catch (err) {
     console.warn(`GISTDA Flood ${timeframe} fetch error, using structured fallback:`, err);
+  }
+
+  // If even 3days has an issue, try fetching 7days before mock
+  if (timeframe !== '7days' && timeframe !== '30days') {
+    try {
+      const fallback7days = await fetch(`${GISTDA_CONFIG.BASE_URL}/features/flood/7days?limit=${limit}&offset=0`, {
+        headers: getGistdaHeaders(GISTDA_CONFIG.PRIMARY_API_KEY)
+      });
+      if (fallback7days.ok) {
+        const d7 = await fallback7days.json();
+        if (d7 && Array.isArray(d7.features) && d7.features.length > 0) {
+          return d7 as FloodResponse;
+        }
+      }
+    } catch {}
   }
 
   return generateMockFloodData(timeframe);
