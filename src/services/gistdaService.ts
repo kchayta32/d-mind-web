@@ -5,7 +5,7 @@
 
 export const GISTDA_CONFIG = {
   BASE_URL: 'https://api-gateway.gistda.or.th/api/2.0/resources',
-  PRIMARY_API_KEY: 'UIKDdatC5lgDcdrGxBJfyjHRlvRSvKQFGjY8A3mG00fj99MqcWCd2VxVTkcfkVX6',
+  PRIMARY_API_KEY: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GISTDA_API_KEY) || 'VdXi3UYkRaaZDGVsFOgO6KvYeZY8dV7CjFx2j4e1xdxm2wZcfXrwwfdzs1lepkMD',
   BACKUP_API_KEY: 'wFaHcoOyzK53pVqspkI9Mvobjm5vWzHVOwGOjzW4f2nAAvsVf8CETklHpX1peaDF',
   
   ENDPOINTS: {

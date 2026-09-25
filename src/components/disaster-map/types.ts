@@ -214,3 +214,21 @@ export type BaseMapLayerType =
   | 'google-hybrid' 
   | 'google-streets' 
   | 'google-terrain';
+
+export interface CrowdsourcedFloodReport {
+  id: string;
+  lat: number;
+  lng: number;
+  locationName: string;
+  waterLevel: 'ankle' | 'knee' | 'waist' | 'chest' | 'critical';
+  waterLevelCm?: number;
+  waterFlow?: 'calm' | 'flowing' | 'torrential';
+  situation: string;
+  imageUrl?: string;
+  reporterName?: string;
+  reporterPhone?: string;
+  createdAt: string;
+  verifiedBySatellite?: boolean;
+  satelliteDistanceMeters?: number;
+}
+

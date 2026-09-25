@@ -13,6 +13,8 @@ import { DisasterType } from './DisasterMap';
 import { useDisasterMapState } from './hooks/useDisasterMapState';
 import { useDisasterMapData } from './hooks/useDisasterMapData';
 import { useSinkholeData } from '../../hooks/useSinkholeData';
+import { useCrowdsourcedFloodReports } from './hooks/useCrowdsourcedFloodReports';
+import { CrowdsourceFloodModal } from './CrowdsourceFloodModal';
 
 interface DisasterMapContentProps {
   selectedType: DisasterType;
@@ -54,6 +56,14 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     setShowWaterHyacinth,
     floodMapMode,
     setFloodMapMode,
+    showRainRadarOnFlood,
+    setShowRainRadarOnFlood,
+    showSentinel2TrueColor,
+    setShowSentinel2TrueColor,
+    showSentinel1Sar,
+    setShowSentinel1Sar,
+    isCrowdsourceModalOpen,
+    setIsCrowdsourceModalOpen
   } = useDisasterMapState();
 
   const {
@@ -79,6 +89,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
   } = useDisasterMapData(rainTimeFilter, wildfireTimeFilter, floodTimeFilter);
 
   const { sinkholes, stats: sinkholeStats } = useSinkholeData();
+  const { reports: crowdsourcedReports, addReport } = useCrowdsourcedFloodReports(gistdaFloodFeatures);
 
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-0">
@@ -96,6 +107,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           storms={storms}
           volcanoes={volcanoes}
           sinkholes={sinkholes}
+          crowdsourcedFloodReports={crowdsourcedReports}
           selectedType={selectedType}
           magnitudeFilter={magnitudeFilter}
           humidityFilter={humidityFilter}
@@ -106,6 +118,9 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           showFloodFrequency={showFloodFrequency}
           floodMapMode={floodMapMode}
           showWaterHyacinth={showWaterHyacinth}
+          showRainRadarOnFlood={showRainRadarOnFlood}
+          showSentinel2TrueColor={showSentinel2TrueColor}
+          showSentinel1Sar={showSentinel1Sar}
           wildfireTimeFilter={wildfireTimeFilter}
           showBurnFreq={showBurnFreq}
           showBurnScar={showBurnScar}
@@ -113,6 +128,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           isLoading={getCurrentLoading(selectedType)}
           onLocationSelect={onLocationSelect}
           onRefreshAll={refetchAll}
+          onOpenCrowdsourceModal={() => setIsCrowdsourceModalOpen(true)}
         />
       </div>
       
@@ -149,6 +165,13 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           onShowWaterHyacinthChange={setShowWaterHyacinth}
           floodMapMode={floodMapMode}
           onFloodMapModeChange={setFloodMapMode}
+          showRainRadarOnFlood={showRainRadarOnFlood}
+          onShowRainRadarOnFloodChange={setShowRainRadarOnFlood}
+          showSentinel2TrueColor={showSentinel2TrueColor}
+          onShowSentinel2TrueColorChange={setShowSentinel2TrueColor}
+          showSentinel1Sar={showSentinel1Sar}
+          onShowSentinel1SarChange={setShowSentinel1Sar}
+          onOpenCrowdsourceModal={() => setIsCrowdsourceModalOpen(true)}
         />
         
         {/* Statistics Panel */}
@@ -197,7 +220,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           />
         )}
 
-        {/* Specific Charts for Flood */}
+        {/* Specific Charts for Flood (Enhanced with Sentinel & Crowdsource stats) */}
         {selectedType === 'flood' && (
           <FloodCharts 
             stats={floodStats}
@@ -209,6 +232,16 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           <SinkholeNews />
         )}
       </div>
+
+      {/* Citizen Crowdsourcing Flood Report Dialog */}
+      <CrowdsourceFloodModal
+        isOpen={isCrowdsourceModalOpen}
+        onClose={() => setIsCrowdsourceModalOpen(false)}
+        onSubmitReport={addReport}
+        onNavigateToLocation={(lat, lng) => onLocationSelect(lat, lng, 'รายงานประชาชน')}
+      />
     </div>
   );
 };
+
+export default DisasterMapContent;

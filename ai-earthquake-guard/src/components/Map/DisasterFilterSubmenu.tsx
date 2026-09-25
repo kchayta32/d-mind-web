@@ -9,12 +9,21 @@ import {
   AlertTriangle,
   ChevronDown, 
   X,
-  CheckCircle2,
   Filter,
   Radio
 } from 'lucide-react';
 import { DisasterType, DisasterFilterOption } from '../../types/disaster';
 import { DISASTER_FILTER_OPTIONS } from '../../services/naturalDisastersData';
+
+const DISASTER_ICONS: Record<DisasterType, React.ComponentType<{ className?: string }>> = {
+  earthquake: Activity,
+  tsunami: Waves,
+  flood: Droplets,
+  landslide: Mountain,
+  storm: Wind,
+  wildfire: Flame,
+  volcano: AlertTriangle,
+};
 
 export interface DisasterFilterSubmenuProps {
   selectedDisaster: DisasterType;
@@ -57,26 +66,9 @@ export const DisasterFilterSubmenu: React.FC<DisasterFilterSubmenuProps> = ({
     };
   }, [isOpen]);
 
-  // Helper icon resolver
   const getDisasterIcon = (type: DisasterType, classNameStr = 'w-4 h-4') => {
-    switch (type) {
-      case 'earthquake':
-        return <Activity className={classNameStr} />;
-      case 'tsunami':
-        return <Waves className={classNameStr} />;
-      case 'flood':
-        return <Droplets className={classNameStr} />;
-      case 'landslide':
-        return <Mountain className={classNameStr} />;
-      case 'storm':
-        return <Wind className={classNameStr} />;
-      case 'wildfire':
-        return <Flame className={classNameStr} />;
-      case 'volcano':
-        return <AlertTriangle className={classNameStr} />;
-      default:
-        return <Activity className={classNameStr} />;
-    }
+    const Icon = DISASTER_ICONS[type] || Activity;
+    return <Icon className={classNameStr} />;
   };
 
   const currentOption = DISASTER_FILTER_OPTIONS.find((opt) => opt.id === selectedDisaster) 

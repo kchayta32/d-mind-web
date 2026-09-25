@@ -148,7 +148,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     timestamp: Date.now() - 15 * 60 * 1000,
     source: 'ศูนย์เตือนภัยพิบัติแห่งชาติ (NDWC)',
     description: 'หอสัญญาณเตือนภัยพร้อมระบบไซเรนพลังงานแสงอาทิตย์ 5 ภาษา และระบบถ่ายทอดวิทยุฉุกเฉิน',
-    affectedPopulation: 85000,
     metrics: [
       { label: 'ระบบกระจายเสียง', value: '130', unit: 'dB (พร้อมใช้งาน)', trend: 'stable' },
       { label: 'เส้นทางอพยพคลื่นยักษ์', value: '4 เส้นทางหลัก', unit: 'สู่พื้นที่สูง' },
@@ -169,7 +168,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     timestamp: Date.now() - 22 * 60 * 1000,
     source: 'ปภ. ศูนย์เตือนภัยพิบัติแห่งชาติ',
     description: 'จุดเฝ้าระวังพิเศษชายฝั่งอันดามันตอนบน พร้อมจุดรวมพลอาคารอพยพหลบภัยคลื่นสึนามิ',
-    affectedPopulation: 32000,
     metrics: [
       { label: 'ความพร้อมระบบไซเรน', value: '100%', unit: 'Solar + Batt', trend: 'stable' },
       { label: 'จุดหลบภัยสูงสุด', value: '+28', unit: 'เมตรเหนือระดับน้ำทะเล' },
@@ -189,7 +187,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     timestamp: Date.now() - 30 * 60 * 1000,
     source: 'อบต.อ่าวนาง / ปภ. กระบี่',
     description: 'ระบบตรวจวัดคลื่นชายฝั่งพร้อมไฟสัญญาณเตือนฉุกเฉินความเข้มสูงสำหรับเกาะท่องเที่ยวหนาแน่น',
-    affectedPopulation: 14000,
     metrics: [
       { label: 'ระบบประกาศเตือน', value: '5 ภาษา', unit: 'ไทย/อังกฤษ/จีน/ญี่ปุ่น/เยอรมัน' },
       { label: 'ระยะทางสู่จุดปลอดภัย', value: '450', unit: 'เมตร (เขาจุดชมวิว)' },
@@ -233,7 +230,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'กรมชลประทาน (RID) ศูนย์ปฏิบัติการน้ำอัจฉริยะ (SWOC)',
     description: 'จุดควบคุมการระบายน้ำสู่พื้นที่ลุ่มน้ำเจ้าพระยาตอนล่าง (อยุธยา ปทุมธานี นนทบุรี กรุงเทพฯ)',
     radiusKm: 45,
-    affectedPopulation: 650000,
     metrics: [
       { label: 'อัตราการระบายน้ำท้ายเขื่อน', value: '1,450', unit: 'ลบ.ม./วินาที', trend: 'up' },
       { label: 'ระดับน้ำเหนือเขื่อน', value: '16.85', unit: 'ม.(รทก.) / สูงกว่าเกณฑ์ 0.35m' },
@@ -255,7 +251,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'สถาบันสารสนเทศทรัพยากรน้ำ (สสน. HII) / กรมชลประทาน',
     description: 'จุดชี้วัดน้ำท่วมเขตเศรษฐกิจเมืองเชียงใหม่ ระดับวิกฤตตลิ่งอยู่ที่ 3.70 - 4.20 เมตร',
     radiusKm: 25,
-    affectedPopulation: 220000,
     metrics: [
       { label: 'ระดับน้ำปัจจุบัน', value: '3.45', unit: 'เมตร (จุดวิกฤต 3.70 ม.)', trend: 'up' },
       { label: 'อัตราการไหล', value: '412', unit: 'ลบ.ม./วินาที' },
@@ -277,7 +272,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'สำนักงานทรัพยากรน้ำแห่งชาติ (สทนช.)',
     description: 'จุดรวมน้ำก่อนไหลลงสู่แม่น้ำโขงที่ อ.โขงเจียม พื้นที่ลุ่มต่ำเสี่ยงน้ำท่วมซ้ำซาก',
     radiusKm: 35,
-    affectedPopulation: 180000,
     metrics: [
       { label: 'ระดับน้ำปัจจุบัน', value: '111.45', unit: 'ม.(รทก.) / ตลิ่ง 112.0 ม.' },
       { label: 'อัตราการไหลสะสม', value: '1,890', unit: 'ลบ.ม./วินาที', trend: 'stable' },
@@ -378,7 +372,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'กรมทรัพยากรธรณี (DMR) / ปภ. เชียงราย',
     description: 'ตรวจพบการเลื่อนตัวของมวลดินชั้นบนเนื่องจากปริมาณน้ำฝนสะสมเกิน 150 มม. เสี่ยงดินถล่มปิดทับเส้นทางหลวงชนบท',
     radiusKm: 18,
-    affectedPopulation: 8500,
     metrics: [
       { label: 'ปริมาณฝนสะสม 24 ชม.', value: '178.5', unit: 'มิลลิเมตร (เกณฑ์วิกฤต >150)', trend: 'up' },
       { label: 'ความอิ่มตัวของน้ำในดิน', value: '91.4%', unit: 'Soil Saturation Ratio', trend: 'up' },
@@ -400,7 +393,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'กรมทรัพยากรธรณี / สถานีเตือนภัยพิบัติดอยสุเทพ',
     description: 'พื้นที่เสี่ยงน้ำป่าไหลหลากลงสู่ลำห้วยแก้ว และดินสไลด์ตามแนวถนนขึ้นพระธาตุดอยสุเทพ',
     radiusKm: 12,
-    affectedPopulation: 45000,
     metrics: [
       { label: 'ปริมาณฝนสะสม 24 ชม.', value: '142.0', unit: 'มิลลิเมตร', trend: 'up' },
       { label: 'ความชื้นในดิน', value: '82.0%', unit: 'Moisture' },
@@ -442,7 +434,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'ปภ. ยะลา / กรมทรัพยากรธรณี',
     description: 'เส้นทางสกายวอล์คอัยเยอร์เวงและแนวถนนเชื่อมเบตง เสี่ยงดินสไลด์ปิดทับผิวทาง',
     radiusKm: 20,
-    affectedPopulation: 16000,
     metrics: [
       { label: 'ฝนสะสม 24 ชม.', value: '162.0', unit: 'มม.', trend: 'up' },
       { label: 'ความอิ่มตัวในดิน', value: '86.5%', unit: 'Saturation' },
@@ -493,7 +484,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
       [9.800, 101.500],
       [10.100, 99.800]
     ],
-    affectedPopulation: 1200000,
     metrics: [
       { label: 'ความเร็วลมใกล้ศูนย์กลาง', value: '55 - 65', unit: 'กม./ชม.', trend: 'up' },
       { label: 'ความกดอากาศศูนย์กลาง', value: '1,002', unit: 'hPa' },
@@ -578,7 +568,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'GISTDA ดาวเทียม Suomi NPP (VIIRS) / กรมป่าไม้',
     description: 'ตรวจพบจุดความร้อนสะสมต่อเนื่อง 18 จุด ในป่าลึกเข้าถึงยาก มีการส่งเฮลิคอปเตอร์ทิ้งน้ำดับไฟป่า',
     radiusKm: 22,
-    affectedPopulation: 12000,
     metrics: [
       { label: 'จำนวนจุดความร้อน (Hotspots)', value: '18', unit: 'จุด (ดาวเทียม VIIRS)', trend: 'up' },
       { label: 'ดัชนีฝุ่น PM2.5 ในพื้นที่', value: '135.0', unit: 'µg/m³ (มีผลกระทบต่อสุขภาพ)', trend: 'up' },
@@ -601,7 +590,6 @@ export const NATURAL_DISASTER_INCIDENTS: DisasterIncident[] = [
     source: 'GISTDA / กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช',
     description: 'ไฟป่าลุกลามบนสันเขาแนวชายแดน ควันไฟสะสมในแอ่งกระทะเมืองปาย ค่าคุณภาพอากาศอยู่ในเกณฑ์สีแดง',
     radiusKm: 25,
-    affectedPopulation: 28000,
     metrics: [
       { label: 'จุดความร้อน Hotspots', value: '24', unit: 'จุด', trend: 'up' },
       { label: 'ค่าฝุ่น PM2.5 ตรวจวัด', value: '168.4', unit: 'µg/m³ (อันตราย)', trend: 'up' },
@@ -783,26 +771,30 @@ export function getIncidentsByType(type: DisasterType): DisasterIncident[] {
   return NATURAL_DISASTER_INCIDENTS.filter((inc) => inc.type === type);
 }
 
-/**
- * Get incident count for a given disaster type
- */
-export function getIncidentCount(type: DisasterType, fallbackEarthquakeCount = 14): number {
-  if (type === 'earthquake') return fallbackEarthquakeCount;
-  return NATURAL_DISASTER_INCIDENTS.filter((inc) => inc.type === type).length;
-}
+const DISASTER_COLORS: Record<DisasterType, string> = {
+  earthquake: '#06b6d4',
+  tsunami: '#3b82f6',
+  flood: '#0284c7',
+  landslide: '#d97706',
+  storm: '#8b5cf6',
+  wildfire: '#f97316',
+  volcano: '#ef4444',
+};
 
-/**
- * Get color theme associated with a disaster type
- */
+const DISASTER_LABELS: Record<DisasterType, string> = {
+  earthquake: 'แผ่นดินไหว',
+  tsunami: 'สึนามิ & ทุ่นอันดามัน',
+  flood: 'น้ำท่วม & ลุ่มน้ำวิกฤต',
+  landslide: 'ดินโคลนถล่ม & ดินสไลด์',
+  storm: 'พายุหมุนเขตร้อน & ลมแรง',
+  wildfire: 'ไฟป่า & จุดความร้อน',
+  volcano: 'ภูเขาไฟระเบิดในอาเซียน',
+};
+
 export function getDisasterColor(type: DisasterType): string {
-  const opt = DISASTER_FILTER_OPTIONS.find((o) => o.id === type);
-  return opt ? opt.color : '#06b6d4';
+  return DISASTER_COLORS[type] || '#06b6d4';
 }
 
-/**
- * Get label for a disaster type
- */
 export function getDisasterLabel(type: DisasterType): string {
-  const opt = DISASTER_FILTER_OPTIONS.find((o) => o.id === type);
-  return opt ? opt.label : 'แผ่นดินไหว';
+  return DISASTER_LABELS[type] || 'แผ่นดินไหว';
 }

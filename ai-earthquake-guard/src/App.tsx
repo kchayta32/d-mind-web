@@ -42,7 +42,6 @@ import {
 
 import { DisasterType, DisasterIncident } from './types/disaster';
 import { 
-  NATURAL_DISASTER_INCIDENTS, 
   getIncidentsByType, 
   getDisasterLabel, 
   getDisasterColor 
@@ -68,13 +67,7 @@ import {
   Minimize2,
   ChevronRight,
   ShieldCheck,
-  ShieldAlert,
-  Flame,
-  Waves,
-  Droplets,
-  Mountain,
-  Wind,
-  Filter
+  ShieldAlert
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -92,6 +85,9 @@ export const App: React.FC = () => {
   // Natural Disaster Filter Mode (Single Select: 'earthquake' | 'tsunami' | 'flood' | 'landslide' | 'storm' | 'wildfire' | 'volcano')
   const [selectedDisaster, setSelectedDisaster] = useState<DisasterType>('earthquake');
   const [activeDisasterIncident, setActiveDisasterIncident] = useState<DisasterIncident | null>(null);
+
+  const currentDisasterIncidents = selectedDisaster !== 'earthquake' ? getIncidentsByType(selectedDisaster) : [];
+  const featuredIncident = activeDisasterIncident || currentDisasterIncidents[0] || null;
 
   // User Target Location (Default: Bangkok City Center)
   const [userLocation, setUserLocation] = useState<[number, number]>([13.7563, 100.5018]);
@@ -470,135 +466,118 @@ export const App: React.FC = () => {
                     </div>
 
                     {/* Featured Disaster Incident Card */}
-                    {(() => {
-                      const currentIncidents = getIncidentsByType(selectedDisaster);
-                      const featured = activeDisasterIncident || currentIncidents[0];
-                      if (!featured) return null;
+                    {featuredIncident && (
+                      <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Activity className="w-3.5 h-3.5" />
+                            ข้อมูลจุดเฝ้าระวังที่เลือก
+                          </span>
+                          <span 
+                            className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase"
+                            style={{ 
+                              backgroundColor: `${featuredIncident.severity === 'critical' ? '#ef4444' : featuredIncident.severity === 'warning' ? '#f59e0b' : '#10b981'}20`, 
+                              color: featuredIncident.severity === 'critical' ? '#ef4444' : featuredIncident.severity === 'warning' ? '#f59e0b' : '#10b981', 
+                              border: `1px solid ${featuredIncident.severity === 'critical' ? '#ef4444' : featuredIncident.severity === 'warning' ? '#f59e0b' : '#10b981'}50` 
+                            }}
+                          >
+                            ● {featuredIncident.status}
+                          </span>
+                        </div>
 
-                      const isCrit = featured.severity === 'critical';
-                      const isWarn = featured.severity === 'warning';
-                      const statusBadgeColor = isCrit ? '#ef4444' : isWarn ? '#f59e0b' : '#10b981';
-
-                      return (
-                        <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                              <Activity className="w-3.5 h-3.5" />
-                              ข้อมูลจุดเฝ้าระวังที่เลือก
-                            </span>
-                            <span 
-                              className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase"
-                              style={{ 
-                                backgroundColor: `${statusBadgeColor}20`, 
-                                color: statusBadgeColor, 
-                                border: `1px solid ${statusBadgeColor}50` 
-                              }}
-                            >
-                              ● {featured.status}
-                            </span>
-                          </div>
-
-                          <div>
-                            <h3 className="font-bold text-base text-slate-100 leading-snug">
-                              {featured.titleTh}
-                            </h3>
-                            <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-slate-500" />
-                              <span>{featured.location}, {featured.province}</span>
-                            </p>
-                          </div>
-
-                          {/* Dynamic Telemetry Matrix */}
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center pt-1">
-                            {featured.metrics.slice(0, 3).map((m, idx) => (
-                              <div key={idx} className="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
-                                <span className="text-[9px] text-slate-400 font-mono block truncate">{m.label}</span>
-                                <span className="text-xs sm:text-sm font-bold font-mono text-cyan-300 block mt-0.5 truncate">
-                                  {m.value} <span className="text-[10px] font-normal text-slate-400">{m.unit}</span>
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Description */}
-                          <p className="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
-                            {featured.description}
+                        <div>
+                          <h3 className="font-bold text-base text-slate-100 leading-snug">
+                            {featuredIncident.titleTh}
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-slate-500" />
+                            <span>{featuredIncident.location}, {featuredIncident.province}</span>
                           </p>
+                        </div>
 
-                          {/* Coordinates & Agency */}
-                          <div className="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-950/40 p-2.5 rounded-lg">
-                            <div className="flex justify-between">
-                              <span>พิกัดตรวจวัด:</span>
-                              <span className="text-slate-200">{featured.latitude.toFixed(3)}°N, {featured.longitude.toFixed(3)}°E</span>
+                        {/* Dynamic Telemetry Matrix */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center pt-1">
+                          {featuredIncident.metrics.slice(0, 3).map((m, idx) => (
+                            <div key={idx} className="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+                              <span className="text-[9px] text-slate-400 font-mono block truncate">{m.label}</span>
+                              <span className="text-xs sm:text-sm font-bold font-mono text-cyan-300 block mt-0.5 truncate">
+                                {m.value} <span className="text-[10px] font-normal text-slate-400">{m.unit}</span>
+                              </span>
                             </div>
-                            <div className="flex justify-between">
-                              <span>หน่วยงานข้อมูล:</span>
-                              <span className="text-cyan-400 truncate max-w-[180px]">{featured.source}</span>
-                            </div>
+                          ))}
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
+                          {featuredIncident.description}
+                        </p>
+
+                        {/* Coordinates & Agency */}
+                        <div className="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-950/40 p-2.5 rounded-lg">
+                          <div className="flex justify-between">
+                            <span>พิกัดตรวจวัด:</span>
+                            <span className="text-slate-200">{featuredIncident.latitude.toFixed(3)}°N, {featuredIncident.longitude.toFixed(3)}°E</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>หน่วยงานข้อมูล:</span>
+                            <span className="text-cyan-400 truncate max-w-[180px]">{featuredIncident.source}</span>
                           </div>
                         </div>
-                      );
-                    })()}
+                      </div>
+                    )}
 
                     {/* Incidents List for Selected Disaster */}
-                    {(() => {
-                      const currentIncidents = getIncidentsByType(selectedDisaster);
-                      const featured = activeDisasterIncident || currentIncidents[0];
+                    <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-mono font-semibold uppercase text-slate-300">
+                          จุดเฝ้าระวัง{getDisasterLabel(selectedDisaster)} ({currentDisasterIncidents.length})
+                        </h4>
+                        <span className="text-[10px] text-cyan-400 font-mono">LIVE TELEMETRY</span>
+                      </div>
 
-                      return (
-                        <div className="bg-slate-900/90 rounded-xl border border-slate-800 p-4 shadow-xl space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-mono font-semibold uppercase text-slate-300">
-                              จุดเฝ้าระวัง{getDisasterLabel(selectedDisaster)} ({currentIncidents.length})
-                            </h4>
-                            <span className="text-[10px] text-cyan-400 font-mono">LIVE TELEMETRY</span>
-                          </div>
+                      <div className="max-h-[280px] overflow-y-auto space-y-1.5 pr-1">
+                        {currentDisasterIncidents.map((inc) => {
+                          const isSelected = featuredIncident?.id === inc.id;
+                          const isCrit = inc.severity === 'critical';
+                          const isWarn = inc.severity === 'warning';
+                          return (
+                            <button
+                              key={inc.id}
+                              type="button"
+                              onClick={() => setActiveDisasterIncident(inc)}
+                              className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-cyan-500/15 border-cyan-500/50 shadow-sm'
+                                  : 'bg-slate-950/50 border-slate-800/80 hover:bg-slate-800/60'
+                              }`}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono ${
+                                    isCrit ? 'bg-rose-500 text-white' :
+                                    isWarn ? 'bg-amber-500 text-slate-950' :
+                                    'bg-cyan-500/20 text-cyan-300'
+                                  }`}>
+                                    {inc.severity.toUpperCase()}
+                                  </span>
+                                  <span className="text-xs font-medium text-slate-200 truncate">
+                                    {inc.titleTh}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1">
+                                  <span>📍 {inc.province}</span>
+                                  <span className="text-cyan-400 font-semibold truncate max-w-[120px]">
+                                    {inc.metrics[0]?.value} {inc.metrics[0]?.unit}
+                                  </span>
+                                </div>
+                              </div>
 
-                          <div className="max-h-[280px] overflow-y-auto space-y-1.5 pr-1">
-                            {currentIncidents.map((inc) => {
-                              const isSelected = featured?.id === inc.id;
-                              const isCrit = inc.severity === 'critical';
-                              const isWarn = inc.severity === 'warning';
-                              return (
-                                <button
-                                  key={inc.id}
-                                  type="button"
-                                  onClick={() => setActiveDisasterIncident(inc)}
-                                  className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 cursor-pointer ${
-                                    isSelected
-                                      ? 'bg-cyan-500/15 border-cyan-500/50 shadow-sm'
-                                      : 'bg-slate-950/50 border-slate-800/80 hover:bg-slate-800/60'
-                                  }`}
-                                >
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1.5">
-                                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono ${
-                                        isCrit ? 'bg-rose-500 text-white' :
-                                        isWarn ? 'bg-amber-500 text-slate-950' :
-                                        'bg-cyan-500/20 text-cyan-300'
-                                      }`}>
-                                        {inc.severity.toUpperCase()}
-                                      </span>
-                                      <span className="text-xs font-medium text-slate-200 truncate">
-                                        {inc.titleTh}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1">
-                                      <span>📍 {inc.province}</span>
-                                      <span className="text-cyan-400 font-semibold truncate max-w-[120px]">
-                                        {inc.metrics[0]?.value} {inc.metrics[0]?.unit}
-                                      </span>
-                                    </div>
-                                  </div>
-
-                                  <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-600'}`} />
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })()}
+                              <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-600'}`} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>

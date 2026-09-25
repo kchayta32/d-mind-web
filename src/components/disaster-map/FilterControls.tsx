@@ -40,6 +40,14 @@ interface FilterControlsProps {
   onShowWaterHyacinthChange?: (show: boolean) => void;
   floodMapMode?: FloodMapProtocol;
   onFloodMapModeChange?: (value: FloodMapProtocol) => void;
+  // Rain Radar on Flood & Sentinel Satellite Props
+  showRainRadarOnFlood?: boolean;
+  onShowRainRadarOnFloodChange?: (show: boolean) => void;
+  showSentinel2TrueColor?: boolean;
+  onShowSentinel2TrueColorChange?: (show: boolean) => void;
+  showSentinel1Sar?: boolean;
+  onShowSentinel1SarChange?: (show: boolean) => void;
+  onOpenCrowdsourceModal?: () => void;
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -72,29 +80,36 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onShowWaterHyacinthChange,
   floodMapMode = 'wmts',
   onFloodMapModeChange,
+  showRainRadarOnFlood = true,
+  onShowRainRadarOnFloodChange,
+  showSentinel2TrueColor = false,
+  onShowSentinel2TrueColorChange,
+  showSentinel1Sar = false,
+  onShowSentinel1SarChange,
+  onOpenCrowdsourceModal
 }) => {
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-gray-800 text-sm font-bold flex items-center gap-1.5">
-          <SlidersHorizontal className="w-4 h-4 text-blue-600" />
-          ตัวกรองข้อมูลและการแสดงผล
+    <Card className="shadow-xs border-slate-200">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-blue-500" />
+          ตัวกรองข้อมูล
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {selectedType === 'earthquake' && (
           <EarthquakeFilters
             magnitudeFilter={magnitudeFilter}
             onMagnitudeChange={onMagnitudeChange}
           />
         )}
-        
+
         {selectedType === 'heavyrain' && (
           <HeavyRainFilters
             humidityFilter={humidityFilter}
             onHumidityChange={onHumidityChange}
-            timeFilter={rainTimeFilter}
-            onTimeFilterChange={onRainTimeFilterChange}
+            rainTimeFilter={rainTimeFilter}
+            onRainTimeFilterChange={onRainTimeFilterChange}
           />
         )}
 
@@ -137,6 +152,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             onShowWaterHyacinthChange={onShowWaterHyacinthChange}
             floodMapMode={floodMapMode}
             onFloodMapModeChange={onFloodMapModeChange}
+            showRainRadar={showRainRadarOnFlood}
+            onShowRainRadarChange={onShowRainRadarOnFloodChange}
+            showSentinel2TrueColor={showSentinel2TrueColor}
+            onShowSentinel2TrueColorChange={onShowSentinel2TrueColorChange}
+            showSentinel1Sar={showSentinel1Sar}
+            onShowSentinel1SarChange={onShowSentinel1SarChange}
+            onOpenCrowdsourceModal={onOpenCrowdsourceModal}
           />
         )}
 

@@ -14,6 +14,8 @@ interface MapLayersProps {
   floodTimeFilter: string;
   showFloodFrequency: boolean;
   floodMapMode?: FloodMapProtocol;
+  showSentinel2TrueColor?: boolean;
+  showSentinel1Sar?: boolean;
   showRainOverlay: boolean;
   rainData: RainViewerData | null;
   rainOverlayType: 'radar' | 'satellite';
@@ -32,6 +34,8 @@ export const MapLayers: React.FC<MapLayersProps> = ({
   floodTimeFilter,
   showFloodFrequency,
   floodMapMode = 'wmts',
+  showSentinel2TrueColor = false,
+  showSentinel1Sar = false,
   showRainOverlay,
   rainData,
   rainOverlayType,
@@ -63,18 +67,20 @@ export const MapLayers: React.FC<MapLayersProps> = ({
         />
       )}
 
-      {/* WMS / WMTS / TMS layers for flood */}
+      {/* Sentinel satellite & GISTDA flood layers */}
       {selectedType === 'flood' && (
         <FloodWMSLayers
           timeFilter={floodTimeFilter as FloodTimeFilter}
           showFrequency={showFloodFrequency}
-          opacity={0.7}
+          opacity={0.75}
           mapProtocol={floodMapMode}
+          showSentinel2TrueColor={showSentinel2TrueColor}
+          showSentinel1Sar={showSentinel1Sar}
         />
       )}
       
-      {/* Rain overlay for heavy rain type */}
-      {selectedType === 'heavyrain' && showRainOverlay && rainData && (
+      {/* Rain Doppler Radar overlay: active for heavyrain OR flood mode when user toggles radar */}
+      {(selectedType === 'heavyrain' || selectedType === 'flood') && showRainOverlay && rainData && (
         <RainOverlay 
           rainData={rainData}
           overlayType={rainOverlayType}
@@ -85,3 +91,5 @@ export const MapLayers: React.FC<MapLayersProps> = ({
     </>
   );
 };
+
+export default MapLayers;

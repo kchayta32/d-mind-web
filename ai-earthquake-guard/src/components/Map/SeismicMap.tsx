@@ -9,7 +9,6 @@ import {
 import { THAI_ACTIVE_FAULTS, THAI_SEISMIC_STATIONS } from '../../services/thaiFaultData';
 import { DisasterType, DisasterIncident } from '../../types/disaster';
 import { 
-  NATURAL_DISASTER_INCIDENTS, 
   getIncidentsByType, 
   getDisasterColor, 
   getDisasterLabel 
@@ -36,11 +35,18 @@ import {
   EyeOff,
   Globe,
   Sliders,
-  AlertTriangle,
-  Droplets,
-  Wind,
-  Mountain
+  AlertTriangle
 } from 'lucide-react';
+
+const DISASTER_EMOJIS: Record<DisasterType, string> = {
+  tsunami: '🌊',
+  flood: '💧',
+  landslide: '⛰️',
+  storm: '🌪️',
+  wildfire: '🔥',
+  volcano: '🌋',
+  earthquake: '●',
+};
 
 // Wave propagation velocities (average continental crust speeds)
 const P_WAVE_VELOCITY_KM_S = 6.0; // Primary Wave velocity (~6.0 km/s)
@@ -122,15 +128,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
   const mapRef = useRef<L.Map | null>(null);
 
   // Natural Disaster Single-Select State
-  const [internalDisaster, setInternalDisaster] = useState<DisasterType>('earthquake');
-  const activeDisaster = selectedDisaster !== undefined ? selectedDisaster : internalDisaster;
-
-  const handleDisasterChange = (disaster: DisasterType) => {
-    setInternalDisaster(disaster);
-    if (onSelectDisaster) {
-      onSelectDisaster(disaster);
-    }
-  };
+  const activeDisaster = selectedDisaster || 'earthquake';
 
   // Layer groups refs
   const baseTilesRef = useRef<{ 
@@ -937,13 +935,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
       const isWarning = incident.severity === 'warning';
       const badgeColor = isCritical ? '#ef4444' : isWarning ? '#f59e0b' : primaryColor;
 
-      let iconEmoji = '●';
-      if (incident.type === 'tsunami') iconEmoji = '🌊';
-      else if (incident.type === 'flood') iconEmoji = '💧';
-      else if (incident.type === 'landslide') iconEmoji = '⛰️';
-      else if (incident.type === 'storm') iconEmoji = '🌪️';
-      else if (incident.type === 'wildfire') iconEmoji = '🔥';
-      else if (incident.type === 'volcano') iconEmoji = '🌋';
+      const iconEmoji = DISASTER_EMOJIS[incident.type] || '●';
 
       const customIcon = L.divIcon({
         className: 'custom-disaster-marker',
@@ -1244,7 +1236,7 @@ export const SeismicMap: React.FC<SeismicMapProps> = ({
           {/* Natural Disaster Filter Submenu (Single-select only) */}
           <DisasterFilterSubmenu 
             selectedDisaster={activeDisaster}
-            onSelectDisaster={handleDisasterChange}
+            onSelectDisaster={onSelectDisaster || (() => {})}
             earthquakeCount={events.length}
           />
 

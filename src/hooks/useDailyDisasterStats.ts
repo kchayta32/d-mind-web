@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { GISTDA_CONFIG, getGistdaHeaders } from '@/services/gistdaService';
 
 interface DailyStats {
   earthquakes: number;
@@ -58,11 +59,8 @@ export const useDailyDisasterStats = () => {
 
         // Fetch GISTDA flood data for accurate count
         try {
-          const floodResponse = await fetch('https://api-gateway.gistda.or.th/api/2.0/resources/features/flood/1day', {
-            headers: {
-              'API-Key': 'UIKDdatC5lgDcdrGxBJfyjHRlvRSvKQFGjY8A3mG00fj99MqcWCd2VxVTkcfkVX6',
-              'accept': 'application/json'
-            }
+          const floodResponse = await fetch(`${GISTDA_CONFIG.BASE_URL}/features/flood/1day`, {
+            headers: getGistdaHeaders(GISTDA_CONFIG.PRIMARY_API_KEY)
           });
           if (floodResponse.ok) {
             const floodData = await floodResponse.json();

@@ -14,13 +14,17 @@ interface FloodWMSLayersProps {
   showFrequency: boolean;
   opacity?: number;
   mapProtocol?: FloodMapProtocol;
+  showSentinel2TrueColor?: boolean;
+  showSentinel1Sar?: boolean;
 }
 
 export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({ 
   timeFilter = '3days', 
   showFrequency = true, 
-  opacity = 0.7,
-  mapProtocol = 'wmts'
+  opacity = 0.75,
+  mapProtocol = 'wmts',
+  showSentinel2TrueColor = false,
+  showSentinel1Sar = false
 }) => {
   const safeTime: FloodTimeFilter = (timeFilter === '1day' || timeFilter === '3days' || timeFilter === '7days' || timeFilter === '30days')
     ? timeFilter
@@ -30,43 +34,71 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
 
   return (
     <>
-      {/* 1. Main Flood Area Map Layer */}
+      {/* 0. Optional Copernicus Sentinel-2 True Color / Cloudless Base Imagery */}
+      {showSentinel2TrueColor && (
+        <WMSTileLayer
+          key="sentinel2-cloudless-wms"
+          url="https://tiles.maps.eox.at/wms"
+          layers="s2cloudless-2020"
+          format="image/jpeg"
+          transparent={false}
+          opacity={0.85}
+          attribution="&copy; <a href='https://s2maps.eu' target='_blank'>Sentinel-2 cloudless</a> by EOX IT Services GmbH (Copernicus Sentinel data)"
+          maxZoom={18}
+        />
+      )}
+
+      {/* 0.1 Optional Copernicus Sentinel-1 Synthetic Aperture Radar (SAR) Water Backscatter Layer */}
+      {showSentinel1Sar && (
+        <WMSTileLayer
+          key="sentinel1-sar-wms"
+          url="https://tiles.maps.eox.at/wms"
+          layers="hydrography"
+          format="image/png"
+          transparent={true}
+          opacity={0.7}
+          attribution="&copy; Copernicus Sentinel-1 C-SAR Flood Detection"
+          maxZoom={18}
+        />
+      )}
+
+      {/* 1. Main Sentinel Satellite Flood Area Layer (Processed by GISTDA API 2.0 from Sentinel-1 SAR & Sentinel-2) */}
       {timeFilter && (
         mapProtocol === 'tms' ? (
           <TileLayer
-            key={`flood-tms-${safeTime}`}
+            key={`flood-sentinel-tms-${safeTime}`}
             url={getGistdaFloodTmsTileUrl('flood', safeTime, apiKey)}
             opacity={opacity}
             tms={true}
-            attribution={`GISTDA Flood (${safeTime}) TMS`}
+            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) TMS`}
             maxZoom={18}
           />
         ) : mapProtocol === 'wms' ? (
           <WMSTileLayer
-            key={`flood-wms-${safeTime}`}
+            key={`flood-sentinel-wms-${safeTime}`}
             url={getGistdaFloodWmsUrl('flood', safeTime, apiKey)}
             layers="flood"
             format="image/png"
             transparent={true}
             opacity={opacity}
-            attribution={`GISTDA Flood (${safeTime}) WMS`}
+            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) WMS`}
             maxZoom={18}
           />
         ) : (
           <WMSTileLayer
-            key={`flood-wmts-${safeTime}`}
+            key={`flood-sentinel-wmts-${safeTime}`}
             url={getGistdaFloodWmtsUrl('flood', safeTime, apiKey)}
             layers="flood"
             format="image/png"
             transparent={true}
             opacity={opacity}
-            attribution={`GISTDA Flood (${safeTime}) WMTS`}
+            attribution={`GISTDA & Sentinel-1/2 Satellite Flood (${safeTime}) WMTS`}
             maxZoom={18}
           />
         )
       )}
 
-      {/* 2. Recurrent Flood Areas (พื้นที่น้ำท่วมซ้ำซาก) */}
+      {/* 2. Recurrent Flood Areas (พื้นที่น้ำท่วมซ้ำซาก สถิติจากดาวเทียมย้อนหลัง) */}
       {showFrequency && (
         mapProtocol === 'tms' ? (
           <TileLayer
@@ -74,7 +106,7 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
             url={getGistdaFloodTmsTileUrl('flood-freq', safeTime, apiKey)}
             opacity={opacity * 0.75}
             tms={true}
-            attribution="GISTDA Flood Frequency TMS"
+            attribution="GISTDA Sentinel Historical Flood Frequency TMS"
             maxZoom={18}
           />
         ) : mapProtocol === 'wms' ? (
@@ -85,7 +117,7 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
             format="image/png"
             transparent={true}
             opacity={opacity * 0.75}
-            attribution="GISTDA Flood Frequency WMS"
+            attribution="GISTDA Sentinel Historical Flood Frequency WMS"
             maxZoom={18}
           />
         ) : (
@@ -96,7 +128,7 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
             format="image/png"
             transparent={true}
             opacity={opacity * 0.75}
-            attribution="GISTDA Flood Frequency WMTS"
+            attribution="GISTDA Sentinel Historical Flood Frequency WMTS"
             maxZoom={18}
           />
         )

@@ -21,6 +21,79 @@ export interface MapLegendProps {
   activeDisaster?: DisasterType;
 }
 
+interface LegendItem {
+  dotClass: string;
+  name: string;
+  nameClass: string;
+  desc: string;
+}
+
+interface HazardLegendConfig {
+  title: string;
+  colorClass: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: LegendItem[];
+}
+
+const HAZARD_LEGENDS: Partial<Record<DisasterType, HazardLegendConfig>> = {
+  tsunami: {
+    title: 'ทุ่นและหอเตือนภัยสึนามิ (Tsunami Network)',
+    colorClass: 'text-blue-400',
+    icon: Waves,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-blue-500 border border-white shadow-[0_0_8px_#3b82f6]', name: 'ทุ่นน้ำลึก DART (23401, 23461)', nameClass: 'text-blue-300', desc: 'ตรวจจับการเปลี่ยนระดับผิวน้ำทะเลเชื่อมต่อดาวเทียม' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-cyan-400 border border-slate-900', name: 'หอเตือนภัยชายฝั่ง (Siren Towers)', nameClass: 'text-cyan-300', desc: 'กระจายเสียง 5 ภาษา พร้อมไฟสัญญาณและเส้นทางอพยพ' },
+      { dotClass: 'w-3 h-3 rounded-full border border-blue-400/50 bg-blue-500/20', name: 'รัศมีเฝ้าระวังคลื่นซัดฝั่ง', nameClass: 'text-slate-300', desc: 'ขอบเขตพื้นที่ลุ่มต่ำชายฝั่งทะเลอันดามัน 6 จังหวัด' },
+    ],
+  },
+  flood: {
+    title: 'โทรมาตรลุ่มน้ำและจุดเสี่ยงน้ำท่วม (Flood Network)',
+    colorClass: 'text-sky-400',
+    icon: Droplets,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-amber-500 border border-white shadow-[0_0_8px_#f59e0b]', name: 'เขื่อนหลัก / จุดควบคุมน้ำ (C.13)', nameClass: 'text-amber-300', desc: 'อัตราการระบายน้ำและการแจ้งเตือนท้ายเขื่อน' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-sky-500 border border-slate-900', name: 'สถานีวัดระดับน้ำแม่น้ำ (P.1, M.7, N.1)', nameClass: 'text-sky-300', desc: 'เปรียบเทียบระดับน้ำจริงกับขอบตลิ่งวิกฤต' },
+      { dotClass: 'w-3 h-3 rounded-full border border-sky-400/50 bg-sky-500/20', name: 'รัศมีเสี่ยงน้ำท่วมฉับพลัน', nameClass: 'text-slate-300', desc: 'พื้นที่ลุ่มต่ำที่ต้องยกของขึ้นที่สูง' },
+    ],
+  },
+  landslide: {
+    title: 'จุดเฝ้าระวังดินโคลนถล่ม (Landslide Risk)',
+    colorClass: 'text-amber-500',
+    icon: Mountain,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-rose-500 border border-white shadow-[0_0_8px_#ef4444] animate-ping', name: 'จุดวิกฤตดินสไลด์ (ดอยแม่สลอง)', nameClass: 'text-rose-400', desc: 'ฝนสะสมเกิน 150 มม. ความอิ่มตัวในดิน > 90%' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-amber-500 border border-slate-900', name: 'จุดเฝ้าระวังลาดเชิงเขา (ดอยสุเทพ, เขาค้อ)', nameClass: 'text-amber-300', desc: 'พื้นที่ลาดชันสูงตามแนวรอยเลื่อนและลำห้วย' },
+    ],
+  },
+  storm: {
+    title: 'พายุหมุนและเรดาร์ตรวจอากาศ (Storm Tracking)',
+    colorClass: 'text-purple-400',
+    icon: Wind,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-purple-500 border border-white shadow-[0_0_10px_#a855f7] animate-pulse', name: 'ศูนย์กลางพายุหมุน (Depression 02W)', nameClass: 'text-purple-300', desc: 'ความเร็วลม 55-65 กม./ชม. พร้อมเส้นทางเคลื่อนที่' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-indigo-400 border border-slate-900', name: 'สถานีเรดาร์ตรวจอากาศ (สัตหีบ, ภูเก็ต)', nameClass: 'text-indigo-300', desc: 'ตรวจจับการก่อตัวของกลุ่มฝนลมกระโชกแรง' },
+    ],
+  },
+  wildfire: {
+    title: 'จุดความร้อนและไฟป่า (Hotspots VIIRS/MODIS)',
+    colorClass: 'text-orange-400',
+    icon: Flame,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-orange-500 border border-white shadow-[0_0_10px_#f97316] animate-pulse', name: 'จุดความร้อนวิกฤต (อมก๋อย, ปาย)', nameClass: 'text-orange-400', desc: 'ไฟป่าสะสมต่อเนื่อง > 15 จุด และ PM2.5 สูงเกินเกณฑ์' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-amber-400 border border-slate-900', name: 'แนวเฝ้าระวังไฟป่า (ดอยภูคา, ไทรโยค)', nameClass: 'text-amber-300', desc: 'การสร้างแนวกันไฟและตรวจการณ์ดาวเทียม' },
+    ],
+  },
+  volcano: {
+    title: 'ภูเขาไฟและเถ้าถ่านในอาเซียน (Volcanic Alert)',
+    colorClass: 'text-rose-400',
+    icon: AlertTriangle,
+    items: [
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-rose-600 border border-white shadow-[0_0_10px_#e11d48] animate-ping', name: 'ภูเขาไฟปะทุรุนแรง (มารูปี สุมาตรา)', nameClass: 'text-rose-300', desc: 'สถานะ Siaga (Level III) กลุ่มเถ้าถ่านสูง > 3,000 ม.' },
+      { dotClass: 'w-3.5 h-3.5 rounded-full bg-amber-500 border border-slate-900', name: 'ภูเขาไฟเฝ้าระวัง (ซีนาบุง, อานัก กรากะตัว)', nameClass: 'text-amber-300', desc: 'แจ้งเตือนภัยการบิน (VONA) และความเสี่ยงคลื่นยักษ์' },
+    ],
+  },
+};
+
 export const MapLegend: React.FC<MapLegendProps> = ({ 
   className = '', 
   defaultExpanded = false,
@@ -72,172 +145,23 @@ export const MapLegend: React.FC<MapLegendProps> = ({
       {isExpanded && (
         <div className="px-4 pb-3.5 pt-1 space-y-4 max-h-[75vh] overflow-y-auto border-t border-slate-800/80 text-xs">
           
-          {/* If Disaster is TSUNAMI */}
-          {activeDisaster === 'tsunami' && (
+          {/* Multi-Hazard Natural Disaster Legends */}
+          {activeDisaster !== 'earthquake' && HAZARD_LEGENDS[activeDisaster] && (
             <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-blue-400 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <Waves className="w-3.5 h-3.5" />
-                <span>ทุ่นและหอเตือนภัยสึนามิ (Tsunami Network)</span>
+              <div className={`flex items-center gap-1.5 ${HAZARD_LEGENDS[activeDisaster].colorClass} font-mono text-[11px] font-semibold uppercase tracking-wider`}>
+                {React.createElement(HAZARD_LEGENDS[activeDisaster].icon, { className: 'w-3.5 h-3.5' })}
+                <span>{HAZARD_LEGENDS[activeDisaster].title}</span>
               </div>
               <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-blue-500 border border-white shadow-[0_0_8px_#3b82f6] shrink-0" />
-                  <div>
-                    <span className="font-semibold text-blue-300">ทุ่นน้ำลึก DART (23401, 23461)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ตรวจจับการเปลี่ยนระดับผิวน้ำทะเลเชื่อมต่อดาวเทียม</p>
+                {HAZARD_LEGENDS[activeDisaster].items.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5">
+                    <span className={`shrink-0 ${item.dotClass}`} />
+                    <div>
+                      <span className={`font-semibold ${item.nameClass}`}>{item.name}</span>
+                      <p className="text-[10px] text-slate-400 font-sans">{item.desc}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-cyan-400 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-cyan-300">หอเตือนภัยชายฝั่ง (Siren Towers)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">กระจายเสียง 5 ภาษา พร้อมไฟสัญญาณและเส้นทางอพยพ</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full border border-blue-400/50 bg-blue-500/20 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-slate-300">รัศมีเฝ้าระวังคลื่นซัดฝั่ง</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ขอบเขตพื้นที่ลุ่มต่ำชายฝั่งทะเลอันดามัน 6 จังหวัด</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* If Disaster is FLOOD */}
-          {activeDisaster === 'flood' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-sky-400 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <Droplets className="w-3.5 h-3.5" />
-                <span>โทรมาตรลุ่มน้ำและจุดเสี่ยงน้ำท่วม (Flood Network)</span>
-              </div>
-              <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-white shadow-[0_0_8px_#f59e0b] shrink-0" />
-                  <div>
-                    <span className="font-semibold text-amber-300">เขื่อนหลัก / จุดควบคุมน้ำ (C.13)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">อัตราการระบายน้ำและการแจ้งเตือนท้ายเขื่อน</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-sky-500 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-sky-300">สถานีวัดระดับน้ำแม่น้ำ (P.1, M.7, N.1)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">เปรียบเทียบระดับน้ำจริงกับขอบตลิ่งวิกฤต</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full border border-sky-400/50 bg-sky-500/20 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-slate-300">รัศมีเสี่ยงน้ำท่วมฉับพลัน</span>
-                    <p className="text-[10px] text-slate-400 font-sans">พื้นที่ลุ่มต่ำที่ต้องยกของขึ้นที่สูง</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* If Disaster is LANDSLIDE */}
-          {activeDisaster === 'landslide' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-amber-500 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <Mountain className="w-3.5 h-3.5" />
-                <span>จุดเฝ้าระวังดินโคลนถล่ม (Landslide Risk)</span>
-              </div>
-              <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-rose-500 border border-white shadow-[0_0_8px_#ef4444] shrink-0 animate-ping" />
-                  <div>
-                    <span className="font-semibold text-rose-400">จุดวิกฤตดินสไลด์ (ดอยแม่สลอง)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ฝนสะสมเกิน 150 มม. ความอิ่มตัวในดิน &gt; 90%</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-amber-300">จุดเฝ้าระวังลาดเชิงเขา (ดอยสุเทพ, เขาค้อ)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">พื้นที่ลาดชันสูงตามแนวรอยเลื่อนและลำห้วย</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* If Disaster is STORM */}
-          {activeDisaster === 'storm' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-purple-400 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <Wind className="w-3.5 h-3.5" />
-                <span>พายุหมุนและเรดาร์ตรวจอากาศ (Storm Tracking)</span>
-              </div>
-              <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-purple-500 border border-white shadow-[0_0_10px_#a855f7] shrink-0 animate-pulse" />
-                  <div>
-                    <span className="font-semibold text-purple-300">ศูนย์กลางพายุหมุน (Depression 02W)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ความเร็วลม 55-65 กม./ชม. พร้อมเส้นทางเคลื่อนที่</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-indigo-400 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-indigo-300">สถานีเรดาร์ตรวจอากาศ (สัตหีบ, ภูเก็ต)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ตรวจจับการก่อตัวของกลุ่มฝนลมกระโชกแรง</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* If Disaster is WILDFIRE */}
-          {activeDisaster === 'wildfire' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-orange-400 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <Flame className="w-3.5 h-3.5" />
-                <span>จุดความร้อนและไฟป่า (Hotspots VIIRS/MODIS)</span>
-              </div>
-              <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-orange-500 border border-white shadow-[0_0_10px_#f97316] shrink-0 animate-pulse" />
-                  <div>
-                    <span className="font-semibold text-orange-400">จุดความร้อนวิกฤต (อมก๋อย, ปาย)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">ไฟป่าสะสมต่อเนื่อง &gt; 15 จุด และ PM2.5 สูงเกินเกณฑ์</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-amber-400 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-amber-300">แนวเฝ้าระวังไฟป่า (ดอยภูคา, ไทรโยค)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">การสร้างแนวกันไฟและตรวจการณ์ดาวเทียม</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* If Disaster is VOLCANO */}
-          {activeDisaster === 'volcano' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-rose-400 font-mono text-[11px] font-semibold uppercase tracking-wider">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>ภูเขาไฟและเถ้าถ่านในอาเซียน (Volcanic Alert)</span>
-              </div>
-              <div className="space-y-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60 font-mono">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-rose-600 border border-white shadow-[0_0_10px_#e11d48] shrink-0 animate-ping" />
-                  <div>
-                    <span className="font-semibold text-rose-300">ภูเขาไฟปะทุรุนแรง (มารูปี สุมาตรา)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">สถานะ Siaga (Level III) กลุ่มเถ้าถ่านสูง &gt; 3,000 ม.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-slate-900 shrink-0" />
-                  <div>
-                    <span className="font-semibold text-amber-300">ภูเขาไฟเฝ้าระวัง (ซีนาบุง, อานัก กรากะตัว)</span>
-                    <p className="text-[10px] text-slate-400 font-sans">แจ้งเตือนภัยการบิน (VONA) และความเสี่ยงคลื่นยักษ์</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           )}

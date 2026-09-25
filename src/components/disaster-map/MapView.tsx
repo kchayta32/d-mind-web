@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, BaseMapLayerType } from './types';
+import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, BaseMapLayerType, CrowdsourcedFloodReport } from './types';
 import { GISTDAHotspot } from './useGISTDAData';
 import { RainViewerData } from './useRainViewerData';
 import { MapLayers } from './map-components/MapLayers';
@@ -31,6 +31,7 @@ interface MapViewProps {
   storms?: StormData[];
   volcanoes?: VolcanoData[];
   sinkholes?: SinkholeData[];
+  crowdsourcedFloodReports?: CrowdsourcedFloodReport[];
   selectedType: DisasterType;
   magnitudeFilter?: number;
   humidityFilter?: number;
@@ -41,6 +42,9 @@ interface MapViewProps {
   showFloodFrequency?: boolean;
   floodMapMode?: import('@/services/gistdaService').FloodMapProtocol;
   showWaterHyacinth?: boolean;
+  showRainRadarOnFlood?: boolean;
+  showSentinel2TrueColor?: boolean;
+  showSentinel1Sar?: boolean;
   wildfireTimeFilter?: string;
   showBurnFreq?: boolean;
   showBurnScar?: boolean;
@@ -48,6 +52,7 @@ interface MapViewProps {
   isLoading?: boolean;
   onLocationSelect?: (lat: number, lon: number, name: string) => void;
   onRefreshAll?: () => void;
+  onOpenCrowdsourceModal?: () => void;
 }
 
 const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string; maxZoom?: number; subdomains?: string[] }> = {
@@ -117,6 +122,7 @@ export const MapView: React.FC<MapViewProps> = ({
   storms = [],
   volcanoes = [],
   sinkholes = [],
+  crowdsourcedFloodReports = [],
   selectedType,
   magnitudeFilter = 0,
   humidityFilter = 0,
@@ -127,13 +133,17 @@ export const MapView: React.FC<MapViewProps> = ({
   showFloodFrequency = false,
   floodMapMode = 'wmts',
   showWaterHyacinth = false,
+  showRainRadarOnFlood = true,
+  showSentinel2TrueColor = false,
+  showSentinel1Sar = false,
   wildfireTimeFilter = '1day',
   showBurnFreq = false,
   showBurnScar = false,
   wildfireMapMode = 'wmts',
   isLoading = false,
   onLocationSelect,
-  onRefreshAll
+  onRefreshAll,
+  onOpenCrowdsourceModal
 }) => {
   const [baseLayer, setBaseLayer] = useState<BaseMapLayerType>('osm');
   const [rainOverlayType, setRainOverlayType] = useState<'radar' | 'satellite'>('radar');
@@ -168,6 +178,11 @@ export const MapView: React.FC<MapViewProps> = ({
   const center: [number, number] = [13.7563, 100.5018];
   const activeBaseConfig = baseLayerUrls[baseLayer] || baseLayerUrls.osm;
 
+  // Active radar overlay state based on selected view
+  const isRadarActiveOnMap = selectedType === 'heavyrain' 
+    ? showRainOverlay 
+    : (selectedType === 'flood' ? (showRainRadarOnFlood && showRainOverlay) : false);
+
   return (
     <div className="relative h-full w-full z-0 flex flex-col">
       {/* Real-time Disaster Urgent Alert Banner */}
@@ -199,7 +214,7 @@ export const MapView: React.FC<MapViewProps> = ({
           {/* User Location Marker */}
           <UserLocationMarker showLocation={showUserLocation} />
           
-          {/* Map Layer Overlays (WMS, Radar Tiles, Drought) */}
+          {/* Map Layer Overlays (WMS, Radar Tiles, Drought, Sentinel Satellite) */}
           <MapLayers
             selectedType={selectedType}
             droughtLayers={droughtLayers}
@@ -207,7 +222,9 @@ export const MapView: React.FC<MapViewProps> = ({
             floodTimeFilter={floodTimeFilter}
             showFloodFrequency={showFloodFrequency}
             floodMapMode={floodMapMode}
-            showRainOverlay={showRainOverlay}
+            showSentinel2TrueColor={showSentinel2TrueColor}
+            showSentinel1Sar={showSentinel1Sar}
+            showRainOverlay={isRadarActiveOnMap}
             rainData={rainData}
             rainOverlayType={rainOverlayType}
             rainTimeType={rainTimeType}
@@ -232,6 +249,7 @@ export const MapView: React.FC<MapViewProps> = ({
               storms={safeStorms}
               volcanoes={safeVolcanoes}
               sinkholes={safeSinkholes}
+              crowdsourcedFloodReports={crowdsourcedFloodReports}
             />
           )}
         </MapContainer>
@@ -253,8 +271,8 @@ export const MapView: React.FC<MapViewProps> = ({
           />
         </div>
         
-        {/* Radar Player for Heavy Rain & Radar mode */}
-        {selectedType === 'heavyrain' && rainData && (
+        {/* Radar Player for Heavy Rain & Flood Radar overlay mode (TMD Radar) */}
+        {((selectedType === 'heavyrain') || (selectedType === 'flood' && showRainRadarOnFlood)) && rainData && (
           <div className="absolute bottom-6 left-4 z-[1000]">
             <RadarPlayer
               rainData={rainData}
@@ -269,6 +287,23 @@ export const MapView: React.FC<MapViewProps> = ({
             />
           </div>
         )}
+
+        {/* Floating Quick Crowdsourcing Button for Citizens (Ground Truth) */}
+        <div className="absolute bottom-6 right-4 z-[1000] flex flex-col items-end gap-2">
+          {onOpenCrowdsourceModal && (
+            <button
+              type="button"
+              onClick={onOpenCrowdsourceModal}
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-xs py-2 px-3.5 rounded-full shadow-xl flex items-center gap-2 border-2 border-white/90 hover:scale-105 active:scale-95 transition-all"
+            >
+              <span className="text-base">📢</span>
+              <span>รายงานน้ำท่วมด้วยตนเอง</span>
+              <span className="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">
+                Ground Truth
+              </span>
+            </button>
+          )}
+        </div>
         
         {/* Overlays for loading */}
         <MapOverlays selectedType={selectedType} isLoading={isLoading} />
@@ -276,3 +311,5 @@ export const MapView: React.FC<MapViewProps> = ({
     </div>
   );
 };
+
+export default MapView;

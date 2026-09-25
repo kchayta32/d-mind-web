@@ -24,6 +24,10 @@ export const useDisasterMapState = () => {
   const [showFloodFrequency, setShowFloodFrequency] = useState(true);
   const [showWaterHyacinth, setShowWaterHyacinth] = useState(false);
   const [floodMapMode, setFloodMapMode] = useState<FloodMapProtocol>('wmts');
+  const [showRainRadarOnFlood, setShowRainRadarOnFlood] = useState(true);
+  const [showSentinel2TrueColor, setShowSentinel2TrueColor] = useState(false);
+  const [showSentinel1Sar, setShowSentinel1Sar] = useState(false);
+  const [isCrowdsourceModalOpen, setIsCrowdsourceModalOpen] = useState(false);
 
   return {
     selectedType,
@@ -56,5 +60,13 @@ export const useDisasterMapState = () => {
     setShowWaterHyacinth,
     floodMapMode,
     setFloodMapMode,
+    showRainRadarOnFlood,
+    setShowRainRadarOnFlood,
+    showSentinel2TrueColor,
+    setShowSentinel2TrueColor,
+    showSentinel1Sar,
+    setShowSentinel1Sar,
+    isCrowdsourceModalOpen,
+    setIsCrowdsourceModalOpen
   };
 };

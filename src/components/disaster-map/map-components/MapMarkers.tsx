@@ -9,7 +9,8 @@ import { OpenMeteoWeatherMarker } from '../OpenMeteoWeatherMarker';
 import SinkholeMarker from '../SinkholeMarker';
 import { StormMarker } from './StormMarker';
 import { VolcanoMarker } from './VolcanoMarker';
-import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData } from '../types';
+import { CrowdsourcedFloodMarkers } from '../CrowdsourcedFloodMarkers';
+import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, CrowdsourcedFloodReport } from '../types';
 import { GISTDAHotspot } from '../useGISTDAData';
 import { FloodDataPoint } from '../hooks/useOpenMeteoFloodData';
 import { FloodFeature, getFloodCenter } from '../hooks/useGISTDAFloodData';
@@ -29,6 +30,7 @@ interface MapMarkersProps {
   storms?: StormData[];
   volcanoes?: VolcanoData[];
   sinkholes: SinkholeData[];
+  crowdsourcedFloodReports?: CrowdsourcedFloodReport[];
 }
 
 export const MapMarkers: React.FC<MapMarkersProps> = ({
@@ -42,7 +44,8 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
   openMeteoRainData = [],
   storms = [],
   volcanoes = [],
-  sinkholes
+  sinkholes,
+  crowdsourcedFloodReports = []
 }) => {
   return (
     <>
@@ -84,7 +87,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         <AirStationMarker key={station.id} station={station} />
       ))}
 
-      {/* GISTDA Flood markers */}
+      {/* GISTDA Sentinel Flood markers */}
       {selectedType === 'flood' && gistdaFloodFeatures.map((feature, index) => {
         const center = getFloodCenter(feature);
         return (
@@ -97,6 +100,11 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         <FloodDataMarker key={`flood-river-${index}`} floodPoint={floodPoint} />
       ))}
 
+      {/* Crowdsourced Ground Truth Flood Markers (real-time citizen reports) */}
+      {selectedType === 'flood' && crowdsourcedFloodReports.length > 0 && (
+        <CrowdsourcedFloodMarkers reports={crowdsourcedFloodReports} />
+      )}
+
       {/* Sinkhole markers */}
       {selectedType === 'sinkhole' && sinkholes.map((sinkhole) => (
         <SinkholeMarker key={sinkhole.id} sinkhole={sinkhole} />
@@ -104,3 +112,5 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
     </>
   );
 };
+
+export default MapMarkers;

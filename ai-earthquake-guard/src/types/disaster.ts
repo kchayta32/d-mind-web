@@ -37,8 +37,6 @@ export interface DisasterIncident {
   status: string;
   description: string;
   radiusKm?: number;
-  affectedPopulation?: number;
-  riskLevel?: string;
   pathCoordinates?: [number, number][]; // e.g. for storm tracks or river flows
 }
 
