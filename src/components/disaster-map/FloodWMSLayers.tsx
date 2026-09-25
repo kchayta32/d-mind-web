@@ -1,11 +1,9 @@
 import React from 'react';
-import { WMSTileLayer, TileLayer } from 'react-leaflet';
+import { TileLayer } from 'react-leaflet';
 import { 
   GISTDA_CONFIG, 
   FloodTimeFilter, 
   FloodMapProtocol, 
-  getGistdaFloodWmsUrl, 
-  getGistdaFloodWmtsUrl, 
   getGistdaFloodTmsTileUrl 
 } from '@/services/gistdaService';
 
@@ -21,10 +19,9 @@ interface FloodWMSLayersProps {
 export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({ 
   timeFilter = '3days', 
   showFrequency = true, 
-  opacity = 0.8,
-  mapProtocol = 'tms',
+  opacity = 0.85,
   showSentinel2TrueColor = false,
-  showSentinel1Sar = true
+  showSentinel1Sar = false
 }) => {
   const safeTime: FloodTimeFilter = (timeFilter === '1day' || timeFilter === '3days' || timeFilter === '7days' || timeFilter === '30days')
     ? timeFilter
@@ -34,15 +31,12 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
 
   return (
     <>
-      {/* 0. Copernicus Sentinel-2 True Color / Cloudless Base Imagery (10m Resolution) */}
+      {/* 0. Copernicus Sentinel-2 True Color / Cloudless Base Imagery (10m Resolution via EOX WMTS) */}
       {showSentinel2TrueColor && (
-        <WMSTileLayer
-          key="sentinel2-cloudless-wms"
-          url="https://tiles.maps.eox.at/wms"
-          layers="s2cloudless-2024"
-          format="image/jpeg"
-          transparent={false}
-          opacity={0.85}
+        <TileLayer
+          key="sentinel2-cloudless-wmts"
+          url="https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg"
+          opacity={0.9}
           attribution="&copy; <a href='https://s2maps.eu' target='_blank'>Sentinel-2 cloudless</a> by EOX IT Services GmbH (Copernicus Sentinel data)"
           maxZoom={18}
         />
@@ -50,13 +44,10 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
 
       {/* 0.1 Copernicus Sentinel-1 Synthetic Aperture Radar (SAR) Water Backscatter / Hydrography Layer */}
       {showSentinel1Sar && (
-        <WMSTileLayer
-          key="sentinel1-sar-wms"
-          url="https://tiles.maps.eox.at/wms"
-          layers="hydrography"
-          format="image/png"
-          transparent={true}
-          opacity={0.7}
+        <TileLayer
+          key="sentinel1-sar-wmts"
+          url="https://tiles.maps.eox.at/wmts/1.0.0/hydrography_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.png"
+          opacity={0.75}
           attribution="&copy; Copernicus Sentinel-1 C-SAR Flood & Water Surface Backscatter"
           maxZoom={18}
         />
@@ -65,10 +56,10 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
       {/* 1. Main Sentinel Satellite Flood Area Layer (Processed by GISTDA API 2.0 from Sentinel-1 SAR & Sentinel-2) */}
       {timeFilter && (
         <TileLayer
-          key={`flood-sentinel-tms-${safeTime}`}
+          key={`flood-sentinel-xyz-${safeTime}`}
           url={getGistdaFloodTmsTileUrl('flood', safeTime, apiKey)}
           opacity={opacity}
-          tms={true}
+          tms={false} // GISTDA uses standard XYZ tiling; tms=false ensures valid y-coordinate
           attribution={`GISTDA Sentinel-1/2 Satellite Flood Inspection (${safeTime})`}
           maxZoom={18}
         />
@@ -77,10 +68,10 @@ export const FloodWMSLayers: React.FC<FloodWMSLayersProps> = ({
       {/* 2. Recurrent Flood Areas (พื้นที่น้ำท่วมซ้ำซาก สถิติจากดาวเทียมย้อนหลัง) */}
       {showFrequency && (
         <TileLayer
-          key="flood-freq-tms"
+          key="flood-freq-xyz"
           url={getGistdaFloodTmsTileUrl('flood-freq', safeTime, apiKey)}
           opacity={opacity * 0.75}
-          tms={true}
+          tms={false}
           attribution="GISTDA Sentinel Historical Flood Frequency TMS"
           maxZoom={18}
         />

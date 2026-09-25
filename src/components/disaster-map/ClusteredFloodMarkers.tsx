@@ -14,7 +14,8 @@ export const ClusteredFloodMarkers: React.FC<ClusteredFloodMarkersProps> = ({ fe
   return (
     <MarkerClusterGroup
       chunkedLoading
-      maxClusterRadius={45}
+      maxClusterRadius={35}
+      disableClusteringAtZoom={8}
       spiderfyOnMaxZoom={true}
       showCoverageOnHover={false}
       zoomToBoundsOnClick={true}

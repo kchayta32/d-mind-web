@@ -28,9 +28,10 @@ const floodIcon = new L.DivIcon({
 interface FloodMarkerProps {
   feature: FloodFeature;
   center: [number, number];
+  renderPolygon?: boolean;
 }
 
-export const FloodMarker: React.FC<FloodMarkerProps> = ({ feature, center }) => {
+export const FloodMarker: React.FC<FloodMarkerProps> = ({ feature, center, renderPolygon = false }) => {
   const properties = feature?.properties || {};
   const area = properties.f_area || 0;
   const areaInKm = (area / 1000000).toFixed(2);
@@ -78,8 +79,8 @@ export const FloodMarker: React.FC<FloodMarkerProps> = ({ feature, center }) => 
 
   return (
     <>
-      {/* Render all detected water polygons with vivid styling */}
-      {allPolygons.map((ring, idx) => (
+      {/* Render all detected water polygons with vivid styling if requested */}
+      {renderPolygon && allPolygons.map((ring, idx) => (
         <Polygon
           key={`poly-${feature.id || properties._id || idx}-${idx}`}
           positions={ring}

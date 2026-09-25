@@ -18,6 +18,7 @@ import { OpenMeteoRainDataPoint } from './hooks/useOpenMeteoRainData';
 import { SinkholeData } from '../../hooks/useSinkholeData';
 import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
+import { SentinelFloodLegend } from './SentinelFloodLegend';
 
 interface MapViewProps {
   earthquakes?: Earthquake[];
@@ -285,6 +286,15 @@ export const MapView: React.FC<MapViewProps> = ({
               currentFrameIndex={rainFrameIndex}
               onFrameIndexChange={setRainFrameIndex}
             />
+          </div>
+        )}
+
+        {/* Sentinel Satellite Flood Map Legend */}
+        {selectedType === 'flood' && (
+          <div className={`absolute z-[1000] left-4 transition-all duration-300 ${
+            showRainRadarOnFlood && rainData ? 'bottom-28' : 'bottom-6'
+          }`}>
+            <SentinelFloodLegend />
           </div>
         )}
 

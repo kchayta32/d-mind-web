@@ -6,6 +6,7 @@ import AirStationMarker from '../AirStationMarker';
 import { FloodDataMarker } from '../FloodDataMarker';
 import { FloodMarker } from '../FloodMarker';
 import { ClusteredFloodMarkers } from '../ClusteredFloodMarkers';
+import { SentinelFloodVectorLayer } from '../SentinelFloodVectorLayer';
 import { OpenMeteoWeatherMarker } from '../OpenMeteoWeatherMarker';
 import SinkholeMarker from '../SinkholeMarker';
 import { StormMarker } from './StormMarker';
@@ -88,7 +89,12 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         <AirStationMarker key={station.id} station={station} />
       ))}
 
-      {/* GISTDA Sentinel Flood markers with clustering and polygon overlays */}
+      {/* 1. Sentinel-1 SAR & Sentinel-2 Flood Vector Polygons (always drawn directly across Thailand) */}
+      {selectedType === 'flood' && gistdaFloodFeatures.length > 0 && (
+        <SentinelFloodVectorLayer features={gistdaFloodFeatures} />
+      )}
+
+      {/* 2. GISTDA Sentinel Flood center markers with clustering */}
       {selectedType === 'flood' && gistdaFloodFeatures.length > 0 && (
         <ClusteredFloodMarkers features={gistdaFloodFeatures} />
       )}
