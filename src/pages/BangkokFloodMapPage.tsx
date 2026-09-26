@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import { 
   BangkokFloodMap, 
@@ -16,6 +16,7 @@ import {
   BANGKOK_CCTV_CAMERAS, 
   BangkokCctvCamera 
 } from '@/data/bangkokCctvData';
+import { fetchBmaCctvFromDataGoTh } from '@/services/dataGoThService';
 import { 
   BangkokZone, 
   FloodSeverity, 
@@ -81,10 +82,34 @@ export const BangkokFloodMapPage: React.FC = () => {
   const [focusTarget, setFocusTarget] = useState<[number, number] | null>(null);
   const [focusZoom, setFocusZoom] = useState<number>(14);
 
+  // Live BMA Open Data CCTV state
+  const [bmaDataGoThCameras, setBmaDataGoThCameras] = useState<BangkokCctvCamera[]>([]);
+  const [dataGoThSource, setDataGoThSource] = useState<string>('');
+  const [isLoadingBma, setIsLoadingBma] = useState<boolean>(false);
+
   // Timestamp
   const [lastRefreshedAt, setLastRefreshedAt] = useState<string>(
     new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
   );
+
+  const loadBmaCameras = async () => {
+    setIsLoadingBma(true);
+    try {
+      const res = await fetchBmaCctvFromDataGoTh(200);
+      if (res.cameras && res.cameras.length > 0) {
+        setBmaDataGoThCameras(res.cameras);
+        setDataGoThSource(res.source);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch data.go.th BMA cameras', e);
+    } finally {
+      setIsLoadingBma(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBmaCameras();
+  }, []);
 
   // Filtered Roads Memo
   const filteredRoads = useMemo(() => {
@@ -112,11 +137,19 @@ export const BangkokFloodMapPage: React.FC = () => {
     });
   }, [searchQuery, selectedZone, selectedSeverity]);
 
+  // Combined CCTVs: curated local + official BMA from data.go.th
+  const allCctvs = useMemo(() => {
+    if (bmaDataGoThCameras.length === 0) return BANGKOK_CCTV_CAMERAS;
+    const existingIds = new Set(BANGKOK_CCTV_CAMERAS.map(c => c.id));
+    const newFromGov = bmaDataGoThCameras.filter(c => !existingIds.has(c.id));
+    return [...BANGKOK_CCTV_CAMERAS, ...newFromGov];
+  }, [bmaDataGoThCameras]);
+
   // Filtered CCTVs Memo based on zone
   const filteredCctvs = useMemo(() => {
-    if (selectedZone === 'all') return BANGKOK_CCTV_CAMERAS;
-    return BANGKOK_CCTV_CAMERAS.filter(c => c.zone === selectedZone);
-  }, [selectedZone]);
+    if (selectedZone === 'all') return allCctvs;
+    return allCctvs.filter(c => c.zone === selectedZone);
+  }, [selectedZone, allCctvs]);
 
   // Filtered Water Stations based on zone
   const filteredWaterStations = useMemo(() => {
@@ -142,7 +175,7 @@ export const BangkokFloodMapPage: React.FC = () => {
   };
 
   const handleOpenCctvFromId = (cctvId: string) => {
-    const found = BANGKOK_CCTV_CAMERAS.find(c => c.id === cctvId);
+    const found = allCctvs.find(c => c.id === cctvId);
     if (found) {
       setSelectedCctv(found);
       setIsRoadModalOpen(false);
@@ -182,6 +215,7 @@ export const BangkokFloodMapPage: React.FC = () => {
 
   const handleRefreshData = () => {
     setLastRefreshedAt(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
+    loadBmaCameras();
   };
 
   return (
@@ -208,6 +242,10 @@ export const BangkokFloodMapPage: React.FC = () => {
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-mono text-sky-200">
                     🛰️ Sentinel-1 SAR Overpass
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/30 border border-emerald-400/40 backdrop-blur-md text-xs font-medium text-emerald-200 flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    🏛️ เชื่อมต่อข้อมูลกล้อง BMA Open Data ({bmaDataGoThCameras.length > 0 ? `${bmaDataGoThCameras.length} จุด` : 'data.go.th'})
                   </span>
                 </div>
 
@@ -249,7 +287,7 @@ export const BangkokFloodMapPage: React.FC = () => {
           {/* 3. Real-time Status Stats Cards */}
           <BangkokFloodStats
             roads={BANGKOK_ROAD_SEGMENTS}
-            cctvs={BANGKOK_CCTV_CAMERAS}
+            cctvs={allCctvs}
             waterStations={BANGKOK_CANAL_STATIONS}
             selectedSeverity={selectedSeverity}
             onSelectSeverityFilter={(sev) => setSelectedSeverity(sev)}
@@ -617,7 +655,7 @@ export const BangkokFloodMapPage: React.FC = () => {
         isOpen={isRoadModalOpen}
         onClose={() => setIsRoadModalOpen(false)}
         onOpenCctv={handleOpenCctvFromId}
-        cctvs={BANGKOK_CCTV_CAMERAS}
+        cctvs={allCctvs}
         onFocusOnMap={(center, zoom) => {
           setFocusTarget(center);
           if (zoom) setFocusZoom(zoom);

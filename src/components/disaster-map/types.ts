@@ -208,6 +208,7 @@ export type BaseMapLayerType =
   | 'osm' 
   | 'satellite' 
   | 'dark' 
+  | 'matrix'
   | 'light' 
   | 'topo' 
   | 'google-satellite' 

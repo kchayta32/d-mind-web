@@ -56,6 +56,8 @@ interface MapViewProps {
   onOpenCrowdsourceModal?: () => void;
 }
 
+const JAWG_ACCESS_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JAWG_ACCESS_TOKEN) || 'FTtoH6pBTHEDddbaGWyVP2EDCUBCVIdUP92MVIcbIx5H6jYNdDQca7404lHLL3Dc';
+
 const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string; maxZoom?: number; subdomains?: string[] }> = {
   osm: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -92,9 +94,15 @@ const baseLayerUrls: Record<BaseMapLayerType, { url: string; attribution: string
     maxZoom: 18
   },
   dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19,
+    url: `https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}.png?access-token=${JAWG_ACCESS_TOKEN}`,
+    attribution: '&copy; <a href="https://www.jawg.io" target="_blank">Jawg</a>Maps &copy; OpenStreetMap',
+    maxZoom: 20,
+    subdomains: ['a', 'b', 'c', 'd']
+  },
+  matrix: {
+    url: `https://{s}.tile.jawg.io/jawg-matrix/{z}/{x}/{y}.png?access-token=${JAWG_ACCESS_TOKEN}`,
+    attribution: '&copy; <a href="https://www.jawg.io" target="_blank">Jawg</a>Maps &copy; OpenStreetMap',
+    maxZoom: 20,
     subdomains: ['a', 'b', 'c', 'd']
   },
   light: {

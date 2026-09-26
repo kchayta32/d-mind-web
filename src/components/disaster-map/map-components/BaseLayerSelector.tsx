@@ -60,9 +60,15 @@ const baseLayers: Array<{
   },
   {
     id: 'dark',
-    label: 'CartoDB Dark Matter',
-    sublabel: 'แผนที่โทนมืด แทคติคอล (กลางคืน)',
+    label: 'Jawg Dark (โหมดมืด)',
+    sublabel: 'แผนที่โทนมืดแทคติคอล Jawg Maps',
     icon: <Moon className="w-4 h-4 text-indigo-400" />
+  },
+  {
+    id: 'matrix',
+    label: 'Jawg Matrix',
+    sublabel: 'แผนที่ไซเบอร์/เมทริกซ์ Jawg Maps',
+    icon: <Moon className="w-4 h-4 text-emerald-400" />
   },
   {
     id: 'light',

@@ -820,6 +820,28 @@ def get_telegram_subscribers():
         "admin_chat_configured": bool(TELEGRAM_CHAT_ID)
     })
 
+@app.route('/api/cctv/datagoth', methods=['GET'])
+@app.route('/cctv/datagoth', methods=['GET'])
+def get_datagoth_bma_cctv():
+    api_key = os.environ.get("VITE_DATA_GO_TH_API_KEY", "SfsCwAmoIxUhrPfwIGuYP7sLIwcoVUU3")
+    resource_id = "0d5af6a8-5747-4b16-913a-8e0455e37280"
+    limit = request.args.get("limit", 250)
+    try:
+        url = f"https://data.go.th/api/3/action/datastore_search?resource_id={resource_id}&limit={limit}"
+        headers = {"api-key": api_key, "User-Agent": "D-MIND-Disaster-Platform/1.0"}
+        resp = requests.get(url, headers=headers, timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            return jsonify({
+                "success": True,
+                "total": data.get("result", {}).get("total", 0),
+                "records": data.get("result", {}).get("records", [])
+            })
+        else:
+            return jsonify({"success": False, "error": f"Upstream error {resp.status_code}"}), 502
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 # Vercel Serverless WSGI entrypoint alias
 handler = app
 

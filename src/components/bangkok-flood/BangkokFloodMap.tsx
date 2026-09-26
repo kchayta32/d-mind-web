@@ -36,8 +36,10 @@ import { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation } f
 export type { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation, BangkokCctvCamera };
 export type BangkokSeverity = 'all' | FloodSeverity;
 
+const JAWG_ACCESS_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JAWG_ACCESS_TOKEN) || 'FTtoH6pBTHEDddbaGWyVP2EDCUBCVIdUP92MVIcbIx5H6jYNdDQca7404lHLL3Dc';
+
 // Map base layer types
-export type BaseMapStyle = 'osm' | 'google-hybrid' | 'satellite' | 'dark';
+export type BaseMapStyle = 'osm' | 'google-hybrid' | 'satellite' | 'dark' | 'matrix';
 
 export const BASE_MAP_URLS: Record<BaseMapStyle, { url: string; attribution: string; subdomains?: string[] }> = {
   osm: {
@@ -56,8 +58,13 @@ export const BASE_MAP_URLS: Record<BaseMapStyle, { url: string; attribution: str
     subdomains: ['a', 'b', 'c']
   },
   dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-    attribution: '&copy; OpenStreetMap &copy; CARTO (Free / No API Key)',
+    url: `https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}.png?access-token=${JAWG_ACCESS_TOKEN}`,
+    attribution: '&copy; <a href="https://www.jawg.io" target="_blank">Jawg</a>Maps &copy; OpenStreetMap',
+    subdomains: ['a', 'b', 'c', 'd']
+  },
+  matrix: {
+    url: `https://{s}.tile.jawg.io/jawg-matrix/{z}/{x}/{y}.png?access-token=${JAWG_ACCESS_TOKEN}`,
+    attribution: '&copy; <a href="https://www.jawg.io" target="_blank">Jawg</a>Maps &copy; OpenStreetMap',
     subdomains: ['a', 'b', 'c', 'd']
   }
 };
@@ -292,7 +299,13 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
           onClick={() => setBaseMap('dark')}
           className={`px-2.5 py-1 rounded-lg font-medium transition ${baseMap === 'dark' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
         >
-          โหมดมืด (Dark)
+          Jawg โหมดมืด
+        </button>
+        <button
+          onClick={() => setBaseMap('matrix')}
+          className={`px-2.5 py-1 rounded-lg font-medium transition ${baseMap === 'matrix' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+        >
+          Jawg เมทริกซ์
         </button>
       </div>
 
