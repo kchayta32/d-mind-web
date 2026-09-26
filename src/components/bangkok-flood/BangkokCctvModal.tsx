@@ -21,7 +21,12 @@ import {
   Navigation,
   Clock,
   Waves,
-  Building
+  Building,
+  ExternalLink,
+  PhoneCall,
+  Video,
+  Ruler,
+  Maximize2
 } from 'lucide-react';
 import { BangkokCctvCamera, FloodSeverity } from '@/data/bangkokCctvData';
 
@@ -49,18 +54,23 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
   const [lastRefreshedTime, setLastRefreshedTime] = useState<string>('');
   const [autoRefreshCount, setAutoRefreshCount] = useState<number>(30);
   const [imageTimestamp, setImageTimestamp] = useState<number>(Date.now());
+  const [showRulerGrid, setShowRulerGrid] = useState(false);
+  const [isLiveStreamMode, setIsLiveStreamMode] = useState(false);
 
   // Setup current time and refresh interval
   useEffect(() => {
     if (isOpen && cctv) {
-      const now = new Date();
-      setLastRefreshedTime(now.toLocaleTimeString('th-TH'));
+      const updateClock = () => {
+        const now = new Date();
+        setLastRefreshedTime(now.toLocaleTimeString('th-TH'));
+      };
+      updateClock();
       setAutoRefreshCount(30);
 
       const interval = setInterval(() => {
         setAutoRefreshCount(prev => {
           if (prev <= 1) {
-            setLastRefreshedTime(new Date().toLocaleTimeString('th-TH'));
+            updateClock();
             setImageTimestamp(Date.now());
             return 30;
           }
@@ -117,7 +127,7 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl">
+      <DialogContent className="!z-[9999] max-w-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl">
         
         {/* Header */}
         <div className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -159,23 +169,40 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
         </div>
 
         {/* Video / Snapshot Display */}
-        <div className="relative aspect-video w-full bg-slate-950 overflow-hidden group">
+        <div className="relative aspect-video w-full bg-slate-950 overflow-hidden group select-none">
           <img
             src={`${cctv.snapshotUrl}&t=${imageTimestamp}`}
             alt={cctv.name}
-            className="w-full h-full object-cover transition-opacity duration-300"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${isLiveStreamMode ? 'filter contrast-[1.05] brightness-95' : ''}`}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = cctv.fallbackSnapshotUrl || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80';
+              (e.target as HTMLImageElement).src = cctv.fallbackSnapshotUrl || 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=800&q=80';
             }}
           />
 
+          {/* Simulated scanlines & noise in live stream mode */}
+          {isLiveStreamMode && (
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-40"></div>
+          )}
+
+          {/* Water Depth Gauge Grid Overlay (Optional Toggle) */}
+          {showRulerGrid && (
+            <div className="absolute inset-0 pointer-events-none flex flex-col justify-end p-4 border border-cyan-400/40">
+              <div className="h-32 w-16 border-l-2 border-b-2 border-cyan-400 bg-cyan-950/40 backdrop-blur-sm p-1 text-[10px] text-cyan-300 font-mono flex flex-col justify-between">
+                <span>30cm</span>
+                <span>20cm</span>
+                <span>10cm</span>
+                <span className="text-emerald-400">0cm(ผิวทาง)</span>
+              </div>
+            </div>
+          )}
+
           {/* CCTV On-Screen Display (OSD) Overlay */}
           <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md text-[11px] font-mono text-emerald-400 border border-emerald-500/40">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md text-[11px] font-mono text-emerald-400 border border-emerald-500/40">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              LIVE FEED &bull; 1080p FHD
+              {isLiveStreamMode ? 'LIVE STREAM • 30 FPS' : 'LIVE FEED • 1080p FHD'}
             </span>
-            <span className="px-2 py-1 rounded-md bg-black/70 backdrop-blur-md text-[11px] font-mono text-slate-300 border border-white/10">
+            <span className="px-2 py-1 rounded-md bg-black/75 backdrop-blur-md text-[11px] font-mono text-slate-300 border border-white/10">
               {cctv.id}
             </span>
           </div>
@@ -202,6 +229,32 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
             </div>
           </div>
 
+          {/* Quick Overlay Controls on top right of video */}
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+            <button
+              onClick={() => setShowRulerGrid(!showRulerGrid)}
+              title="เปิด/ปิดเส้นวัดระดับน้ำ"
+              className={`p-1.5 rounded-md backdrop-blur-md text-xs font-mono border transition ${
+                showRulerGrid 
+                  ? 'bg-cyan-500 text-white border-cyan-400' 
+                  : 'bg-black/60 text-slate-300 border-white/20 hover:bg-black/80'
+              }`}
+            >
+              <Ruler className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setIsLiveStreamMode(!isLiveStreamMode)}
+              title="สลับโหมดจำลองสตรีมมิ่งสด"
+              className={`p-1.5 rounded-md backdrop-blur-md text-xs font-mono border transition ${
+                isLiveStreamMode 
+                  ? 'bg-red-600 text-white border-red-500' 
+                  : 'bg-black/60 text-slate-300 border-white/20 hover:bg-black/80'
+              }`}
+            >
+              <Video className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* Refresh Overlay Animation */}
           {isRefreshing && (
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-20">
@@ -211,6 +264,38 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Official BMA Traffic Portal Direct Link Bar */}
+        <div className="px-4 py-2.5 bg-blue-50/70 dark:bg-blue-950/40 border-t border-b border-blue-100 dark:border-blue-900/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-blue-900 dark:text-blue-200">
+            <span className="font-semibold flex items-center gap-1">
+              🌐 กล้องสดทางการ กทม.:
+            </span>
+            <span className="text-slate-600 dark:text-slate-300 hidden sm:inline">
+              สตรีมมิ่งระบบเครือข่าย BMA Traffic สำนักการจราจรและขนส่ง
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="http://www.bmatraffic.com/index.aspx"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              เปิดพอร์ทัลกล้องสด กทม. (BMA Traffic)
+            </a>
+            <a
+              href="https://dds.bangkok.go.th/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-900/60 dark:hover:bg-cyan-900 text-cyan-800 dark:text-cyan-200 font-medium text-xs transition"
+            >
+              ศูนย์ระบายน้ำ (DDS)
+            </a>
+          </div>
         </div>
 
         {/* Status & Action Bar */}
@@ -227,7 +312,16 @@ export const BangkokCctvModal: React.FC<BangkokCctvModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="tel:1555"
+              className="inline-flex items-center gap-1 h-9 px-3 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 text-red-700 dark:text-red-300 text-xs font-semibold transition"
+              title="โทรแจ้งเหตุน้ำท่วมขัง สายด่วน กทม. 1555"
+            >
+              <PhoneCall className="w-3.5 h-3.5" />
+              แจ้ง กทม. 1555
+            </a>
+
             <Button
               variant="outline"
               size="sm"

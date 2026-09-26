@@ -103,6 +103,22 @@ const disasterContent = readFileSync(resolve('src/components/disaster-map/Disast
 assert(disasterContent.includes('bkk_road_flood'), 'bkk_road_flood mode integrated into DisasterMapContent.tsx');
 assert(disasterContent.includes('BangkokFloodMap'), 'BangkokFloodMap rendered when bkk_road_flood is selected');
 
+// 9. Validate Bug Fixes & Hotlines
+const dialogContent = readFileSync(resolve('src/components/ui/dialog.tsx'), 'utf-8');
+assert(dialogContent.includes('z-[9998]'), 'DialogOverlay has z-[9998] above Leaflet');
+assert(dialogContent.includes('z-[9999]'), 'DialogContent has z-[9999] above Leaflet');
+
+assert(mapContent.includes("subdomains: ['a', 'b', 'c']"), 'BASE_MAP_URLS satellite has subdomains defined');
+assert(mapContent.includes('subdomains={BASE_MAP_URLS[baseMap].subdomains ||'), 'TileLayer has subdomains fallback preventing undefined length error');
+
+const emergencyContent = readFileSync(resolve('src/pages/EmergencyContacts.tsx'), 'utf-8');
+const requiredHotlines = ['191', '199', '1137', '1192', '1193', '1195', '1199', '1300', '1418', '1543', '1555', '1584', '1669', '1646', '1667'];
+requiredHotlines.forEach(hotline => {
+  assert(emergencyContent.includes(`phoneNumber: '${hotline}'`), `Emergency Hotline ${hotline} is present in dataset`);
+});
+assert(emergencyContent.includes('เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า'), 'Headline quote is present in Emergency Contacts');
+assert(pageContent.includes('เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า'), 'Headline quote is present in Bangkok Flood Map Page');
+
 console.log('\n----------------------------------------------------');
 console.log(` Test Summary: ${passCount} Passed, ${failCount} Failed`);
 console.log('----------------------------------------------------');

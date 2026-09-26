@@ -24,6 +24,8 @@ import {
 } from '@/types/bangkokFlood';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   AlertOctagon, 
   AlertTriangle, 
@@ -39,10 +41,19 @@ import {
   Info,
   Car,
   Activity,
-  Layers
+  Layers,
+  Copy,
+  Check,
+  Bookmark,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { EMERGENCY_CONTACTS_DATA } from '@/pages/EmergencyContacts';
 
 export const BangkokFloodMapPage: React.FC = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState<BangkokZone>('all');
@@ -59,6 +70,10 @@ export const BangkokFloodMapPage: React.FC = () => {
 
   const [selectedCctv, setSelectedCctv] = useState<BangkokCctvCamera | null>(null);
   const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
+
+  // Emergency Hotlines Expansion & Copy State
+  const [isHotlinesExpanded, setIsHotlinesExpanded] = useState(false);
+  const [copiedHotlineId, setCopiedHotlineId] = useState<string | null>(null);
 
   // Map Target Focus
   const [focusTarget, setFocusTarget] = useState<[number, number] | null>(null);
@@ -390,43 +405,204 @@ export const BangkokFloodMapPage: React.FC = () => {
 
           </div>
 
-          {/* 6. Emergency Contacts & Hotline Section */}
-          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* 6. Emergency Contacts & Flood Hotlines Section */}
+          <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-md space-y-4">
+            
+            {/* Header with User Quote */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="space-y-1">
-                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                  <PhoneCall className="w-4 h-4 text-red-500" />
-                  เบอร์โทรสายด่วนแจ้งเหตุน้ำท่วมขัง & ขอความช่วยเหลือใน กทม.
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  หากพบเห็นน้ำท่วมขังผิวถนน เครื่องสูบน้ำขัดข้อง หรือต้องการความช่วยเหลือฉุกเฉิน
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 text-xs font-bold">
+                  <Bookmark className="w-3.5 h-3.5" />
+                  รวมเบอร์โทรฉุกเฉิน ช่วงน้ำท่วม
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  “เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า”
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  รวมสายด่วนน้ำท่วมขัง แจ้งเหตุด่วน กู้ชีพ กู้ภัย และอุบัติเหตุจราจรทั่วกรุงเทพฯ และปริมณฑล 24 ชม.
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const text = `📌 รวมเบอร์โทรฉุกเฉิน ช่วงน้ำท่วม (เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า)\n\n` +
+                      EMERGENCY_CONTACTS_DATA.map(c => `${c.phoneNumber} ${c.name} (${c.description})`).join('\n') +
+                      `\n\nข้อมูลโดย D-MIND: https://d-mind-six.vercel.app/`;
+                    navigator.clipboard.writeText(text);
+                    toast({
+                      title: 'คัดลอกเบอร์ฉุกเฉินทั้งหมดสำเร็จ! 📋',
+                      description: 'สามารถนำข้อความไปเซฟไว้ใน Note หรือส่งต่อใน LINE ได้ทันที',
+                    });
+                  }}
+                  className="text-xs h-9 rounded-xl border-slate-200 dark:border-slate-700"
+                >
+                  <Copy className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+                  คัดลอกเบอร์ทั้งหมด
+                </Button>
+
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/emergency-contacts')}
+                  className="text-xs h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                  เปิดหน้าเบอร์ฉุกเฉินเต็มรูปแบบ
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick-Dial Hotlines Chips (Priority Flood Hotlines) */}
+            <div>
+              <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
+                <span>🚨 เบอร์สายด่วนสำคัญช่วงน้ำท่วม (กดโทรออกได้ทันที):</span>
+                <button
+                  onClick={() => setIsHotlinesExpanded(!isHotlinesExpanded)}
+                  className="text-blue-600 dark:text-blue-400 text-xs font-medium flex items-center gap-1 hover:underline"
+                >
+                  {isHotlinesExpanded ? (
+                    <>ย่อรายการ <ChevronUp className="w-3.5 h-3.5" /></>
+                  ) : (
+                    <>ดูทั้งหมด {EMERGENCY_CONTACTS_DATA.length} เบอร์ <ChevronDown className="w-3.5 h-3.5" /></>
+                  )}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                 <a
                   href="tel:1555"
-                  className="px-3.5 py-2 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 font-bold text-xs flex items-center gap-1.5 hover:bg-red-100 transition"
+                  className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 hover:bg-red-100 transition flex flex-col justify-between group"
                 >
-                  <PhoneCall className="w-3.5 h-3.5" />
-                  สายด่วน กทม. 1555
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-red-600 dark:text-red-400">1555</span>
+                    <PhoneCall className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">สายด่วน กทม.</div>
+                  <div className="text-[10px] text-slate-500 truncate">น้ำท่วมขัง/ท่อตัน</div>
                 </a>
+
                 <a
-                  href="tel:022485115"
-                  className="px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center gap-1.5 hover:bg-blue-100 transition"
+                  href="tel:1669"
+                  className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-100 transition flex flex-col justify-between group"
                 >
-                  <Waves className="w-3.5 h-3.5" />
-                  ศูนย์ระบายน้ำ 02-248-5115
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-rose-600 dark:text-rose-400">1669</span>
+                    <Heart className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">แพทย์ฉุกเฉิน</div>
+                  <div className="text-[10px] text-slate-500 truncate">กู้ชีพนเรนทร 24 ชม.</div>
                 </a>
+
                 <a
-                  href="tel:1197"
-                  className="px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-700 dark:text-amber-300 font-bold text-xs flex items-center gap-1.5 hover:bg-amber-100 transition"
+                  href="tel:1646"
+                  className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-900/60 hover:bg-orange-100 transition flex flex-col justify-between group"
                 >
-                  <Car className="w-3.5 h-3.5" />
-                  สายด่วนจราจร 1197
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-orange-600 dark:text-orange-400">1646</span>
+                    <Activity className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">ศูนย์เอราวัณ กทม.</div>
+                  <div className="text-[10px] text-slate-500 truncate">กู้ชีพพื้นที่ กทม.</div>
+                </a>
+
+                <a
+                  href="tel:1199"
+                  className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-900/60 hover:bg-cyan-100 transition flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-cyan-600 dark:text-cyan-400">1199</span>
+                    <Waves className="w-4 h-4 text-cyan-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">กรมเจ้าท่า</div>
+                  <div className="text-[10px] text-slate-500 truncate">อุบัติเหตุทางน้ำ/ริมน้ำ</div>
+                </a>
+
+                <a
+                  href="tel:1137"
+                  className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 hover:bg-indigo-100 transition flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">1137</span>
+                    <Radio className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">จส.100</div>
+                  <div className="text-[10px] text-slate-500 truncate">แจ้งอุบัติเหตุ/รถติด</div>
+                </a>
+
+                <a
+                  href="tel:1418"
+                  className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 hover:bg-amber-100 transition flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-black text-amber-600 dark:text-amber-400">1418</span>
+                    <PhoneCall className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">มูลนิธิป่อเต็กตึ๊ง</div>
+                  <div className="text-[10px] text-slate-500 truncate">กู้ภัยอุทกภัย 24 ชม.</div>
                 </a>
               </div>
             </div>
+
+            {/* Expandable Full List of 16+ Hotlines */}
+            {isHotlinesExpanded && (
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 animate-in fade-in-50 duration-300">
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  รายชื่อเบอร์โทรฉุกเฉินทั้งหมด ({EMERGENCY_CONTACTS_DATA.length} สายด่วน):
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
+                  {EMERGENCY_CONTACTS_DATA.map(c => {
+                    const isCopied = copiedHotlineId === c.id;
+                    return (
+                      <div
+                        key={c.id}
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-2.5 ${c.colorClass}`}
+                      >
+                        <div className="space-y-0.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-black text-foreground">{c.phoneNumber}</span>
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                              {c.categoryLabel}
+                            </span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground truncate">{c.name}</div>
+                          <div className="text-[10px] text-muted-foreground line-clamp-1">{c.description}</div>
+                        </div>
+
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(c.phoneNumber.replace(/-/g, ''));
+                              setCopiedHotlineId(c.id);
+                              toast({
+                                title: 'คัดลอกเบอร์สำเร็จ',
+                                description: `เบอร์ ${c.phoneNumber} (${c.name})`,
+                              });
+                              setTimeout(() => setCopiedHotlineId(null), 2000);
+                            }}
+                            className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700"
+                            title="คัดลอกเบอร์"
+                          >
+                            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+
+                          <a
+                            href={`tel:${c.phoneNumber.replace(/-/g, '')}`}
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition"
+                          >
+                            <PhoneCall className="w-3 h-3" />
+                            โทร
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
           </div>
 
         </div>

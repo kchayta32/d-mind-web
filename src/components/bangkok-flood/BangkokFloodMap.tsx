@@ -52,11 +52,12 @@ export const BASE_MAP_URLS: Record<BaseMapStyle, { url: string; attribution: str
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Sentinel/Maxar/DigitalGlobe'
+    attribution: 'Tiles &copy; Esri &mdash; Sentinel/Maxar/DigitalGlobe',
+    subdomains: ['a', 'b', 'c']
   },
   dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap &copy; CARTO (Free / No API Key)',
     subdomains: ['a', 'b', 'c', 'd']
   }
 };
@@ -374,7 +375,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
           key={baseMap}
           url={BASE_MAP_URLS[baseMap].url}
           attribution={BASE_MAP_URLS[baseMap].attribution}
-          subdomains={BASE_MAP_URLS[baseMap].subdomains}
+          subdomains={BASE_MAP_URLS[baseMap].subdomains || ['a', 'b', 'c']}
           maxZoom={19}
         />
 
