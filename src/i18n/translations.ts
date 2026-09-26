@@ -12,6 +12,7 @@ export const translations = {
             assistant: 'คุยกับเอไอ',
             about: 'เกี่ยวกับเรา',
             contact: 'ติดต่อเรา',
+            bkkFlood: 'น้ำท่วมขังถนน กทม. & CCTV',
             menuTitle: 'เมนูหลัก',
             changeLanguage: 'เปลี่ยนภาษา (TH / EN)',
             search: 'ค้นหา',
@@ -43,10 +44,17 @@ export const translations = {
             iosApp: 'iOS Application',
             iosDev: 'อยู่ในระหว่างการพัฒนา (Coming Soon)',
             readMore: 'อ่านรายละเอียดเพิ่มเติม',
-            slide2Badge: 'Update',
-            slide2Title: '2 วันแห่งการเปลี่ยนแปลง!',
-            slide2Subtitle: 'D-MIND ยกระดับสู่เวอร์ชันล่าสุด',
-            slide2Desc: 'พลิกโฉมหน้าตาใหม่ (UI Overhaul) ด้วยดีไซน์ Modern Blue-White Theme | ระบบแจ้งเตือนภัยแม้ออฟไลน์ | ฮับเครื่องมือคำนวณครบวงจร',
+            slide2Badge: 'New Feature • กทม. Live',
+            slide2Title: 'เปิดตัวแผนที่น้ำท่วมถนน & กล้อง CCTV กทม.!',
+            slide2Subtitle: 'เฝ้าระวังน้ำท่วมขังเรียลไทม์ 4 โซน 65 จุดกล้องสด ด้วยดาวเทียม Sentinel & Open Data',
+            slide2Desc: 'ตรวจสอบระดับน้ำท่วมถนนรายสาย พร้อมรหัสสี แดง-ส้ม-เขียว สัญจรปลอดภัย เลี่ยงเส้นทางวิกฤต และดูกล้องวงจรปิดสดทุกจุดเสี่ยงในกรุงเทพมหานคร',
+            bkkRoadStatus: 'รหัสสี 3 ระดับ',
+            bkkRoadStatusDesc: 'แดง=หลีกเลี่ยง, ส้ม=ขับช้า, เขียว=ปกติ',
+            bkkCctvFeeds: 'กล้อง CCTV 65 จุด',
+            bkkCctvFeedsDesc: 'ครอบคลุม 4 โซน พร้อมภาพสด & Auto-refresh',
+            sentinelTelemetry: 'ดาวเทียม Sentinel-1 & กทม.',
+            sentinelTelemetryDesc: 'โทรมาตรคลอง, สถานีสูบน้ำ & เรดาร์ฝน',
+            openBkkMap: 'เปิดแผนที่น้ำท่วม กทม.',
             bgAlerts: 'Background Alerts',
             bgAlertsDesc: 'แจ้งเตือนผ่าน E-mail แม้ปิดแอป',
             mapUi: 'Modern Map UI',
@@ -81,6 +89,7 @@ export const translations = {
         navCards: {
             mainMenu: 'บริการหลัก',
             selectService: 'เลือกบริการและเครื่องมือที่คุณต้องการเข้าถึง',
+            bkkFloodDesc: 'ตรวจสอบสภาพน้ำท่วมขังถนนทั่ว กทม. และภาพกล้อง CCTV สด',
             homeDesc: 'กลับสู่หน้าหลัก',
             emergencyDesc: 'ติดต่อหน่วยงานฉุกเฉินและเบอร์โทรด่วน',
             surveyDesc: 'แบบสำรวจความพึงพอใจการใช้งาน',
@@ -102,6 +111,19 @@ export const translations = {
             reportIncident: 'แจ้งเหตุการณ์',
             status: 'สถานะ',
             trackingActive: 'ระบบติดตามทำงานอยู่'
+        },
+
+        // Bangkok Flood Banner (Home Page)
+        bangkokFloodBanner: {
+            badge: 'ใหม่ • ระบบเปิดตัวล่าสุด',
+            title: 'ระบบแผนที่ตรวจสอบสภาพน้ำท่วมขังถนน',
+            highlight: 'และกล้อง CCTV กรุงเทพมหานคร',
+            description: 'เฝ้าระวังน้ำท่วมผิวจราจร 39 เส้นทางเสี่ยง 4 โซนทั่วกรุง ด้วยรหัสสี 3 ระดับ (แดง-ส้ม-เขียว) พร้อมภาพถ่ายทอดสดกล้อง CCTV 65 จุด โทรมาตรคลอง และภาพถ่ายดาวเทียม Sentinel-1 SAR',
+            openMap: 'เปิดแผนที่น้ำท่วม กทม.',
+            readArticle: 'อ่านคู่มือ & รายละเอียด',
+            statusPassable: 'สถานะสัญจร 39 สายหลัก',
+            liveCameras: '65 จุดกล้องสด 4 โซน',
+            sentinelTelemetry: 'Sentinel-1 SAR & BMA Telemetry'
         },
 
         // App Download Section
@@ -468,6 +490,7 @@ export const translations = {
             assistant: 'AI Assistant',
             about: 'About Us',
             contact: 'Contact Us',
+            bkkFlood: 'Bangkok Road Flood & CCTV',
             menuTitle: 'Main Menu',
             changeLanguage: 'Switch Language (TH / EN)',
             search: 'Search',
@@ -499,10 +522,17 @@ export const translations = {
             iosApp: 'iOS Application',
             iosDev: 'Currently under development (Coming Soon)',
             readMore: 'Read More Details',
-            slide2Badge: 'Update',
-            slide2Title: '2 Days of Transformation!',
-            slide2Subtitle: 'D-MIND Upgraded to Latest Version',
-            slide2Desc: 'Brand new UI overhaul with Modern Blue-White theme | Offline background email notifications | Comprehensive calculation and forecasting tools hub.',
+            slide2Badge: 'New Feature • BKK Live',
+            slide2Title: 'Bangkok Road Flood & Live CCTV Map Launched!',
+            slide2Subtitle: 'Real-time urban flood monitoring across 4 zones & 65 live CCTVs with Sentinel & Open Data',
+            slide2Desc: 'Check road-by-road flood depths with Red-Orange-Green traffic status, avoid impassable routes, and view real-time traffic camera feeds throughout Bangkok.',
+            bkkRoadStatus: '3-Tier Color Codes',
+            bkkRoadStatusDesc: 'Red=Avoid, Orange=Caution, Green=Normal',
+            bkkCctvFeeds: '65 CCTV Cameras',
+            bkkCctvFeedsDesc: '4 zones coverage with live snapshots & refresh',
+            sentinelTelemetry: 'Sentinel-1 & Telemetry',
+            sentinelTelemetryDesc: 'BMA canals, drainage pumps & Open-Meteo rain',
+            openBkkMap: 'Open Bangkok Flood Map',
             bgAlerts: 'Background Alerts',
             bgAlertsDesc: 'Email alerts even when app is closed',
             mapUi: 'Modern Map UI',
@@ -537,6 +567,7 @@ export const translations = {
         navCards: {
             mainMenu: 'Main Services',
             selectService: 'Select the service or tool you want to access',
+            bkkFloodDesc: 'Monitor Bangkok road flood levels & live CCTV feeds',
             homeDesc: 'Return to Home',
             emergencyDesc: 'Emergency contacts and hotlines',
             surveyDesc: 'User satisfaction survey',
@@ -558,6 +589,19 @@ export const translations = {
             reportIncident: 'Report Incident',
             status: 'Status',
             trackingActive: 'Live Tracking Active'
+        },
+
+        // Bangkok Flood Banner (Home Page)
+        bangkokFloodBanner: {
+            badge: 'NEW • Newly Launched',
+            title: 'Bangkok Road Flood &',
+            highlight: 'Live CCTV Monitoring System',
+            description: 'Monitor road-by-road inundation depths across 39 flood-risk arteries in 4 Bangkok zones with 3-tier passability colors (Red/Orange/Green), 65 live CCTV traffic cameras, BMA canal telemetry, and Sentinel-1 SAR satellite sensing.',
+            openMap: 'Open Bangkok Flood Map',
+            readArticle: 'Read Feature Guide',
+            statusPassable: '39 Monitored Arteries',
+            liveCameras: '65 Live CCTVs in 4 Zones',
+            sentinelTelemetry: 'Sentinel-1 SAR & BMA Telemetry'
         },
 
         // App Download Section

@@ -26,7 +26,9 @@ import NotificationSettings from './pages/NotificationSettings';
 import ArticleDetail from './pages/ArticleDetail';
 import ResourceDetail from './pages/ResourceDetail';
 import RagComparison from './pages/RagComparison';
+import BangkokFloodMapPage from './pages/BangkokFloodMapPage';
 import NotFound from './pages/NotFound';
+import BlueCursorTrail from './components/common/BlueCursorTrail';
 
 // Simple QueryClient without complex config
 const queryClient = new QueryClient({
@@ -150,6 +152,8 @@ const AppRoutes = () => {
         <Route path="/arena" element={<RagComparison />} />
         <Route path="/llm-arena" element={<RagComparison />} />
         <Route path="/rag-comparison" element={<RagComparison />} />
+        <Route path="/bangkok-flood" element={<BangkokFloodMapPage />} />
+        <Route path="/bkk-flood" element={<BangkokFloodMapPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
@@ -164,6 +168,7 @@ const App = () => {
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
           <LanguageProvider>
             <TooltipProvider>
+              <BlueCursorTrail />
               <AppRoutes />
               <Toaster />
               <Sonner />

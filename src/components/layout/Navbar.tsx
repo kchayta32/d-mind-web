@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
     Moon, Sun, Globe, Menu, X, Search,
     Home, Phone, AlertTriangle, FileText,
-    Smile, BookOpen, Bot, Info, Mail, CloudSun
+    Smile, BookOpen, Bot, Info, Mail, CloudSun, Waves
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AnimatedLogo from '@/components/ui/AnimatedLogo';
@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageProvider';
 // Menu Items Configuration with Icons
 const MENU_ITEMS_CONFIG = [
     { key: 'home', route: '/', icon: Home, color: 'text-blue-400' },
+    { key: 'bkkFlood', route: '/bangkok-flood', icon: Waves, color: 'text-cyan-400' },
     { key: 'disasterNews', route: '/disaster-news', icon: CloudSun, color: 'text-sky-400' },
     { key: 'emergency', route: '/contacts', icon: Phone, color: 'text-red-400' },
     { key: 'victim', route: '/victim-reports', icon: AlertTriangle, color: 'text-orange-400' },
@@ -91,6 +92,17 @@ const Navbar: React.FC = () => {
 
                     {/* Desktop/Tablet Actions */}
                     <div className="flex items-center gap-2 z-50">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="hidden md:flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-sky-200 border-sky-400/40 hover:border-sky-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            onClick={() => navigate('/bangkok-flood')}
+                        >
+                            <Waves className="h-3.5 w-3.5 text-sky-400 animate-pulse" />
+                            <span>น้ำท่วมถนน กทม.</span>
+                            <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">CCTV</span>
+                        </Button>
+
                         <Button
                             variant="ghost"
                             size="icon"

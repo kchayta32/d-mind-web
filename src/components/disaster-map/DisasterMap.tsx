@@ -11,6 +11,7 @@ export type DisasterType =
   | 'airpollution' 
   | 'drought' 
   | 'flood' 
+  | 'bkk_road_flood'
   | 'storm' 
   | 'volcano' 
   | 'sinkhole';

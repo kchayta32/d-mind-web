@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3, Camera, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -84,24 +84,29 @@ const NewsCarousel = () => {
                 <div className="space-y-3 sm:space-y-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-4">
                         <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Shield className="w-5 h-5 text-green-400 mb-1.5" />
-                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.bgAlerts')}</h4>
-                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bgAlertsDesc')}</p>
+                            <AlertTriangle className="w-5 h-5 text-red-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.bkkRoadStatus')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bkkRoadStatusDesc')}</p>
                         </div>
                         <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Map className="w-5 h-5 text-blue-300 mb-1.5" />
-                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.mapUi')}</h4>
-                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.mapUiDesc')}</p>
+                            <Camera className="w-5 h-5 text-cyan-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.bkkCctvFeeds')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bkkCctvFeedsDesc')}</p>
                         </div>
                         <div className="col-span-2 sm:col-span-1 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <CloudRain className="w-5 h-5 text-yellow-300 mb-1.5" />
-                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.weatherTools')}</h4>
-                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.weatherToolsDesc')}</p>
+                            <Radio className="w-5 h-5 text-blue-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.sentinelTelemetry')}</h4>
+                            <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.sentinelTelemetryDesc')}</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2.5 pt-1">
-                        <Button onClick={() => navigate('/article/system-update-v2')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
+                        <Button onClick={() => navigate('/bangkok-flood')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold shadow-lg shadow-blue-500/20 border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
+                            <Map className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                            {t('newsCarousel.openBkkMap')}
+                        </Button>
+                        <Button onClick={() => navigate('/article/bangkok-flood-monitoring')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-3.5">
                             {t('newsCarousel.readMore')}
+                            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5" />
                         </Button>
                     </div>
                 </div>
@@ -237,26 +242,49 @@ const NewsCarousel = () => {
                                                 <p className="text-blue-200">Coming to Android</p>
                                             </div>
                                         ) : slide.id === 2 ? (
-                                            <div className="relative w-full h-full p-4">
-                                                <div className="grid grid-cols-2 gap-4 h-full">
-                                                    <div className="bg-slate-800/80 rounded-xl p-4 border border-white/5 flex flex-col justify-end group/card hover:bg-slate-800 transition-colors">
-                                                        <Bell className="w-8 h-8 text-yellow-400 mb-2 group-hover/card:scale-110 transition-transform" />
-                                                        <div className="h-2 w-12 bg-gray-600 rounded mb-2"></div>
-                                                        <div className="h-2 w-20 bg-gray-600 rounded"></div>
+                                            <div className="relative w-full h-full p-4 flex flex-col justify-between">
+                                                {/* Bangkok Flood & CCTV Live Visual Mockup */}
+                                                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
+                                                        <span className="text-xs font-mono font-bold text-red-300">Bangkok Flood & CCTV</span>
                                                     </div>
-                                                    <div className="bg-blue-600/20 rounded-xl p-4 border border-blue-500/30 flex flex-col justify-end group/card">
-                                                        <div className="w-full h-16 bg-blue-500/20 rounded-lg mb-2 overflow-hidden relative">
-                                                            <div className="absolute bottom-0 left-0 w-full h-[60%] bg-blue-400/50"></div>
+                                                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">
+                                                        LIVE 65 CCTVs
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-2 my-auto">
+                                                    <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-center">
+                                                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mb-1"></span>
+                                                        <p className="text-[11px] font-bold text-white leading-tight">แดง</p>
+                                                        <p className="text-[9px] text-red-300">หลีกเลี่ยง</p>
+                                                    </div>
+                                                    <div className="p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/40 text-center">
+                                                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mb-1"></span>
+                                                        <p className="text-[11px] font-bold text-white leading-tight">ส้ม</p>
+                                                        <p className="text-[9px] text-amber-300">ขับช้า ระวัง</p>
+                                                    </div>
+                                                    <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-center">
+                                                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mb-1"></span>
+                                                        <p className="text-[11px] font-bold text-white leading-tight">เขียว</p>
+                                                        <p className="text-[9px] text-emerald-300">สัญจรปกติ</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-slate-800/80 rounded-xl p-3 border border-white/10 flex items-center justify-between">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                                            <Camera className="w-4 h-4" />
                                                         </div>
-                                                        <div className="h-2 w-full bg-blue-400/30 rounded"></div>
-                                                    </div>
-                                                    <div className="col-span-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-4 border border-green-500/20 flex items-center gap-4">
-                                                        <Shield className="w-10 h-10 text-green-400" />
-                                                        <div>
-                                                            <h4 className="text-white font-bold">Safe & Secure</h4>
-                                                            <p className="text-xs text-green-200">Offline Notifications Ready</p>
+                                                        <div className="text-left">
+                                                            <p className="text-xs font-semibold text-white">4 โซนทั่วกรุง</p>
+                                                            <p className="text-[10px] text-slate-300">เหนือ • กลาง • ตะวันออก • ธนบุรี</p>
                                                         </div>
                                                     </div>
+                                                    <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">
+                                                        Sentinel-1 SAR
+                                                    </span>
                                                 </div>
                                             </div>
                                         ) : slide.id === 3 ? (

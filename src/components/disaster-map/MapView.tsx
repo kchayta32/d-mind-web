@@ -289,13 +289,9 @@ export const MapView: React.FC<MapViewProps> = ({
           </div>
         )}
 
-        {/* Sentinel Satellite Flood Map Legend */}
+        {/* Sentinel Satellite Flood Map Legend (Draggable & Positioned above RainViewer) */}
         {selectedType === 'flood' && (
-          <div className={`absolute z-[1000] left-4 transition-all duration-300 ${
-            showRainRadarOnFlood && rainData ? 'bottom-28' : 'bottom-6'
-          }`}>
-            <SentinelFloodLegend />
-          </div>
+          <SentinelFloodLegend isRadarActive={Boolean(showRainRadarOnFlood && rainData)} />
         )}
 
         {/* Floating Quick Crowdsourcing Button for Citizens (Ground Truth) */}

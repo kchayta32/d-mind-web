@@ -20,11 +20,17 @@ import PM25CleanAirActArticle from '@/components/articles/PM25CleanAirActArticle
 import ColdWeatherArticle from '@/components/articles/ColdWeatherArticle';
 import SriLankaFloodArticle from '@/components/articles/SriLankaFloodArticle';
 import TodayUpdateArticle from '@/components/articles/TodayUpdateArticle';
+import BangkokRoadFloodArticle from '@/components/articles/BangkokRoadFloodArticle';
 
 const ArticleDetail: React.FC = () => {
   const { id } = useParams();
 
   switch (id) {
+    case 'bangkok-flood-monitoring':
+    case 'bangkok-road-flood':
+    case 'bkk-flood':
+    case 'bangkok-flood-cctv':
+      return <BangkokRoadFloodArticle />;
     case 'today-update':
     case 'daily-update':
     case 'sentinel-satellite-update':

@@ -16,7 +16,8 @@ import {
   Navigation,
   CloudDrizzle,
   Mountain,
-  FlameKindling
+  FlameKindling,
+  Camera
 } from 'lucide-react';
 import { DisasterType } from './DisasterMap';
 
@@ -33,6 +34,14 @@ const disasterTypes: Array<{
   activeColor: string;
   available: boolean;
 }> = [
+  {
+    type: 'bkk_road_flood',
+    label: 'น้ำท่วมถนน กทม.',
+    sublabel: 'Sentinel & 65 CCTV',
+    icon: <Camera className="w-5 h-5" />,
+    activeColor: 'bg-sky-600 hover:bg-sky-700 text-white',
+    available: true
+  },
   {
     type: 'earthquake',
     label: 'แผ่นดินไหว',

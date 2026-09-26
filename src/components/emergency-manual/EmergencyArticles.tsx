@@ -23,6 +23,7 @@ import {
   Activity,
   Wind,
   Satellite,
+  Camera,
   X
 } from 'lucide-react';
 import { ImprovedArticleTimeline } from './ImprovedArticleTimeline';
@@ -54,6 +55,25 @@ const EmergencyArticles: React.FC = () => {
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date } | null>(null);
 
   const articles = useMemo<EmergencyArticleItem[]>(() => [
+    // Banner 2 New Feature: Bangkok Road Flood & CCTV Real-time Monitoring
+    {
+      id: 'bangkok-flood-monitoring',
+      title: isEn
+        ? 'Bangkok Road Flood & 65 Live CCTV Monitoring: 4-Zone Interactive Map with 3-Tier Status & Satellite Telemetry'
+        : 'เปิดตัวระบบแผนที่น้ำท่วมขังถนน กทม. & กล้อง CCTV สด 65 จุด: เฝ้าระวัง 4 โซน พร้อมรหัสสี 3 ระดับและดาวเทียม Sentinel',
+      subtitle: isEn ? 'D-MIND GIS & Urban Resilience Team' : 'จาก ทีมพัฒนา D-MIND GIS & Urban Resilience',
+      description: isEn
+        ? 'Comprehensive guide and launch announcement for Bangkok Road Flood Surveillance: Interactive map covering 39 flood-prone arterial roads across 4 zones (North, Central, East, Thonburi), real-time passability color codes (Red=Avoid, Orange=Caution, Green=Normal), 65 live CCTV traffic camera streams, BMA canal & drainage pump telemetry, and Sentinel-1 SAR satellite remote sensing.'
+        : 'คู่มือและบทความเปิดตัวระบบเฝ้าระวังน้ำท่วมขังถนนทั่วกรุงเทพมหานคร: แผนที่อินเทอร์แอคทีฟ 39 ถนนสายหลักเสี่ยงท่วม ครอบคลุม 4 โซน (เหนือ, กลาง, ตะวันออก, ธนบุรี) พร้อมรหัสสีสัญจร 3 ระดับ (แดง=หลีกเลี่ยง, ส้ม=ระวัง, เขียว=ปกติ), กล้องวงจรปิด CCTV ถ่ายทอดสด 65 จุด, โทรมาตรระดับน้ำคลองและสถานีสูบน้ำ กทม. และภาพถ่ายดาวเทียม Sentinel-1 SAR',
+      image: '/dmind-premium-icon.png',
+      created_at: '2026-09-26',
+      category: 'banner',
+      categoryLabel: isEn ? 'Bangkok Road Flood' : 'น้ำท่วมถนน กทม.',
+      readTime: isEn ? '8 min read' : '8 นาที',
+      isBanner: true,
+      bannerBadge: isEn ? 'Banner #2 • Bangkok Road Flood' : 'แบนเนอร์ที่ 2 • น้ำท่วมถนน กทม.',
+      icon: <Camera className="w-5 h-5 text-cyan-400" />
+    },
     // Today's Major Update: Sentinel Satellites, Crowdsourcing & FCM
     {
       id: 'today-update',
@@ -146,7 +166,7 @@ const EmergencyArticles: React.FC = () => {
       categoryLabel: isEn ? 'System Update' : 'อัปเดตระบบ',
       readTime: isEn ? '5 min read' : '5 นาที',
       isBanner: true,
-      bannerBadge: isEn ? 'Banner #2 • System Update' : 'แบนเนอร์ที่ 2 • อัปเดตระบบ',
+      bannerBadge: isEn ? 'Archive • System Update v2.0' : 'คลังบทความ • อัปเดตระบบ v2.0',
       icon: <Sparkles className="w-5 h-5 text-blue-400" />
     },
     // Banner 1: D-MIND Launch

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Map, ArrowRight, Activity, Navigation } from 'lucide-react';
+import { Map, ArrowRight, Activity, Navigation, Waves } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageProvider';
 
 const MapBanner: React.FC = () => {
@@ -30,14 +30,14 @@ const MapBanner: React.FC = () => {
                             {t('mapBanner.description')}
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start pt-2 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center md:justify-start pt-2 w-full sm:w-auto">
                             <Button
                                 size="lg"
                                 onClick={() => navigate('/disaster-map')}
-                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 group/btn font-semibold rounded-xl"
+                                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/20 group/btn font-semibold rounded-xl"
                             >
                                 <Map className="mr-2 h-5 w-5" />
-                                {t('mapBanner.openMap')}
+                                <span>{t('mapBanner.openMap')}</span>
                                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                             </Button>
                             <Button

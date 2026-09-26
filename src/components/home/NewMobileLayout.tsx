@@ -26,6 +26,7 @@ import { useTheme } from '@/contexts/ThemeProvider';
 import { useLanguage } from '@/contexts/LanguageProvider';
 import NewsCarousel from './NewsCarousel';
 import MapBanner from './MapBanner';
+import BangkokFloodBanner from './BangkokFloodBanner';
 import VideoTourSection from './VideoTourSection';
 import AppDownloadSection from './AppDownloadSection';
 import Footer from '@/components/layout/Footer';
@@ -324,6 +325,11 @@ const NewMobileLayout: React.FC = () => {
       {/* Map Banner Section */}
       <div className="px-2">
         <MapBanner />
+      </div>
+
+      {/* [NEW] Bangkok Road Flood & CCTV Banner Section */}
+      <div className="px-2">
+        <BangkokFloodBanner />
       </div>
 
       {/* App Download Section */}

@@ -6,7 +6,8 @@ import {
   Star,
   BookOpen,
   Info,
-  Mail
+  Mail,
+  Waves
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageProvider';
@@ -25,6 +26,13 @@ const NavigationCards: React.FC = () => {
   const { t } = useLanguage();
 
   const navigationItems: NavigationItem[] = [
+    {
+      icon: <Waves className="w-8 h-8" />,
+      titleKey: 'menu.bkkFlood',
+      descKey: 'navCards.bkkFloodDesc',
+      route: '/bangkok-flood',
+      color: 'bg-sky-500'
+    },
     {
       icon: <Home className="w-8 h-8" />,
       titleKey: 'menu.home',
