@@ -163,7 +163,7 @@ export const getBangkokFloodSummary = (
     warningCount,
     normalCount,
     avgWaterLevelCm,
-    maxWaterLevelCm,
+    maxWaterLevelCm: maxWaterLevel,
     affectedLanesTotal,
     impassableSmallCarCount,
     impassableMotorcycleCount,

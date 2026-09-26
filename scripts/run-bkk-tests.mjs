@@ -119,6 +119,10 @@ requiredHotlines.forEach(hotline => {
 assert(emergencyContent.includes('เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า'), 'Headline quote is present in Emergency Contacts');
 assert(pageContent.includes('เซฟเก็บไว้ติดเครื่องกันได้เลย! มีไว้อุ่นใจกว่า'), 'Headline quote is present in Bangkok Flood Map Page');
 
+const updatedPageContent = readFileSync(pagePath, 'utf-8');
+assert(updatedPageContent.includes('Heart,') || updatedPageContent.includes('Heart\n'), 'Heart icon is imported in BangkokFloodMapPage');
+assert(updatedPageContent.includes('Radio,') || updatedPageContent.includes('Radio\n'), 'Radio icon is imported in BangkokFloodMapPage');
+
 console.log('\n----------------------------------------------------');
 console.log(` Test Summary: ${passCount} Passed, ${failCount} Failed`);
 console.log('----------------------------------------------------');

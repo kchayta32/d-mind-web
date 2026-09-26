@@ -166,7 +166,7 @@ export const triggerLocalTestNotification = async (
         data: {
           url: '/disaster-map'
         }
-      });
+      } as any);
       return true;
     } else {
       new Notification(title, {

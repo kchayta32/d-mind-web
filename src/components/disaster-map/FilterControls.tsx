@@ -108,8 +108,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           <HeavyRainFilters
             humidityFilter={humidityFilter}
             onHumidityChange={onHumidityChange}
-            rainTimeFilter={rainTimeFilter}
-            onRainTimeFilterChange={onRainTimeFilterChange}
+            timeFilter={rainTimeFilter}
+            onTimeFilterChange={onRainTimeFilterChange}
           />
         )}
 

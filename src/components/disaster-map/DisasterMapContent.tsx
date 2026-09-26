@@ -220,22 +220,26 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
               selectedSeverity={bkkSeverity}
               onSeverityChange={setBkkSeverity}
               showCctvLayer={bkkShowCctv}
-              onToggleCctvLayer={() => setBkkShowCctv(!bkkShowCctv)}
+              onToggleCctv={setBkkShowCctv}
               showCanalPumpsLayer={bkkShowCanals}
-              onToggleCanalPumpsLayer={() => setBkkShowCanals(!bkkShowCanals)}
+              onToggleCanalPumps={setBkkShowCanals}
               showSentinelSarLayer={bkkShowSentinel}
-              onToggleSentinelSarLayer={() => setBkkShowSentinel(!bkkShowSentinel)}
+              onToggleSentinelSar={setBkkShowSentinel}
               totalRoadsCount={BANGKOK_ROAD_SEGMENTS.length}
               filteredRoadsCount={filteredBkkRoads.length}
-              totalCctvCount={filteredBkkCctvs.length}
+              onResetFilters={() => {
+                setBkkSearch('');
+                setBkkZone('all');
+                setBkkSeverity('all');
+              }}
             />
 
             <BangkokFloodStats
               roads={BANGKOK_ROAD_SEGMENTS}
               cctvs={BANGKOK_CCTV_CAMERAS}
-              canals={BANGKOK_CANAL_STATIONS}
+              waterStations={BANGKOK_CANAL_STATIONS}
               selectedSeverity={bkkSeverity}
-              onSeveritySelect={setBkkSeverity}
+              onSelectSeverityFilter={setBkkSeverity}
             />
           </>
         ) : (
@@ -355,7 +359,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           isOpen={bkkRoadModalOpen}
           onClose={() => setBkkRoadModalOpen(false)}
           road={bkkSelectedRoad}
-          onViewCctv={(cctvId) => {
+          onOpenCctv={(cctvId) => {
             const cctv = BANGKOK_CCTV_CAMERAS.find(c => c.id === cctvId);
             if (cctv) {
               setBkkSelectedCctv(cctv);
@@ -371,7 +375,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           isOpen={bkkCctvModalOpen}
           onClose={() => setBkkCctvModalOpen(false)}
           cctv={bkkSelectedCctv}
-          onNavigateToRoad={(roadName) => {
+          onViewRoadOnMap={(roadName) => {
             const road = BANGKOK_ROAD_SEGMENTS.find(r => r.name.includes(roadName) || roadName.includes(r.name));
             if (road) {
               setBkkSelectedRoad(road);
