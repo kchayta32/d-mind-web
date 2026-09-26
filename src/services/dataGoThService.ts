@@ -5,6 +5,7 @@
  */
 
 import { BangkokCctvCamera, BangkokCctvZone } from '@/data/bangkokCctvData';
+import BMA_FALLBACK_RECORDS from '@/data/bmaCctvDataGoTh.json';
 
 export const DATA_GO_TH_CONFIG = {
   API_KEY: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DATA_GO_TH_API_KEY) || 'SfsCwAmoIxUhrPfwIGuYP7sLIwcoVUU3',
@@ -209,9 +210,21 @@ export const fetchBmaCctvFromDataGoTh = async (limit: number = 100): Promise<{
     // Fallback gracefully
   }
 
-  return {
-    cameras: [],
-    total: 0,
-    source: 'fallback'
-  };
+  // 4. Guaranteed fallback dataset from data.go.th (238 BMA cameras)
+  try {
+    const fallbackCameras = (BMA_FALLBACK_RECORDS as DataGoThCctvRecord[]).map((r, idx) => 
+      transformDataGoThRecord(r, idx)
+    );
+    return {
+      cameras: fallbackCameras,
+      total: fallbackCameras.length,
+      source: 'fallback'
+    };
+  } catch {
+    return {
+      cameras: [],
+      total: 0,
+      source: 'fallback'
+    };
+  }
 };
