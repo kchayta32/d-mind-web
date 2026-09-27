@@ -4,6 +4,7 @@ import AppDownloadSection from './AppDownloadSection';
 import NavigationCards from './NavigationCards';
 import MapBanner from './MapBanner';
 import BangkokFloodBanner from './BangkokFloodBanner';
+import BangkokCafeFloodBanner from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
 import MainLayout from '@/components/layout/MainLayout';
 
@@ -24,6 +25,9 @@ const NewDesktopLayout: React.FC = () => {
 
       {/* [NEW] ระบบแผนที่ตรวจสอบสภาพน้ำท่วมขังถนนและกล้อง CCTV กรุงเทพมหานคร */}
       <BangkokFloodBanner />
+
+      {/* [NEW] เรดาร์คาเฟ่ & บาร์ ที่เปิดให้บริการ ปลอดภัยจากน้ำท่วม กทม. และปริมณฑล */}
+      <BangkokCafeFloodBanner />
 
       {/* App Download Section */}
       <AppDownloadSection />

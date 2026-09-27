@@ -27,6 +27,7 @@ import ArticleDetail from './pages/ArticleDetail';
 import ResourceDetail from './pages/ResourceDetail';
 import RagComparison from './pages/RagComparison';
 import BangkokFloodMapPage from './pages/BangkokFloodMapPage';
+import BangkokCafeFloodMapPage from './pages/BangkokCafeFloodMapPage';
 import NotFound from './pages/NotFound';
 import BlueCursorTrail from './components/common/BlueCursorTrail';
 
@@ -154,6 +155,9 @@ const AppRoutes = () => {
         <Route path="/rag-comparison" element={<RagComparison />} />
         <Route path="/bangkok-flood" element={<BangkokFloodMapPage />} />
         <Route path="/bkk-flood" element={<BangkokFloodMapPage />} />
+        <Route path="/cafe-flood-map" element={<BangkokCafeFloodMapPage />} />
+        <Route path="/cafe-map" element={<BangkokCafeFloodMapPage />} />
+        <Route path="/bangkok-cafe" element={<BangkokCafeFloodMapPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

@@ -3,6 +3,8 @@ export const translations = {
         // Navigation Menu
         menu: {
             home: 'หน้าแรก',
+            disasterMap: 'แผนที่ภัยพิบัติ',
+            cafeFlood: 'เรดาร์คาเฟ่ & บาร์ น้ำท่วม',
             disasterNews: 'ข่าวภัยพิบัติ & พยากรณ์',
             emergency: 'บริการฉุกเฉิน',
             victim: 'รายงานผู้ประสบภัย',
@@ -89,6 +91,8 @@ export const translations = {
         navCards: {
             mainMenu: 'บริการหลัก',
             selectService: 'เลือกบริการและเครื่องมือที่คุณต้องการเข้าถึง',
+            disasterMapDesc: 'แผนที่ดาวเทียม GISTDA, เรดาร์กลุ่มฝน และชั้นข้อมูลภัยพิบัติ 7 ระดับ',
+            cafeFloodDesc: 'ค้นหาร้านกาแฟ มัทฉะ บาร์ และที่นั่งทำงานที่เปิดให้บริการ ปลอดภัยจากน้ำท่วม',
             bkkFloodDesc: 'ตรวจสอบสภาพน้ำท่วมขังถนนทั่ว กทม. และภาพกล้อง CCTV สด',
             homeDesc: 'กลับสู่หน้าหลัก',
             emergencyDesc: 'ติดต่อหน่วยงานฉุกเฉินและเบอร์โทรด่วน',
@@ -481,6 +485,8 @@ export const translations = {
         // Navigation Menu
         menu: {
             home: 'Home',
+            disasterMap: 'Disaster Map',
+            cafeFlood: 'Cafe & Bar Flood Radar',
             disasterNews: 'Disaster & Weather News',
             emergency: 'Emergency Services',
             victim: 'Victim Reports',
@@ -567,6 +573,8 @@ export const translations = {
         navCards: {
             mainMenu: 'Main Services',
             selectService: 'Select the service or tool you want to access',
+            disasterMapDesc: 'Explore interactive 7-layer Web GIS map with GISTDA satellite & rain radar',
+            cafeFloodDesc: 'Search open cafes, matcha bars & speakeasies safe from Bangkok floods',
             bkkFloodDesc: 'Monitor Bangkok road flood levels & live CCTV feeds',
             homeDesc: 'Return to Home',
             emergencyDesc: 'Emergency contacts and hotlines',

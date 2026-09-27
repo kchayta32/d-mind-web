@@ -7,7 +7,9 @@ import {
   BookOpen,
   Info,
   Mail,
-  Waves
+  Waves,
+  MapPin,
+  Coffee
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageProvider';
@@ -26,6 +28,20 @@ const NavigationCards: React.FC = () => {
   const { t } = useLanguage();
 
   const navigationItems: NavigationItem[] = [
+    {
+      icon: <MapPin className="w-8 h-8" />,
+      titleKey: 'menu.disasterMap',
+      descKey: 'navCards.disasterMapDesc',
+      route: '/disaster-map',
+      color: 'bg-emerald-500'
+    },
+    {
+      icon: <Coffee className="w-8 h-8" />,
+      titleKey: 'menu.cafeFlood',
+      descKey: 'navCards.cafeFloodDesc',
+      route: '/cafe-flood-map',
+      color: 'bg-amber-500'
+    },
     {
       icon: <Waves className="w-8 h-8" />,
       titleKey: 'menu.bkkFlood',

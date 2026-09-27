@@ -19,7 +19,9 @@ import {
   Mail,
   HeartHandshake,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Coffee,
+  Waves
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeProvider';
@@ -109,6 +111,28 @@ const NewMobileLayout: React.FC = () => {
           gradient: 'from-blue-500/15 via-blue-500/5 to-transparent',
           iconBg: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20',
           accent: 'border-blue-500/30'
+        },
+        {
+          id: 'bkkFlood',
+          title: t('menu.bkkFlood'),
+          desc: isEn ? 'Live road waterlogging & 65 CCTV cams' : 'ตรวจระดับน้ำท่วมถนนรายสาย & กล้องสด 65 จุด',
+          icon: Waves,
+          route: '/bangkok-flood',
+          badge: 'CCTV Live',
+          gradient: 'from-cyan-500/15 via-cyan-500/5 to-transparent',
+          iconBg: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+          accent: 'border-cyan-500/30'
+        },
+        {
+          id: 'cafeFlood',
+          title: t('menu.cafeFlood'),
+          desc: isEn ? 'Find open cafes & bars safe from flood' : 'ค้นหาร้านกาแฟ มัทฉะ บาร์ ที่เปิด ปลอดภัยจากน้ำท่วม',
+          icon: Coffee,
+          route: '/cafe-flood-map',
+          badge: 'Typhoon AI',
+          gradient: 'from-amber-500/15 via-amber-500/5 to-transparent',
+          iconBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20',
+          accent: 'border-amber-500/30'
         },
         {
           id: 'assistant',

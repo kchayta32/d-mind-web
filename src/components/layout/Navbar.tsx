@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
     Moon, Sun, Globe, Menu, X, Search,
     Home, Phone, AlertTriangle, FileText,
-    Smile, BookOpen, Bot, Info, Mail, CloudSun, Waves
+    Smile, BookOpen, Bot, Info, Mail, CloudSun, Waves, MapPin, Coffee
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AnimatedLogo from '@/components/ui/AnimatedLogo';
@@ -14,6 +14,8 @@ import { useLanguage } from '@/contexts/LanguageProvider';
 // Menu Items Configuration with Icons
 const MENU_ITEMS_CONFIG = [
     { key: 'home', route: '/', icon: Home, color: 'text-blue-400' },
+    { key: 'disasterMap', route: '/disaster-map', icon: MapPin, color: 'text-emerald-400' },
+    { key: 'cafeFlood', route: '/cafe-flood-map', icon: Coffee, color: 'text-amber-400' },
     { key: 'bkkFlood', route: '/bangkok-flood', icon: Waves, color: 'text-cyan-400' },
     { key: 'disasterNews', route: '/disaster-news', icon: CloudSun, color: 'text-sky-400' },
     { key: 'emergency', route: '/contacts', icon: Phone, color: 'text-red-400' },
@@ -92,6 +94,28 @@ const Navbar: React.FC = () => {
 
                     {/* Desktop/Tablet Actions */}
                     <div className="flex items-center gap-2 z-50">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="hidden xl:flex items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border-emerald-400/40 hover:border-emerald-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            onClick={() => navigate('/disaster-map')}
+                        >
+                            <MapPin className="h-3.5 w-3.5 text-emerald-400" />
+                            <span>แผนที่ภัยพิบัติ</span>
+                            <span className="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">GIS</span>
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="hidden lg:flex items-center gap-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-200 border-amber-400/40 hover:border-amber-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            onClick={() => navigate('/cafe-flood-map')}
+                        >
+                            <Coffee className="h-3.5 w-3.5 text-amber-400" />
+                            <span>เรดาร์คาเฟ่ & บาร์</span>
+                            <span className="bg-amber-500 text-slate-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold">AI</span>
+                        </Button>
+
                         <Button
                             variant="outline"
                             size="sm"
