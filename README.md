@@ -4,24 +4,38 @@
 
 # 🌊 D-MIND
 ### Disaster Management & Intelligence Network Dashboard
-**แพลตฟอร์มจัดการและเฝ้าระวังภัยพิบัติอัจฉริยะแบบบูรณาการสำหรับประเทศไทย**
+**แพลตฟอร์มบูรณาการข้อมูลและระบบเตือนภัยพิบัติอัจฉริยะสำหรับประเทศไทย ผสานพลังปัญญาประดิษฐ์และโทรสัมผัส**
 
+[![Production Status](https://img.shields.io/badge/Production-Live%20on%20Vercel-success?style=for-the-badge&logo=vercel&logoColor=white)](https://d-mind-six.vercel.app/)
 [![Vite](https://img.shields.io/badge/Vite-7.3+-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Leaflet](https://img.shields.io/badge/Leaflet-GIS-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
-[![Python](https://img.shields.io/badge/Python-Flask_API-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![ThaiLLM](https://img.shields.io/badge/AI-ThaiLLM_%7C_RAG-FF6B6B?style=for-the-badge&logo=openai&logoColor=white)](https://thaillm.org)
+[![Leaflet](https://img.shields.io/badge/Leaflet-GIS_Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
+[![Typhoon LLM](https://img.shields.io/badge/Typhoon_AI-v2.5_30B-FF6B6B?style=for-the-badge&logo=openai&logoColor=white)](https://opentyphoon.ai)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+<br/>
+
+### 🌐 บริการหลักและช่องทางเข้าใช้งานระบบจริง (Live Deployments)
+
+| บริการ / หน้าแอปพลิเคชัน | URL เชื่อมต่อไปยังระบบจริง | รายละเอียดฟังก์ชันหลัก |
+|---|---|---|
+| 🏠 **หน้าหลัก D-MIND Portal** | **[d-mind-six.vercel.app](https://d-mind-six.vercel.app/)** | ศูนย์กลางบริหารจัดการและเตือนภัยพิบัติ, ดัชนีความเสี่ยงรายวัน, ข่าวสารฉุกเฉิน, Thai LLM Arena, RAG Assistant |
+| ☕ **เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม.** | **[d-mind-six.vercel.app/cafe-flood-map](https://d-mind-six.vercel.app/cafe-flood-map)** | เรดาร์ค้นหาร้านกาแฟ มัทฉะ บาร์ และที่นั่งทำงานที่เปิดให้บริการ ปลอดภัยจากน้ำท่วมขัง พร้อม Typhoon AI Barista Concierge |
+| 🚦 **แผนที่น้ำท่วมถนน กทม. & จุดตรวจวัด** | **[d-mind-six.vercel.app/bangkok-flood](https://d-mind-six.vercel.app/bangkok-flood)** | แผนที่ติดตามเส้นทางถนนน้ำท่วม กทม. 3 ระดับสี, สถานีสูบน้ำระบายสู่เจ้าพระยา, ข้อมูลจุดกล้อง CCTV และดาวเทียม Sentinel-1 SAR |
+| 🗺️ **แผนที่ภัยพิบัติบูรณาการ (Disaster Map)** | **[d-mind-six.vercel.app/disaster-map](https://d-mind-six.vercel.app/disaster-map)** | แผนที่ดาวเทียม WMS GISTDA ทั่วประเทศ (น้ำท่วม, จุดความร้อน VIIRS, เรดาร์ฝน RainViewer, แผ่นดินไหว USGS) |
+| 🌋 **SeismoGuard AI (แผ่นดินไหว)** | **[d-mind-ai-earthquake-guard.vercel.app](https://d-mind-ai-earthquake-guard.vercel.app)** | ระบบนวัตกรรมประเมินและแจ้งเตือนคลื่นแผ่นดินไหวแบบ Real-time ด้วย AI (โครงการประกวด วช. NRCT) |
+
+<br/>
 
 <p align="center">
-  <a href="#-features">คุณสมบัติเด่น</a> •
+  <a href="#-1-หน้าหลัก-d-mind-portal">1. หน้าหลัก D-MIND</a> •
+  <a href="#-2-เรดาร์คาเฟ่--บาร์-น้ำท่วม-กทม-bangkok-cafe--bar-flood-radar">2. เรดาร์คาเฟ่ & บาร์</a> •
+  <a href="#-3-แผนที่น้ำท่วมถนน-กทม--โครงข่ายจุดตรวจวัด-cctv">3. แผนที่น้ำท่วมถนน กทม.</a> •
   <a href="#-system-architecture">สถาปัตยกรรมระบบ</a> •
   <a href="#-tech-stack">เทคโนโลยีที่ใช้</a> •
-  <a href="#-getting-started">การติดตั้งและเริ่มใช้งาน</a> •
-  <a href="#-data-sources">แหล่งข้อมูล</a> •
-  <a href="#-api-reference">API & AI Models</a>
+  <a href="#-getting-started">การติดตั้งและใช้งาน</a>
 </p>
 
 </div>
@@ -30,61 +44,132 @@
 
 ## 📖 บทนำ (Overview)
 
-**D-MIND** (Disaster Management & Intelligence Network Dashboard) เป็นระบบเว็บแอปพลิเคชันและแดชบอร์ดอัจฉริยะที่ออกแบบมาเพื่อยกระดับการจัดการและเตือนภัยพิบัติในประเทศไทยแบบองค์รวม โดยผสานรวม:
-1. **ข้อมูลโทรสัมผัสและดาวเทียมแบบ Real-time (Remote Sensing & GIS)** จาก GISTDA, TMD และ USGS
-2. **ปัญญาประดิษฐ์ภาษาไทย (Thai Large Language Models) & RAG System** เพื่อการสืบค้นและตอบคำถามเกี่ยวกับภัยพิบัติ
-3. **ระบบประเมินความเสียหาย (AI Damage Assessment)**
-4. **ระบบแจ้งเตือนและศูนย์รวมข่าวสารภัยพิบัติทั่วประเทศ**
-5. **ระบบรับแจ้งเหตุและขอความช่วยเหลือจากประชาชน (Crowdsourced Citizen Reports)**
+**D-MIND** (*Disaster Management & Intelligence Network Dashboard*) ได้รับการพัฒนาขึ้นเพื่อเป็นโครงสร้างพื้นฐานดิจิทัลด้านการเตือนภัยและรับมือภัยพิบัติสำหรับประชาชนและหน่วยงานในประเทศไทย โดยเชื่อมต่อข้อมูลสารสนเทศภูมิศาสตร์ (GIS), ภาพถ่ายดาวเทียมโทรสัมผัส (Remote Sensing), ข้อมูลโทรมาตรตรวจวัดระดับน้ำและสภาพอากาศแบบเรียลไทม์ และผสานพลังปัญญาประดิษฐ์โมเดลภาษาไทย **Typhoon LLM v2.5** เพื่อให้คำแนะนำที่แม่นยำ ปฏิบัติได้จริง และเข้าถึงได้ง่ายในยามเกิดวิกฤตสภาพอากาศ
 
 ---
 
-> 🌟 **โครงการนวัตกรรมภาคแยกเพื่อการแข่งขันระดับชาติ วช. (NRCT Innovation Candidate):**  
-> **[SeismoGuard AI — ระบบแจ้งเตือนแผ่นดินไหวด้วยระบบปัญญาประดิษฐ์แบบเรียลไทม์](./ai-earthquake-guard)**  
-> 🚀 Production URL: [https://d-mind-ai-earthquake-guard.vercel.app](https://d-mind-ai-earthquake-guard.vercel.app)  
-> 📐 สถาปัตยกรรมระบบ: [System Architecture Diagram (Editorial SVG)](./ai-earthquake-guard/docs/diagrams/seismoguard-architecture.svg) | [เอกสารประกอบฉบับเต็ม](./ai-earthquake-guard/README.md)
+## 🌟 จุดเด่นและระบบงานหลัก (Core Modules)
+
+```mermaid
+graph TD
+    User([ผู้ใช้งาน / ประชาชน / ผู้ประสบภัย]) --> Portal["🏠 D-MIND Main Portal\n(d-mind-six.vercel.app)"]
+    
+    Portal --> Mod1["☕ เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม.\n(/cafe-flood-map)"]
+    Portal --> Mod2["🚦 แผนที่น้ำท่วมถนน กทม. & CCTV\n(/bangkok-flood)"]
+    Portal --> Mod3["🗺️ แผนที่ภัยพิบัติบูรณาการดาวเทียม\n(/disaster-map)"]
+    Portal --> Mod4["🤖 Thai Disaster AI Arena & RAG\n(LLM Evaluation & Query)"]
+    Portal --> Mod5["📢 รายงานเหตุฉุกเฉิน & สายด่วน 1555\n(Crowdsourcing & Hotlines)"]
+
+    Mod1 --> Engine1["Overpass Web Scraping +\nTyphoon AI Barista Concierge"]
+    Mod2 --> Engine2["BMA Open Data + Copernicus SAR +\nTyphoon Vehicle Flood Advice"]
+    Mod3 --> Engine3["GISTDA WMS + TMD Radar +\nUSGS Real-time Earthquakes"]
+```
 
 ---
 
-## ✨ Features (คุณสมบัติเด่น)
+### 🏠 1. หน้าหลัก: D-MIND Portal
+> **URL:** [https://d-mind-six.vercel.app/](https://d-mind-six.vercel.app/)
 
-### 🗺️ 1. Interactive Disaster Map & Remote Sensing (แผนที่ภัยพิบัติแบบไดนามิก)
-- **GISTDA Satellite Layers**: แสดงแผนที่น้ำท่วม (Flood Inundation), จุดความร้อนไฟป่า (VIIRS Hotspots), และรอยไหม้ (Burn Scar Area)
-- **Drought & Climate Index**: ชั้นข้อมูลภัยแล้งและสภาพอากาศเชิงพื้นที่
-- **Real-time Weather Radar**: ซ้อนทับเรดาร์ฝนแบบสดจาก RainViewer และ Open-Meteo
-- **USGS Earthquake Integration**: หมุดจุดศูนย์กลางแผ่นดินไหวขนาดและระดับความลึกแบบ Real-time
-- **Filtering & Time Travel**: กรองข้อมูลตามช่วงเวลา รายจังหวัด และระดับความรุนแรง
+ศูนย์กลางข่าวสารและแดชบอร์ดติดตามภัยพิบัติระดับประเทศ ออกแบบตามมาตรฐาน **UI/UX Pro Max** รองรับโหมดมืด (Dark Mode) และโหมดสว่าง (Light Mode) อย่างสมบูรณ์:
 
-### 🤖 2. Thai Disaster AI Assistant & LLM Arena (ผู้ช่วย AI และระบบ RAG)
-- **Retrieval-Augmented Generation (RAG)**: ตอบคำถามเกี่ยวกับขั้นตอนการรับมือภัยพิบัติ ข้อปฏิบัติตน และข้อมูลสภาพอากาศด้วยชุดข้อมูลอ้างอิงภาษาไทย
-- **Multi-Model LLM Arena**: เปรียบเทียบประสิทธิภาพโมเดลภาษาไทยชั้นนำ:
-  - `OpenThaiGPT 8B v7.2`
-  - `Pathumma 8B Think 3.0.0`
-  - `Typhoon-S 8B Instruct`
-  - `THaLLE 0.2 8B FA`
-  - `Google Gemini Flash`
-  - Local LLM via Ollama (`Nemotron-3`, `Gemma 4`)
-- **Blind Test & Model Rating**: ให้คะแนนคำตอบ AI เพื่อพัฒนาโมเดล
+1. **Live Emergency Announcement & Hero Banner:**
+   - แสดงสถานะเฝ้าระวังมรสุมและฝนตกหนักแบบไดนามิก
+   - แบนเนอร์ทางลัดด่วนสู่นวัตกรรมล่าสุด **"เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม."** และ **"แผนที่น้ำท่วมถนน กทม."**
+2. **ดัชนีชี้วัดสถานการณ์ฉุกเฉินรายวัน (Daily Disaster Indicators):**
+   - ตรวจจับระดับความเสี่ยงประจำวัน สภาพฝนสะสม พื้นที่เสี่ยงน้ำหลาก และจุดความร้อนไฟป่า
+3. **Thai Disaster AI Assistant & LLM Arena:**
+   - ระบบสืบค้นข้อมูลภัยพิบัติด้วยเทคนิค **Retrieval-Augmented Generation (RAG)**
+   - เวทีทดสอบและเปรียบเทียบประสิทธิภาพโมเดลภาษาไทยชั้นนำ:
+     - `Typhoon-S 8B Instruct / v2.5 30B`
+     - `OpenThaiGPT 8B v7.2`
+     - `Pathumma 8B Think 3.0.0`
+     - `THaLLE 0.2 8B FA`
+     - `Google Gemini 1.5 / 2.0 Flash`
+     - Local LLM via Ollama (`Nemotron-3`, `Gemma`)
+4. **AI Damage Assessment (ระบบประเมินความเสียหายจากภาพถ่าย):**
+   - วิเคราะห์ภาพถ่ายความเสียหายจากภัยพิบัติด้วยโมเดล Vision AI เพื่อคัดกรองระดับความเร่งด่วนในการช่วยเหลือ
+5. **ศูนย์รับแจ้งเหตุประชาชน & รวบรวมสายด่วนฉุกเฉิน (Hotline Directory):**
+   - รวมเบอร์โทรฉุกเฉินสำคัญ เช่น สายด่วน กทม. **1555**, กู้ชีพ **1669**, ดับเพลิง **199**, ตำรวจทางหลวง **1193** พร้อมฟังก์ชันคลิกโทรออกได้ทันที
 
-### 🏚️ 3. AI Damage Assessment (การประเมินความเสียหายด้วย AI)
-- วิเคราะห์ภาพถ่ายความเสียหายจากภัยพิบัติ (น้ำท่วม, ดินถล่ม, ไฟไหม้, แผ่นดินไหว)
-- คัดกรองและประเมินระดับความเสียหายเบื้องต้นเพื่อจัดลำดับความสำคัญในการช่วยเหลือ
+---
 
-### 📢 4. Disaster News & Real-time Alerts (ศูนย์เตือนภัยและข่าวสาร)
-- รวมประกาศเตือนภัยจากกรมอุตุนิยมวิทยาและหน่วยงานภาครัฐ
-- สรุปสถานการณ์รายวันพร้อมดัชนีชี้วัดความเสี่ยงภัยประจำพื้นที่
-- การแจ้งเตือนภัยผ่าน Web Push Notifications และการกำหนดพิกัดพื้นที่เตือนภัยเฉพาะบุคคล
+### ☕ 2. เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม. (Bangkok Cafe & Bar Flood Radar)
+> **URL:** [https://d-mind-six.vercel.app/cafe-flood-map](https://d-mind-six.vercel.app/cafe-flood-map)
 
-### 🤝 5. Crowdsourced Incident & Victim Reports (ระบบรายงานเหตุและผู้ประสบภัย)
-- ประชาชนสามารถส่งรายงานจุดเกิดเหตุ พร้อมพิกัด GPS ภาพถ่าย และรายละเอียดความช่วยเหลือที่ต้องการ
-- แสดงผลหมุดบนแผนที่แบบ Real-time ให้เจ้าหน้าที่และหน่วยกู้ภัยเข้าประสานงานได้ทันท่วงที
+โซลูชันนวัตกรรมที่ออกแบบมาเพื่อช่วยเหลือคนกรุงเทพฯ ในช่วงสัปดาห์มรสุมและฝนตกหนัก ค้นหาร้าน Specialty Coffee, ร้านมัทฉะ, ค็อกเทลบาร์, เบเกอรี่ และพื้นที่นั่งทำงาน (Coworking Space) ที่ **เปิดให้บริการจริง** และ **ปลอดภัยจากน้ำท่วมขัง**:
 
-### 📚 6. Emergency Manual & Hotline Directory (คู่มือฉุกเฉินและเบอร์โทรด่วน)
-- รวมคู่มือเอาชีวิตรอดและวิธีปฏิบัติตนในเหตุฉุกเฉินทุกรูปแบบ
-- รวมเบอร์โทรสายด่วนฉุกเฉินทั่วประเทศ สามารถกดโทรออกได้ทันที
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ ☕ Bangkok Cafe & Bar Flood Radar                                      │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│ 🗺️ Interactive React-Leaflet Map  │ 🔍 Search & Multi-Filters Bar       │
+│  - 60+ Curated Beloved Venues    │  - Categories: Coffee, Matcha, Bar, │
+│  - Category Icon & Glow Halos    │    Bakery, Coworking, Pet-Friendly  │
+│  - Flood Safe Halo (Green/Amber) │  - Zones: Inner, Outer, Thonburi,   │
+│  - Flooded Roads Polyline Layer  │    Metropolitan Perimeter           │
+│  - Bottom-right Zoom Control     │  - Day/Time: Live Open, Morning,    │
+│  - Stacking Context Isolated     │    Afternoon, Evening, Custom Hour  │
+│                                  │  - Toggle: Flood Safe Only / OSM    │
+├──────────────────────────────────┴─────────────────────────────────────┤
+│ 🌪️ Typhoon LLM AI Barista & Flood Weather Concierge (v2.5-30b)         │
+│  - "วิเคราะห์ระดับน้ำขังรอบร้าน แนะนำเมนู และเส้นทางหลบฝนแบบเรียลไทม์"    │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
-### 📊 7. Analytics & Disaster Trends (สถิติและการวิเคราะห์แนวโน้ม)
-- แดชบอร์ดแสดงกราฟสถิติภัยพิบัติย้อนหลัง แนวโน้มพื้นที่เสี่ยง และการกระจายตัวของเหตุการณ์
+#### คุณสมบัติเด่นของเรดาร์คาเฟ่ & บาร์:
+- **ครอบคลุม 4 โซนหลักทั่วกรุงเทพฯ และปริมณฑล:**
+  - **กทม. ชั้นใน (Inner Bangkok):** สยาม, สุขุมวิท, สาทร, อารีย์, พระนคร, ตลาดน้อย, เจริญกรุง
+  - **กทม. ชั้นนอก (Outer Bangkok):** บางนา, อุดมสุข, ลาดกระบัง, จตุจักร, รามอินทรา, บางกะปิ
+  - **ฝั่งธนบุรี (Thonburi):** คลองสาน, เจริญนคร, ตลาดพลู, ราชพฤกษ์, ปิ่นเกล้า, ธนบุรี
+  - **ปริมณฑล (Metropolitan Area):** นนทบุรี, ปทุมธานี, สมุทรปราการ, นครปฐม
+- **ระบบกรองวันและเวลาเปิด-ปิดร้าน (Day & Time Filter Engine):**
+  - ตรวจสอบสถานะการเปิดบริการจริงตามวัน (วันนี้, พรุ่งนี้, จันทร์-อาทิตย์) และช่วงเวลา (เปิดตอนนี้เลย, เช้า, บ่าย, เย็น, ดึก)
+- **Web Scraping & Open Data สด:**
+  - ดึงข้อมูลพิกัดและรายละเอียดร้านสดผ่าน **OpenStreetMap Overpass Turbo API** พร้อมระบบแคชข้อมูล LocalStorage 30 นาที
+- **เลเยอร์ซ้อนทับถนนน้ำท่วม กทม. (BMA Flooded Roads Layer):**
+  - แสดงเส้นทางน้ำท่วมระดับวิกฤตและเฝ้าระวังบนแผนที่คาเฟ่ เพื่อให้ผู้ใช้งานมองเห็นทันทีว่าเส้นทางไปร้านมีน้ำขังหรือไม่
+- **ผู้ช่วยปัญญาประดิษฐ์ Typhoon AI Barista (`typhoon-v2.5-30b-a3b-instruct`):**
+  - แชตบอตบาริสต้าอัจฉริยะที่เชี่ยวชาญทั้งกาแฟ มัทฉะ บาร์ และสภาพการจราจรหน้าฝน พร้อมปุ่ม Prompt ทางลัด 1 คลิก
+
+---
+
+### 🚦 3. แผนที่น้ำท่วมถนน กทม. & โครงข่ายจุดตรวจวัด (Bangkok Road Flood & Monitoring Network)
+> **URL:** [https://d-mind-six.vercel.app/bangkok-flood](https://d-mind-six.vercel.app/bangkok-flood)
+
+ระบบติดตามระดับน้ำท่วมขังบนผิวการจราจรถนนสายหลักทั่วกรุงเทพมหานครแบบบูรณาการ ช่วยให้ประชาชนวางแผนการเดินทาง หลีกเลี่ยงจุดเสี่ยง และถนอมยานพาหนะ:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ 🚦 Bangkok Road Flood & Drainage Monitoring Network                     │
+├────────────────────────────────────────────────────────────────────────┤
+│ 🛣️ 39+ สายทางหลัก กทม. แบ่ง 3 ระดับสีตามมาตรฐานความรุนแรง:                 │
+│   🔴 สีแดง (วิกฤต): น้ำท่วมสูงเกิน 20-30 ซม. เลนขวาท่วม รถเล็กห้ามผ่าน    │
+│   🟠 สีส้ม (เฝ้าระวัง): น้ำขัง 10-20 ซม. ท่วมเลนซ้าย ชะลอความเร็ว          │
+│   🟢 สีเขียว (ปกติ): ผิวการจราจรแห้ง สัญจรได้ตามปกติทุกช่องทาง           │
+├────────────────────────────────────────────────────────────────────────┤
+│ 🌊 โทรมาตรสถานีระบายน้ำและระดับน้ำคลองสายหลักสู่แม่น้ำเจ้าพระยา          │
+│ 🛰️ เลเยอร์ดาวเทียม Copernicus Sentinel-1 C-SAR ตรวจจับผิวน้ำท่วมขังทะลุเมฆ │
+├────────────────────────────────────────────────────────────────────────┤
+│ 📷 เครือข่ายจุดกล้อง CCTV สำนักการจราจรและขนส่ง (สจส.) กทม. 300+ จุด:   │
+│   - สถานะ: [กำลังปรับปรุงแก้ไข / Maintenance Mode]                      │
+│   - แสดงข้อมูลจุดติดตั้ง, ทิศทางมุมกล้อง, หน่วยงานดูแล, พิกัด GPS          │
+│   - เชื่อมต่อพอร์ทัลทางการ BMA Traffic (bmatraffic.com) & ศูนย์ระบายน้ำ DDS│
+├────────────────────────────────────────────────────────────────────────┤
+│ 🌪️ Typhoon LLM AI Flood Concierge:                                     │
+│   - วิเคราะห์ความปลอดภัยแยกตามประเภทยานพาหนะ (Eco Car, Sedan, SUV,      │
+│     กระบะยกสูง, มอเตอร์ไซค์) พร้อมคำแนะนำเส้นทางเลี่ยงน้ำท่วมแบบเรียลไทม์ │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+#### การแก้ปัญหาด้านเทคนิค (Technical Fixes & Architecture Highlights):
+1. **การปรับระบบกล้อง CCTV สู่โหมดซ่อมบำรุง (Maintenance Mode):**
+   - ถอดการฝัง YouTube Live Stream ออกทั้งหมดเพื่อความปลอดภัยและความเสถียร
+   - แสดงหน้าจอโหมดซ่อมบำรุงแบบไฮเทคพร้อมข้อมูลพิกัดจุดติดตั้ง และลิงก์ตรงไปยังพอร์ทัลทางการของกรุงเทพมหานคร
+   - ตั้งค่าเริ่มต้นของเลเยอร์กล้องให้ปิด (`showCctvLayer: false`) เพื่อไม่ให้หมุด 300+ จุดบดบังแผนที่เส้นทางถนน
+2. **การแก้ไขข้อผิดพลาดการซ้อนทับของแผนที่ (Map Overlapping & Stacking Context Isolation):**
+   - เพิ่ม `isolation: isolate` ในกรอบแผนที่ ป้องกันไม่ให้คอนโทรลและหมุดมาร์กเกอร์หลุดออกมารบกวนองค์ประกอบภายนอก
+   - ปรับ `Navbar.tsx` เป็น `z-[9990]` เพื่อให้อยู่เหนือเลเยอร์แผนที่เสมอขณะเลื่อนหน้าจอ (Scroll)
+   - ปิดปุ่มซูมมุมซ้ายบนเดิม (`zoomControl={false}`) และย้ายปุ่มซูมไปไว้ที่ **มุมขวาล่าง** (`<ZoomControl position="bottomright" />`) ขจัดปัญหาปุ่มซูมชนทับกับแถบเลือกแผนที่ฐาน
 
 ---
 
@@ -92,52 +177,43 @@
 
 ```mermaid
 flowchart TB
-    subgraph DataSources["🌐 External Data Sources & Satellites"]
-        GISTDA["🛰️ GISTDA (WMS / VIIRS / Flood / Burn Scars)"]
-        TMD["🌧️ กรมอุตุนิยมวิทยา (Weather API)"]
-        USGS["🌐 USGS (Earthquake Feeds)"]
-        RainViewer["📡 RainViewer (Radar Overlay)"]
-        OpenMeteo["☁️ Open-Meteo API"]
+    subgraph DataSources["🌐 External Data Sources & Open Data"]
+        OSMOverpass["☕ OpenStreetMap Overpass Turbo API\n(Amenity Cafes & Bars)"]
+        BMAData["🏛️ BMA Open Data / data.go.th\n(CCTV Coordinates & Metadata)"]
+        GISTDA["🛰️ GISTDA Satellite WMS\n(Flood, VIIRS, Burn Scars)"]
+        Sentinel["🛰️ Copernicus Sentinel-1 C-SAR\n(Flood Water Extent)"]
+        TMD["🌧️ TMD & Open-Meteo\n(Precipitation & Rain Radar)"]
+        USGS["🌐 USGS Earthquake Feeds"]
     end
 
-    subgraph DataPipeline["⚙️ Python Scraper & Ingestion Engine"]
-        ScraperEngine["Scraper Engine (Python / Requests / BeautifulSoup)"]
-        DataProcessors["Data Cleaner & Geocoding Pipeline"]
+    subgraph AICloud["🌪️ Typhoon AI & Thai LLM Cloud"]
+        Typhoon["Typhoon LLM v2.5 30B\n(typhoon-v2.5-30b-a3b-instruct)"]
+        ThaiLLM["ThaiLLM / OpenThaiGPT / Pathumma\n(Disaster RAG Knowledge Base)"]
+        GeminiFlash["Google Gemini 1.5 / 2.0 Flash"]
     end
 
-    subgraph DatabaseCloud["☁️ Backend & Cloud Storage"]
-        Supabase["⚡ Supabase (PostgreSQL + PostGIS + Realtime)"]
-        Storage["🗄️ Supabase Storage / Media Assets"]
-        LocalDB["📦 SQLite / Ratings DB"]
+    subgraph FrontendApp["💻 D-MIND Client Application (React 18 + Vite 7)"]
+        Router["React Router DOM (SPA)"]
+        
+        subgraph Pages["Pages & Dashboards"]
+            MainPortal["🏠 Home Portal\n(/)"]
+            CafeRadar["☕ Cafe & Bar Flood Radar\n(/cafe-flood-map)"]
+            BkkFlood["🚦 Bangkok Road Flood Map\n(/bangkok-flood)"]
+            DisasterMap["🗺️ Disaster Satellite Map\n(/disaster-map)"]
+        end
+
+        subgraph CoreComponents["Core Map & UI Components"]
+            CafeMapComponent["Leaflet Cafe Map\n(Isolate Stacking / z-20)"]
+            BkkMapComponent["Leaflet Flood Road Map\n(Polyline Severity / z-20)"]
+            NavbarComp["Header Navigation Bar\n(z-[9990] Priority)"]
+            TyphoonChat["Typhoon AI Chat Widgets\n(Barista & Road Concierge)"]
+        end
     end
 
-    subgraph BackendAPI["🚀 Serverless API (Flask / Vercel)"]
-        FlaskAPI["Python Flask API (/api/index.py)"]
-        RAGModule["RAG Engine & Knowledge Base"]
-        LLMHub["ThaiLLM / Gemini / Ollama Model Proxy"]
-    end
-
-    subgraph FrontendApp["💻 Frontend Application (React 18 + Vite)"]
-        MapLibre["🗺️ Leaflet / WMS Map Engine"]
-        ZustandStore["🏪 Zustand State Management"]
-        TanStackQuery["🔄 TanStack Query (Data Fetching)"]
-        ShadcnUI["🎨 Tailwind CSS + Shadcn/ui"]
-        AIChatUI["💬 AI Disaster Assistant & Arena UI"]
-    end
-
-    DataSources --> ScraperEngine
-    ScraperEngine --> DataProcessors
-    DataProcessors --> Supabase
-    DataSources -.-> FlaskAPI
-
-    Supabase <--> FlaskAPI
-    Supabase <--> FrontendApp
-    LocalDB <--> FlaskAPI
-
-    FlaskAPI <--> LLMHub
-    RAGModule <--> LLMHub
-
-    FrontendApp <--> FlaskAPI
+    DataSources --> FrontendApp
+    AICloud <--> TyphoonChat
+    Router --> Pages
+    Pages --> CoreComponents
 ```
 
 ---
@@ -146,61 +222,70 @@ flowchart TB
 
 | หมวดหมู่ | เทคโนโลยี | รายละเอียดการใช้งาน |
 |---|---|---|
-| **Frontend Framework** | `React 18.3` + `TypeScript` | โครงสร้างหลักของแอปพลิเคชัน ประสิทธิภาพสูงและ Type-safe |
-| **Build & Bundler** | `Vite 7` | พัฒนาและคอมไพล์โค้ดอย่างรวดเร็ว |
-| **Styling & Design** | `Tailwind CSS`, `shadcn/ui`, `Framer Motion` | ออกแบบ UI ที่สวยงาม ล้ำสมัย Responsive และมี Micro-interactions |
-| **GIS & Mapping** | `Leaflet`, `React-Leaflet`, `GISTDA WMS` | จัดการแผนที่เชิงพื้นที่และเลเยอร์ภาพถ่ายดาวเทียม |
-| **State & Data** | `Zustand`, `@tanstack/react-query` | จัดการ Global State และแคชข้อมูล API |
-| **Backend & API** | `Python 3.10+`, `Flask`, `Vercel Serverless` | API จัดการระบบ AI Arena, การเชื่อมต่อโมเดล และข้อมูล RAG |
-| **Database** | `Supabase (PostgreSQL)`, `SQLite` | จัดเก็บข้อมูลผู้ใช้ รายงานภัยพิบัติ และประวัติการประเมินโมเดล |
-| **AI & LLM** | `ThaiLLM`, `Google Gemini`, `Ollama` | โมเดลภาษาปัญญาประดิษฐ์และ RAG ตอบคำถามภัยพิบัติ |
-| **Scraper Pipeline** | `Python (BeautifulSoup, Requests, Schedule)` | ดึงข้อมูลภัยพิบัติ สภาพอากาศ และจุดความร้อนแบบอัตโนมัติ |
+| **Frontend Framework** | `React 18.3` + `TypeScript 5.5` | โครงสร้างสถาปัตยกรรมเว็บแอปพลิเคชันหลัก รองรับ Single Page Application (SPA) |
+| **Bundler & Build Tool** | `Vite 7.3+` | เครื่องมือคอมไพล์และ Bundle โค้ดประสิทธิภาพสูง ใช้เวลาสร้าง Production ต่ำกว่า 40 วินาที |
+| **Styling & Design System** | `Tailwind CSS 3.4`, `shadcn/ui`, `Lucide Icons` | ดีไซน์อินเทอร์เฟซทันสมัยระดับ UI/UX Pro Max พร้อมระบบชุดสี Dark/Light Mode และ CSS Stacking Context Isolation |
+| **Mapping & GIS** | `Leaflet 1.9`, `React-Leaflet 4.2`, `Jawg Maps`, `Esri` | แสดงผลแผนที่เชิงพื้นที่, Polylines ความเสี่ยงน้ำท่วม, หมุดคัสตอมพร้อม Glowing Halos และเลเยอร์ดาวเทียม |
+| **Generative AI & LLM** | `Typhoon LLM v2.5 30B` (`opentyphoon.ai`), `ThaiLLM`, `Gemini Flash` | โมเดลภาษาปัญญาประดิษฐ์สัญชาติไทย ตอบคำถามสภาพอากาศ แนะนำร้านกาแฟ และวิเคราะห์เส้นทางน้ำท่วม |
+| **Web Scraping & Open Data** | `OpenStreetMap Overpass API`, `data.go.th` | ดึงข้อมูลพิกัดร้านคาเฟ่สด และพิกัดจุดติดตั้งกล้องวงจรปิดของกรุงเทพมหานคร |
+| **Earth Observation Data** | `Copernicus Sentinel-1 SAR`, `GISTDA WMS`, `Open-Meteo`, `RainViewer` | ข้อมูลดาวเทียมเรดาร์ตรวจจับผิวน้ำท่วมขัง, เรดาร์กลุ่มฝน และจุดศูนย์กลางแผ่นดินไหว |
+| **Deployment & Hosting** | `Vercel Serverless Platform` | คลาวด์แพลตฟอร์มสำหรับการประมวลผลและการเผยแพร่ระดับ Production อัปเดตอัตโนมัติผ่าน Git Push |
 
 ---
 
-## 📁 Project Structure (โครงสร้างโปรเจกต์)
+## 📁 โครงสร้างโปรเจกต์ (Project Structure)
 
 ```
 d-mind-web/
-├── 📁 api/                  # Python Flask API สำหรับ Serverless Backend
-│   ├── index.py            # จุดเชื่อมต่อ API (AI Hub, RAG, Survey)
-│   ├── database.py         # ตัวจัดการฐานข้อมูล SQLite สำหรับประเมินผล AI
-│   └── supabase_helper.py  # ระบบเชื่อมต่อ Supabase SDK
-├── 📁 scraper/              # ระบบดูดและรวบรวมข้อมูลภัยพิบัติอัตโนมัติ
-│   ├── scrapers/           # โมดูล Scraper (สภาพอากาศ, น้ำท่วม, ไฟป่า, แผ่นดินไหว)
-│   ├── schema.sql          # โครงสร้างฐานข้อมูล PostgreSQL / Supabase
-│   └── app.py              # ตัวควบคุมการทำงานตามตารางเวลา
-├── 📁 src/                  # ซอร์สโค้ด React Frontend
-│   ├── 📁 components/      # คอมโพเนนต์ UI
-│   │   ├── disaster-map/   # เลเยอร์แผนที่ WMS, ตัวกรอง, Heatmaps, สถิติ
-│   │   ├── chat/           # หน้าต่างแชทกับ AI Assistant
-│   │   ├── home/           # คอมโพเนนต์หน้าหลักและ Carousel ข่าว
-│   │   ├── ui/             # shadcn/ui components (Radix UI)
-│   │   └── ...
-│   ├── 📁 contexts/        # React Contexts (ThemeProvider, LanguageProvider)
-│   ├── 📁 hooks/           # Custom React Hooks สำหรับดึงข้อมูลและจัดการ State
-│   ├── 📁 pages/           # หน้าหลักทั้งหมดของเว็บแอปพลิเคชัน
-│   ├── 📁 services/        # Service modules (GISTDA API, Weather API)
-│   └── 📁 types/           # Type definitions (TypeScript Interfaces)
-├── 📁 public/               # ไฟล์ Assets, Icons, และภาพประกอบ
-├── 📄 .env.example          # แม่แบบ Environment Variables
-├── 📄 package.json          # รายการ Dependencies และ Scripts ของ Node.js
-├── 📄 requirements.txt      # รายการ Dependencies ของ Python Backend
-├── 📄 vercel.json           # การตั้งค่า Deployment บน Vercel
-└── 📄 README.md             # เอกสารคู่มือโครงการ
+├── 📁 scripts/                      # สคริปต์ทดสอบระบบอัตโนมัติ (Automated Test Suites)
+│   ├── run-cafe-flood-tests.mjs     # การทดสอบความถูกต้องของเรดาร์คาเฟ่ (43 ข้อทดสอบ)
+│   ├── run-bkk-tests.mjs            # การทดสอบระบบแผนที่น้ำท่วม กทม. (59 ข้อทดสอบ)
+│   └── run-typhoon-cctv-tests.mjs   # การทดสอบ Typhoon AI & โหมดปรับปรุง CCTV (33 ข้อทดสอบ)
+├── 📁 src/                          # ซอร์สโค้ด React Frontend
+│   ├── 📁 components/               # คอมโพเนนต์ UI
+│   │   ├── 📁 bangkok-flood/        # แผนที่น้ำท่วม กทม., จุดตรวจวัด, สถิติ, Typhoon AI Concierge
+│   │   │   ├── BangkokFloodMap.tsx
+│   │   │   ├── BangkokFloodControls.tsx
+│   │   │   ├── BangkokFloodStats.tsx
+│   │   │   ├── BangkokCctvModal.tsx
+│   │   │   └── BangkokFloodTyphoonConcierge.tsx
+│   │   ├── 📁 cafe-flood/           # เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม.
+│   │   │   ├── CafeFloodMap.tsx
+│   │   │   ├── CafeCard.tsx
+│   │   │   ├── CafeDetailModal.tsx
+│   │   │   ├── CafeTyphoonChat.tsx
+│   │   │   └── BangkokCafeFloodBanner.tsx
+│   │   ├── 📁 disaster-map/         # แผนที่ดาวเทียม WMS ทั่วประเทศ (GISTDA/USGS/RainViewer)
+│   │   ├── 📁 layout/               # Navbar (z-[9990] isolated), Footer, PageLayout
+│   │   └── 📁 ui/                   # shadcn/ui components (Dialog, Button, Badge, Switch ฯลฯ)
+│   ├── 📁 data/                     # ชุดข้อมูลพิกัดจำลองและข้อมูลรับรอง
+│   │   ├── bangkokCafesData.ts      # 60+ คาเฟ่ มัทฉะ บาร์ ทั่ว 4 โซน กทม.-ปริมณฑล
+│   │   ├── bangkokRoadFloodData.ts  # 39+ เส้นทางถนนสายหลัก กทม., สถานีสูบน้ำ, ดาวเทียม SAR
+│   │   └── bangkokCctvData.ts       # 65+ ข้อมูลจุดกล้องตรวจวัด กทม.
+│   ├── 📁 pages/                    # หน้าหลักของระบบ
+│   │   ├── Index.tsx                # หน้าหลัก D-MIND Portal
+│   │   ├── BangkokCafeFloodMapPage.tsx # หน้าเรดาร์คาเฟ่ & บาร์
+│   │   ├── BangkokFloodMapPage.tsx  # หน้าแผนที่น้ำท่วมถนน กทม.
+│   │   └── DisasterMap.tsx          # หน้าแผนที่ภัยพิบัติบูรณาการ
+│   ├── 📁 services/                 # ตัวเชื่อมต่อ API ภายนอก
+│   │   ├── typhoonCafeService.ts    # Typhoon LLM Barista Concierge
+│   │   ├── typhoonFloodService.ts   # Typhoon LLM Road Flood Concierge
+│   │   ├── cafeOverpassService.ts   # OpenStreetMap Overpass Web Scraping
+│   │   └── dataGoThService.ts       # BMA Open Data scraper & mapper
+│   └── 📁 types/                    # TypeScript Interface Definitions
+├── 📄 package.json                  # รายการ Dependencies และ Build Scripts
+├── 📄 tsconfig.json                 # TypeScript Configuration
+└── 📄 README.md                     # เอกสารคู่มือโครงการ
 ```
 
 ---
 
-## 🚀 Getting Started (การติดตั้งและเริ่มใช้งาน)
+## 🚀 การติดตั้งและเริ่มใช้งาน (Getting Started)
 
 ### ข้อกำหนดเบื้องต้น (Prerequisites)
 - **Node.js**: เวอร์ชัน `18.0.0` หรือสูงกว่า
-- **npm** หรือ **bun**
-- **Python**: เวอร์ชัน `3.10` หรือสูงกว่า (สำหรับรัน API / Scraper)
+- **npm** (หรือ **bun**, **pnpm**)
 - **Git**
-
----
 
 ### 1. โคลนคลังโค้ด (Clone Repository)
 ```bash
@@ -208,95 +293,82 @@ git clone https://github.com/kchayta32/d-mind-web.git
 cd d-mind-web
 ```
 
----
+### 2. ติดตั้ง Dependencies
+```bash
+npm install
+```
 
-### 2. ตั้งค่า Environment Variables
-คัดลอกไฟล์ `.env.example` ไปเป็น `.env`:
+### 3. ตั้งค่าตัวแปรสภาพแวดล้อม (.env)
+คัดลอกไฟล์ `.env.example` ไปเป็น `.env` และระบุคีย์บริการ:
 ```bash
 cp .env.example .env
 ```
-
-แก้ไขค่าในไฟล์ `.env` ให้ตรงกับระบบของคุณ:
+ตัวอย่างการตั้งค่าคีย์ที่จำเป็น:
 ```env
-# Supabase Frontend Keys
-VITE_SUPABASE_PROJECT_ID="your_supabase_project_id"
-VITE_SUPABASE_PUBLISHABLE_KEY="your_supabase_anon_key"
-VITE_SUPABASE_URL="https://your_project.supabase.co"
+# Typhoon LLM API Key (สำหรับระบบ AI Barista & Flood Concierge)
+VITE_TYPHOON_API_KEY="sk-your-typhoon-api-key"
 
-# AI Model Provider Keys
-THAILLM_API_KEY="your_thaillm_api_key"
-OPENROUTER_API_KEY="your_openrouter_api_key"
-GOOGLE_API_KEY="your_google_gemini_api_key"
-OLLAMA_API_KEY=""
+# Jawg Maps Token (สำหรับ Base Map โหมดมืดและเมทริกซ์)
+VITE_JAWG_ACCESS_TOKEN="your-jawg-access-token"
 
-# Backend Supabase Config
-SUPABASE_URL="https://your_project.supabase.co"
-SUPABASE_ANON_KEY="your_supabase_anon_key"
-SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key"
+# Supabase (สำหรับการจัดเก็บข้อมูลรายงานเหตุฉุกเฉิน)
+VITE_SUPABASE_URL="https://your-project.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your-supabase-anon-key"
 ```
 
----
-
-### 3. ติดตั้งและเริ่มรัน Frontend
+### 4. รันระบบในโหมดพัฒนา (Development Server)
 ```bash
-# ติดตั้ง dependencies
-npm install
-
-# รันโหมด Development Server
 npm run dev
 ```
 เปิดเบราว์เซอร์ไปที่: `http://localhost:5173`
 
----
-
-### 4. (ทางเลือก) ติดตั้งและรัน Python API Server
+### 5. รันชุดทดสอบคุณภาพอัตโนมัติ (Run Test Suites)
 ```bash
-# สร้าง virtual environment
-python -m venv venv
-# สำหรับ Windows:
-venv\Scripts\activate
-# สำหรับ macOS/Linux:
-source venv/bin/activate
+# รันการทดสอบเรดาร์คาเฟ่ & บาร์
+node scripts/run-cafe-flood-tests.mjs
 
-# ติดตั้ง requirements
-pip install -r requirements.txt
+# รันการทดสอบแผนที่น้ำท่วมถนน กทม.
+node scripts/run-bkk-tests.mjs
 
-# รัน Flask API
-python api/index.py
+# รันการทดสอบกล้อง CCTV และ Typhoon AI
+node scripts/run-typhoon-cctv-tests.mjs
+```
+
+### 6. ตรวจสอบชนิดข้อมูลและสร้างไฟล์สำหรับการเผยแพร่จริง (Production Build)
+```bash
+# Type-check ด้วย TypeScript
+npx tsc --noEmit
+
+# คอมไพล์โปรเจกต์
+npm run build
 ```
 
 ---
 
-## 🌐 Data Sources & Integrations (แหล่งข้อมูลอ้างอิง)
+## 🌐 แหล่งข้อมูลเปิดและการอ้างอิง (Data Sources & Credits)
 
-| องค์กร / แหล่งข้อมูล | ประเภทข้อมูล | การใช้งานในระบบ | เว็บไซต์ทางการ |
-|---|---|---|---|
-| **GISTDA** (สทอภ.) | ดาวเทียม / GIS / WMS | แผนที่น้ำท่วม, จุดความร้อน VIIRS, รอยไหม้ | [gistda.or.th](https://www.gistda.or.th) |
-| **กรมอุตุนิยมวิทยา (TMD)** | พยากรณ์อากาศและเตือนภัย | ข้อมูลสภาพอากาศ สภาพฝนตก ประกาศเตือนภัย | [tmd.go.th](https://www.tmd.go.th) |
-| **USGS** | ธรณีวิทยาและแผ่นดินไหว | ข้อมูลแผ่นดินไหว Real-time ทั่วโลกและแถบอาเซียน | [earthquake.usgs.gov](https://earthquake.usgs.gov) |
-| **Open-Meteo** | Weather Models | ข้อมูลอุณหภูมิ ความชื้น ลม ย้อนหลังและพยากรณ์ | [open-meteo.com](https://open-meteo.com) |
-| **RainViewer** | Live Radar Tiles | แผนที่ภาพถ่ายเรดาร์ตรวจวัดกลุ่มฝนสด | [rainviewer.com](https://www.rainviewer.com) |
-| **OpenStreetMap** | Base Maps & Carto | แผนที่พื้นฐานและโครงข่ายภูมิศาสตร์ | [openstreetmap.org](https://www.openstreetmap.org) |
-
----
-
-## 🔒 Security & Privacy (ความปลอดภัยและการคุ้มครองข้อมูล)
-- ข้อมูลตำแหน่งพิกัด GPS ของผู้ใช้งานได้รับการประมวลผลบนเบราว์เซอร์และใช้เฉพาะเมื่อได้รับอนุญาต (Explicit User Consent)
-- การสื่อสารข้อมูลทั้งหมดผ่าน HTTPS / TLS Encryption
-- ระบบเก็บข้อมูลรายงานเหตุและการสำรวจความพึงพอใจเป็นไปตามมาตรฐานการรักษาความปลอดภัย
+| องค์กร / ผู้ให้บริการ | ข้อมูลที่ใช้งานในระบบ | เว็บไซต์ทางการ |
+|---|---|---|
+| **SCB 10X / OpenTyphoon** | `typhoon-v2.5-30b-a3b-instruct` สำหรับ AI Concierge | [opentyphoon.ai](https://opentyphoon.ai) |
+| **กรุงเทพมหานคร (BMA)** | ข้อมูลจุดติดตั้งกล้อง สจส. และศูนย์ป้องกันน้ำท่วม สสน. กทม. | [bmatraffic.com](http://www.bmatraffic.com) • [dds.bangkok.go.th](https://dds.bangkok.go.th) |
+| **OpenStreetMap & Overpass** | ข้อมูลตำแหน่งคาเฟ่ ร้านมัทฉะ และค็อกเทลบาร์ | [openstreetmap.org](https://www.openstreetmap.org) |
+| **Copernicus / ESA** | ภาพถ่ายดาวเทียม Sentinel-1 C-SAR Hydrography | [copernicus.eu](https://www.copernicus.eu) |
+| **GISTDA (สทอภ.)** | ข้อมูลแผนที่น้ำท่วมและดาวเทียม WMS ทั่วประเทศ | [gistda.or.th](https://www.gistda.or.th) |
+| **Open-Meteo & RainViewer** | เรดาร์ตรวจวัดกลุ่มฝนและโมเดลพยากรณ์ปริมาณน้ำฝน | [open-meteo.com](https://open-meteo.com) • [rainviewer.com](https://www.rainviewer.com) |
 
 ---
 
-## 👥 Contributors & Acknowledgements
+## 👥 ผู้พัฒนาและการติดต่อ (Authors & Contact)
 
-- **Developer**: [kchayta32](https://github.com/kchayta32)
-- ขอขอบคุณข้อมูลเปิดและบริการ API จาก **GISTDA**, **กรมอุตุนิยมวิทยา**, **Open-Meteo**, **USGS** และ **ThaiLLM Foundation**
+- **โครงการ D-MIND (Disaster Management & Intelligence Network Dashboard)**
+- **GitHub Repository**: [https://github.com/kchayta32/d-mind-web](https://github.com/kchayta32/d-mind-web)
+- **Live Production URL**: [https://d-mind-six.vercel.app](https://d-mind-six.vercel.app)
 
 ---
 
 <div align="center">
 
-**D-MIND: Disaster Management & Intelligence Network Dashboard**  
-Made with ❤️ for Thailand Disaster Management & Community Safety
+**D-MIND: นวัตกรรมดิจิทัลเพื่อความปลอดภัยและการดำเนินชีวิตของประชาชนไทยในทุกฤดูกาล**  
+Made with ❤️ by [kchayta32](https://github.com/kchayta32)
 
 </div>
