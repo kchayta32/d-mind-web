@@ -187,10 +187,10 @@ export const CafeCard: React.FC<CafeCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className={`group relative rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-md bg-slate-900/85 hover:bg-slate-900/95 shadow-lg ${
+      className={`group relative rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-md bg-white dark:bg-slate-900/85 hover:bg-slate-50/90 dark:hover:bg-slate-900/95 shadow-md hover:shadow-xl ${
         isSelected
-          ? 'border-amber-400 ring-2 ring-amber-400/50 shadow-amber-500/20 shadow-xl scale-[1.01]'
-          : 'border-slate-800 hover:border-slate-700 hover:shadow-xl hover:scale-[1.008]'
+          ? 'border-amber-500 ring-2 ring-amber-400/50 shadow-amber-500/20 shadow-xl scale-[1.01]'
+          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:scale-[1.008]'
       }`}
     >
       {/* Top Media & Floating Badges */}
@@ -258,38 +258,38 @@ export const CafeCard: React.FC<CafeCardProps> = ({
         {/* Venue Title & District */}
         <div>
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-base font-bold text-slate-100 group-hover:text-amber-300 transition-colors line-clamp-1">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors line-clamp-1">
               {venue.name}
             </h3>
-            <span className="text-[11px] text-slate-400 shrink-0 font-medium px-1.5 py-0.5 bg-slate-800/80 rounded border border-slate-700/60">
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 shrink-0 font-medium px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800/80 rounded border border-slate-200 dark:border-slate-700/60">
               {venue.district}
             </span>
           </div>
-          <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
             {venue.nameEn}
           </p>
         </div>
 
         {/* Flood Note */}
-        <p className="text-xs text-slate-300/90 bg-slate-950/60 border border-slate-800/80 rounded-lg p-2 leading-relaxed flex items-start gap-1.5">
-          <span className="text-amber-400 shrink-0 mt-0.5">ℹ️</span>
+        <p className="text-xs text-slate-700 dark:text-slate-300/90 bg-amber-500/10 dark:bg-slate-950/60 border border-amber-500/20 dark:border-slate-800/80 rounded-lg p-2 leading-relaxed flex items-start gap-1.5">
+          <span className="text-amber-500 shrink-0 mt-0.5">ℹ️</span>
           <span className="line-clamp-2">{venue.floodNote}</span>
         </p>
 
         {/* Opening Hours & Schedule */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+          <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
           <span className="truncate">{venue.openingHoursText}</span>
         </div>
 
         {/* Amenities Icons */}
-        <div className="flex items-center gap-2 pt-1 border-t border-slate-800/80">
+        <div className="flex items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
           <span
             title={venue.hasWifi ? 'มีอินเทอร์เน็ต Wi-Fi ความเร็วสูง' : 'ไม่มี Wi-Fi'}
             className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${
               venue.hasWifi
-                ? 'bg-sky-950/60 text-sky-300 border border-sky-800/40'
-                : 'text-slate-500 bg-slate-800/30 opacity-60'
+                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/40 font-medium'
+                : 'text-slate-400 bg-slate-100 dark:bg-slate-800/30 opacity-60'
             }`}
           >
             <Wifi className="w-3 h-3" />
@@ -300,8 +300,8 @@ export const CafeCard: React.FC<CafeCardProps> = ({
             title={venue.hasPlugs ? 'มีปลั๊กไฟสำหรับทำงาน' : 'ไม่มีปลั๊กไฟ'}
             className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${
               venue.hasPlugs
-                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/40'
-                : 'text-slate-500 bg-slate-800/30 opacity-60'
+                ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 font-medium'
+                : 'text-slate-400 bg-slate-100 dark:bg-slate-800/30 opacity-60'
             }`}
           >
             <Zap className="w-3 h-3" />
@@ -312,8 +312,8 @@ export const CafeCard: React.FC<CafeCardProps> = ({
             title={venue.indoorSeating ? 'มีที่นั่งในร่ม / ห้องแอร์' : 'ที่นั่งกลางแจ้ง'}
             className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${
               venue.indoorSeating
-                ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40'
-                : 'text-slate-500 bg-slate-800/30 opacity-60'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 font-medium'
+                : 'text-slate-400 bg-slate-100 dark:bg-slate-800/30 opacity-60'
             }`}
           >
             <Wind className="w-3 h-3" />
@@ -324,8 +324,8 @@ export const CafeCard: React.FC<CafeCardProps> = ({
             title={venue.hasParking ? 'มีที่จอดรถ' : 'ไม่มีที่จอดรถ'}
             className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${
               venue.hasParking
-                ? 'bg-purple-950/60 text-purple-300 border border-purple-800/40'
-                : 'text-slate-500 bg-slate-800/30 opacity-60'
+                ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 font-medium'
+                : 'text-slate-400 bg-slate-100 dark:bg-slate-800/30 opacity-60'
             }`}
           >
             <Car className="w-3 h-3" />
@@ -334,17 +334,17 @@ export const CafeCard: React.FC<CafeCardProps> = ({
         </div>
 
         {/* Action Buttons Row */}
-        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-800/80">
+        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
           {/* Focus Map */}
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleFocusClick}
-            className="h-8 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 hover:border-slate-600 px-2 flex items-center justify-center gap-1 rounded-lg transition-all"
+            className="h-8 text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 px-2 flex items-center justify-center gap-1 rounded-lg transition-all"
             title="ขยับแผนที่โฟกัสร้านนี้"
           >
-            <MapPin className="w-3 h-3 text-amber-400" />
+            <MapPin className="w-3 h-3 text-amber-500" />
             <span>ดูบนแผนที่</span>
           </Button>
 
@@ -354,10 +354,10 @@ export const CafeCard: React.FC<CafeCardProps> = ({
             variant="outline"
             size="sm"
             onClick={handleTyphoonClick}
-            className="h-8 text-[11px] font-semibold bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 text-cyan-200 border-cyan-700/50 hover:border-cyan-500 px-2 flex items-center justify-center gap-1 rounded-lg transition-all shadow-sm"
+            className="h-8 text-[11px] font-semibold bg-gradient-to-r from-cyan-500/10 to-blue-500/10 dark:from-cyan-950/80 dark:to-blue-950/80 hover:from-cyan-500/20 hover:to-blue-500/20 dark:hover:from-cyan-900 dark:hover:to-blue-900 text-cyan-800 dark:text-cyan-200 border-cyan-300 dark:border-cyan-700/50 px-2 flex items-center justify-center gap-1 rounded-lg transition-all shadow-sm"
             title="ขอคำแนะนำและข้อมูลน้ำท่วมจาก Typhoon AI"
           >
-            <Bot className="w-3 h-3 text-cyan-400" />
+            <Bot className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
             <span>ถาม AI</span>
           </Button>
 
@@ -367,10 +367,10 @@ export const CafeCard: React.FC<CafeCardProps> = ({
             variant="outline"
             size="sm"
             onClick={openGoogleMapsDirections}
-            className="h-8 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 hover:border-slate-600 px-2 flex items-center justify-center gap-1 rounded-lg transition-all"
+            className="h-8 text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 px-2 flex items-center justify-center gap-1 rounded-lg transition-all"
             title="เปิดเส้นทางใน Google Maps"
           >
-            <Navigation className="w-3 h-3 text-blue-400" />
+            <Navigation className="w-3 h-3 text-blue-500" />
             <span>นำทาง</span>
           </Button>
         </div>

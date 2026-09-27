@@ -189,7 +189,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-slate-800 bg-slate-950 text-slate-100 shadow-2xl rounded-2xl scrollbar-thin scrollbar-thumb-slate-800">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-2xl rounded-2xl scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800">
         <DialogHeader className="sr-only">
           <DialogTitle>{venue.name}</DialogTitle>
           <DialogDescription>{venue.nameEn} - รายละเอียดร้านและข้อมูลความปลอดภัยจากน้ำท่วม</DialogDescription>
@@ -280,12 +280,12 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           </div>
 
           {/* Section 2: Typhoon AI Opinion Card */}
-          <div className="p-4 rounded-xl border border-cyan-800/40 bg-gradient-to-br from-cyan-950/40 via-slate-900/60 to-blue-950/40 space-y-3">
+          <div className="p-4 rounded-xl border border-cyan-300 dark:border-cyan-800/40 bg-cyan-50/70 dark:bg-gradient-to-br dark:from-cyan-950/40 dark:via-slate-900/60 dark:to-blue-950/40 space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-cyan-300 font-bold text-sm">
-                <Bot className="w-4 h-4 text-cyan-400" />
+              <div className="flex items-center gap-2 text-cyan-850 dark:text-cyan-300 font-bold text-sm">
+                <Bot className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span>ความเห็นจาก Typhoon AI บาริสต้า</span>
-                <span className="text-[10px] text-cyan-400/80 bg-cyan-950 px-2 py-0.5 rounded-full border border-cyan-700/50">
+                <span className="text-[10px] text-cyan-700 dark:text-cyan-400/80 bg-cyan-100 dark:bg-cyan-950 px-2 py-0.5 rounded-full border border-cyan-300 dark:border-cyan-700/50">
                   typhoon-v2.5
                 </span>
               </div>
@@ -294,21 +294,21 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                   size="sm"
                   variant="outline"
                   onClick={() => onAskTyphoon(venue)}
-                  className="h-7 text-xs bg-cyan-900/40 hover:bg-cyan-800/60 text-cyan-200 border-cyan-700/50 px-2.5 rounded-lg"
+                  className="h-7 text-xs bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-900/40 dark:hover:bg-cyan-800/60 text-cyan-900 dark:text-cyan-200 border-cyan-300 dark:border-cyan-700/50 px-2.5 rounded-lg"
                 >
-                  <Sparkles className="w-3 h-3 mr-1 text-cyan-400" />
+                  <Sparkles className="w-3 h-3 mr-1 text-cyan-600 dark:text-cyan-400" />
                   คุยต่อ
                 </Button>
               )}
             </div>
 
             {loadingOpinion ? (
-              <div className="flex items-center gap-2 text-xs text-slate-400 py-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 py-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
                 <span>กำลังขอความคิดเห็นและวิเคราะห์น้ำท่วมจาก Typhoon AI...</span>
               </div>
             ) : (
-              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+              <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
                 {typhoonOpinion}
               </div>
             )}
@@ -318,8 +318,8 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-amber-400" />
-                <h4 className="text-sm font-bold text-slate-200">
+                <Clock className="w-4 h-4 text-amber-500" />
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200">
                   ตารางเวลาเปิด-ปิดประจำสัปดาห์ (Weekly Schedule)
                 </h4>
               </div>
@@ -327,8 +327,8 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 variant="outline"
                 className={`text-xs font-semibold px-2.5 py-0.5 ${
                   isOpenNow
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                    : 'bg-rose-500/20 text-rose-300 border-rose-500/50'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/50'
+                    : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/50'
                 }`}
               >
                 {isOpenNow ? '🟢 เปิดให้บริการตอนนี้' : '🔴 ปิดทำการตอนนี้'}
@@ -336,9 +336,9 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             </div>
 
             {/* Schedule Table */}
-            <div className="rounded-xl border border-slate-800 overflow-hidden bg-slate-900/50">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50/80 dark:bg-slate-900/50">
               <table className="w-full text-xs text-left">
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
                   {DAY_ORDER.map((dayKey) => {
                     const isSelectedDay = dayKey === activeDayOfWeek;
                     const slots = venue.schedule?.[dayKey] || [];
@@ -354,20 +354,20 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                         key={dayKey}
                         className={`transition-colors ${
                           isSelectedDay
-                            ? 'bg-amber-500/15 font-semibold text-amber-200'
-                            : 'text-slate-300 hover:bg-slate-800/40'
+                            ? 'bg-amber-500/15 font-semibold text-amber-900 dark:text-amber-200'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/40'
                         }`}
                       >
                         <td className="py-2.5 px-3 w-1/3 flex items-center gap-1.5">
-                          {isSelectedDay && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                          {isSelectedDay && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
                           <span>{DAY_LABELS[dayKey].th}</span>
-                          <span className="text-[10px] text-slate-400">({DAY_LABELS[dayKey].en.slice(0, 3)})</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">({DAY_LABELS[dayKey].en.slice(0, 3)})</span>
                         </td>
                         <td className="py-2.5 px-3 text-right font-mono">
                           {isClosed ? (
-                            <span className="text-rose-400/90 font-medium">ปิดทำการ</span>
+                            <span className="text-rose-600 dark:text-rose-400/90 font-medium">ปิดทำการ</span>
                           ) : (
-                            <span className={isSelectedDay ? 'text-amber-300' : 'text-slate-200'}>
+                            <span className={isSelectedDay ? 'text-amber-800 dark:text-amber-300 font-bold' : 'text-slate-800 dark:text-slate-200'}>
                               {hoursDisplay}
                             </span>
                           )}
@@ -382,49 +382,49 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
 
           {/* Section 4: Amenities & Features */}
           <div className="space-y-2">
-            <h4 className="text-sm font-bold text-slate-200">สิ่งอำนวยความสะดวก</h4>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200">สิ่งอำนวยความสะดวก</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs ${
                   venue.hasWifi
-                    ? 'border-sky-500/30 bg-sky-950/30 text-sky-200'
-                    : 'border-slate-800 bg-slate-900/30 text-slate-500'
+                    ? 'border-sky-300 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-950/30 text-sky-800 dark:text-sky-200 font-medium'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500'
                 }`}
               >
-                <Wifi className="w-4 h-4 text-sky-400" />
+                <Wifi className="w-4 h-4 text-sky-500" />
                 <span>{venue.hasWifi ? 'มี Wi-Fi ฟรี' : 'ไม่มี Wi-Fi'}</span>
               </div>
 
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs ${
                   venue.hasPlugs
-                    ? 'border-amber-500/30 bg-amber-950/30 text-amber-200'
-                    : 'border-slate-800 bg-slate-900/30 text-slate-500'
+                    ? 'border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 font-medium'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500'
                 }`}
               >
-                <Zap className="w-4 h-4 text-amber-400" />
+                <Zap className="w-4 h-4 text-amber-500" />
                 <span>{venue.hasPlugs ? 'มีปลั๊กไฟ' : 'ไม่มีปลั๊กไฟ'}</span>
               </div>
 
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs ${
                   venue.indoorSeating
-                    ? 'border-emerald-500/30 bg-emerald-950/30 text-emerald-200'
-                    : 'border-slate-800 bg-slate-900/30 text-slate-500'
+                    ? 'border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 font-medium'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500'
                 }`}
               >
-                <Wind className="w-4 h-4 text-emerald-400" />
+                <Wind className="w-4 h-4 text-emerald-500" />
                 <span>{venue.indoorSeating ? 'มีที่นั่งในร่ม/แอร์' : 'กลางแจ้ง'}</span>
               </div>
 
               <div
                 className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs ${
                   venue.hasParking
-                    ? 'border-purple-500/30 bg-purple-950/30 text-purple-200'
-                    : 'border-slate-800 bg-slate-900/30 text-slate-500'
+                    ? 'border-purple-300 dark:border-purple-500/30 bg-purple-50 dark:bg-purple-950/30 text-purple-800 dark:text-purple-200 font-medium'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/30 text-slate-400 dark:text-slate-500'
                 }`}
               >
-                <Car className="w-4 h-4 text-purple-400" />
+                <Car className="w-4 h-4 text-purple-500" />
                 <span>{venue.hasParking ? 'มีที่จอดรถ' : 'ไม่มีที่จอดรถ'}</span>
               </div>
             </div>

@@ -48,15 +48,17 @@ export const mapDistrictToZone = (districtName: string = ''): BangkokCctvZone =>
 
 // Curated high-reliability road snapshot perspectives
 const ROAD_SNAPSHOT_POOL = [
-  'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1494783367193-149034c05e8f?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80'
+  'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1080&q=80',
+  'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1080&q=80'
 ];
+
+const BMA_STREAM_IDS = ['GIhc9Fm1OJU', 'HZ4lMaimpy8', 'uQqAnp8cduc'];
 
 /**
  * Convert a raw data.go.th record into our application's BangkokCctvCamera format
@@ -90,6 +92,7 @@ export const transformDataGoThRecord = (
   }
 
   const snapshot = ROAD_SNAPSHOT_POOL[index % ROAD_SNAPSHOT_POOL.length];
+  const streamId = BMA_STREAM_IDS[index % BMA_STREAM_IDS.length];
 
   return {
     id: `bma-gov-${record.ID || index + 1}`,
@@ -100,13 +103,15 @@ export const transformDataGoThRecord = (
     coordinates: [validLat, validLng],
     snapshotUrl: `${snapshot}&cam=${cameraId}`,
     liveStreamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    youtubeVideoId: streamId,
     status: 'online',
     floodSeverity: 'normal',
     agency: 'BMA Traffic (สำนักการจราจรและขนส่ง)',
     lastImageTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
     facingDirection: locationText,
     waterLevelCm: 0,
-    description: `${record.project || 'กล้องโทรทัศน์วงจรปิด สจส. กทม.'} [จุดติดตั้ง: ${locationText}] [รหัส DVR: ${record['Code DVR'] || '-'}]`
+    description: `${record.project || 'กล้องโทรทัศน์วงจรปิด สจส. กทม.'} [จุดติดตั้ง: ${locationText}] [รหัส DVR: ${record['Code DVR'] || '-'}]`,
+    officialPortalUrl: 'http://www.bmatraffic.com/index.aspx'
   };
 };
 

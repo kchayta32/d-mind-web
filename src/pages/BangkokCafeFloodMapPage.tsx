@@ -249,7 +249,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-amber-500 selection:text-slate-950">
       {/* Top Navbar */}
       <Navbar />
 
@@ -258,7 +258,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
         {/* ==================================================== */}
         {/* 1. HERO / HEADER BANNER */}
         {/* ==================================================== */}
-        <section className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-5 sm:p-7 shadow-2xl">
+        <section className="relative overflow-hidden rounded-3xl border border-amber-500/20 dark:border-slate-800 bg-gradient-to-br from-amber-50/80 via-white to-amber-100/50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-5 sm:p-7 shadow-xl">
           {/* Subtle Ambient Glow */}
           <div className="absolute top-0 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -268,23 +268,23 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="bg-amber-500/15 text-amber-300 border-amber-500/30 text-xs px-3 py-1 font-semibold flex items-center gap-1.5 backdrop-blur-md"
+                className="bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/30 text-xs px-3 py-1 font-semibold flex items-center gap-1.5 backdrop-blur-md"
               >
-                <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                <Coffee className="w-3.5 h-3.5 text-amber-500" />
                 <span>DMind Lifestyle & Flood Intelligence</span>
               </Badge>
 
               <Badge
                 variant="outline"
-                className="bg-cyan-950/80 text-cyan-300 border-cyan-700/50 text-xs px-3 py-1 font-semibold flex items-center gap-1.5 backdrop-blur-md animate-pulse"
+                className="bg-cyan-50 dark:bg-cyan-950/80 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700/50 text-xs px-3 py-1 font-semibold flex items-center gap-1.5 backdrop-blur-md animate-pulse"
               >
-                <CloudRain className="w-3.5 h-3.5 text-cyan-400" />
+                <CloudRain className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
                 <span>🌧️ สัปดาห์มรสุมฝนตกหนัก เฝ้าระวังพิเศษ กทม.</span>
               </Badge>
 
               <Badge
                 variant="outline"
-                className="bg-slate-900 text-slate-300 border-slate-700 text-xs px-2.5 py-1 font-mono"
+                className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 text-xs px-2.5 py-1 font-mono"
               >
                 Typhoon AI v2.5 Online
               </Badge>
@@ -292,42 +292,42 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
 
             {/* Title & Subtitle */}
             <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-amber-400 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-orange-600 to-amber-600 dark:from-amber-200 dark:via-white dark:to-amber-400 tracking-tight">
                 ☕ Bangkok Cafe & Bar Flood Radar
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
                 เรดาร์ค้นหาร้านกาแฟ มัทฉะ บาร์ และที่นั่งทำงาน ที่เปิดให้บริการ ปลอดภัยจากน้ำท่วม กทม. ชั้นใน นอก ฝั่งธนฯ และปริมณฑล พร้อมระบบวิเคราะห์ความเสี่ยงเส้นทางและผู้ช่วย AI บาริสต้า
               </p>
             </div>
 
             {/* Live Stats Counters Bar */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-              <span className="bg-slate-900/90 text-slate-200 px-3 py-1 rounded-xl border border-slate-800 flex items-center gap-1.5">
+              <span className="bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 shadow-xs">
                 <span>แสดง:</span>
-                <strong className="text-amber-400 font-bold">{stats.total}</strong>
+                <strong className="text-amber-600 dark:text-amber-400 font-bold">{stats.total}</strong>
                 <span>แห่ง</span>
               </span>
 
-              <span className="bg-emerald-950/70 text-emerald-300 px-3 py-1 rounded-xl border border-emerald-800/40 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/40 flex items-center gap-1.5 shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>ปลอดภัย:</span>
                 <strong className="font-bold">{stats.safeCount}</strong>
               </span>
 
-              <span className="bg-amber-950/70 text-amber-300 px-3 py-1 rounded-xl border border-amber-800/40 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+              <span className="bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-xl border border-amber-200 dark:border-amber-800/40 flex items-center gap-1.5 shadow-xs">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 <span>เฝ้าระวัง:</span>
                 <strong className="font-bold">{stats.moderateCount}</strong>
               </span>
 
-              <span className="bg-rose-950/70 text-rose-300 px-3 py-1 rounded-xl border border-rose-800/40 flex items-center gap-1.5">
-                <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
+              <span className="bg-rose-50 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 px-3 py-1 rounded-xl border border-rose-200 dark:border-rose-800/40 flex items-center gap-1.5 shadow-xs">
+                <AlertOctagon className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                 <span>จุดเสี่ยง:</span>
                 <strong className="font-bold">{stats.riskCount}</strong>
               </span>
 
-              <span className="bg-blue-950/70 text-blue-300 px-3 py-1 rounded-xl border border-blue-800/40 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-blue-400" />
+              <span className="bg-blue-50 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-800/40 flex items-center gap-1.5 shadow-xs">
+                <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>เปิดบริการตอนนี้:</span>
                 <strong className="font-bold">{stats.currentlyOpenCount}</strong>
               </span>
@@ -338,7 +338,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
         {/* ==================================================== */}
         {/* 2. SEARCH & FILTER CONTROLS BAR */}
         {/* ==================================================== */}
-        <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-3.5 backdrop-blur-md shadow-xl">
+        <section className="bg-white/95 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3.5 backdrop-blur-md shadow-lg">
           {/* Search Input & Reset Button */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             <div className="relative flex-1">
@@ -348,7 +348,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                 placeholder="ค้นหาชื่อร้าน, เมนู, ย่าน (เช่น อารีย์, ทองหล่อ, BTS พญาไท, Drip, Matcha)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-slate-950 border-slate-700 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 rounded-xl h-10"
+                className="pl-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl h-10"
               />
             </div>
 
@@ -357,16 +357,16 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={handleResetFilters}
-              className="h-10 px-3 bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 shrink-0"
+              className="h-10 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white rounded-xl text-xs flex items-center gap-1.5 shrink-0"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+              <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
               <span>ล้างตัวกรอง</span>
             </Button>
           </div>
 
           {/* Category Selector Tabs */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs text-slate-400 font-medium px-1">
+            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium px-1">
               <span>หมวดหมู่สถานที่ (Category):</span>
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
@@ -385,7 +385,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   className={`text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap transition-all ${
                     selectedCategory === cat.id
                       ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20 scale-105'
-                      : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60'
+                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white border border-slate-200 dark:border-slate-700/60'
                   }`}
                 >
                   {cat.label}
@@ -396,7 +396,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
 
           {/* Zone Selector Tabs */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs text-slate-400 font-medium px-1">
+            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium px-1">
               <span>โซนพื้นที่ (Metropolitan Zone):</span>
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
@@ -413,7 +413,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   className={`text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap transition-all ${
                     selectedZone === zone.id
                       ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/20 scale-105'
-                      : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60'
+                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white border border-slate-200 dark:border-slate-700/60'
                   }`}
                 >
                   {zone.label}
@@ -423,11 +423,11 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
           </div>
 
           {/* Day & Time Filter Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-800/80">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-200 dark:border-slate-800/80">
             {/* Day Selector */}
             <div className="space-y-1.5">
-              <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-amber-500" />
                 <span>วันเปิดให้บริการ:</span>
               </span>
               <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
@@ -447,8 +447,8 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                     onClick={() => setSelectedDay(day.id as SelectedDayFilter)}
                     className={`text-xs px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all ${
                       selectedDay === day.id
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500 font-bold'
-                        : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                        ? 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500 font-bold'
+                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700/60'
                     }`}
                   >
                     {day.label}
@@ -459,8 +459,8 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
 
             {/* Time Period Selector */}
             <div className="space-y-1.5">
-              <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-amber-500" />
                 <span>ช่วงเวลาที่ต้องการไป:</span>
               </span>
               <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
@@ -479,8 +479,8 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                     }}
                     className={`text-xs px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all ${
                       !isCustomTimeActive && selectedTime === period.id
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500 font-bold'
-                        : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                        ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500 font-bold'
+                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700/60'
                     }`}
                   >
                     {period.label}
@@ -495,10 +495,10 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                     setCustomTimeInput(e.target.value);
                     setIsCustomTimeActive(true);
                   }}
-                  className={`text-xs bg-slate-950 border px-2 py-1 rounded-lg text-slate-200 ${
+                  className={`text-xs bg-slate-50 dark:bg-slate-950 border px-2 py-1 rounded-lg text-slate-800 dark:text-slate-200 ${
                     isCustomTimeActive
-                      ? 'border-emerald-500 ring-1 ring-emerald-500 text-emerald-300'
-                      : 'border-slate-700'
+                      ? 'border-emerald-500 ring-1 ring-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold'
+                      : 'border-slate-200 dark:border-slate-700'
                   }`}
                   title="ระบุเวลาเฉพาะเจาะจง"
                 />
@@ -507,7 +507,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
           </div>
 
           {/* Toggle Switches Row */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs">
             <div className="flex flex-wrap items-center gap-4">
               {/* Flood Safe Only Toggle */}
               <label className="flex items-center gap-2 cursor-pointer">
@@ -515,7 +515,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   checked={floodSafeOnly}
                   onCheckedChange={setFloodSafeOnly}
                 />
-                <span className={`font-medium ${floodSafeOnly ? 'text-emerald-300 font-bold' : 'text-slate-300'}`}>
+                <span className={`font-medium ${floodSafeOnly ? 'text-emerald-700 dark:text-emerald-300 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
                   🛡️ เฉพาะร้านที่ปลอดภัยจากน้ำท่วมเท่านั้น (Flood Safe Only)
                 </span>
               </label>
@@ -526,24 +526,24 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   checked={workFriendlyOnly}
                   onCheckedChange={setWorkFriendlyOnly}
                 />
-                <span className={`font-medium ${workFriendlyOnly ? 'text-sky-300 font-bold' : 'text-slate-300'}`}>
+                <span className={`font-medium ${workFriendlyOnly ? 'text-sky-700 dark:text-sky-300 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
                   ⚡ มีปลั๊ก & Wi-Fi พร้อมนั่งทำงาน
                 </span>
               </label>
             </div>
 
             {/* Live Overpass OSM Scraping Toggle */}
-            <label className="flex items-center gap-2 cursor-pointer bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-1.5">
+            <label className="flex items-center gap-2 cursor-pointer bg-slate-100/80 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5">
               <Switch
                 checked={enableOverpassScraping}
                 onCheckedChange={setEnableOverpassScraping}
               />
               <div className="flex items-center gap-1.5">
-                <span className={`font-medium ${enableOverpassScraping ? 'text-cyan-300 font-bold' : 'text-slate-400'}`}>
+                <span className={`font-medium ${enableOverpassScraping ? 'text-cyan-700 dark:text-cyan-300 font-bold' : 'text-slate-600 dark:text-slate-400'}`}>
                   🌐 ดึงข้อมูล OSM สด (Overpass Turbo Scraping)
                 </span>
                 {isScrapingLoading && (
-                  <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400 animate-spin" />
                 )}
               </div>
             </label>
@@ -580,13 +580,13 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
 
           {/* Sidebar Area (Right Column: 5 cols on Desktop) */}
           <div
-            className={`lg:col-span-5 flex flex-col h-[560px] lg:h-[720px] bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl ${
+            className={`lg:col-span-5 flex flex-col h-[560px] lg:h-[720px] bg-white/90 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl ${
               mobileView === 'map' ? 'hidden lg:flex' : 'flex'
             }`}
           >
             {/* Desktop Tabs Header (Venues List vs Typhoon AI Chat) */}
-            <div className="p-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <div className="p-2.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 shrink-0">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => {
@@ -596,7 +596,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   className={`text-xs px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
                     (mobileView === 'list' || desktopSidebarTab === 'list') && mobileView !== 'chat'
                       ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                   }`}
                 >
                   <List className="w-3.5 h-3.5" />
@@ -612,15 +612,15 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
                   className={`text-xs px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
                     mobileView === 'chat' || (desktopSidebarTab === 'chat' && mobileView !== 'list')
                       ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                   }`}
                 >
-                  <Bot className="w-3.5 h-3.5 text-cyan-300" />
+                  <Bot className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-300" />
                   <span>Typhoon AI Chat</span>
                 </button>
               </div>
 
-              <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono hidden sm:inline">
                 {stats.currentlyOpenCount} เปิดตอนนี้
               </span>
             </div>
@@ -696,14 +696,14 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
         {/* 4. MOBILE FLOATING BOTTOM NAVIGATION BAR */}
         {/* ==================================================== */}
         <div className="lg:hidden fixed bottom-4 inset-x-4 z-[9990] flex items-center justify-center pointer-events-none">
-          <div className="bg-slate-900/95 border border-slate-700/80 shadow-2xl rounded-full p-1.5 flex items-center gap-1 backdrop-blur-lg pointer-events-auto">
+          <div className="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700/80 shadow-2xl rounded-full p-1.5 flex items-center gap-1 backdrop-blur-lg pointer-events-auto">
             <button
               type="button"
               onClick={() => setMobileView('map')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 mobileView === 'map'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
-                  : 'text-slate-300 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
               }`}
             >
               <MapIcon className="w-3.5 h-3.5" />
@@ -716,7 +716,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 mobileView === 'list'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
-                  : 'text-slate-300 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
               }`}
             >
               <List className="w-3.5 h-3.5" />
@@ -729,10 +729,10 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                 mobileView === 'chat'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md font-bold'
-                  : 'text-slate-300 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
               }`}
             >
-              <Bot className="w-3.5 h-3.5 text-cyan-300" />
+              <Bot className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-300" />
               <span>AI Typhoon</span>
             </button>
           </div>

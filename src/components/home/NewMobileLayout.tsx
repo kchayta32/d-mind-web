@@ -29,6 +29,7 @@ import { useLanguage } from '@/contexts/LanguageProvider';
 import NewsCarousel from './NewsCarousel';
 import MapBanner from './MapBanner';
 import BangkokFloodBanner from './BangkokFloodBanner';
+import { BangkokCafeFloodBanner } from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
 import AppDownloadSection from './AppDownloadSection';
 import Footer from '@/components/layout/Footer';
@@ -354,6 +355,11 @@ const NewMobileLayout: React.FC = () => {
       {/* [NEW] Bangkok Road Flood & CCTV Banner Section */}
       <div className="px-2">
         <BangkokFloodBanner />
+      </div>
+
+      {/* [NEW] Bangkok Cafe & Bar Flood-Safe Radar Banner Section */}
+      <div className="px-2">
+        <BangkokCafeFloodBanner />
       </div>
 
       {/* App Download Section */}

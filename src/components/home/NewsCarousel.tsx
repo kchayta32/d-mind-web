@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3, Camera, AlertTriangle, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3, Camera, AlertTriangle, ArrowRight, Coffee, Bot, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ const NewsCarousel = () => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 30 });
     const [selectedIndex, setSelectedIndex] = useState(0);
     const navigate = useNavigate();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -179,6 +179,47 @@ const NewsCarousel = () => {
                         <Button onClick={() => navigate('/disaster-map')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-3.5">
                             <Map className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                             {t('newsCarousel.openMap')}
+                        </Button>
+                    </div>
+                </div>
+            )
+        },
+        {
+            id: 5,
+            badge: language === 'en' ? '☕ MONSOON RADAR' : '☕ เรดาร์มรสุม กทม.',
+            title: language === 'en' ? 'Bangkok Cafe & Bar Flood Radar' : 'เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม.',
+            subtitle: language === 'en' ? 'Specialty Coffee, Matcha & Bars Open Safe from Floods' : 'ค้นหาร้านกาแฟ มัทฉะ บาร์ และ Co-working space ที่เปิดให้บริการ ปลอดภัยจากน้ำท่วม',
+            description: language === 'en'
+                ? 'Check 60+ verified specialty venues open by day & time across Bangkok & perimeter. Live correlation with flooded road telemetry & Typhoon AI concierge.'
+                : 'ค้นหาร้านกาแฟ Specialty, มัทฉะแท้, ค็อกเทลบาร์ กว่า 60 แห่ง ที่เปิดให้บริการตามวันเวลาที่คุณเลือก พร้อมวิเคราะห์ความปลอดภัยจากน้ำท่วมถนน กทม. ชั้นใน นอก ฝั่งธนฯ และปริมณฑล ด้วยพลัง Typhoon AI',
+            bgImage: '/images/hero-background.png',
+            content: (
+                <div className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-4">
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Coffee className="w-5 h-5 text-amber-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">67+ คาเฟ่ & บาร์</h4>
+                            <p className="text-[10px] sm:text-xs text-amber-100 mt-0.5 line-clamp-2">ครอบคลุม 4 โซนรอบกรุงเทพฯ</p>
+                        </div>
+                        <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <ShieldCheck className="w-5 h-5 text-emerald-400 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">ตรวจความปลอดภัย</h4>
+                            <p className="text-[10px] sm:text-xs text-emerald-100 mt-0.5 line-clamp-2">เทียบระดับน้ำท่วมถนนเรียลไทม์</p>
+                        </div>
+                        <div className="col-span-2 sm:col-span-1 p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
+                            <Bot className="w-5 h-5 text-cyan-300 mb-1.5" />
+                            <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">Typhoon AI Barista</h4>
+                            <p className="text-[10px] sm:text-xs text-cyan-100 mt-0.5 line-clamp-2">ผู้ช่วยแนะนำร้าน & เส้นทางเลี่ยงฝน</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                        <Button onClick={() => navigate('/cafe-flood-map')} className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-extrabold shadow-lg shadow-amber-500/20 border border-white/20 transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-4">
+                            <Coffee className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                            {language === 'en' ? 'Open Cafe Radar' : 'สำรวจเรดาร์คาเฟ่ & บาร์'}
+                        </Button>
+                        <Button onClick={() => navigate('/bangkok-flood')} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 font-semibold transition-all hover:scale-105 rounded-xl text-xs sm:text-sm h-9 sm:h-10 px-3.5">
+                            <Waves className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 text-cyan-400" />
+                            {language === 'en' ? 'BKK Road Floods' : 'แผนที่น้ำท่วมถนน กทม.'}
                         </Button>
                     </div>
                 </div>

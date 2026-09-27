@@ -229,3 +229,69 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ===== Leaflet Map Custom Tooltips & Popups (Dual-Theme & High Contrast) ===== */
+.leaflet-tooltip {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(71, 85, 105, 0.7) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  padding: 8px 12px !important;
+  font-family: inherit !important;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(15, 23, 42, 0.96) !important;
+}
+.leaflet-tooltip-bottom:before {
+  border-bottom-color: rgba(15, 23, 42, 0.96) !important;
+}
+.leaflet-tooltip-left:before {
+  border-left-color: rgba(15, 23, 42, 0.96) !important;
+}
+.leaflet-tooltip-right:before {
+  border-right-color: rgba(15, 23, 42, 0.96) !important;
+}
+
+/* Dedicated Leaflet Dark Tooltip for Road Flood & Cafe popups */
+.leaflet-dark-tooltip {
+  background-color: #0b1329 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6) !important;
+}
+.leaflet-dark-tooltip:before {
+  border-top-color: #0b1329 !important;
+  border-bottom-color: #0b1329 !important;
+  border-left-color: #0b1329 !important;
+  border-right-color: #0b1329 !important;
+}
+
+/* Leaflet Popups */
+.leaflet-popup-content-wrapper {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(71, 85, 105, 0.6) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-tip {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  border: 1px solid rgba(71, 85, 105, 0.6) !important;
+}
+
+.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 8px !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #38bdf8 !important;
+}

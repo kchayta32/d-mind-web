@@ -8,6 +8,7 @@ import { BangkokFloodControls } from '@/components/bangkok-flood/BangkokFloodCon
 import { BangkokFloodStats } from '@/components/bangkok-flood/BangkokFloodStats';
 import { BangkokCctvModal } from '@/components/bangkok-flood/BangkokCctvModal';
 import { BangkokRoadDetailModal } from '@/components/bangkok-flood/BangkokRoadDetailModal';
+import { BangkokFloodTyphoonConcierge } from '@/components/bangkok-flood/BangkokFloodTyphoonConcierge';
 import { 
   BANGKOK_ROAD_SEGMENTS, 
   BANGKOK_CANAL_STATIONS 
@@ -50,7 +51,8 @@ import {
   ChevronDown,
   ChevronUp,
   Heart,
-  Radio
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import { EMERGENCY_CONTACTS_DATA } from '@/pages/EmergencyContacts';
 
@@ -81,6 +83,9 @@ export const BangkokFloodMapPage: React.FC = () => {
   // Map Target Focus
   const [focusTarget, setFocusTarget] = useState<[number, number] | null>(null);
   const [focusZoom, setFocusZoom] = useState<number>(14);
+
+  // Typhoon AI Concierge Question State
+  const [typhoonInitialQuestion, setTyphoonInitialQuestion] = useState<string>('');
 
   // Live BMA Open Data CCTV state
   const [bmaDataGoThCameras, setBmaDataGoThCameras] = useState<BangkokCctvCamera[]>([]);
@@ -260,7 +265,7 @@ export const BangkokFloodMapPage: React.FC = () => {
               </div>
 
               {/* Quick Actions & Live Timestamp */}
-              <div className="flex md:flex-col items-center md:items-end justify-between gap-2 flex-shrink-0">
+              <div className="flex md:flex-col items-center md:items-end justify-between gap-2.5 flex-shrink-0">
                 <div className="text-right text-xs text-blue-200">
                   <span>ข้อมูลอัปเดตล่าสุด</span>
                   <div className="font-mono font-bold text-white text-sm">
@@ -268,15 +273,28 @@ export const BangkokFloodMapPage: React.FC = () => {
                   </div>
                 </div>
 
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleRefreshData}
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-md text-xs font-semibold h-9 rounded-xl"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                  รีเฟรชข้อมูล
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs h-9 rounded-xl shadow-lg border border-amber-300/40 transition-all hover:scale-105"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 mr-1 text-slate-950" />
+                    ถาม Typhoon AI
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleRefreshData}
+                    className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-md text-xs font-semibold h-9 rounded-xl"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                    รีเฟรชข้อมูล
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -445,7 +463,19 @@ export const BangkokFloodMapPage: React.FC = () => {
 
           </div>
 
-          {/* 6. Emergency Contacts & Flood Hotlines Section */}
+          {/* 6. Typhoon AI Flood & Traffic Routing Concierge Flagship Section */}
+          <div id="typhoon-ai-concierge" className="scroll-mt-20">
+            <BangkokFloodTyphoonConcierge
+              roads={BANGKOK_ROAD_SEGMENTS}
+              cctvs={allCctvs}
+              initialQuestion={typhoonInitialQuestion}
+              onSelectRoadByName={(roadName) => {
+                handleViewRoadOnMapFromCctv(roadName);
+              }}
+            />
+          </div>
+
+          {/* 7. Emergency Contacts & Flood Hotlines Section */}
           <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-md space-y-4">
             
             {/* Header with User Quote */}
@@ -648,7 +678,7 @@ export const BangkokFloodMapPage: React.FC = () => {
         </div>
       </main>
 
-      {/* 7. Modals */}
+      {/* 8. Modals */}
       {/* Road Detail Modal */}
       <BangkokRoadDetailModal
         road={selectedRoad}
@@ -660,6 +690,12 @@ export const BangkokFloodMapPage: React.FC = () => {
           setFocusTarget(center);
           if (zoom) setFocusZoom(zoom);
         }}
+        onAskTyphoonAboutRoad={(road) => {
+          setTyphoonInitialQuestion(`ขอวิเคราะห์ถนน ${road.name} (เขต${road.district}) ระดับน้ำท่วมขัง ${road.waterLevelCm} ซม. ท่วม ${road.lanesAffected} เลน รถยนต์แต่ละประเภทผ่านได้ไหม และมีเส้นทางเลี่ยงไหนแนะนำบ้าง?`);
+          setTimeout(() => {
+            document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        }}
       />
 
       {/* CCTV Live Stream Modal */}
@@ -668,7 +704,27 @@ export const BangkokFloodMapPage: React.FC = () => {
         isOpen={isCctvModalOpen}
         onClose={() => setIsCctvModalOpen(false)}
         onViewRoadOnMap={handleViewRoadOnMapFromCctv}
+        onAskTyphoonAboutCctv={(cctv) => {
+          setTyphoonInitialQuestion(`ช่วยวิเคราะห์กล้อง CCTV จุด ${cctv.name} ถนน ${cctv.road} (ระดับน้ำ ${cctv.waterLevelCm || 0} ซม.) รถแต่ละประเภทผ่านได้ไหม และควรใช้เส้นทางใดหลบน้ำท่วม?`);
+          setTimeout(() => {
+            document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        }}
       />
+
+      {/* Floating Typhoon AI Quick Action Pill */}
+      <div className="fixed bottom-6 right-6 z-40 hidden sm:block">
+        <Button
+          onClick={() => {
+            document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="rounded-full shadow-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs h-11 px-4 border border-white/20 flex items-center gap-2 group hover:scale-105 transition-all"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span className="text-base">🌪️</span>
+          <span>ปรึกษา Typhoon AI หลบน้ำท่วม</span>
+        </Button>
+      </div>
 
     </div>
   );

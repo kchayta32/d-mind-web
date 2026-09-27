@@ -437,17 +437,21 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
                 }}
               >
                 <Tooltip sticky className="leaflet-dark-tooltip">
-                  <div className="p-1 space-y-1 text-xs">
-                    <p className="font-bold text-slate-100 flex items-center gap-1">
-                      <Waves className="w-3.5 h-3.5 text-cyan-400" />
-                      {road.name}
+                  <div className="p-1.5 space-y-1.5 text-xs min-w-[210px]">
+                    <p className="font-bold text-white flex items-center gap-1.5 text-sm drop-shadow-sm">
+                      <Waves className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>{road.name}</span>
                     </p>
-                    <p className="text-[11px] text-slate-300">
-                      ระดับน้ำ: <strong>{road.waterLevelCm} ซม.</strong> ({road.district})
+                    <p className="text-xs text-slate-200 flex items-center gap-1">
+                      <span>ระดับน้ำ:</span>
+                      <strong className="text-cyan-300 font-extrabold text-sm">{road.waterLevelCm} ซม.</strong>
+                      <span className="text-slate-400">({road.district})</span>
                     </p>
                     <p
-                      className={`text-[10px] font-semibold ${
-                        road.passable.smallCar ? 'text-amber-400' : 'text-rose-400'
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
+                        road.passable.smallCar 
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                       }`}
                     >
                       {road.passable.smallCar
@@ -476,22 +480,22 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
               }}
             >
               <Popup className="leaflet-dark-popup" maxWidth={280}>
-                <div className="p-1 text-slate-900 dark:text-slate-100 space-y-2">
+                <div className="p-1.5 text-slate-100 space-y-2">
                   {/* Popup Header */}
                   <div>
                     <div className="flex items-center justify-between gap-1 text-[11px] mb-0.5">
-                      <span className="font-semibold text-amber-600 dark:text-amber-400">
+                      <span className="font-bold text-amber-400 tracking-wide">
                         {venue.category.toUpperCase()} • {venue.zone.toUpperCase()}
                       </span>
-                      <span className="font-bold flex items-center gap-0.5">
+                      <span className="font-bold text-slate-200 flex items-center gap-0.5">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400 inline" />
                         {venue.rating.toFixed(1)}
                       </span>
                     </div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 line-clamp-1">
+                    <h4 className="font-bold text-sm text-white line-clamp-1">
                       {venue.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                    <p className="text-[11px] text-slate-300 line-clamp-1">
                       {venue.nameEn}
                     </p>
                   </div>
@@ -501,15 +505,15 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
                     <div
                       className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold ${
                         venue.floodRisk === 'safe'
-                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                           : venue.floodRisk === 'moderate'
-                          ? 'bg-amber-500/15 text-amber-600 dark:text-amber-300'
-                          : 'bg-rose-500/15 text-rose-600 dark:text-rose-300'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                       }`}
                     >
-                      {venue.floodRisk === 'safe' && <ShieldCheck className="w-3.5 h-3.5" />}
-                      {venue.floodRisk === 'moderate' && <AlertTriangle className="w-3.5 h-3.5" />}
-                      {venue.floodRisk === 'risk' && <AlertOctagon className="w-3.5 h-3.5" />}
+                      {venue.floodRisk === 'safe' && <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />}
+                      {venue.floodRisk === 'moderate' && <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />}
+                      {venue.floodRisk === 'risk' && <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />}
                       <span>
                         {venue.floodRisk === 'safe'
                           ? 'ปลอดภัยจากน้ำท่วม'
@@ -519,8 +523,8 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400">
-                      <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-1 text-[11px] text-slate-300">
+                      <Clock className="w-3 h-3 text-slate-400" />
                       <span>{venue.openingHoursText}</span>
                     </div>
                   </div>

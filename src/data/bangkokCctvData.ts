@@ -23,6 +23,7 @@ export interface BangkokCctvCamera {
   coordinates: [number, number]; // [latitude, longitude]
   snapshotUrl: string;
   liveStreamUrl?: string;
+  youtubeVideoId?: string; // Real-time Bangkok traffic live stream webcam
   status: CctvStatus;
   floodSeverity: FloodSeverity;
   agency: CctvAgency;
@@ -31,22 +32,23 @@ export interface BangkokCctvCamera {
   waterLevelCm?: number;
   description?: string;
   fallbackSnapshotUrl?: string;
+  officialPortalUrl?: string;
 }
 
 // Curated high-reliability snapshot photos representing authentic Bangkok traffic & street surveillance
 const SNAPSHOT_PRESETS = [
-  'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=800&q=80', // Bangkok elevated highway & expressway traffic
-  'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80', // Urban traffic intersection
-  'https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=800&q=80', // Wet asphalt road with rain
-  'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80', // Highway lanes with vehicles
-  'https://images.unsplash.com/photo-1494783367193-149034c05e8f?auto=format&fit=crop&w=800&q=80', // Rain on roadway asphalt
-  'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=800&q=80', // Overhead traffic bridge surveillance angle
-  'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=800&q=80', // Traffic junction road markings
-  'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80', // Wet highway reflective road surface
-  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80', // Roadway monitoring surveillance perspective
-  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80', // Bangkok avenue traffic flow
-  'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80', // Rainy highway road conditions
-  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80'  // City road traffic
+  'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1080&q=80', // Bangkok Sukhumvit evening traffic with skywalk
+  'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1080&q=80', // Bangkok road intersection traffic
+  'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1080&q=80', // High-angle expressway interchange
+  'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1080&q=80', // Urban traffic flow surveillance
+  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1080&q=80', // Rainy city street & traffic reflections
+  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1080&q=80', // Bangkok avenue traffic flow
+  'https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=1080&q=80', // Wet road reflections & rain puddles
+  'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1080&q=80', // Traffic roadway overhead perspective
+  'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1080&q=80', // Highway lanes with vehicles
+  'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1080&q=80', // Traffic junction surveillance
+  'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1080&q=80', // Overhead bridge traffic
+  'https://images.unsplash.com/photo-1494783367193-149034c05e8f?auto=format&fit=crop&w=1080&q=80'  // Rain on roadway asphalt
 ];
 
 export const BANGKOK_CCTV_CAMERAS: BangkokCctvCamera[] = [

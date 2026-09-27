@@ -23,7 +23,8 @@ import {
   MapPin, 
   Info,
   Activity,
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { BangkokRoadSegment } from '@/types/bangkokFlood';
 import { BangkokCctvCamera } from '@/data/bangkokCctvData';
@@ -35,6 +36,7 @@ export interface BangkokRoadDetailModalProps {
   onOpenCctv: (cctvId: string) => void;
   cctvs?: BangkokCctvCamera[];
   onFocusOnMap?: (center: [number, number], zoom?: number) => void;
+  onAskTyphoonAboutRoad?: (road: BangkokRoadSegment) => void;
 }
 
 const ZONE_LABELS: Record<string, string> = {
@@ -50,7 +52,8 @@ export const BangkokRoadDetailModal: React.FC<BangkokRoadDetailModalProps> = ({
   onClose,
   onOpenCctv,
   cctvs = [],
-  onFocusOnMap
+  onFocusOnMap,
+  onAskTyphoonAboutRoad
 }) => {
   if (!road) return null;
 
@@ -362,7 +365,7 @@ export const BangkokRoadDetailModal: React.FC<BangkokRoadDetailModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+        <div className="p-4 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <Button
             variant="outline"
             size="sm"
@@ -372,19 +375,36 @@ export const BangkokRoadDetailModal: React.FC<BangkokRoadDetailModalProps> = ({
             ปิดหน้าต่าง
           </Button>
 
-          {onFocusOnMap && (
-            <Button
-              size="sm"
-              onClick={() => {
-                onFocusOnMap(roadCenter, 14);
-                onClose();
-              }}
-              className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm"
-            >
-              <Navigation className="w-3.5 h-3.5 mr-1.5" />
-              เลื่อนไปดูจุดนี้บนแผนที่
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {onAskTyphoonAboutRoad && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onAskTyphoonAboutRoad(road);
+                  onClose();
+                }}
+                className="text-xs border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/60"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1.5 text-indigo-500" />
+                ขอคำแนะนำหลบเส้นทางนี้ (Typhoon AI)
+              </Button>
+            )}
+
+            {onFocusOnMap && (
+              <Button
+                size="sm"
+                onClick={() => {
+                  onFocusOnMap(roadCenter, 14);
+                  onClose();
+                }}
+                className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm"
+              >
+                <Navigation className="w-3.5 h-3.5 mr-1.5" />
+                ดูบนแผนที่
+              </Button>
+            )}
+          </div>
         </div>
 
       </DialogContent>

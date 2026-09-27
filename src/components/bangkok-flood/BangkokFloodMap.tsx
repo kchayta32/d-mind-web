@@ -449,24 +449,24 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
                 }
               }}
             >
-              <Tooltip sticky direction="top">
-                <div className="font-sans text-xs min-w-[210px] p-0.5">
-                  <div className="flex items-center justify-between gap-2 border-b pb-1 mb-1">
-                    <span className="font-bold text-slate-800 dark:text-slate-100">{road.name}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                      road.status === 'critical' ? 'bg-red-100 text-red-700' :
-                      road.status === 'warning' ? 'bg-amber-100 text-amber-700' :
-                      'bg-emerald-100 text-emerald-700'
+              <Tooltip sticky direction="top" className="leaflet-dark-tooltip">
+                <div className="font-sans text-xs min-w-[220px] p-1 space-y-1">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-1">
+                    <span className="font-bold text-white text-sm">{road.name}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      road.status === 'critical' ? 'bg-rose-500/25 text-rose-300 border border-rose-500/40' :
+                      road.status === 'warning' ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' :
+                      'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40'
                     }`}>
                       {road.status === 'critical' ? '🔴 วิกฤต' : road.status === 'warning' ? '🟠 ระวัง' : '🟢 ปกติ'}
                     </span>
                   </div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-                    <div>ระดับน้ำ: <b className="text-blue-600 font-bold">{road.waterLevelCm} ซม.</b></div>
-                    <div className="truncate">ผลกระทบ: ท่วม {road.lanesAffected} เลน</div>
-                    <div className="text-[10px] text-slate-500 pt-0.5 flex items-center justify-between">
+                  <div className="text-[11px] text-slate-200 space-y-0.5">
+                    <div>ระดับน้ำ: <b className="text-cyan-300 font-extrabold text-sm">{road.waterLevelCm} ซม.</b></div>
+                    <div className="text-slate-300">ผลกระทบ: ท่วม {road.lanesAffected} เลน</div>
+                    <div className="text-[10px] text-slate-400 pt-0.5 flex items-center justify-between">
                       <span>เขต{road.district}</span>
-                      <span className="text-blue-600 font-medium">คลิกดูรายงาน &rarr;</span>
+                      <span className="text-sky-300 font-semibold">คลิกดูรายงาน &rarr;</span>
                     </div>
                   </div>
                 </div>
@@ -491,23 +491,23 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
                 }
               }}
             >
-              <Tooltip direction="top" offset={[0, -12]}>
-                <div className="font-sans text-xs p-1 min-w-[190px]">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-100 mb-0.5">
-                    <Camera className="w-3.5 h-3.5 text-blue-500" />
+              <Tooltip direction="top" offset={[0, -12]} className="leaflet-dark-tooltip">
+                <div className="font-sans text-xs p-1 min-w-[200px] space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-white mb-0.5">
+                    <Camera className="w-3.5 h-3.5 text-sky-400" />
                     <span>{cctv.name}</span>
                   </div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300">
+                  <div className="text-[11px] text-slate-300">
                     ถนน: {cctv.road}
                   </div>
-                  <div className="text-[10px] text-slate-500">
+                  <div className="text-[10px] text-slate-400">
                     ทิศทาง: {cctv.facingDirection}
                   </div>
-                  <div className="flex items-center justify-between text-[10px] mt-1 pt-1 border-t border-slate-200 dark:border-slate-700">
-                    <span className="text-blue-600 font-semibold">
+                  <div className="flex items-center justify-between text-[10px] mt-1 pt-1 border-t border-slate-700">
+                    <span className="text-cyan-300 font-bold">
                       {cctv.waterLevelCm ? `ระดับน้ำ ${cctv.waterLevelCm} ซม.` : 'พร้อมใช้งาน'}
                     </span>
-                    <span className="text-indigo-600 font-medium">คลิกดูภาพสด &rarr;</span>
+                    <span className="text-sky-300 font-semibold">คลิกดูภาพสด &rarr;</span>
                   </div>
                 </div>
               </Tooltip>
@@ -530,15 +530,15 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
                 }
               }}
             >
-              <Tooltip direction="top" offset={[0, -12]}>
-                <div className="font-sans text-xs p-1 min-w-[210px]">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-100 mb-0.5">
-                    <Waves className="w-3.5 h-3.5 text-cyan-500" />
+              <Tooltip direction="top" offset={[0, -12]} className="leaflet-dark-tooltip">
+                <div className="font-sans text-xs p-1 min-w-[220px] space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-white mb-0.5">
+                    <Waves className="w-3.5 h-3.5 text-cyan-400" />
                     <span>{station.name}</span>
                   </div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-                    <div>ระดับน้ำ: <b className="text-cyan-600 font-bold">{station.waterLevelMsl > 0 ? `+${station.waterLevelMsl}` : station.waterLevelMsl} ม.รทก.</b> (วิกฤต: +{station.criticalLevelMsl})</div>
-                    <div>เครื่องสูบน้ำ: <b>{station.pumpsRunning}/{station.totalPumps} เครื่อง</b> ({station.flowRateM3s} ลบ.ม./วินาที)</div>
+                  <div className="text-[11px] text-slate-200 space-y-0.5">
+                    <div>ระดับน้ำ: <b className="text-cyan-300 font-bold">{station.waterLevelMsl > 0 ? `+${station.waterLevelMsl}` : station.waterLevelMsl} ม.รทก.</b> (วิกฤต: +{station.criticalLevelMsl})</div>
+                    <div className="text-slate-300">เครื่องสูบน้ำ: <b>{station.pumpsRunning}/{station.totalPumps} เครื่อง</b> ({station.flowRateM3s} ลบ.ม./วินาที)</div>
                     <div className="text-[10px] text-slate-400 pt-0.5">
                       สถานะ: {station.status === 'critical' ? '🔴 สูบระบายเต็มกำลัง' : station.status === 'warning' ? '🟠 เฝ้าระวัง' : '🟢 ปกติ'}
                     </div>
