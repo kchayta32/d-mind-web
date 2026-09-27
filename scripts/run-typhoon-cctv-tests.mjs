@@ -30,12 +30,12 @@ const dataGoThFile = fs.readFileSync('src/services/dataGoThService.ts', 'utf8');
 assert(!dataGoThFile.includes('photo-1545459720-aac8509eb02c'), 'ROAD_SNAPSHOT_POOL does not contain parking lot photo');
 assert(dataGoThFile.includes('BMA_STREAM_IDS'), 'data.go.th service assigns live stream IDs');
 
-// 3. Verify BangkokCctvModal
+// 3. Verify BangkokCctvModal (Maintenance Mode & YouTube Stream Removed)
 const cctvModalFile = fs.readFileSync('src/components/bangkok-flood/BangkokCctvModal.tsx', 'utf8');
-assert(cctvModalFile.includes('iframe'), 'BangkokCctvModal renders iframe for live video');
-assert(cctvModalFile.includes('BANGKOK_LIVE_CHANNELS'), 'BangkokCctvModal has Bangkok live webcam channels');
-assert(cctvModalFile.includes('activeTab'), 'BangkokCctvModal supports switching between stream and snapshot');
-assert(cctvModalFile.includes('GIhc9Fm1OJU'), 'BangkokCctvModal includes Asoke 24/7 Live Stream channel');
+assert(!cctvModalFile.includes('<iframe'), 'BangkokCctvModal has YouTube live stream iframe completely removed');
+assert(!cctvModalFile.includes('BANGKOK_LIVE_CHANNELS'), 'BangkokCctvModal does not contain YouTube webcam channels');
+assert(cctvModalFile.includes('ระบบกล้องวงจรปิด (CCTV) กำลังอยู่ระหว่างการปรับปรุงแก้ไข'), 'BangkokCctvModal displays clear CCTV maintenance notice');
+assert(cctvModalFile.includes('MAINTENANCE MODE'), 'BangkokCctvModal indicates MAINTENANCE MODE in telemetry');
 assert(cctvModalFile.includes('onAskTyphoonAboutCctv'), 'BangkokCctvModal connects to Typhoon AI concierge');
 assert(cctvModalFile.includes('http://www.bmatraffic.com/index.aspx'), 'BangkokCctvModal links to official BMA traffic portal');
 
@@ -53,12 +53,24 @@ assert(conciergeFile.includes('QUICK_PROMPT_CHIPS'), 'Typhoon Concierge defines 
 assert(conciergeFile.includes('selectedVehicle'), 'Typhoon Concierge allows selecting vehicle profile');
 assert(conciergeFile.includes('askTyphoonFloodConcierge'), 'Typhoon Concierge calls Typhoon service');
 
-// 6. Verify BangkokFloodMapPage Integration
+// 6. Verify BangkokFloodMapPage & Map Overlap Fixes
 const floodPageFile = fs.readFileSync('src/pages/BangkokFloodMapPage.tsx', 'utf8');
 assert(floodPageFile.includes('BangkokFloodTyphoonConcierge'), 'BangkokFloodMapPage imports Typhoon Concierge');
 assert(floodPageFile.includes('typhoon-ai-concierge'), 'BangkokFloodMapPage renders Typhoon Concierge section');
+assert(floodPageFile.includes('useState(false)'), 'BangkokFloodMapPage defaults showCctvLayer to false');
 assert(floodPageFile.includes('onAskTyphoonAboutRoad'), 'BangkokFloodMapPage wires road detail modal to Typhoon AI');
 assert(floodPageFile.includes('onAskTyphoonAboutCctv'), 'BangkokFloodMapPage wires CCTV modal to Typhoon AI');
+
+// 7. Verify Map Overlap Prevention (Stacking Context Isolation & Zoom Control)
+const bkkMapFile = fs.readFileSync('src/components/bangkok-flood/BangkokFloodMap.tsx', 'utf8');
+assert(bkkMapFile.includes('relative isolate'), 'BangkokFloodMap container has CSS isolation: isolate');
+assert(bkkMapFile.includes('zoomControl={false}'), 'BangkokFloodMap disables default top-left zoom control');
+assert(bkkMapFile.includes('ZoomControl position="bottomright"'), 'BangkokFloodMap moves zoom control to bottomright');
+
+const cafeMapFile = fs.readFileSync('src/components/cafe-flood/CafeFloodMap.tsx', 'utf8');
+assert(cafeMapFile.includes('relative isolate'), 'CafeFloodMap container has CSS isolation: isolate');
+assert(cafeMapFile.includes('zoomControl={false}'), 'CafeFloodMap disables default top-left zoom control');
+assert(cafeMapFile.includes('ZoomControl position="bottomright"'), 'CafeFloodMap moves zoom control to bottomright');
 
 // 7. Verify Index CSS Tooltip & Popup Contrast Overrides
 const cssFile = fs.readFileSync('src/index.css', 'utf8');

@@ -84,7 +84,7 @@ const Navbar: React.FC = () => {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm border-b border-white/10"
+                className="fixed top-0 left-0 right-0 z-[9990] bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md shadow-md border-b border-white/10"
             >
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     {/* Logo Area */}

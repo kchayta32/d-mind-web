@@ -169,14 +169,14 @@ export const BangkokFloodStats: React.FC<BangkokFloodStatsProps> = ({
         </div>
       </div>
 
-      {/* 4. Ready CCTV Cameras */}
-      <div className="relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      {/* 4. Ready CCTV Cameras (Maintenance Mode) */}
+      <div className="relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-900 border border-amber-200/60 dark:border-amber-950/60 shadow-sm">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            กล้อง CCTV พร้อมใช้งาน
+          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            กล้อง CCTV (ปิดปรับปรุงระบบ)
           </span>
-          <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
             <Camera className="w-4 h-4" />
           </div>
         </div>
@@ -184,18 +184,18 @@ export const BangkokFloodStats: React.FC<BangkokFloodStatsProps> = ({
         <div className="mt-3 flex items-baseline justify-between">
           <div className="flex items-baseline gap-1.5">
             <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              {onlineCctvs.length}
+              {cctvs.length}
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/{cctvs.length} จุด</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">จุดติดตั้ง</span>
           </div>
-          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-900">
-            ออนไลน์ {Math.round((onlineCctvs.length / Math.max(1, cctvs.length)) * 100)}%
+          <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+            กำลังปรับปรุงแก้ไข
           </span>
         </div>
 
         <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-          <span>สตรีมสด/ภาพนิ่งจราจร</span>
-          <span className="text-blue-500 font-medium">BMA Surveillance</span>
+          <span>ปรับปรุงการเชื่อมต่อสัญญาณ</span>
+          <span className="text-amber-600 dark:text-amber-400 font-medium">BMA Maintenance</span>
         </div>
       </div>
 

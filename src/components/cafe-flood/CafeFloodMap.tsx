@@ -6,7 +6,8 @@ import {
   Popup, 
   Polyline, 
   Tooltip, 
-  useMap 
+  useMap,
+  ZoomControl 
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -298,10 +299,10 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
   return (
     <div
       id="cafe-flood-map-wrapper"
-      className={`relative w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl flex flex-col ${className}`}
+      className={`relative isolate w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl flex flex-col ${className}`}
     >
       {/* Top Map Floating Toolbar */}
-      <div className="absolute top-3 inset-x-3 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+      <div className="absolute top-3 inset-x-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Left Badges: Venue Count & Legend */}
         <div className="flex items-center gap-2 pointer-events-auto">
           <Badge
@@ -383,7 +384,7 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
       </div>
 
       {/* Floating Bottom Left Legend */}
-      <div className="absolute bottom-3 left-3 z-[1000] hidden sm:flex items-center gap-3 bg-slate-950/90 border border-slate-800/90 rounded-xl px-3 py-1.5 text-[11px] text-slate-300 backdrop-blur-md shadow-xl pointer-events-auto">
+      <div className="absolute bottom-3 left-3 z-20 hidden sm:flex items-center gap-3 bg-slate-950/90 border border-slate-800/90 rounded-xl px-3 py-1.5 text-[11px] text-slate-300 backdrop-blur-md shadow-xl pointer-events-auto">
         <span className="font-semibold text-slate-400">สถานะน้ำท่วม:</span>
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
@@ -403,10 +404,14 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
       <MapContainer
         center={BANGKOK_CENTER}
         zoom={DEFAULT_ZOOM}
+        zoomControl={false}
         scrollWheelZoom={true}
         className="w-full h-full z-0"
         style={{ background: '#020617' }}
       >
+        {/* Bottom-right zoom control avoids top bar collision */}
+        <ZoomControl position="bottomright" />
+
         <TileLayer
           url={MAP_TILES[tileStyle].url}
           attribution={MAP_TILES[tileStyle].attribution}

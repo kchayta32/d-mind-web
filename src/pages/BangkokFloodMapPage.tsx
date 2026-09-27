@@ -64,8 +64,8 @@ export const BangkokFloodMapPage: React.FC = () => {
   const [selectedZone, setSelectedZone] = useState<BangkokZone>('all');
   const [selectedSeverity, setSelectedSeverity] = useState<BangkokSeverity>('all');
 
-  // Layer Toggles
-  const [showCctvLayer, setShowCctvLayer] = useState(true);
+  // Layer Toggles (CCTV defaulted to false for clean map & maintenance mode)
+  const [showCctvLayer, setShowCctvLayer] = useState(false);
   const [showCanalPumpsLayer, setShowCanalPumpsLayer] = useState(true);
   const [showSentinelSarLayer, setShowSentinelSarLayer] = useState(true);
 
@@ -230,7 +230,7 @@ export const BangkokFloodMapPage: React.FC = () => {
       <Navbar />
 
       {/* Main Content Area */}
-      <main className="flex-1 pt-16 pb-12">
+      <main className="flex-1 pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
           
           {/* 2. Live Announcement & Header Banner */}
@@ -243,14 +243,14 @@ export const BangkokFloodMapPage: React.FC = () => {
                     เฝ้าระวังน้ำท่วมขัง กทม.
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-mono text-blue-100">
-                    BMA Smart Drainage & CCTV
+                    BMA Smart Drainage
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-mono text-sky-200">
                     🛰️ Sentinel-1 SAR Overpass
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/30 border border-emerald-400/40 backdrop-blur-md text-xs font-medium text-emerald-200 flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    🏛️ เชื่อมต่อข้อมูลกล้อง BMA Open Data ({bmaDataGoThCameras.length > 0 ? `${bmaDataGoThCameras.length} จุด` : 'data.go.th'})
+                  <span className="px-2.5 py-1 rounded-full bg-amber-500/30 border border-amber-400/40 backdrop-blur-md text-xs font-medium text-amber-200 flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    🔧 ระบบกล้อง CCTV อยู่ระหว่างปรับปรุงแก้ไข
                   </span>
                 </div>
 

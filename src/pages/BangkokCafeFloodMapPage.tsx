@@ -254,7 +254,7 @@ export const BangkokCafeFloodMapPage: React.FC = () => {
       <Navbar />
 
       {/* Main Container */}
-      <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-3 sm:px-4 lg:px-6 py-4 space-y-4">
+      <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-3 sm:px-4 lg:px-6 pt-20 pb-12 space-y-4">
         {/* ==================================================== */}
         {/* 1. HERO / HEADER BANNER */}
         {/* ==================================================== */}

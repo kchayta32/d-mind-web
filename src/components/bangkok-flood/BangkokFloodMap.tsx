@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Tooltip, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline, Marker, Tooltip, GeoJSON, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
@@ -269,10 +269,10 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
   };
 
   return (
-    <div className={`relative w-full h-[620px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-slate-900 ${isFullscreen ? 'fixed inset-0 z-50 h-screen w-screen rounded-none' : ''} ${className}`}>
+    <div className={`relative isolate w-full h-[620px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-slate-900 ${isFullscreen ? 'fixed inset-0 z-50 h-screen w-screen rounded-none' : ''} ${className}`}>
       
       {/* Top Floating Map Controls */}
-      <div className="absolute top-3 left-3 z-[1000] flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-md text-xs">
+      <div className="absolute top-3 left-3 z-20 flex flex-wrap items-center gap-1.5 sm:gap-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-md text-xs">
         <span className="font-semibold px-2 text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
           <Layers className="w-3.5 h-3.5 text-blue-500" />
           <span className="hidden sm:inline">แผนที่ฐาน:</span>
@@ -310,7 +310,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
       </div>
 
       {/* Top Right Quick Actions */}
-      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-2">
+      <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
         <Button
           variant="secondary"
           size="sm"
@@ -333,7 +333,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
       </div>
 
       {/* Bottom Floating Legend */}
-      <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg text-xs space-y-2 pointer-events-auto max-w-[340px]">
+      <div className="absolute bottom-3 left-3 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg text-xs space-y-2 pointer-events-auto max-w-[340px]">
         <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1">
           <span>คำอธิบายสัญลักษณ์ถนน & จุดเฝ้าระวัง</span>
           <span className="text-[10px] text-slate-500 dark:text-slate-400">เรียลไทม์ กทม.</span>
@@ -354,8 +354,8 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         </div>
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-600 dark:text-slate-400">
           <span className="flex items-center gap-1">
-            <Camera className="w-3 h-3 text-blue-500" />
-            กล้อง CCTV สำนักการจราจร ({cctvs.length})
+            <Camera className="w-3 h-3 text-amber-500" />
+            กล้อง CCTV (ปิดปรับปรุงระบบ)
           </span>
           <span className="flex items-center gap-1">
             <Waves className="w-3 h-3 text-cyan-500" />
@@ -377,9 +377,12 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         zoom={defaultZoom}
         minZoom={9}
         maxZoom={18}
+        zoomControl={false}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
+        {/* Clean Bottom-Right Zoom Controls to prevent collision with top-left base map bar */}
+        <ZoomControl position="bottomright" />
         {/* Dynamic FlyTo controller */}
         <MapController centerTarget={focusTarget || null} zoomTarget={focusZoom} />
 
@@ -504,10 +507,10 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
                     ทิศทาง: {cctv.facingDirection}
                   </div>
                   <div className="flex items-center justify-between text-[10px] mt-1 pt-1 border-t border-slate-700">
-                    <span className="text-cyan-300 font-bold">
-                      {cctv.waterLevelCm ? `ระดับน้ำ ${cctv.waterLevelCm} ซม.` : 'พร้อมใช้งาน'}
+                    <span className="text-amber-400 font-bold">
+                      ปิดปรับปรุงระบบ
                     </span>
-                    <span className="text-sky-300 font-semibold">คลิกดูภาพสด &rarr;</span>
+                    <span className="text-slate-300 font-semibold">ดูข้อมูลจุดกล้อง &rarr;</span>
                   </div>
                 </div>
               </Tooltip>

@@ -216,9 +216,12 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
                 onCheckedChange={onToggleCctv}
                 className="data-[state=checked]:bg-blue-600"
               />
-              <Label htmlFor="toggle-cctv" className="text-xs cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
-                <Camera className="w-3.5 h-3.5 text-blue-500" />
-                กล้อง CCTV จราจร
+              <Label htmlFor="toggle-cctv" className="text-xs cursor-pointer flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                <Camera className="w-3.5 h-3.5 text-amber-500" />
+                <span>กล้อง CCTV</span>
+                <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                  กำลังปรับปรุงแก้ไข
+                </span>
               </Label>
             </div>
 
