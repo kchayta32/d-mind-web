@@ -33,9 +33,11 @@ import {
 import { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation } from '@/types/bangkokFlood';
 import { BangkokFloodUserReportsLayer } from './BangkokFloodUserReportsLayer';
 import { BangkokUserFloodReport } from '@/services/bangkokFloodUserReportService';
+import { GoogleFloodHubLayer } from './GoogleFloodHubLayer';
+import { FloodHubGaugeStation } from '@/services/googleFloodHubService';
 
 // Export types for consumer components
-export type { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation, BangkokCctvCamera, BangkokUserFloodReport };
+export type { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation, BangkokCctvCamera, BangkokUserFloodReport, FloodHubGaugeStation };
 export type BangkokSeverity = 'all' | FloodSeverity;
 
 const JAWG_ACCESS_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JAWG_ACCESS_TOKEN) || 'FTtoH6pBTHEDddbaGWyVP2EDCUBCVIdUP92MVIcbIx5H6jYNdDQca7404lHLL3Dc';
@@ -168,11 +170,16 @@ export interface BangkokFloodMapProps {
   showCanalPumpsLayer?: boolean;
   showSentinelSarLayer?: boolean;
   showUserReportsLayer?: boolean;
+  showFloodHubLayer?: boolean;
+  showInundationPolygons?: boolean;
+  showBangkokBoundary?: boolean;
+  selectedFloodHubStationId?: string | null;
   userReports?: BangkokUserFloodReport[];
   onSelectRoad?: (road: BangkokRoadSegment) => void;
   onSelectCctv?: (cctv: BangkokCctvCamera) => void;
   onSelectStation?: (station: BangkokCanalStation) => void;
   onSelectUserReport?: (report: BangkokUserFloodReport) => void;
+  onSelectFloodHubStation?: (station: FloodHubGaugeStation) => void;
   focusTarget?: [number, number] | null;
   focusZoom?: number;
   className?: string;
@@ -188,11 +195,16 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
   showCanalPumpsLayer = true,
   showSentinelSarLayer = true,
   showUserReportsLayer = true,
+  showFloodHubLayer = true,
+  showInundationPolygons = true,
+  showBangkokBoundary = true,
+  selectedFloodHubStationId,
   userReports,
   onSelectRoad,
   onSelectCctv,
   onSelectStation,
   onSelectUserReport,
+  onSelectFloodHubStation,
   focusTarget,
   focusZoom = 14,
   className = ''
@@ -504,6 +516,17 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
           <BangkokFloodUserReportsLayer
             reports={userReports}
             onSelectReport={onSelectUserReport}
+          />
+        )}
+
+        {/* Google Flood Hub & GloFAS Hydrological Layer (Image 1, 2, 3) */}
+        {showFloodHubLayer && (
+          <GoogleFloodHubLayer
+            selectedStationId={selectedFloodHubStationId}
+            onSelectStation={onSelectFloodHubStation}
+            showInundationPolygons={showInundationPolygons}
+            showBangkokBoundary={showBangkokBoundary}
+            showHazardZones={true}
           />
         )}
 

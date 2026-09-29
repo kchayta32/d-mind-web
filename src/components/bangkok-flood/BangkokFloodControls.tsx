@@ -33,6 +33,12 @@ export interface BangkokFloodControlsProps {
   onToggleSentinelSar: (val: boolean) => void;
   showUserReportsLayer?: boolean;
   onToggleUserReports?: (val: boolean) => void;
+  showFloodHubLayer?: boolean;
+  onToggleFloodHub?: (val: boolean) => void;
+  showInundationPolygons?: boolean;
+  onToggleInundationPolygons?: (val: boolean) => void;
+  showBangkokBoundary?: boolean;
+  onToggleBangkokBoundary?: (val: boolean) => void;
   userReportsCount?: number;
   totalRoadsCount?: number;
   filteredRoadsCount?: number;
@@ -92,6 +98,12 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
   onToggleSentinelSar,
   showUserReportsLayer = true,
   onToggleUserReports,
+  showFloodHubLayer = true,
+  onToggleFloodHub,
+  showInundationPolygons = true,
+  onToggleInundationPolygons,
+  showBangkokBoundary = true,
+  onToggleBangkokBoundary,
   userReportsCount = 0,
   totalRoadsCount = 0,
   filteredRoadsCount = 0,
@@ -209,7 +221,58 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
             เปิด-ปิดชั้นข้อมูลบนแผนที่:
           </span>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            {/* Google Flood Hub & GloFAS Toggle */}
+            {onToggleFloodHub && (
+              <div className="flex items-center gap-2 bg-indigo-50/70 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
+                <Switch
+                  id="toggle-floodhub"
+                  checked={showFloodHubLayer}
+                  onCheckedChange={onToggleFloodHub}
+                  className="data-[state=checked]:bg-indigo-600"
+                />
+                <Label htmlFor="toggle-floodhub" className="text-xs cursor-pointer flex items-center gap-1.5 text-indigo-950 dark:text-indigo-200 font-semibold">
+                  <span>🌐</span>
+                  <span>Google Flood Hub & GloFAS</span>
+                  <Badge variant="outline" className="text-[9px] py-0 px-1 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-400">
+                    AI
+                  </Badge>
+                </Label>
+              </div>
+            )}
+
+            {/* Inundation Polygons Toggle */}
+            {onToggleInundationPolygons && (
+              <div className="flex items-center gap-2 bg-purple-50/70 dark:bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800">
+                <Switch
+                  id="toggle-inundation"
+                  checked={showInundationPolygons}
+                  onCheckedChange={onToggleInundationPolygons}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+                <Label htmlFor="toggle-inundation" className="text-xs cursor-pointer flex items-center gap-1 text-purple-950 dark:text-purple-200 font-medium">
+                  <span>🌊</span>
+                  <span>พื้นที่น้ำท่วมขัง (Inundation)</span>
+                </Label>
+              </div>
+            )}
+
+            {/* Bangkok Boundary Toggle */}
+            {onToggleBangkokBoundary && (
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <Switch
+                  id="toggle-bma-boundary"
+                  checked={showBangkokBoundary}
+                  onCheckedChange={onToggleBangkokBoundary}
+                  className="data-[state=checked]:bg-slate-700"
+                />
+                <Label htmlFor="toggle-bma-boundary" className="text-xs cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
+                  <span>🏛️</span>
+                  <span>ขอบเขต กทม.</span>
+                </Label>
+              </div>
+            )}
+
             {/* Citizen User Reports Toggle */}
             {onToggleUserReports && (
               <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
@@ -255,30 +318,9 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
               />
               <Label htmlFor="toggle-sentinel" className="text-xs cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
                 <Satellite className="w-3.5 h-3.5 text-sky-500" />
-                ดาวเทียม Sentinel-1 SAR
+                ดาวเทียม SAR
               </Label>
             </div>
-
-            {/* Citizen User Reports Toggle */}
-            {onToggleUserReports && (
-              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <Switch
-                  id="toggle-user-reports"
-                  checked={showUserReportsLayer}
-                  onCheckedChange={onToggleUserReports}
-                  className="data-[state=checked]:bg-blue-600"
-                />
-                <Label htmlFor="toggle-user-reports" className="text-xs cursor-pointer flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-                  <Users className="w-3.5 h-3.5 text-blue-500" />
-                  <span>รายงานจากประชาชน</span>
-                  {userReportsCount > 0 && (
-                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-1.5 py-0 h-4">
-                      {userReportsCount}
-                    </Badge>
-                  )}
-                </Label>
-              </div>
-            )}
           </div>
         </div>
       </div>

@@ -21,6 +21,13 @@ import {
   BANGKOK_ROAD_SEGMENTS, 
   BANGKOK_CANAL_STATIONS 
 } from '@/data/bangkokRoadFloodData';
+import { GoogleFloodHubSidebar } from '@/components/bangkok-flood/GoogleFloodHubSidebar';
+import { MultiSourceFloodDashboard } from '@/components/bangkok-flood/MultiSourceFloodDashboard';
+import { 
+  FloodHubGaugeStation, 
+  GOOGLE_FLOOD_HUB_STATIONS, 
+  getFloodHubStationById 
+} from '@/services/googleFloodHubService';
 import { 
   BangkokZone, 
   FloodSeverity, 
@@ -56,6 +63,7 @@ import {
   Radio,
   Sparkles,
   Megaphone,
+  Globe,
   Users
 } from 'lucide-react';
 import { EMERGENCY_CONTACTS_DATA } from '@/pages/EmergencyContacts';
@@ -72,6 +80,14 @@ export const BangkokFloodMapPage: React.FC = () => {
   const [showCanalPumpsLayer, setShowCanalPumpsLayer] = useState(true);
   const [showSentinelSarLayer, setShowSentinelSarLayer] = useState(true);
   const [showUserReportsLayer, setShowUserReportsLayer] = useState(true);
+  const [showFloodHubLayer, setShowFloodHubLayer] = useState(true);
+  const [showInundationPolygons, setShowInundationPolygons] = useState(true);
+  const [showBangkokBoundary, setShowBangkokBoundary] = useState(true);
+
+  // Google Flood Hub Active Station (defaulting to Preng forecast matching Image 2)
+  const [selectedFloodHubStation, setSelectedFloodHubStation] = useState<FloodHubGaugeStation | null>(
+    getFloodHubStationById('hybas_4121126440') || GOOGLE_FLOOD_HUB_STATIONS[0]
+  );
 
   // Citizen Flood User Reports State
   const [userReports, setUserReports] = useState<BangkokUserFloodReport[]>([]);
@@ -280,6 +296,17 @@ export const BangkokFloodMapPage: React.FC = () => {
                   </Button>
 
                   <Button
+                    size="sm"
+                    onClick={() => {
+                      document.getElementById('multi-source-dashboard')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-extrabold text-xs h-9 rounded-xl shadow-lg border border-indigo-300/40 transition-all hover:scale-105"
+                  >
+                    <Globe className="w-3.5 h-3.5 mr-1 text-white" />
+                    ศูนย์ข่าวกรองทุกช่องทาง
+                  </Button>
+
+                  <Button
                     variant="secondary"
                     size="sm"
                     onClick={handleRefreshData}
@@ -319,6 +346,12 @@ export const BangkokFloodMapPage: React.FC = () => {
             onToggleSentinelSar={setShowSentinelSarLayer}
             showUserReportsLayer={showUserReportsLayer}
             onToggleUserReports={setShowUserReportsLayer}
+            showFloodHubLayer={showFloodHubLayer}
+            onToggleFloodHub={setShowFloodHubLayer}
+            showInundationPolygons={showInundationPolygons}
+            onToggleInundationPolygons={setShowInundationPolygons}
+            showBangkokBoundary={showBangkokBoundary}
+            onToggleBangkokBoundary={setShowBangkokBoundary}
             userReportsCount={userReports.length}
             totalRoadsCount={BANGKOK_ROAD_SEGMENTS.length}
             filteredRoadsCount={filteredRoads.length}
@@ -345,6 +378,15 @@ export const BangkokFloodMapPage: React.FC = () => {
                 showCanalPumpsLayer={showCanalPumpsLayer}
                 showSentinelSarLayer={showSentinelSarLayer}
                 showUserReportsLayer={showUserReportsLayer}
+                showFloodHubLayer={showFloodHubLayer}
+                showInundationPolygons={showInundationPolygons}
+                showBangkokBoundary={showBangkokBoundary}
+                selectedFloodHubStationId={selectedFloodHubStation?.id}
+                onSelectFloodHubStation={(st) => {
+                  setSelectedFloodHubStation(st);
+                  setFocusTarget(st.coordinates);
+                  setFocusZoom(13);
+                }}
                 userReports={userReports}
                 onSelectRoad={handleSelectRoad}
                 onSelectStation={(station) => {
@@ -460,7 +502,21 @@ export const BangkokFloodMapPage: React.FC = () => {
 
           </div>
 
-          {/* 6. Typhoon AI Flood & Traffic Routing Concierge Flagship Section */}
+          {/* 6. Multi-Source Flood Intelligence Dashboard (News, Facebook & Google Flood Hub) */}
+          <div id="multi-source-dashboard" className="scroll-mt-20">
+            <MultiSourceFloodDashboard
+              onSelectDistrict={(district) => {
+                setSearchQuery(district);
+                toast({
+                  title: `กรองข้อมูลเขต: ${district}`,
+                  description: 'ระบบกำลังแสดงเส้นทางถนนและสถานการณ์ในพื้นที่ดังกล่าว'
+                });
+                window.scrollTo({ top: 380, behavior: 'smooth' });
+              }}
+            />
+          </div>
+
+          {/* 7. Typhoon AI Flood & Traffic Routing Concierge Flagship Section */}
           <div id="typhoon-ai-concierge" className="scroll-mt-20">
             <BangkokFloodTyphoonConcierge
               roads={BANGKOK_ROAD_SEGMENTS}
@@ -707,6 +763,20 @@ export const BangkokFloodMapPage: React.FC = () => {
           }
         }}
       />
+
+      {/* Google Flood Hub Left Sliding Sidebar (Image 2 & 3) */}
+      {showFloodHubLayer && selectedFloodHubStation && (
+        <GoogleFloodHubSidebar
+          station={selectedFloodHubStation}
+          onClose={() => setSelectedFloodHubStation(null)}
+          onSelectStation={(st) => {
+            setSelectedFloodHubStation(st);
+            setFocusTarget(st.coordinates);
+            setFocusZoom(13);
+          }}
+          allStations={GOOGLE_FLOOD_HUB_STATIONS}
+        />
+      )}
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
