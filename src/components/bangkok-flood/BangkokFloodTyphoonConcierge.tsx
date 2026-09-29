@@ -99,6 +99,9 @@ export const BangkokFloodTyphoonConcierge: React.FC<BangkokFloodTyphoonConcierge
     }
   ]);
 
+  const isFirstMount = useRef(true);
+  const chatScrollContainerRef = useRef<HTMLDivElement>(null);
+
   // Handle initial question from external props if provided
   useEffect(() => {
     if (initialQuestion && initialQuestion.trim() !== '') {
@@ -106,9 +109,18 @@ export const BangkokFloodTyphoonConcierge: React.FC<BangkokFloodTyphoonConcierge
     }
   }, [initialQuestion]);
 
-  // Scroll to bottom when messages update
+  // Scroll only internal chat messages container when messages update, never hijack window scroll on mount
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    if (chatScrollContainerRef.current) {
+      chatScrollContainerRef.current.scrollTo({
+        top: chatScrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, [messages, isLoading]);
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -280,7 +292,10 @@ export const BangkokFloodTyphoonConcierge: React.FC<BangkokFloodTyphoonConcierge
           </div>
 
           {/* 4. Chat Messages Scroll Area */}
-          <div className="p-4 space-y-3.5 overflow-y-auto max-h-[380px] sm:max-h-[420px] bg-slate-50/50 dark:bg-slate-950/40">
+          <div
+            ref={chatScrollContainerRef}
+            className="p-4 space-y-3.5 overflow-y-auto max-h-[380px] sm:max-h-[420px] bg-slate-50/50 dark:bg-slate-950/40"
+          >
             {messages.map(msg => {
               const isUser = msg.sender === 'user';
 

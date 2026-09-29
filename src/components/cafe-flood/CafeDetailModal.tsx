@@ -22,6 +22,7 @@ import {
   ExternalLink,
   Waves
 } from 'lucide-react';
+import { TyphoonMarkdownRenderer } from '@/components/chat/TyphoonMarkdownRenderer';
 import {
   Dialog,
   DialogContent,
@@ -308,9 +309,10 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 <span>กำลังขอความคิดเห็นและวิเคราะห์น้ำท่วมจาก Typhoon AI...</span>
               </div>
             ) : (
-              <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
-                {typhoonOpinion}
-              </div>
+              <TyphoonMarkdownRenderer
+                content={typhoonOpinion}
+                className="[&_strong]:text-cyan-950 [&_strong]:dark:text-cyan-200 [&_strong]:bg-cyan-200/60 [&_strong]:dark:bg-cyan-900/60 text-slate-800 dark:text-slate-200"
+              />
             )}
           </div>
 

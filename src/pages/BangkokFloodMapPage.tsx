@@ -133,6 +133,8 @@ export const BangkokFloodMapPage: React.FC = () => {
   };
 
   useEffect(() => {
+    // Ensure page always starts at top and never auto-scrolls down on load
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     loadRealTelemetry();
     // Load citizen user reports
     bangkokFloodUserReportService.loadReports().then(reps => {

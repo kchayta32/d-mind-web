@@ -59,29 +59,24 @@ export interface CafeFloodMapProps {
 const BANGKOK_CENTER: [number, number] = [13.7563, 100.5230];
 const DEFAULT_ZOOM = 12;
 
-// Map Tile Styles
-export type MapTileStyle = 'dark' | 'osm' | 'satellite' | 'google-hybrid';
+// Map Tile Styles - Removed dark map per user specification
+export type MapTileStyle = 'osm' | 'google-hybrid' | 'satellite';
 
 const MAP_TILES: Record<MapTileStyle, { url: string; attribution: string; name: string }> = {
-  dark: {
-    name: 'แผนที่มืด (Jawg/Carto Dark)',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB &copy; OpenStreetMap contributors',
-  },
   osm: {
     name: 'OpenStreetMap ปกติ',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; OpenStreetMap contributors',
   },
-  satellite: {
-    name: 'ภาพถ่ายดาวเทียม (Esri)',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri',
-  },
   'google-hybrid': {
     name: 'Google Maps Hybrid',
     url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
     attribution: '&copy; Google Maps',
+  },
+  satellite: {
+    name: 'ภาพถ่ายดาวเทียม (Esri)',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri',
   },
 };
 
@@ -267,7 +262,7 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
   focusedVenue,
   className = '',
 }) => {
-  const [tileStyle, setTileStyle] = useState<MapTileStyle>('dark');
+  const [tileStyle, setTileStyle] = useState<MapTileStyle>('osm');
   const [resetCount, setResetCount] = useState<number>(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
@@ -336,9 +331,9 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
 
         {/* Right Controls: Style selector, Reset, Fullscreen */}
         <div className="flex items-center gap-1.5 pointer-events-auto">
-          {/* Map Base Tile Switcher */}
+          {/* Map Base Tile Switcher (dark map removed) */}
           <div className="bg-slate-900/90 border border-slate-700/80 rounded-xl p-0.5 flex items-center backdrop-blur-md shadow-lg">
-            {(['dark', 'osm', 'satellite'] as MapTileStyle[]).map((style) => (
+            {(['osm', 'google-hybrid', 'satellite'] as MapTileStyle[]).map((style) => (
               <button
                 key={style}
                 onClick={() => setTileStyle(style)}
@@ -348,7 +343,7 @@ export const CafeFloodMap: React.FC<CafeFloodMapProps> = ({
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {style === 'dark' ? 'Dark' : style === 'osm' ? 'OSM' : 'Sat'}
+                {style === 'osm' ? 'OSM' : style === 'google-hybrid' ? 'Hybrid' : 'Sat'}
               </button>
             ))}
           </div>
