@@ -1,20 +1,12 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, MapPin, X, Loader2 } from 'lucide-react';
+import { Search, MapPin, X, Loader2, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-
-interface SearchResult {
-  name: string;
-  lat: number;
-  lon: number;
-  country: string;
-  state?: string;
-}
+import { SelectedLocation } from './types';
 
 interface LocationSearchProps {
-  onLocationSelect: (lat: number, lon: number, name: string) => void;
+  onLocationSelect: (lat: number, lon: number, name: string, locationData?: SelectedLocation) => void;
   className?: string;
 }
 
@@ -24,7 +16,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<SelectedLocation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,21 +41,57 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
 
     setIsLoading(true);
     try {
-      // Using OpenStreetMap Nominatim API for geocoding
+      // Using OpenStreetMap Nominatim API with polygon_geojson=1
+      const params = new URLSearchParams({
+        format: 'json',
+        polygon_geojson: '1',
+        limit: '5',
+        countrycodes: 'th',
+        addressdetails: '1',
+        'accept-language': 'th,en',
+        email: 'contact@dmind.th',
+        q: searchQuery.trim()
+      });
+
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&countrycodes=th&addressdetails=1`
+        `https://nominatim.openstreetmap.org/search?${params.toString()}`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'DMind-DisasterMap/1.0 (https://d-mind.local; contact@dmind.th)'
+          }
+        }
       );
       
       if (!response.ok) throw new Error('Search failed');
       
       const data = await response.json();
-      const searchResults: SearchResult[] = data.map((item: any) => ({
-        name: item.display_name,
-        lat: parseFloat(item.lat),
-        lon: parseFloat(item.lon),
-        country: item.address?.country || 'Thailand',
-        state: item.address?.state
-      }));
+      const searchResults: SelectedLocation[] = data.map((item: any) => {
+        let boundingBox: [number, number, number, number] | undefined;
+        if (Array.isArray(item.boundingbox) && item.boundingbox.length >= 4) {
+          const south = parseFloat(item.boundingbox[0]);
+          const north = parseFloat(item.boundingbox[1]);
+          const west = parseFloat(item.boundingbox[2]);
+          const east = parseFloat(item.boundingbox[3]);
+          if (!isNaN(south) && !isNaN(north) && !isNaN(west) && !isNaN(east)) {
+            boundingBox = [south, north, west, east];
+          }
+        }
+
+        const rawName = item.display_name || '';
+        const primaryName = item.name || rawName.split(',')[0] || 'ตำแหน่งที่ค้นหา';
+
+        return {
+          name: primaryName,
+          displayName: rawName,
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon),
+          country: item.address?.country || 'Thailand',
+          state: item.address?.state || item.address?.province,
+          boundingBox,
+          geojson: item.geojson || null
+        };
+      });
       
       setResults(searchResults);
     } catch (error) {
@@ -85,8 +113,8 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
     return () => clearTimeout(timeoutId);
   };
 
-  const handleResultSelect = (result: SearchResult) => {
-    onLocationSelect(result.lat, result.lon, result.name);
+  const handleResultSelect = (result: SelectedLocation) => {
+    onLocationSelect(result.lat, result.lon, result.name, result);
     setQuery('');
     setResults([]);
     setIsOpen(false);
@@ -144,25 +172,41 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
 
             {results.length > 0 && (
               <div className="space-y-1 max-h-60 overflow-y-auto">
-                {results.map((result, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleResultSelect(result)}
-                    className="w-full text-left p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">
-                          {typeof result.name === 'string' ? result.name.split(',')[0] : (result.name || '')}
-                        </div>
-                        <div className="text-xs text-gray-600 truncate">
-                          {result.name || ''}
+                {results.map((result, index) => {
+                  const hasBoundary = Boolean(
+                    result.geojson &&
+                    (result.geojson.type === 'Polygon' ||
+                     result.geojson.type === 'MultiPolygon' ||
+                     result.boundingBox)
+                  );
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleResultSelect(result)}
+                      className="w-full text-left p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-lg transition-colors group"
+                    >
+                      <div className="flex items-start space-x-2">
+                        <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1.5">
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                              {result.name}
+                            </span>
+                            {hasBoundary && (
+                              <span className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium flex-shrink-0">
+                                ขอบเขตพื้นที่
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                            {result.displayName}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             )}
 

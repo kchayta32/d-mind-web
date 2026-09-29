@@ -75,7 +75,7 @@ assert(mapContent.includes('Polyline'), 'React-Leaflet Polyline road rendering p
 assert(mapContent.includes('#ef4444'), 'Red polyline color (#ef4444) present');
 assert(mapContent.includes('#f97316'), 'Orange polyline color (#f97316) present');
 assert(mapContent.includes('#22c55e'), 'Green polyline color (#22c55e) present');
-assert(mapContent.includes('createCctvIcon'), 'Dynamic CCTV custom marker icons present');
+assert(mapContent.includes('BangkokFloodUserReportsLayer'), 'BangkokFloodUserReportsLayer integrated on map');
 assert(mapContent.includes('SENTINEL_FLOOD_INDICATORS'), 'Sentinel Flood Indicators layer mapped');
 
 // 6. Validate Controls
@@ -85,7 +85,7 @@ const controlsContent = readFileSync(controlsPath, 'utf-8');
 assert(controlsContent.includes('searchQuery'), 'Road search filter implemented');
 assert(controlsContent.includes('selectedZone'), 'Zone filter implemented (all, north, central, east, thonburi)');
 assert(controlsContent.includes('selectedSeverity'), 'Severity filter implemented (critical, warning, normal)');
-assert(controlsContent.includes('showCctvLayer'), 'CCTV layer toggle switch implemented');
+assert(controlsContent.includes('showUserReportsLayer'), 'Citizen reports layer toggle switch implemented');
 assert(controlsContent.includes('showSentinelSarLayer'), 'Sentinel-1 SAR layer toggle switch implemented');
 
 // 7. Validate Page & Routes

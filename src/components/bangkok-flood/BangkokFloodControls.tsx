@@ -4,14 +4,14 @@ import {
   X, 
   MapPin, 
   Filter, 
-  Camera, 
   Waves, 
   Satellite, 
   SlidersHorizontal,
   RotateCcw,
   CheckCircle2,
   AlertTriangle,
-  AlertOctagon
+  AlertOctagon,
+  Users
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,12 +27,13 @@ export interface BangkokFloodControlsProps {
   onZoneChange: (zone: BangkokZone) => void;
   selectedSeverity: BangkokSeverity;
   onSeverityChange: (severity: BangkokSeverity) => void;
-  showCctvLayer: boolean;
-  onToggleCctv: (val: boolean) => void;
   showCanalPumpsLayer: boolean;
   onToggleCanalPumps: (val: boolean) => void;
   showSentinelSarLayer: boolean;
   onToggleSentinelSar: (val: boolean) => void;
+  showUserReportsLayer?: boolean;
+  onToggleUserReports?: (val: boolean) => void;
+  userReportsCount?: number;
   totalRoadsCount?: number;
   filteredRoadsCount?: number;
   onResetFilters?: () => void;
@@ -85,12 +86,13 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
   onZoneChange,
   selectedSeverity,
   onSeverityChange,
-  showCctvLayer,
-  onToggleCctv,
   showCanalPumpsLayer,
   onToggleCanalPumps,
   showSentinelSarLayer,
   onToggleSentinelSar,
+  showUserReportsLayer = true,
+  onToggleUserReports,
+  userReportsCount = 0,
   totalRoadsCount = 0,
   filteredRoadsCount = 0,
   onResetFilters,
@@ -208,22 +210,26 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
           </span>
 
           <div className="flex flex-wrap items-center gap-4">
-            {/* CCTV Toggle */}
-            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-              <Switch
-                id="toggle-cctv"
-                checked={showCctvLayer}
-                onCheckedChange={onToggleCctv}
-                className="data-[state=checked]:bg-blue-600"
-              />
-              <Label htmlFor="toggle-cctv" className="text-xs cursor-pointer flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-                <Camera className="w-3.5 h-3.5 text-amber-500" />
-                <span>กล้อง CCTV</span>
-                <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800">
-                  กำลังปรับปรุงแก้ไข
-                </span>
-              </Label>
-            </div>
+            {/* Citizen User Reports Toggle */}
+            {onToggleUserReports && (
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <Switch
+                  id="toggle-user-reports"
+                  checked={showUserReportsLayer}
+                  onCheckedChange={onToggleUserReports}
+                  className="data-[state=checked]:bg-emerald-600"
+                />
+                <Label htmlFor="toggle-user-reports" className="text-xs cursor-pointer flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                  <span className="text-xs">📢</span>
+                  <span>รายงานจากประชาชน</span>
+                  {userReportsCount !== undefined && userReportsCount > 0 && (
+                    <Badge variant="secondary" className="text-[10px] h-4 px-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-bold">
+                      {userReportsCount}
+                    </Badge>
+                  )}
+                </Label>
+              </div>
+            )}
 
             {/* Canal & Pumps Toggle */}
             <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
@@ -252,6 +258,27 @@ export const BangkokFloodControls: React.FC<BangkokFloodControlsProps> = ({
                 ดาวเทียม Sentinel-1 SAR
               </Label>
             </div>
+
+            {/* Citizen User Reports Toggle */}
+            {onToggleUserReports && (
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <Switch
+                  id="toggle-user-reports"
+                  checked={showUserReportsLayer}
+                  onCheckedChange={onToggleUserReports}
+                  className="data-[state=checked]:bg-blue-600"
+                />
+                <Label htmlFor="toggle-user-reports" className="text-xs cursor-pointer flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
+                  <Users className="w-3.5 h-3.5 text-blue-500" />
+                  <span>รายงานจากประชาชน</span>
+                  {userReportsCount > 0 && (
+                    <Badge className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-1.5 py-0 h-4">
+                      {userReportsCount}
+                    </Badge>
+                  )}
+                </Label>
+              </div>
+            )}
           </div>
         </div>
       </div>

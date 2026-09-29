@@ -17,7 +17,6 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   Waves, 
-  Camera, 
   Navigation, 
   Clock, 
   MapPin, 
@@ -27,14 +26,13 @@ import {
   Sparkles
 } from 'lucide-react';
 import { BangkokRoadSegment } from '@/types/bangkokFlood';
-import { BangkokCctvCamera } from '@/data/bangkokCctvData';
 
 export interface BangkokRoadDetailModalProps {
   road: BangkokRoadSegment | null;
   isOpen: boolean;
   onClose: () => void;
-  onOpenCctv: (cctvId: string) => void;
-  cctvs?: BangkokCctvCamera[];
+  onOpenCctv?: (cctvId: string) => void;
+  cctvs?: any[];
   onFocusOnMap?: (center: [number, number], zoom?: number) => void;
   onAskTyphoonAboutRoad?: (road: BangkokRoadSegment) => void;
 }
@@ -50,19 +48,10 @@ export const BangkokRoadDetailModal: React.FC<BangkokRoadDetailModalProps> = ({
   road,
   isOpen,
   onClose,
-  onOpenCctv,
-  cctvs = [],
   onFocusOnMap,
   onAskTyphoonAboutRoad
 }) => {
   if (!road) return null;
-
-  // Filter linked CCTVs for this road (by matching cctvCameraIds or road name substring)
-  const linkedCctvs = cctvs.filter(c => {
-    if (road.cctvCameraIds && road.cctvCameraIds.includes(c.id)) return true;
-    const roadBase = road.name.split('(')[0].replace('ถนน', '').trim();
-    return c.road.includes(roadBase) || c.name.includes(roadBase);
-  });
 
   // Severity UI configurations
   const severityConfig = {
@@ -327,40 +316,6 @@ export const BangkokRoadDetailModal: React.FC<BangkokRoadDetailModalProps> = ({
 
           </div>
 
-          {/* 5. Linked CCTV Cameras on this Road */}
-          {linkedCctvs.length > 0 && (
-            <div>
-              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Camera className="w-4 h-4 text-blue-500" />
-                กล้อง CCTV สภาพจราจรบนถนนสายนี้ ({linkedCctvs.length} จุด)
-              </h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {linkedCctvs.slice(0, 4).map(cam => (
-                  <div
-                    key={cam.id}
-                    onClick={() => onOpenCctv(cam.id)}
-                    className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-700 bg-slate-50 dark:bg-slate-950/50 hover:bg-blue-50/50 dark:hover:bg-blue-950/40 cursor-pointer transition flex items-center justify-between group"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                        {cam.name}
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
-                        {cam.facingDirection}
-                      </div>
-                      <div className="text-[10px] text-blue-600 font-medium">
-                        {cam.waterLevelCm ? `ระดับน้ำ: ${cam.waterLevelCm} ซม.` : 'สัญญาณปกติ'}
-                      </div>
-                    </div>
-                    <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-blue-600 font-semibold">
-                      ดูภาพสด &rarr;
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
         </div>
 

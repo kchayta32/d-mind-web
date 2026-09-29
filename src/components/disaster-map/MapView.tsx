@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, BaseMapLayerType, CrowdsourcedFloodReport } from './types';
+import { Earthquake, RainSensor, AirPollutionData, StormData, VolcanoData, BaseMapLayerType, CrowdsourcedFloodReport, SelectedLocation } from './types';
 import { GISTDAHotspot } from './useGISTDAData';
 import { RainViewerData } from './useRainViewerData';
 import { MapLayers } from './map-components/MapLayers';
@@ -19,6 +19,8 @@ import { SinkholeData } from '../../hooks/useSinkholeData';
 import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
 import { SentinelFloodLegend } from './SentinelFloodLegend';
+import { LocationBoundaryLayer } from './LocationBoundaryLayer';
+import { X } from 'lucide-react';
 
 interface MapViewProps {
   earthquakes?: Earthquake[];
@@ -52,6 +54,8 @@ interface MapViewProps {
   wildfireMapMode?: import('@/services/gistdaService').WildfireMapProtocol;
   isLoading?: boolean;
   onLocationSelect?: (lat: number, lon: number, name: string) => void;
+  selectedLocation?: SelectedLocation | null;
+  onClearSelectedLocation?: () => void;
   onRefreshAll?: () => void;
   onOpenCrowdsourceModal?: () => void;
 }
@@ -151,6 +155,8 @@ export const MapView: React.FC<MapViewProps> = ({
   wildfireMapMode = 'wmts',
   isLoading = false,
   onLocationSelect,
+  selectedLocation = null,
+  onClearSelectedLocation,
   onRefreshAll,
   onOpenCrowdsourceModal
 }) => {
@@ -222,6 +228,9 @@ export const MapView: React.FC<MapViewProps> = ({
           
           {/* User Location Marker */}
           <UserLocationMarker showLocation={showUserLocation} />
+
+          {/* Selected Location Boundary & Marker (Google Maps Style Dashed Border) */}
+          <LocationBoundaryLayer selectedLocation={selectedLocation} />
           
           {/* Map Layer Overlays (WMS, Radar Tiles, Drought, Sentinel Satellite) */}
           <MapLayers
@@ -263,6 +272,45 @@ export const MapView: React.FC<MapViewProps> = ({
           )}
         </MapContainer>
         
+        {/* Top Floating Badge for Selected Location Boundary */}
+        {selectedLocation && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex items-center shadow-lg rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-blue-300 dark:border-blue-800 px-3.5 py-1.5 text-xs text-slate-800 dark:text-slate-100 transition-all animate-in fade-in slide-in-from-top-2">
+            <button 
+              type="button"
+              className="flex items-center gap-1.5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              onClick={() => {
+                if (mapRef.current) {
+                  if (selectedLocation.boundingBox) {
+                    const [south, north, west, east] = selectedLocation.boundingBox;
+                    mapRef.current.flyToBounds(
+                      [[south, west], [north, east]],
+                      { padding: [40, 40], maxZoom: 13, duration: 1.5 }
+                    );
+                  } else {
+                    mapRef.current.flyTo([selectedLocation.lat, selectedLocation.lon], 13, { duration: 1.5 });
+                  }
+                }
+              }}
+              title="คลิกเพื่อซูมกลับไปยังขอบเขตนี้"
+            >
+              <span className="text-blue-600 dark:text-blue-400 font-bold">📍 ขอบเขต:</span>
+              <span className="font-semibold max-w-[130px] sm:max-w-[240px] md:max-w-[340px] truncate">
+                {selectedLocation.name}
+              </span>
+            </button>
+            <div className="h-3.5 w-px bg-slate-300 dark:bg-slate-700 mx-2" />
+            <button
+              type="button"
+              onClick={onClearSelectedLocation}
+              className="flex items-center gap-1 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-full px-2 py-0.5 transition-colors font-medium"
+              title="ล้างขอบเขตพื้นที่ออกจากแผนที่"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>ล้างขอบเขต</span>
+            </button>
+          </div>
+        )}
+
         {/* Top-Left Floating Controls: API Status Badge */}
         <div className="absolute top-4 left-14 z-[1000] flex items-center gap-2">
           <ApiStatusBadge onRefreshAll={onRefreshAll} isLoading={isLoading} />

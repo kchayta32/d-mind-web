@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Polyline, Marker, Tooltip, GeoJSON, useMap, Zo
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
-  Camera, 
   Droplets, 
   Layers, 
   Maximize2, 
@@ -31,9 +30,11 @@ import {
   BangkokCctvZone
 } from '@/data/bangkokCctvData';
 import { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation } from '@/types/bangkokFlood';
+import { BangkokFloodUserReportsLayer } from './BangkokFloodUserReportsLayer';
+import { BangkokUserFloodReport } from '@/services/bangkokFloodUserReportService';
 
 // Export types for consumer components
-export type { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation, BangkokCctvCamera };
+export type { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation, BangkokCctvCamera, BangkokUserFloodReport };
 export type BangkokSeverity = 'all' | FloodSeverity;
 
 const JAWG_ACCESS_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JAWG_ACCESS_TOKEN) || 'FTtoH6pBTHEDddbaGWyVP2EDCUBCVIdUP92MVIcbIx5H6jYNdDQca7404lHLL3Dc';
@@ -70,35 +71,6 @@ export const BASE_MAP_URLS: Record<BaseMapStyle, { url: string; attribution: str
 };
 
 // Custom Marker Icon Creators using pure HTML/CSS L.divIcon
-const createCctvIcon = (severity: FloodSeverity, isSelected = false) => {
-  const colorMap = {
-    critical: { bg: 'bg-red-500', ring: 'ring-red-400', badge: 'bg-red-600', pulse: 'animate-ping bg-red-400' },
-    warning: { bg: 'bg-amber-500', ring: 'ring-amber-400', badge: 'bg-amber-600', pulse: 'animate-ping bg-amber-400' },
-    normal: { bg: 'bg-emerald-500', ring: 'ring-emerald-400', badge: 'bg-emerald-600', pulse: 'hidden' }
-  };
-  const theme = colorMap[severity] || colorMap.normal;
-
-  const html = `
-    <div class="relative flex items-center justify-center cursor-pointer group">
-      ${severity !== 'normal' ? `<span class="absolute inline-flex h-9 w-9 rounded-full opacity-60 ${theme.pulse}"></span>` : ''}
-      <div class="relative flex items-center justify-center w-8 h-8 rounded-full ${theme.bg} text-white shadow-xl ring-2 ${theme.ring} ${isSelected ? 'scale-125 ring-4 ring-white' : 'transition-transform hover:scale-115'}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-          <circle cx="12" cy="13" r="3"/>
-        </svg>
-      </div>
-      <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 ${theme.badge}"></div>
-    </div>
-  `;
-
-  return L.divIcon({
-    html,
-    className: 'bangkok-cctv-marker',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -18]
-  });
-};
 
 const createWaterStationIcon = (status: 'critical' | 'warning' | 'normal', isSelected = false) => {
   const statusColors = {
@@ -194,9 +166,12 @@ export interface BangkokFloodMapProps {
   showCctvLayer?: boolean;
   showCanalPumpsLayer?: boolean;
   showSentinelSarLayer?: boolean;
+  showUserReportsLayer?: boolean;
+  userReports?: BangkokUserFloodReport[];
   onSelectRoad?: (road: BangkokRoadSegment) => void;
   onSelectCctv?: (cctv: BangkokCctvCamera) => void;
   onSelectStation?: (station: BangkokCanalStation) => void;
+  onSelectUserReport?: (report: BangkokUserFloodReport) => void;
   focusTarget?: [number, number] | null;
   focusZoom?: number;
   className?: string;
@@ -211,9 +186,12 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
   showCctvLayer = true,
   showCanalPumpsLayer = true,
   showSentinelSarLayer = true,
+  showUserReportsLayer = true,
+  userReports,
   onSelectRoad,
   onSelectCctv,
   onSelectStation,
+  onSelectUserReport,
   focusTarget,
   focusZoom = 14,
   className = ''
@@ -368,6 +346,12 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
             <span>ชั้นดาวเทียม Sentinel-1 SAR ตรวจจับผิวน้ำท่วมขัง</span>
           </div>
         )}
+        {showUserReportsLayer && (
+          <div className="flex items-center gap-1.5 text-[10px] text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 p-1.5 rounded-lg border border-blue-200 dark:border-blue-800">
+            <Droplets className="w-3.5 h-3.5 flex-shrink-0 text-blue-500 animate-pulse" />
+            <span>รายงานประชาชน: 💧 น้ำท่วมขัง / 🟢 ถนนแห้ง</span>
+          </div>
+        )}
       </div>
 
       {/* Main Leaflet Map */}
@@ -478,45 +462,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
           );
         })}
 
-        {/* Bangkok CCTV Cameras */}
-        {showCctvLayer && cctvs.map(cctv => {
-          const isSelected = selectedCctvId === cctv.id;
-          const icon = createCctvIcon(cctv.floodSeverity, isSelected);
 
-          return (
-            <Marker
-              key={cctv.id}
-              position={cctv.coordinates}
-              icon={icon}
-              eventHandlers={{
-                click: () => {
-                  if (onSelectCctv) onSelectCctv(cctv);
-                }
-              }}
-            >
-              <Tooltip direction="top" offset={[0, -12]} className="leaflet-dark-tooltip">
-                <div className="font-sans text-xs p-1 min-w-[200px] space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-white mb-0.5">
-                    <Camera className="w-3.5 h-3.5 text-sky-400" />
-                    <span>{cctv.name}</span>
-                  </div>
-                  <div className="text-[11px] text-slate-300">
-                    ถนน: {cctv.road}
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    ทิศทาง: {cctv.facingDirection}
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] mt-1 pt-1 border-t border-slate-700">
-                    <span className="text-amber-400 font-bold">
-                      ปิดปรับปรุงระบบ
-                    </span>
-                    <span className="text-slate-300 font-semibold">ดูข้อมูลจุดกล้อง &rarr;</span>
-                  </div>
-                </div>
-              </Tooltip>
-            </Marker>
-          );
-        })}
 
         {/* Canal Water Gauges & Pumping Stations */}
         {showCanalPumpsLayer && waterStations.map(station => {
@@ -551,6 +497,14 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
             </Marker>
           );
         })}
+
+        {/* Bangkok Citizen User Reports Layer */}
+        {showUserReportsLayer && (
+          <BangkokFloodUserReportsLayer
+            reports={userReports}
+            onSelectReport={onSelectUserReport}
+          />
+        )}
 
       </MapContainer>
     </div>

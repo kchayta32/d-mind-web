@@ -18,23 +18,26 @@ import { CrowdsourceFloodModal } from './CrowdsourceFloodModal';
 import { BangkokFloodMap } from '@/components/bangkok-flood/BangkokFloodMap';
 import { BangkokFloodControls } from '@/components/bangkok-flood/BangkokFloodControls';
 import { BangkokFloodStats } from '@/components/bangkok-flood/BangkokFloodStats';
-import { BangkokCctvModal } from '@/components/bangkok-flood/BangkokCctvModal';
 import { BangkokRoadDetailModal } from '@/components/bangkok-flood/BangkokRoadDetailModal';
 import { BANGKOK_ROAD_SEGMENTS, BANGKOK_CANAL_STATIONS } from '@/data/bangkokRoadFloodData';
-import { BANGKOK_CCTV_CAMERAS, BangkokCctvCamera } from '@/data/bangkokCctvData';
 import { BangkokZone, BangkokRoadSegment } from '@/types/bangkokFlood';
 import { ExternalLink } from 'lucide-react';
+import { SelectedLocation } from './types';
 
 interface DisasterMapContentProps {
   selectedType: DisasterType;
   onTypeChange: (type: DisasterType) => void;
-  onLocationSelect: (lat: number, lon: number, name: string) => void;
+  onLocationSelect: (lat: number, lon: number, name: string, locationData?: SelectedLocation) => void;
+  selectedLocation?: SelectedLocation | null;
+  onClearSelectedLocation?: () => void;
 }
 
 export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
   selectedType,
   onTypeChange,
-  onLocationSelect
+  onLocationSelect,
+  selectedLocation = null,
+  onClearSelectedLocation
 }) => {
   const {
     magnitudeFilter,
@@ -100,17 +103,14 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
   const { sinkholes, stats: sinkholeStats } = useSinkholeData();
   const { reports: crowdsourcedReports, addReport } = useCrowdsourcedFloodReports(gistdaFloodFeatures);
 
-  // Bangkok Road Flood & CCTV dedicated state
+  // Bangkok Road Flood dedicated state
   const [bkkSearch, setBkkSearch] = useState('');
   const [bkkZone, setBkkZone] = useState<BangkokZone>('all');
   const [bkkSeverity, setBkkSeverity] = useState<'all' | 'normal' | 'warning' | 'critical'>('all');
-  const [bkkShowCctv, setBkkShowCctv] = useState(true);
   const [bkkShowCanals, setBkkShowCanals] = useState(true);
   const [bkkShowSentinel, setBkkShowSentinel] = useState(true);
   const [bkkSelectedRoad, setBkkSelectedRoad] = useState<BangkokRoadSegment | null>(null);
   const [bkkRoadModalOpen, setBkkRoadModalOpen] = useState(false);
-  const [bkkSelectedCctv, setBkkSelectedCctv] = useState<BangkokCctvCamera | null>(null);
-  const [bkkCctvModalOpen, setBkkCctvModalOpen] = useState(false);
   const [bkkFocusTarget, setBkkFocusTarget] = useState<[number, number] | null>(null);
 
   const filteredBkkRoads = useMemo(() => {
@@ -129,11 +129,6 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     });
   }, [bkkSearch, bkkZone, bkkSeverity]);
 
-  const filteredBkkCctvs = useMemo(() => {
-    if (bkkZone === 'all') return BANGKOK_CCTV_CAMERAS;
-    return BANGKOK_CCTV_CAMERAS.filter(c => c.zone === bkkZone);
-  }, [bkkZone]);
-
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-0">
       {/* Main Map Container (8 cols on desktop) */}
@@ -141,20 +136,13 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
         {selectedType === 'bkk_road_flood' ? (
           <BangkokFloodMap
             roads={filteredBkkRoads}
-            cctvs={filteredBkkCctvs}
             waterStations={BANGKOK_CANAL_STATIONS}
             selectedRoadId={bkkSelectedRoad?.id}
-            selectedCctvId={bkkSelectedCctv?.id}
-            showCctvLayer={bkkShowCctv}
             showCanalPumpsLayer={bkkShowCanals}
             showSentinelSarLayer={bkkShowSentinel}
             onSelectRoad={(road) => {
               setBkkSelectedRoad(road);
               setBkkRoadModalOpen(true);
-            }}
-            onSelectCctv={(cctv) => {
-              setBkkSelectedCctv(cctv);
-              setBkkCctvModalOpen(true);
             }}
             focusTarget={bkkFocusTarget}
           />
@@ -191,6 +179,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
             wildfireMapMode={wildfireMapMode}
             isLoading={getCurrentLoading(selectedType)}
             onLocationSelect={onLocationSelect}
+            selectedLocation={selectedLocation}
+            onClearSelectedLocation={onClearSelectedLocation}
             onRefreshAll={refetchAll}
             onOpenCrowdsourceModal={() => setIsCrowdsourceModalOpen(true)}
           />
@@ -219,8 +209,6 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
               onZoneChange={setBkkZone}
               selectedSeverity={bkkSeverity}
               onSeverityChange={setBkkSeverity}
-              showCctvLayer={bkkShowCctv}
-              onToggleCctv={setBkkShowCctv}
               showCanalPumpsLayer={bkkShowCanals}
               onToggleCanalPumps={setBkkShowCanals}
               showSentinelSarLayer={bkkShowSentinel}
@@ -236,7 +224,6 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
 
             <BangkokFloodStats
               roads={BANGKOK_ROAD_SEGMENTS}
-              cctvs={BANGKOK_CCTV_CAMERAS}
               waterStations={BANGKOK_CANAL_STATIONS}
               selectedSeverity={bkkSeverity}
               onSelectSeverityFilter={setBkkSeverity}
@@ -359,30 +346,6 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           isOpen={bkkRoadModalOpen}
           onClose={() => setBkkRoadModalOpen(false)}
           road={bkkSelectedRoad}
-          onOpenCctv={(cctvId) => {
-            const cctv = BANGKOK_CCTV_CAMERAS.find(c => c.id === cctvId);
-            if (cctv) {
-              setBkkSelectedCctv(cctv);
-              setBkkRoadModalOpen(false);
-              setBkkCctvModalOpen(true);
-            }
-          }}
-        />
-      )}
-
-      {bkkSelectedCctv && (
-        <BangkokCctvModal
-          isOpen={bkkCctvModalOpen}
-          onClose={() => setBkkCctvModalOpen(false)}
-          cctv={bkkSelectedCctv}
-          onViewRoadOnMap={(roadName) => {
-            const road = BANGKOK_ROAD_SEGMENTS.find(r => r.name.includes(roadName) || roadName.includes(r.name));
-            if (road) {
-              setBkkSelectedRoad(road);
-              setBkkFocusTarget(road.coordinates[0]);
-            }
-            setBkkCctvModalOpen(false);
-          }}
         />
       )}
     </div>

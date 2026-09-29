@@ -6,18 +6,21 @@ import {
 } from '@/components/bangkok-flood/BangkokFloodMap';
 import { BangkokFloodControls } from '@/components/bangkok-flood/BangkokFloodControls';
 import { BangkokFloodStats } from '@/components/bangkok-flood/BangkokFloodStats';
-import { BangkokCctvModal } from '@/components/bangkok-flood/BangkokCctvModal';
 import { BangkokRoadDetailModal } from '@/components/bangkok-flood/BangkokRoadDetailModal';
 import { BangkokFloodTyphoonConcierge } from '@/components/bangkok-flood/BangkokFloodTyphoonConcierge';
+import { BangkokFloodReportModal } from '@/components/bangkok-flood/BangkokFloodReportModal';
+import { 
+  BangkokUserFloodReport, 
+  bangkokFloodUserReportService 
+} from '@/services/bangkokFloodUserReportService';
+import { 
+  fetchFullBangkokFloodTelemetry, 
+  BangkokFloodTelemetryBundle 
+} from '@/services/bangkokFloodRealTelemetryService';
 import { 
   BANGKOK_ROAD_SEGMENTS, 
   BANGKOK_CANAL_STATIONS 
 } from '@/data/bangkokRoadFloodData';
-import { 
-  BANGKOK_CCTV_CAMERAS, 
-  BangkokCctvCamera 
-} from '@/data/bangkokCctvData';
-import { fetchBmaCctvFromDataGoTh } from '@/services/dataGoThService';
 import { 
   BangkokZone, 
   FloodSeverity, 
@@ -32,7 +35,6 @@ import {
   AlertOctagon, 
   AlertTriangle, 
   CheckCircle2, 
-  Camera, 
   Waves, 
   RotateCcw, 
   PhoneCall, 
@@ -52,7 +54,9 @@ import {
   ChevronUp,
   Heart,
   Radio,
-  Sparkles
+  Sparkles,
+  Megaphone,
+  Users
 } from 'lucide-react';
 import { EMERGENCY_CONTACTS_DATA } from '@/pages/EmergencyContacts';
 
@@ -64,17 +68,25 @@ export const BangkokFloodMapPage: React.FC = () => {
   const [selectedZone, setSelectedZone] = useState<BangkokZone>('all');
   const [selectedSeverity, setSelectedSeverity] = useState<BangkokSeverity>('all');
 
-  // Layer Toggles (CCTV defaulted to false for clean map & maintenance mode)
-  const [showCctvLayer, setShowCctvLayer] = useState(false);
+  // Layer Toggles
   const [showCanalPumpsLayer, setShowCanalPumpsLayer] = useState(true);
   const [showSentinelSarLayer, setShowSentinelSarLayer] = useState(true);
+  const [showUserReportsLayer, setShowUserReportsLayer] = useState(true);
+
+  // Citizen Flood User Reports State
+  const [userReports, setUserReports] = useState<BangkokUserFloodReport[]>([]);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [modalInitialCoords, setModalInitialCoords] = useState<[number, number] | undefined>(undefined);
+  const [modalInitialLocation, setModalInitialLocation] = useState<string | undefined>(undefined);
+  const [modalInitialDistrict, setModalInitialDistrict] = useState<string | undefined>(undefined);
+
+  // Real Telemetry State (ThaiWater + DDS Bangkok + Open-Meteo)
+  const [realTelemetry, setRealTelemetry] = useState<BangkokFloodTelemetryBundle | null>(null);
+  const [isLoadingTelemetry, setIsLoadingTelemetry] = useState<boolean>(false);
 
   // Selected Entity & Modal States
   const [selectedRoad, setSelectedRoad] = useState<BangkokRoadSegment | null>(null);
   const [isRoadModalOpen, setIsRoadModalOpen] = useState(false);
-
-  const [selectedCctv, setSelectedCctv] = useState<BangkokCctvCamera | null>(null);
-  const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
 
   // Emergency Hotlines Expansion & Copy State
   const [isHotlinesExpanded, setIsHotlinesExpanded] = useState(false);
@@ -87,33 +99,35 @@ export const BangkokFloodMapPage: React.FC = () => {
   // Typhoon AI Concierge Question State
   const [typhoonInitialQuestion, setTyphoonInitialQuestion] = useState<string>('');
 
-  // Live BMA Open Data CCTV state
-  const [bmaDataGoThCameras, setBmaDataGoThCameras] = useState<BangkokCctvCamera[]>([]);
-  const [dataGoThSource, setDataGoThSource] = useState<string>('');
-  const [isLoadingBma, setIsLoadingBma] = useState<boolean>(false);
-
   // Timestamp
   const [lastRefreshedAt, setLastRefreshedAt] = useState<string>(
     new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
   );
 
-  const loadBmaCameras = async () => {
-    setIsLoadingBma(true);
+  const loadRealTelemetry = async () => {
+    setIsLoadingTelemetry(true);
     try {
-      const res = await fetchBmaCctvFromDataGoTh(200);
-      if (res.cameras && res.cameras.length > 0) {
-        setBmaDataGoThCameras(res.cameras);
-        setDataGoThSource(res.source);
-      }
+      const bundle = await fetchFullBangkokFloodTelemetry();
+      setRealTelemetry(bundle);
     } catch (e) {
-      console.warn('Failed to fetch data.go.th BMA cameras', e);
+      console.warn('Failed to load real telemetry:', e);
     } finally {
-      setIsLoadingBma(false);
+      setIsLoadingTelemetry(false);
     }
   };
 
   useEffect(() => {
-    loadBmaCameras();
+    loadRealTelemetry();
+    // Load citizen user reports
+    bangkokFloodUserReportService.loadReports().then(reps => {
+      setUserReports(reps);
+    });
+    const unsubscribeReports = bangkokFloodUserReportService.subscribeToReports((updated) => {
+      setUserReports(updated);
+    });
+    return () => {
+      unsubscribeReports();
+    };
   }, []);
 
   // Filtered Roads Memo
@@ -142,24 +156,13 @@ export const BangkokFloodMapPage: React.FC = () => {
     });
   }, [searchQuery, selectedZone, selectedSeverity]);
 
-  // Combined CCTVs: curated local + official BMA from data.go.th
-  const allCctvs = useMemo(() => {
-    if (bmaDataGoThCameras.length === 0) return BANGKOK_CCTV_CAMERAS;
-    const existingIds = new Set(BANGKOK_CCTV_CAMERAS.map(c => c.id));
-    const newFromGov = bmaDataGoThCameras.filter(c => !existingIds.has(c.id));
-    return [...BANGKOK_CCTV_CAMERAS, ...newFromGov];
-  }, [bmaDataGoThCameras]);
-
-  // Filtered CCTVs Memo based on zone
-  const filteredCctvs = useMemo(() => {
-    if (selectedZone === 'all') return allCctvs;
-    return allCctvs.filter(c => c.zone === selectedZone);
-  }, [selectedZone, allCctvs]);
-
-  // Filtered Water Stations based on zone
-  const filteredWaterStations = useMemo(() => {
+  // Active Water Stations: authentic ThaiWater real telemetry mapped stations, with fallback
+  const activeWaterStations = useMemo(() => {
+    if (realTelemetry?.canalStations && realTelemetry.canalStations.length > 0) {
+      return realTelemetry.canalStations;
+    }
     return BANGKOK_CANAL_STATIONS;
-  }, []);
+  }, [realTelemetry]);
 
   // Handlers
   const handleSelectRoad = (road: BangkokRoadSegment) => {
@@ -172,41 +175,14 @@ export const BangkokFloodMapPage: React.FC = () => {
     setIsRoadModalOpen(true);
   };
 
-  const handleSelectCctv = (cctv: BangkokCctvCamera) => {
-    setSelectedCctv(cctv);
-    setFocusTarget(cctv.coordinates);
-    setFocusZoom(15);
-    setIsCctvModalOpen(true);
-  };
-
-  const handleOpenCctvFromId = (cctvId: string) => {
-    const found = allCctvs.find(c => c.id === cctvId);
-    if (found) {
-      setSelectedCctv(found);
-      setIsRoadModalOpen(false);
-      setIsCctvModalOpen(true);
-    }
-  };
-
-  const handleViewRoadOnMapFromCctv = (roadName: string, lat?: number, lng?: number) => {
-    // Try to find road by matching road name
+  const handleFocusRoadByName = (roadName: string) => {
     const found = BANGKOK_ROAD_SEGMENTS.find(r => 
       r.name.includes(roadName) || roadName.includes(r.name.split('(')[0].replace('ถนน', '').trim())
     );
-
-    if (found) {
+    if (found && found.coordinates && found.coordinates.length > 0) {
       setSelectedRoad(found);
-      if (lat && lng) {
-        setFocusTarget([lat, lng]);
-      } else if (found.coordinates && found.coordinates.length > 0) {
-        setFocusTarget(found.coordinates[Math.floor(found.coordinates.length / 2)]);
-      }
+      setFocusTarget(found.coordinates[Math.floor(found.coordinates.length / 2)]);
       setFocusZoom(15);
-      setIsCctvModalOpen(false);
-    } else if (lat && lng) {
-      setFocusTarget([lat, lng]);
-      setFocusZoom(15);
-      setIsCctvModalOpen(false);
     }
   };
 
@@ -220,7 +196,8 @@ export const BangkokFloodMapPage: React.FC = () => {
 
   const handleRefreshData = () => {
     setLastRefreshedAt(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
-    loadBmaCameras();
+    loadRealTelemetry();
+    bangkokFloodUserReportService.loadReports().then(reps => setUserReports(reps));
   };
 
   return (
@@ -242,25 +219,28 @@ export const BangkokFloodMapPage: React.FC = () => {
                     <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
                     เฝ้าระวังน้ำท่วมขัง กทม.
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-mono text-blue-100">
-                    BMA Smart Drainage
+                  <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold text-blue-100 flex items-center gap-1">
+                    <Waves className="w-3.5 h-3.5 text-cyan-300" />
+                    ข้อมูลจริงจาก สสน. ThaiWater & สำนักการระบายน้ำ กทม. DDS
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-mono text-sky-200">
                     🛰️ Sentinel-1 SAR Overpass
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-amber-500/30 border border-amber-400/40 backdrop-blur-md text-xs font-medium text-amber-200 flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                    🔧 ระบบกล้อง CCTV อยู่ระหว่างปรับปรุงแก้ไข
-                  </span>
+                  {realTelemetry?.weather && (
+                    <span className="px-2.5 py-1 rounded-full bg-sky-500/30 border border-sky-400/40 backdrop-blur-md text-xs font-medium text-sky-100 flex items-center gap-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      สภาพอากาศ: {realTelemetry.weather.weatherTextTh} ({realTelemetry.weather.temperatureC}°C) | ฝน {realTelemetry.weather.currentPrecipitationMm} มม.
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                  ระบบติดตามน้ำท่วมขังถนนสายหลัก & กล้อง CCTV กรุงเทพมหานคร
+                  ระบบติดตามน้ำท่วมขังและระดับน้ำ กรุงเทพมหานคร (Real-Time Telemetry & Reports)
                 </h1>
 
                 <p className="text-sm text-blue-100/90 max-w-3xl leading-relaxed">
-                  ตรวจสอบระดับน้ำขังบนผิวจราจรเรียลไทม์ ความสามารถในการผ่านของรถยนต์แต่ละประเภท 
-                  ภาพสดจากกล้อง CCTV สำนักการจราจรและขนส่ง และสถานะการสูบน้ำของอุโมงค์ระบายน้ำหลัก
+                  ตรวจสอบระดับน้ำขังบนผิวจราจรเรียลไทม์ โทรมาตรวัดระดับน้ำและสถานีสูบน้ำจาก สสน. ThaiWater 
+                  เรดาร์ตรวจสภาพอากาศ สำนักการระบายน้ำ กทม. (DDS) และรายงานสถานการณ์น้ำท่วมจริงจากภาคประชาชน
                 </p>
               </div>
 
@@ -273,7 +253,21 @@ export const BangkokFloodMapPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setModalInitialCoords(undefined);
+                      setModalInitialLocation(undefined);
+                      setModalInitialDistrict(undefined);
+                      setIsReportModalOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-extrabold text-xs h-9 rounded-xl shadow-lg border border-teal-300/40 transition-all hover:scale-105"
+                  >
+                    <Megaphone className="w-3.5 h-3.5 mr-1 text-white" />
+                    📢 รายงานสถานการณ์น้ำท่วม
+                  </Button>
+
                   <Button
                     size="sm"
                     onClick={() => {
@@ -289,9 +283,10 @@ export const BangkokFloodMapPage: React.FC = () => {
                     variant="secondary"
                     size="sm"
                     onClick={handleRefreshData}
+                    disabled={isLoadingTelemetry}
                     className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-md text-xs font-semibold h-9 rounded-xl"
                   >
-                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                    <RotateCcw className={`w-3.5 h-3.5 mr-1.5 ${isLoadingTelemetry ? 'animate-spin' : ''}`} />
                     รีเฟรชข้อมูล
                   </Button>
                 </div>
@@ -305,8 +300,7 @@ export const BangkokFloodMapPage: React.FC = () => {
           {/* 3. Real-time Status Stats Cards */}
           <BangkokFloodStats
             roads={BANGKOK_ROAD_SEGMENTS}
-            cctvs={allCctvs}
-            waterStations={BANGKOK_CANAL_STATIONS}
+            waterStations={activeWaterStations}
             selectedSeverity={selectedSeverity}
             onSelectSeverityFilter={(sev) => setSelectedSeverity(sev)}
           />
@@ -319,12 +313,13 @@ export const BangkokFloodMapPage: React.FC = () => {
             onZoneChange={setSelectedZone}
             selectedSeverity={selectedSeverity}
             onSeverityChange={setSelectedSeverity}
-            showCctvLayer={showCctvLayer}
-            onToggleCctv={setShowCctvLayer}
             showCanalPumpsLayer={showCanalPumpsLayer}
             onToggleCanalPumps={setShowCanalPumpsLayer}
             showSentinelSarLayer={showSentinelSarLayer}
             onToggleSentinelSar={setShowSentinelSarLayer}
+            showUserReportsLayer={showUserReportsLayer}
+            onToggleUserReports={setShowUserReportsLayer}
+            userReportsCount={userReports.length}
             totalRoadsCount={BANGKOK_ROAD_SEGMENTS.length}
             filteredRoadsCount={filteredRoads.length}
             onResetFilters={handleResetFilters}
@@ -345,17 +340,19 @@ export const BangkokFloodMapPage: React.FC = () => {
 
               <BangkokFloodMap
                 roads={filteredRoads}
-                cctvs={filteredCctvs}
-                waterStations={filteredWaterStations}
+                waterStations={activeWaterStations}
                 selectedRoadId={selectedRoad?.id}
-                selectedCctvId={selectedCctv?.id}
-                showCctvLayer={showCctvLayer}
                 showCanalPumpsLayer={showCanalPumpsLayer}
                 showSentinelSarLayer={showSentinelSarLayer}
+                showUserReportsLayer={showUserReportsLayer}
+                userReports={userReports}
                 onSelectRoad={handleSelectRoad}
-                onSelectCctv={handleSelectCctv}
                 onSelectStation={(station) => {
                   setFocusTarget(station.coordinates);
+                  setFocusZoom(15);
+                }}
+                onSelectUserReport={(report) => {
+                  setFocusTarget(report.coordinates);
                   setFocusZoom(15);
                 }}
                 focusTarget={focusTarget}
@@ -451,7 +448,7 @@ export const BangkokFloodMapPage: React.FC = () => {
                           <span>รถเล็ก: <b className={!road.passable.smallCar ? 'text-red-600' : 'text-emerald-600'}>
                             {!road.passable.smallCar ? 'ห้ามผ่าน' : 'ผ่านได้'}
                           </b></span>
-                          <span>กล้อง CCTV: <b>{road.cctvCameraIds ? road.cctvCameraIds.length : 0} จุด</b></span>
+                          <span>คลองระบาย: <b>{road.nearestCanal || 'ท่อหลัก'}</b></span>
                           <span>ท่วม {road.lanesAffected} เลน</span>
                         </div>
                       </div>
@@ -467,10 +464,9 @@ export const BangkokFloodMapPage: React.FC = () => {
           <div id="typhoon-ai-concierge" className="scroll-mt-20">
             <BangkokFloodTyphoonConcierge
               roads={BANGKOK_ROAD_SEGMENTS}
-              cctvs={allCctvs}
               initialQuestion={typhoonInitialQuestion}
               onSelectRoadByName={(roadName) => {
-                handleViewRoadOnMapFromCctv(roadName);
+                handleFocusRoadByName(roadName);
               }}
             />
           </div>
@@ -684,8 +680,6 @@ export const BangkokFloodMapPage: React.FC = () => {
         road={selectedRoad}
         isOpen={isRoadModalOpen}
         onClose={() => setIsRoadModalOpen(false)}
-        onOpenCctv={handleOpenCctvFromId}
-        cctvs={allCctvs}
         onFocusOnMap={(center, zoom) => {
           setFocusTarget(center);
           if (zoom) setFocusZoom(zoom);
@@ -698,31 +692,47 @@ export const BangkokFloodMapPage: React.FC = () => {
         }}
       />
 
-      {/* CCTV Live Stream Modal */}
-      <BangkokCctvModal
-        cctv={selectedCctv}
-        isOpen={isCctvModalOpen}
-        onClose={() => setIsCctvModalOpen(false)}
-        onViewRoadOnMap={handleViewRoadOnMapFromCctv}
-        onAskTyphoonAboutCctv={(cctv) => {
-          setTyphoonInitialQuestion(`ช่วยวิเคราะห์กล้อง CCTV จุด ${cctv.name} ถนน ${cctv.road} (ระดับน้ำ ${cctv.waterLevelCm || 0} ซม.) รถแต่ละประเภทผ่านได้ไหม และควรใช้เส้นทางใดหลบน้ำท่วม?`);
-          setTimeout(() => {
-            document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
-          }, 150);
+      {/* Citizen Flood Report Modal */}
+      <BangkokFloodReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        initialCoordinates={modalInitialCoords}
+        initialLocationName={modalInitialLocation}
+        initialDistrict={modalInitialDistrict}
+        onReportSubmitted={(newRep) => {
+          setUserReports(prev => [newRep, ...prev.filter(r => r.id !== newRep.id)]);
+          if (newRep.coordinates) {
+            setFocusTarget(newRep.coordinates);
+            setFocusZoom(15);
+          }
         }}
       />
 
-      {/* Floating Typhoon AI Quick Action Pill */}
-      <div className="fixed bottom-6 right-6 z-40 hidden sm:block">
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+        <Button
+          onClick={() => {
+            setModalInitialCoords(undefined);
+            setModalInitialLocation(undefined);
+            setModalInitialDistrict(undefined);
+            setIsReportModalOpen(true);
+          }}
+          className="rounded-full shadow-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs h-11 px-4 border border-white/20 flex items-center gap-2 group hover:scale-105 transition-all"
+        >
+          <span className="w-2 h-2 rounded-full bg-cyan-300 animate-ping"></span>
+          <Megaphone className="w-4 h-4 text-white" />
+          <span>📢 รายงานสถานการณ์น้ำท่วม</span>
+        </Button>
+
         <Button
           onClick={() => {
             document.getElementById('typhoon-ai-concierge')?.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="rounded-full shadow-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs h-11 px-4 border border-white/20 flex items-center gap-2 group hover:scale-105 transition-all"
+          className="rounded-full shadow-2xl bg-gradient-to-r from-slate-900 via-purple-900 to-indigo-900 hover:from-slate-800 hover:to-purple-800 text-white font-extrabold text-xs h-11 px-4 border border-white/20 hidden sm:flex items-center gap-2 group hover:scale-105 transition-all"
         >
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           <span className="text-base">🌪️</span>
-          <span>ปรึกษา Typhoon AI หลบน้ำท่วม</span>
+          <span>ปรึกษา Typhoon AI</span>
         </Button>
       </div>
 

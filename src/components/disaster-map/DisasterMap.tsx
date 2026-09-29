@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DisasterTypeSelector from './DisasterTypeSelector';
 import { LocationSearch } from './LocationSearch';
 import { DisasterMapContent } from './DisasterMapContent';
+import { SelectedLocation } from './types';
 
 export type DisasterType = 
   | 'earthquake' 
@@ -18,13 +19,23 @@ export type DisasterType =
 
 const DisasterMap: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DisasterType>('earthquake');
-  const [mapRef, setMapRef] = useState<any>(null);
+  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
 
-  const handleLocationSelect = (lat: number, lon: number, name: string) => {
-    if (mapRef) {
-      mapRef.setView([lat, lon], 12);
-      console.log(`Navigated to: ${name} (${lat}, ${lon})`);
+  const handleLocationSelect = (lat: number, lon: number, name: string, locationData?: SelectedLocation) => {
+    if (locationData) {
+      setSelectedLocation(locationData);
+    } else {
+      setSelectedLocation({
+        name,
+        displayName: name,
+        lat,
+        lon
+      });
     }
+  };
+
+  const handleClearSelectedLocation = () => {
+    setSelectedLocation(null);
   };
 
   return (
@@ -50,6 +61,8 @@ const DisasterMap: React.FC = () => {
         selectedType={selectedType}
         onTypeChange={setSelectedType}
         onLocationSelect={handleLocationSelect}
+        selectedLocation={selectedLocation}
+        onClearSelectedLocation={handleClearSelectedLocation}
       />
     </div>
   );

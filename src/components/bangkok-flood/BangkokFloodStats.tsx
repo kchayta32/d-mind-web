@@ -1,23 +1,22 @@
-import React from 'react';
 import { 
   AlertOctagon, 
   AlertTriangle, 
   CheckCircle2, 
-  Camera, 
   Waves, 
   TrendingUp, 
-  ArrowUpRight
+  ArrowUpRight,
+  Activity,
+  Droplets,
+  Building2
 } from 'lucide-react';
 import { 
   BangkokRoadSegment, 
-  BangkokCctvCamera, 
   BangkokCanalStation, 
   BangkokSeverity 
 } from './BangkokFloodMap';
 
 export interface BangkokFloodStatsProps {
   roads: BangkokRoadSegment[];
-  cctvs: BangkokCctvCamera[];
   waterStations: BangkokCanalStation[];
   selectedSeverity?: BangkokSeverity;
   onSelectSeverityFilter?: (severity: BangkokSeverity) => void;
@@ -26,7 +25,6 @@ export interface BangkokFloodStatsProps {
 
 export const BangkokFloodStats: React.FC<BangkokFloodStatsProps> = ({
   roads = [],
-  cctvs = [],
   waterStations = [],
   selectedSeverity = 'all',
   onSelectSeverityFilter,
@@ -36,15 +34,15 @@ export const BangkokFloodStats: React.FC<BangkokFloodStatsProps> = ({
   const criticalRoads = roads.filter(r => r.status === 'critical');
   const warningRoads = roads.filter(r => r.status === 'warning');
   const normalRoads = roads.filter(r => r.status === 'normal');
-
-  const onlineCctvs = cctvs.filter(c => c.status === 'online');
   
   // Calculate canal status & pumps capacity
   const totalPumpsActive = waterStations.reduce((sum, s) => sum + (s.pumpsRunning || 0), 0);
   const totalPumpsCapacity = waterStations.reduce((sum, s) => sum + (s.totalPumps || 0), 0);
   const highWaterCanals = waterStations.filter(s => s.status === 'critical');
-
   const maxWaterLevelCm = roads.length > 0 ? Math.max(...roads.map(r => r.waterLevelCm)) : 0;
+  const maxStationMsl = waterStations.length > 0 
+    ? Math.max(...waterStations.map(s => s.waterLevelMsl || 0)).toFixed(2)
+    : '1.70';
 
   return (
     <div className={`w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 ${className}`}>
@@ -169,33 +167,33 @@ export const BangkokFloodStats: React.FC<BangkokFloodStatsProps> = ({
         </div>
       </div>
 
-      {/* 4. Ready CCTV Cameras (Maintenance Mode) */}
-      <div className="relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-900 border border-amber-200/60 dark:border-amber-950/60 shadow-sm">
+      {/* 4. Real Waterlevel Stations (สสน. ThaiWater HII) */}
+      <div className="relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-900 border border-blue-200/70 dark:border-blue-900/60 shadow-sm">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-            กล้อง CCTV (ปิดปรับปรุงระบบ)
+          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+            โทรมาตร สสน. ThaiWater
           </span>
-          <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <Camera className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <Activity className="w-4 h-4" />
           </div>
         </div>
 
         <div className="mt-3 flex items-baseline justify-between">
           <div className="flex items-baseline gap-1.5">
             <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              {cctvs.length}
+              {waterStations.length}
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">จุดติดตั้ง</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">สถานีตรวจวัด</span>
           </div>
-          <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-            กำลังปรับปรุงแก้ไข
+          <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+            สูงสุด +{maxStationMsl} ม.
           </span>
         </div>
 
         <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-          <span>ปรับปรุงการเชื่อมต่อสัญญาณ</span>
-          <span className="text-amber-600 dark:text-amber-400 font-medium">BMA Maintenance</span>
+          <span>สถาบันสารสนเทศทรัพยากรน้ำ</span>
+          <span className="text-blue-600 dark:text-blue-400 font-medium">HII Real Telemetry</span>
         </div>
       </div>
 

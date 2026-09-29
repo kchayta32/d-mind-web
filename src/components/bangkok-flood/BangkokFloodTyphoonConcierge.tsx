@@ -25,11 +25,10 @@ import {
   VEHICLE_PROFILES 
 } from '@/services/typhoonFloodService';
 import { BangkokRoadSegment } from '@/types/bangkokFlood';
-import { BangkokCctvCamera } from '@/data/bangkokCctvData';
 
 export interface BangkokFloodTyphoonConciergeProps {
   roads?: BangkokRoadSegment[];
-  cctvs?: BangkokCctvCamera[];
+  cctvs?: any[];
   onSelectRoadByName?: (roadName: string) => void;
   initialQuestion?: string;
   isOpen?: boolean;
@@ -62,9 +61,9 @@ const QUICK_PROMPT_CHIPS = [
     prompt: 'ขับขี่มอเตอร์ไซค์ใน กทม. วันนี้ มีจุดไหนและอุโมงค์ไหนที่ต้องหลีกเลี่ยงเด็ดขาด?'
   },
   {
-    icon: '📹',
-    label: 'CCTV จุดไหนระดับน้ำสูงที่สุด?',
-    prompt: 'จากกล้อง CCTV และเซ็นเซอร์ กทม. จุดไหนตรวจพบระดับน้ำรอระบายสูงสุด?'
+    icon: '📊',
+    label: 'สถานีวัดน้ำจุดไหนระดับน้ำสูงสุด?',
+    prompt: 'จากข้อมูลโทรมาตรระดับน้ำ สสน. ThaiWater และเซ็นเซอร์ กทม. จุดไหนตรวจพบระดับน้ำรอระบายสูงสุดและใกล้ล้นตลิ่ง?'
   },
   {
     icon: '🛣️',

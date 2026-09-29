@@ -233,3 +233,14 @@ export interface CrowdsourcedFloodReport {
   satelliteDistanceMeters?: number;
 }
 
+export interface SelectedLocation {
+  name: string;
+  displayName: string;
+  lat: number;
+  lon: number;
+  country?: string;
+  state?: string;
+  boundingBox?: [number, number, number, number]; // [south, north, west, east]
+  geojson?: any; // GeoJSON geometry (Polygon / MultiPolygon / Point)
+}
+
