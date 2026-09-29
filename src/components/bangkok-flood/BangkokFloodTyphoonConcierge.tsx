@@ -25,6 +25,7 @@ import {
   VEHICLE_PROFILES 
 } from '@/services/typhoonFloodService';
 import { BangkokRoadSegment } from '@/types/bangkokFlood';
+import { TyphoonMarkdownRenderer } from '@/components/chat/TyphoonMarkdownRenderer';
 
 export interface BangkokFloodTyphoonConciergeProps {
   roads?: BangkokRoadSegment[];
@@ -320,9 +321,16 @@ export const BangkokFloodTyphoonConcierge: React.FC<BangkokFloodTyphoonConcierge
                     )}
 
                     {/* Content formatted */}
-                    <div className="whitespace-pre-line space-y-1 font-sans">
-                      {msg.text}
-                    </div>
+                    {isUser ? (
+                      <p className="whitespace-pre-wrap leading-relaxed">
+                        {msg.text}
+                      </p>
+                    ) : (
+                      <TyphoonMarkdownRenderer
+                        content={msg.text}
+                        onSelectRoadByName={onSelectRoadByName}
+                      />
+                    )}
 
                     {isUser && (
                       <div className="text-[10px] text-blue-200 text-right mt-1 font-mono">

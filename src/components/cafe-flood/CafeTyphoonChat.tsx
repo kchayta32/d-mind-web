@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CafeVenue, FilterState } from '@/types/cafeFlood';
 import { askTyphoonCafeConcierge } from '@/services/typhoonCafeService';
-import { marked } from 'marked';
+import { TyphoonMarkdownRenderer } from '@/components/chat/TyphoonMarkdownRenderer';
 
 export interface ChatMessage {
   id: string;
@@ -238,11 +238,8 @@ export const CafeTyphoonChat: React.FC<CafeTyphoonChatProps> = ({
                     {msg.content}
                   </p>
                 ) : (
-                  <div
-                    className="text-xs sm:text-sm text-slate-200 leading-relaxed space-y-2 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-amber-300 [&_ul]:list-disc [&_ul]:pl-4 [&_strong]:text-amber-200 [&_a]:text-cyan-400 [&_p]:mb-1.5"
-                    dangerouslySetInnerHTML={{
-                      __html: marked.parse(msg.content, { gfm: true, breaks: true }) as string,
-                    }}
+                  <TyphoonMarkdownRenderer
+                    content={msg.content}
                   />
                 )}
 
