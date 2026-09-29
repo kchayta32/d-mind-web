@@ -22,7 +22,8 @@ import {
     Search,
     Satellite,
     Users,
-    Droplets
+    Droplets,
+    PhoneCall
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageProvider';

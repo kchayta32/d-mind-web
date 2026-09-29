@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ChatMessage } from '@/types/chat';
 import { Loader2, Send, Mic, MicOff, Volume2 } from 'lucide-react';
 import { sanitizeAndParseMarkdown } from '@/utils/markdownUtils';
+import { askTyphoonAssistant } from '@/services/typhoonAssistantService';
 
 interface EnhancedChatBotProps {
   className?: string;
@@ -141,30 +142,12 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
     setIsLoading(true);
     
     try {
-      // สร้างประวัติการแชทในรูปแบบที่ OpenAI ต้องการ
-      const chatHistory = messages.slice(1).map(msg => ({
-        role: msg.sender,
-        content: msg.content
-      }));
+      // เรียกใช้ Typhoon AI Assistant ดึงข้อมูลจากทุกหน้าเว็บใน D-MIND
+      const responseText = await askTyphoonAssistant(messageText, messages);
 
-      // เรียกใช้ Edge Function พร้อมระบุให้ใช้ข้อมูลจาก documents table
-      const { data, error } = await supabase.functions.invoke('ai-chat', {
-        body: {
-          message: messageText,
-          chatHistory,
-          useDocuments: true, // ใช้ข้อมูลจาก documents table
-          systemPrompt: `คุณคือ Dr.Mind ผู้เชี่ยวชาญด้านภัยธรรมชาติและแพทย์ฉุกเฉิน คุณมีบุคลิกเป็นมิตร อารมณ์ดี และพูดจาอย่างผู้เชี่ยวชาญที่มีประสบการณ์ มักใช้คำลงท้ายด้วย "ครับ" และใส่อีโมจิที่เหมาะสมเป็นครั้งคราว คุณให้คำแนะนำที่ชัดเจน แม่นยำ และปฏิบัติได้จริง โดยอิงจากหลักการทางวิทยาศาสตร์และประสบการณ์จริง 
-
-สำคัญ: ให้ใช้ข้อมูลจากฐานข้อมูล documents ที่มีอยู่เป็นหลักในการตอบคำถาม เพื่อให้คำตอบที่ถูกต้องและเป็นปัจจุบันที่สุด`
-        }
-      });
-
-      if (error) throw new Error(error.message);
-
-      // เพิ่มข้อความการตอบกลับจาก AI
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: responseText,
         sender: 'assistant',
         timestamp: new Date()
       };
@@ -173,15 +156,15 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
 
       // เล่นเสียงถ้าเปิดโหมดเสียง
       if (isVoiceMode) {
-        speakText(data.response);
+        speakText(responseText);
       }
       
     } catch (error) {
-      console.error('Error calling AI:', error);
+      console.error('Error calling Typhoon AI:', error);
       
       toast({
         title: "ขออภัย",
-        description: "เกิดข้อผิดพลาดในการเรียกใช้ AI กรุณาลองอีกครั้ง",
+        description: "เกิดข้อผิดพลาดในการเรียกใช้ Typhoon AI กรุณาลองอีกครั้ง",
         variant: "destructive"
       });
     } finally {
@@ -198,8 +181,13 @@ const EnhancedChatBot: React.FC<EnhancedChatBotProps> = ({ className }) => {
               <span className="text-white text-lg">👨‍⚕️</span>
             </div>
             <div>
-              <CardTitle className="text-base sm:text-lg font-bold text-foreground">Dr.Mind - ผู้เชี่ยวชาญฉุกเฉิน</CardTitle>
-              <p className="text-xs text-muted-foreground">ภัยธรรมชาติ & แพทย์ฉุกเฉิน 24 ชม.</p>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base sm:text-lg font-bold text-foreground">Dr.Mind - ผู้เชี่ยวชาญฉุกเฉิน</CardTitle>
+                <span className="text-[10px] bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-2 py-0.5 rounded-full shadow-sm">
+                  Typhoon AI (RAG Multi-Page)
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">ดึงข้อมูลสดจากทุกหน้าเว็บ D-MIND ร่วมตอบคำถาม 24 ชม.</p>
             </div>
           </div>
           <div className="flex space-x-2">

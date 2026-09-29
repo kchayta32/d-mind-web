@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageProvider';
+import { MULTI_SOURCE_FLOOD_NEWS } from '@/services/multiSourceFloodNewsService';
 
 interface DisasterItem {
   id: string;
@@ -126,6 +127,31 @@ const DisasterNews: React.FC = () => {
         });
       }
 
+      // 4. Merge multi-source authentic scraped news (Thai PBS, Thairath, Khaosod, Daily News, PPTV HD 36, PRD, JS100, FM91, Google Flood Hub)
+      if (MULTI_SOURCE_FLOOD_NEWS && Array.isArray(MULTI_SOURCE_FLOOD_NEWS)) {
+        MULTI_SOURCE_FLOOD_NEWS.forEach((msItem) => {
+          allItems.push({
+            id: msItem.id,
+            title: msItem.title,
+            category_id: msItem.sourceType === 'news' || msItem.sourceType === 'gov' ? 'hazard' : 'natural',
+            category_label: msItem.sourceType === 'news' ? 'ข่าวสารภัยพิบัติ' : msItem.sourceType === 'gov' ? 'ประกาศราชการ' : 'เฝ้าระวังน้ำท่วม',
+            category_icon: msItem.sourceType === 'news' ? '📰' : '🌊',
+            description: msItem.summary,
+            summary: msItem.summary,
+            detail: `${msItem.summary}\n\nพื้นที่ได้รับผลกระทบ: ${msItem.affectedDistricts.join(', ')}\nแหล่งที่มา: ${msItem.attributionNote}`,
+            location_name: msItem.affectedDistricts.join(', '),
+            province: msItem.affectedDistricts[0] || 'กรุงเทพฯ/ปริมณฑล',
+            severity_level: msItem.severity === 'extreme' ? 'วิกฤตฉุกเฉิน' : msItem.severity === 'danger' ? 'รุนแรง' : msItem.severity === 'warning' ? 'เตือนภัย' : 'เฝ้าระวัง',
+            warning_level: msItem.severity === 'extreme' ? 'วิกฤตฉุกเฉิน' : msItem.severity === 'danger' ? 'รุนแรง' : msItem.severity === 'warning' ? 'เตือนภัย' : 'เฝ้าระวัง',
+            source_name: msItem.sourceName,
+            source_url: msItem.sourceUrl,
+            image_url: msItem.imageUrl || DEFAULT_IMAGE,
+            event_time: new Date(msItem.publishedAtTimestamp).toISOString(),
+            created_at: new Date(msItem.publishedAtTimestamp).toISOString(),
+          });
+        });
+      }
+
       // If Supabase tables are empty or being initialized, fallback to static / public dataset
       if (allItems.length === 0) {
         // Fetch from local cache API or public endpoint
@@ -140,14 +166,23 @@ const DisasterNews: React.FC = () => {
         }
       }
 
-      // Sort by newest
-      allItems.sort((a, b) => {
+      // Deduplicate by title/id and sort by newest
+      const uniqueItemsMap = new Map<string, DisasterItem>();
+      allItems.forEach((item) => {
+        const key = item.id || item.title;
+        if (!uniqueItemsMap.has(key)) {
+          uniqueItemsMap.set(key, item);
+        }
+      });
+      const deduplicatedItems = Array.from(uniqueItemsMap.values());
+
+      deduplicatedItems.sort((a, b) => {
         const timeA = new Date(a.event_time || a.incident_time || a.created_at).getTime();
         const timeB = new Date(b.event_time || b.incident_time || b.created_at).getTime();
         return timeB - timeA;
       });
 
-      setItems(allItems);
+      setItems(deduplicatedItems);
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching disaster news:', error);
@@ -219,14 +254,19 @@ const DisasterNews: React.FC = () => {
   const handleRefresh = async () => {
     setIsScraping(true);
     toast({
-      title: 'กำลังรีเฟรชข้อมูล',
-      description: 'กำลังตรวจสอบข้อมูลล่าสุดจาก TMD, Air4Thai, และ USGS...',
+      title: 'กำลังทำ Web Scraping ดึงข่าวสด',
+      description: 'กำลังตรวจสอบข้อมูลล่าสุดจาก TMD, Air4Thai, USGS, GDACS, Thai PBS, Thairath, Khaosod, Daily News, PPTV HD 36...',
     });
+    try {
+      await fetch('/api/scrape', { method: 'POST' });
+    } catch (e) {
+      console.warn('Scraper API trigger notice:', e);
+    }
     await fetchData();
     setIsScraping(false);
     toast({
       title: 'อัปเดตเรียบร้อย',
-      description: 'ดึงข้อมูลสถานการณ์ล่าสุดสำเร็จแล้ว',
+      description: 'ทำ Web Scraping ดึงข่าวสารภัยพิบัติล่าสุดสำเร็จแล้ว',
     });
   };
 

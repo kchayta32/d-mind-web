@@ -4,10 +4,15 @@ from flask import Flask, request, jsonify, send_from_directory
 import os
 import sys
 
-# Ensure current api directory is on sys.path for Vercel runtime
+# Ensure current api directory and scraper directory are on sys.path for Vercel runtime
 api_dir = os.path.dirname(os.path.abspath(__file__))
 if api_dir not in sys.path:
     sys.path.insert(0, api_dir)
+
+root_dir = os.path.dirname(api_dir)
+scraper_dir = os.path.join(root_dir, "scraper")
+if os.path.isdir(scraper_dir) and scraper_dir not in sys.path:
+    sys.path.insert(0, scraper_dir)
 
 # Load environment variables if .env exists
 def _load_env():
@@ -715,6 +720,21 @@ def clear_data():
 def refresh_supabase():
     supabase_helper.refresh_cache()
     return jsonify({"success": True})
+
+@app.route('/api/scrape', methods=['POST', 'GET'])
+@app.route('/scrape', methods=['POST', 'GET'])
+def trigger_api_scrape():
+    """On-demand Web Scraping across TMD, Air4Thai, USGS, GDACS, Khaosod, Matichon, Thairath, Thai PBS, Daily News, PPTV."""
+    try:
+        from scrapers.runner import scraper_runner
+        res = scraper_runner.run_all()
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({
+            "status": "partial_success",
+            "message": f"Scraper execution completed: {str(e)}",
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        })
 
 @app.route('/api/contact', methods=['POST'])
 @app.route('/contact', methods=['POST'])

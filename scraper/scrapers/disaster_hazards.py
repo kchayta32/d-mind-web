@@ -92,7 +92,10 @@ class DisasterHazardScraper(BaseScraper):
         feed_configs = [
             {"url": "https://www.khaosod.co.th/feed", "source": "ข่าวสด (Khaosod)"},
             {"url": "https://www.matichon.co.th/feed", "source": "มติชนออนไลน์"},
-            {"url": "https://www.thairath.co.th/rss/news", "source": "ไทยรัฐออนไลน์"}
+            {"url": "https://www.thairath.co.th/rss/news", "source": "ไทยรัฐออนไลน์"},
+            {"url": "https://news.thaipbs.or.th/rss/news.xml", "source": "Thai PBS (ไทยพีบีเอส)"},
+            {"url": "https://www.dailynews.co.th/feed/", "source": "เดลินิวส์ (Daily News)"},
+            {"url": "https://www.pptvhd36.com/rss/news", "source": "PPTV HD 36"}
         ]
 
         hazard_keywords = {
