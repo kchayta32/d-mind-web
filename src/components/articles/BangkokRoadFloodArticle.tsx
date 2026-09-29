@@ -19,9 +19,10 @@ import {
     Compass,
     Waves,
     Car,
-    PhoneCall,
     Search,
-    Satellite
+    Satellite,
+    Users,
+    Droplets
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageProvider';
@@ -50,31 +51,31 @@ const BangkokRoadFloodArticle: React.FC = () => {
                     </Button>
 
                     <div className="flex flex-wrap items-center gap-2 mb-4">
-                        <Badge className="bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-1 font-semibold flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+                        <Badge className="bg-sky-500/20 text-sky-300 border border-sky-500/30 px-3 py-1 font-semibold flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
                             {isEn ? 'New Feature • Bangkok Live' : 'ฟีเจอร์ใหม่ • เฝ้าระวัง กทม. สด'}
                         </Badge>
                         <Badge variant="outline" className="text-cyan-300 border-cyan-400/40 bg-cyan-500/10">
-                            {isEn ? 'Sentinel-1 SAR & BMA Open Data' : 'ดาวเทียม Sentinel-1 & Open Data กทม.'}
+                            {isEn ? 'Sentinel-1 SAR & ThaiWater Telemetry' : 'ดาวเทียม Sentinel-1 & โทรมาตร สสน.'}
                         </Badge>
                         <Badge variant="outline" className="text-emerald-300 border-emerald-400/40 bg-emerald-500/10">
-                            {isEn ? '65 Live CCTV Cameras' : 'กล้องวงจรปิดสด 65 จุด'}
+                            {isEn ? 'Citizen Flood Reports' : 'รายงานสดจากประชาชน'}
                         </Badge>
                     </div>
 
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
                         {isEn ? (
                             <>
-                                Bangkok Road Flood & 65 Live CCTV Monitoring:<br />
+                                Bangkok Road Flood & Real-Time Telemetry:<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
-                                    Real-time Urban Flood Intelligence & 4-Zone Road Passability
+                                    Real-time Urban Flood Intelligence, ThaiWater Sensors & Citizen Reports
                                 </span>
                             </>
                         ) : (
                             <>
-                                เปิดตัวแผนที่น้ำท่วมขังถนน & กล้อง CCTV กทม. เรียลไทม์:<br />
+                                เปิดตัวแผนที่น้ำท่วมขังถนน & โทรมาตรวัดน้ำ กทม. เรียลไทม์:<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
-                                    เฝ้าระวังน้ำท่วมผิวจราจร 39 สายหลัก 4 โซน พร้อมภาพสด 65 จุดตรวจ
+                                    เฝ้าระวังน้ำท่วมผิวจราจร 39 สายหลัก 4 โซน พร้อมโทรมาตรคลอง สสน. และรายงานประชาชน
                                 </span>
                             </>
                         )}
@@ -82,8 +83,8 @@ const BangkokRoadFloodArticle: React.FC = () => {
 
                     <p className="text-slate-300 text-base md:text-lg max-w-3xl leading-relaxed mb-6">
                         {isEn
-                            ? 'D-MIND introduces our specialized Bangkok Road Flood Surveillance System. Track road-by-road inundation depths with intuitive 3-tier passability colors (Red/Orange/Green), inspect 65 live CCTV cameras across 4 zones, and leverage Sentinel-1 SAR satellite microwave detection for safer urban commuting.'
-                            : 'D-MIND ภูมิใจเปิดตัวระบบเฝ้าระวังน้ำท่วมขังถนนทั่วกรุงเทพมหานครแบบเรียลไทม์ ตรวจสอบระดับน้ำท่วมผิวจราจรรายสาย พร้อมรหัสสีสัญจร 3 ระดับ (แดง=หลีกเลี่ยง, ส้ม=ขับช้า, เขียว=ปกติ) ดูกล้องวงจรปิดสด 65 จุด และผสานข้อมูลดาวเทียม Sentinel-1 SAR เพื่อการเดินทางที่ปลอดภัยไร้กังวล'}
+                            ? 'D-MIND introduces our specialized Bangkok Road Flood Surveillance System. Track road-by-road inundation depths with intuitive 3-tier passability colors (Red/Orange/Green), ThaiWater canal water telemetry, citizen crowd reports, and Sentinel-1 SAR satellite microwave detection for safer urban commuting.'
+                            : 'D-MIND ภูมิใจเปิดตัวระบบเฝ้าระวังน้ำท่วมขังถนนทั่วกรุงเทพมหานครแบบเรียลไทม์ ตรวจสอบระดับน้ำท่วมผิวจราจรรายสาย พร้อมรหัสสีสัญจร 3 ระดับ (แดง=หลีกเลี่ยง, ส้ม=ขับช้า, เขียว=ปกติ) ผสานโทรมาตรวัดน้ำคลองจริงจาก สสน. ThaiWater, รายงานระดับน้ำจากประชาชน และข้อมูลดาวเทียม Sentinel-1 SAR เพื่อการเดินทางที่ปลอดภัยไร้กังวล'}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-6 text-xs md:text-sm text-slate-400 pt-2 border-t border-slate-800">
@@ -117,7 +118,7 @@ const BangkokRoadFloodArticle: React.FC = () => {
                             <p className="text-xs text-blue-200">
                                 {isEn
                                     ? 'Filter by 4 zones or search any major road in Bangkok with instant status'
-                                    : 'ค้นหาชื่อถนน หรือเลือกโซน เพื่อดูรหัสสีสัญจรและภาพกล้องสดได้ทันที'}
+                                    : 'ค้นหาชื่อถนน หรือเลือกโซน เพื่อดูรหัสสีสัญจรและโทรมาตรวัดน้ำสดได้ทันที'}
                             </p>
                         </div>
                     </div>
@@ -154,8 +155,8 @@ const BangkokRoadFloodArticle: React.FC = () => {
                         </p>
                         <p className="text-muted-foreground leading-relaxed mb-6">
                             {isEn
-                                ? 'To protect citizens, commuters, and emergency responders, the D-MIND engineering team has integrated heterogeneous open data sources—including BMA canal telemetry, street-level CCTV cameras, and European Space Agency Copernicus Sentinel-1 SAR satellites—into a single high-performance map interface.'
-                                : 'เพื่อแก้ปัญหาและยกระดับการเตือนภัยให้ประชาชน ทีมพัฒนา D-MIND จึงได้สร้างระบบศูนย์กลางรวบรวมข้อมูลสถานการณ์น้ำท่วมถนนแบบเปิด (Open Data Integration) ผสานรวมข้อมูลโทรมาตรระดับน้ำคลอง, กล้องวงจรปิด CCTV ถ่ายทอดสด, รายงานสถานีสูบน้ำของสำนักการระบายน้ำ กทม. และภาพถ่ายดาวเทียมเรดาร์ Sentinel-1 SAR จากสหภาพยุโรป นำเสนอผ่านแผนที่ความคมชัดสูงที่ทุกคนเปิดดูได้ง่ายผ่านเบราว์เซอร์'}
+                                ? 'To protect citizens, commuters, and emergency responders, the D-MIND engineering team has integrated heterogeneous open data sources—including ThaiWater HII canal telemetry, real-time citizen crowdsourced reports, BMA drainage pump telemetry, and European Space Agency Copernicus Sentinel-1 SAR satellites—into a single high-performance map interface.'
+                                : 'เพื่อแก้ปัญหาและยกระดับการเตือนภัยให้ประชาชน ทีมพัฒนา D-MIND จึงได้สร้างระบบศูนย์กลางรวบรวมข้อมูลสถานการณ์น้ำท่วมถนนแบบเปิด (Open Data Integration) ผสานรวมข้อมูลโทรมาตรระดับน้ำคลอง สสน. ThaiWater, ระบบรายงานสถานการณ์จริงจากประชาชน (Crowdsource), รายงานสถานีสูบน้ำของสำนักการระบายน้ำ กทม. และภาพถ่ายดาวเทียมเรดาร์ Sentinel-1 SAR จากสหภาพยุโรป นำเสนอผ่านแผนที่ความคมชัดสูงที่ทุกคนเปิดดูได้ง่ายผ่านเบราว์เซอร์'}
                         </p>
 
                         {/* Highlight stat cards */}
@@ -170,12 +171,12 @@ const BangkokRoadFloodArticle: React.FC = () => {
                                 </p>
                             </div>
                             <div className="p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/20 text-center">
-                                <p className="text-3xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400">65</p>
+                                <p className="text-3xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400">28+</p>
                                 <p className="text-xs sm:text-sm font-semibold text-foreground mt-1">
-                                    {isEn ? 'Live CCTVs' : 'กล้องวงจรปิดสด'}
+                                    {isEn ? 'Canal Gauges & Reports' : 'โทรมาตรคลอง & รายงานสด'}
                                 </p>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    {isEn ? 'Auto-refresh snapshots' : 'อัปเดตทุก 30 วินาที'}
+                                    {isEn ? 'ThaiWater & Citizens' : 'สสน. ThaiWater & ประชาชน'}
                                 </p>
                             </div>
                             <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 text-center">
@@ -319,7 +320,7 @@ const BangkokRoadFloodArticle: React.FC = () => {
                                         : 'ครอบคลุมเขตบางเขน, จตุจักร, ดอนเมือง, หลักสี่, สายไหม ถนนสายสำคัญ: ถนนวิภาวดีรังสิต, พหลโยธิน, แจ้งวัฒนะ, งามวงศ์วาน, ลาดพร้าว (หน้าศาลอาญา, ห้าแยกลาดพร้าว)'}
                                 </p>
                                 <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                                    10 Major Arteries • 18 CCTVs
+                                    {isEn ? '10 Major Arteries • Telemetry & Reports' : '10 เส้นทางเสี่ยง • โทรมาตร & รายงานสด'}
                                 </span>
                             </div>
 
@@ -334,7 +335,7 @@ const BangkokRoadFloodArticle: React.FC = () => {
                                         : 'ศูนย์กลางธุรกิจและเศรษฐกิจ: ปทุมวัน, บางรัก, สาทร, ดินแดง, พญาไท, ห้วยขวาง ถนนสายสำคัญ: สุขุมวิท (อโศก, พร้อมพงษ์, พระโขนง), พระราม 4, รัชดาภิเษก, สาทร, พระราม 9'}
                                 </p>
                                 <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                                    11 Major Arteries • 20 CCTVs
+                                    {isEn ? '11 Major Arteries • Telemetry & Reports' : '11 เส้นทางเสี่ยง • โทรมาตร & รายงานสด'}
                                 </span>
                             </div>
 
@@ -349,7 +350,7 @@ const BangkokRoadFloodArticle: React.FC = () => {
                                         : 'แนวระบายน้ำฝั่งตะวันออก: บางนา, ประเวศ, สะพานสูง, มีนบุรี, คลองสามวา ถนนสายสำคัญ: ศรีนครินทร์ (แยกลำสาลี, แยกพัฒนาการ), รามคำแหง, อุดมสุข, อ่อนนุช, บางนา-ตราด'}
                                 </p>
                                 <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                                    9 Major Arteries • 14 CCTVs
+                                    {isEn ? '9 Major Arteries • Telemetry & Reports' : '9 เส้นทางเสี่ยง • โทรมาตร & รายงานสด'}
                                 </span>
                             </div>
 
@@ -364,13 +365,13 @@ const BangkokRoadFloodArticle: React.FC = () => {
                                         : 'ฝั่งตะวันตกของแม่น้ำเจ้าพระยา: ธนบุรี, บางกอกใหญ่, ภาษีเจริญ, บางแค, จอมทอง, บางบอน ถนนสายสำคัญ: เพชรเกษม (แยกบางแค), จรัญสนิทวงศ์, สมเด็จพระเจ้าตากสิน, บรมราชชนนี, ราชพฤกษ์'}
                                 </p>
                                 <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                                    9 Major Arteries • 13 CCTVs
+                                    {isEn ? '9 Major Arteries • Telemetry & Reports' : '9 เส้นทางเสี่ยง • โทรมาตร & รายงานสด'}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Section 4: 65 Live CCTV Camera Network */}
+                    {/* Section 4: Citizen Flood Reports & ThaiWater Telemetry */}
                     <div className="border-t border-border pt-10">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-lg">
@@ -378,41 +379,41 @@ const BangkokRoadFloodArticle: React.FC = () => {
                             </div>
                             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                                 {isEn
-                                    ? '65 Live CCTV Cameras with Auto-Refresh & Water Gauge Telemetry'
-                                    : 'โครงข่ายกล้องวงจรปิด CCTV 65 จุด พร้อมภาพถ่ายทอดสดและโทรมาตรระดับน้ำ'}
+                                    ? 'Citizen Flood Crowdsource Reports & ThaiWater Real-Time Telemetry'
+                                    : 'ระบบรายงานสถานการณ์น้ำท่วมสดจากประชาชน & โทรมาตรคลอง สสน. ThaiWater'}
                             </h2>
                         </div>
                         <p className="text-muted-foreground leading-relaxed mb-4">
                             {isEn
-                                ? 'Visual ground truth is crucial for assessing road conditions. D-MIND links directly with open BMA and traffic department feeds, presenting 65 active CCTV vantage points at high-risk intersections and underpasses.'
-                                : 'การมองเห็นสภาพจริงบนท้องถนนด้วยตาตนเอง (Ground Truth Verification) คือสิ่งสำคัญที่สุดในการประเมินสถานการณ์ ระบบ D-MIND จึงได้เชื่อมโยงกล้อง CCTV ตรวจวัดน้ำท่วมและจราจรจำนวน 65 จุดทั่วกรุงเทพฯ เพื่อให้ผู้ใช้งานสามารถคลิกดูภาพสดของผิวจราจรได้ทันที'}
+                                ? 'Real-world ground observations from actual commuters provide the most immediate truth during torrential downpours. D-MIND empowers citizens to report flood situations directly on the map with depth presets (ankle, shin, knee, waist, chest, over-head) combined with real-time canal telemetry from HII (Hydro-Informatics Institute - ThaiWater).'
+                                : 'การรายงานสถานการณ์จริงจากประชาชนบนท้องถนน (Ground Truth Crowdsourcing) คือหัวใจสำคัญของการรับมือภัยพิบัติ ระบบ D-MIND เปิดให้ประชาชนร่วมส่งรายงานสถานการณ์น้ำท่วมได้ทันทีผ่านระบบตัวเลือกมาตรฐาน (ตาตุ่ม, ครึ่งแข้ง, หัวเข่า, เอว, อก, มิดหัว) พร้อมพิกัด GPS แสดงหมุดสดบนแผนที่ ผสานรวมข้อมูลโทรมาตรระดับน้ำคลองจริงจากสถาบันสารสนเทศทรัพยากรน้ำ (สสน. ThaiWater) และสถานีสูบน้ำ กทม.'}
                         </p>
 
                         <div className="bg-slate-900 text-slate-100 rounded-2xl p-5 border border-slate-800 space-y-4">
                             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                                 <div className="flex items-center gap-2">
-                                    <Camera className="w-5 h-5 text-cyan-400" />
-                                    <span className="font-bold text-sm">CCTV Feeds Features & Specs</span>
+                                    <Users className="w-5 h-5 text-cyan-400" />
+                                    <span className="font-bold text-sm">Citizen Reports & Telemetry Specs</span>
                                 </div>
                                 <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
-                                    Auto-Refresh 30s
+                                    Live Crowdsource
                                 </span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                                 <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
-                                    <Eye className="w-4 h-4 text-cyan-300 mb-1" />
-                                    <p className="font-semibold text-white">Live Snapshots & Fallbacks</p>
-                                    <p className="text-slate-400 mt-0.5">ภาพสดอัปเดตแบบอัตโนมัติ พร้อมระบบสำรองภาพกรณีกล้องปลายทางขัดข้อง</p>
+                                    <Droplets className="w-4 h-4 text-cyan-300 mb-1" />
+                                    <p className="font-semibold text-white">Citizen Depth Presets</p>
+                                    <p className="text-slate-400 mt-0.5">ตัวเลือกระดับน้ำ 6 ระดับ (ตาตุ่ม, ครึ่งแข้ง, หัวเข่า, เอว, อก, มิดหัว) รายงานสะดวก รวดเร็ว พร้อมหมุด GPS สด</p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
                                     <Waves className="w-4 h-4 text-blue-300 mb-1" />
-                                    <p className="font-semibold text-white">Canal Water Gauges</p>
-                                    <p className="text-slate-400 mt-0.5">โทรมาตรระดับน้ำคลอง 28 สายหลัก เทียบกับระดับสันเขื่อนและระดับวิกฤต</p>
+                                    <p className="font-semibold text-white">ThaiWater Canal Gauges</p>
+                                    <p className="text-slate-400 mt-0.5">โทรมาตรระดับน้ำคลอง 28 สายหลัก สสน. เทียบกับระดับตลิ่งและวิกฤต พร้อมพิกัดสถานีจริง</p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
                                     <Radio className="w-4 h-4 text-amber-300 mb-1" />
-                                    <p className="font-semibold text-white">Pumping Stations Status</p>
-                                    <p className="text-slate-400 mt-0.5">สถานะการเดินเครื่องสถานีสูบน้ำและอุโมงค์ยักษ์ระบายน้ำ กทม.</p>
+                                    <p className="font-semibold text-white">Pumping Stations & Sluices</p>
+                                    <p className="text-slate-400 mt-0.5">สถานะการเดินเครื่องสถานีสูบน้ำ ประตูระบายน้ำ และอุโมงค์ยักษ์ระบายน้ำ กทม.</p>
                                 </div>
                             </div>
                         </div>

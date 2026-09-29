@@ -37,8 +37,8 @@ const disasterTypes: Array<{
   {
     type: 'bkk_road_flood',
     label: 'น้ำท่วมถนน กทม.',
-    sublabel: 'Sentinel & 65 CCTV',
-    icon: <Camera className="w-5 h-5" />,
+    sublabel: 'Sentinel & สสน. ThaiWater',
+    icon: <Waves className="w-5 h-5" />,
     activeColor: 'bg-sky-600 hover:bg-sky-700 text-white',
     available: true
   },

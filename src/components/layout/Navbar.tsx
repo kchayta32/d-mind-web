@@ -124,7 +124,7 @@ const Navbar: React.FC = () => {
                         >
                             <Waves className="h-3.5 w-3.5 text-sky-400 animate-pulse" />
                             <span>น้ำท่วมถนน กทม.</span>
-                            <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">CCTV</span>
+                            <span className="bg-sky-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
                         </Button>
 
                         <Button

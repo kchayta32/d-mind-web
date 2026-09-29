@@ -13,7 +13,9 @@ import {
     Radio,
     BookOpen,
     Eye,
-    ShieldAlert
+    ShieldAlert,
+    Users,
+    Droplets
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageProvider';
 
@@ -65,9 +67,9 @@ const BangkokFloodBanner: React.FC = () => {
                                 <p className="text-[10px] text-muted-foreground">แดง • ส้ม • เขียว</p>
                             </div>
                             <div className="p-2.5 rounded-xl bg-muted/40 border border-border/80 text-left">
-                                <Camera className="w-4 h-4 text-cyan-500 mb-1" />
-                                <p className="text-xs font-bold text-foreground">65 กล้อง CCTV</p>
-                                <p className="text-[10px] text-muted-foreground">ภาพสด 4 โซนทั่วกรุง</p>
+                                <Users className="w-4 h-4 text-cyan-500 mb-1" />
+                                <p className="text-xs font-bold text-foreground">รายงานประชาชน</p>
+                                <p className="text-[10px] text-muted-foreground">ตาตุ่ม ถึง มิดหัว</p>
                             </div>
                             <div className="p-2.5 rounded-xl bg-muted/40 border border-border/80 text-left">
                                 <Radio className="w-4 h-4 text-blue-500 mb-1" />
@@ -76,8 +78,8 @@ const BangkokFloodBanner: React.FC = () => {
                             </div>
                             <div className="p-2.5 rounded-xl bg-muted/40 border border-border/80 text-left">
                                 <Waves className="w-4 h-4 text-indigo-500 mb-1" />
-                                <p className="text-xs font-bold text-foreground">โทรมาตร กทม.</p>
-                                <p className="text-[10px] text-muted-foreground">ระดับคลอง & สถานีสูบ</p>
+                                <p className="text-xs font-bold text-foreground">โทรมาตร สสน.</p>
+                                <p className="text-[10px] text-muted-foreground">ระดับคลอง ThaiWater</p>
                             </div>
                         </div>
 
@@ -116,8 +118,8 @@ const BangkokFloodBanner: React.FC = () => {
                                         BKK LIVE SURVEILLANCE
                                     </span>
                                 </div>
-                                <Badge className="bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] px-2 py-0.5">
-                                    65 CCTV CAMERAS
+                                <Badge className="bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] px-2 py-0.5">
+                                    LIVE TELEMETRY & REPORTS
                                 </Badge>
                             </div>
 
@@ -167,21 +169,21 @@ const BangkokFloodBanner: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Live CCTV Mockup Card */}
+                            {/* Live Citizen Report & Telemetry Mockup Card */}
                             <div className="p-3 rounded-xl bg-gradient-to-r from-slate-800/90 to-slate-800/50 border border-cyan-500/30 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center flex-shrink-0 border border-cyan-400/30">
-                                        <Camera className="w-5 h-5" />
+                                        <Users className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                                            <span>กล้อง CCTV สด #BKK-02</span>
+                                            <span>{isEn ? 'Citizen Flood Report' : 'รายงานสดจากประชาชน'}</span>
                                             <span className="text-[9px] font-mono text-cyan-400 bg-cyan-950/80 px-1.5 py-0.2 rounded border border-cyan-800">
-                                                Live 30s
+                                                Live GPS
                                             </span>
                                         </p>
                                         <p className="text-[10px] text-slate-300">
-                                            แยกอโศก-สุขุมวิท • ระดับน้ำ 12 ซม. (สัญจรชะลอตัว)
+                                            {isEn ? 'Ratchadapisek • Water depth: Shin level (15-30 cm)' : 'แยกรัชดาภิเษก • ระดับน้ำ: ครึ่งแข้ง (15-30 ซม.)'}
                                         </p>
                                     </div>
                                 </div>
@@ -190,8 +192,8 @@ const BangkokFloodBanner: React.FC = () => {
                                     onClick={() => navigate('/bangkok-flood')}
                                     className="h-8 px-2.5 text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-lg flex-shrink-0"
                                 >
-                                    <Eye className="w-3.5 h-3.5 mr-1" />
-                                    {isEn ? 'View' : 'ดูสด'}
+                                    <Waves className="w-3.5 h-3.5 mr-1" />
+                                    {isEn ? 'Reports' : 'รายงานสด'}
                                 </Button>
                             </div>
 

@@ -15,7 +15,8 @@ import {
   Eye,
   Activity,
   Radio,
-  Satellite
+  Satellite,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -332,12 +333,12 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         </div>
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-600 dark:text-slate-400">
           <span className="flex items-center gap-1">
-            <Camera className="w-3 h-3 text-amber-500" />
-            กล้อง CCTV (ปิดปรับปรุงระบบ)
+            <Users className="w-3 h-3 text-emerald-500" />
+            รายงานประชาชนสด ({userReports.length})
           </span>
           <span className="flex items-center gap-1">
             <Waves className="w-3 h-3 text-cyan-500" />
-            สถานีสูบน้ำ/คลอง ({waterStations.length})
+            โทรมาตร สสน./คลอง ({waterStations.length})
           </span>
         </div>
         {showSentinelSarLayer && (

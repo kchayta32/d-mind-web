@@ -116,10 +116,10 @@ const NewMobileLayout: React.FC = () => {
         {
           id: 'bkkFlood',
           title: t('menu.bkkFlood'),
-          desc: isEn ? 'Live road waterlogging & 65 CCTV cams' : 'ตรวจระดับน้ำท่วมถนนรายสาย & กล้องสด 65 จุด',
+          desc: isEn ? 'Live road waterlogging & telemetry' : 'ตรวจระดับน้ำท่วมถนนรายสาย & โทรมาตรสด',
           icon: Waves,
           route: '/bangkok-flood',
-          badge: 'CCTV Live',
+          badge: 'LIVE',
           gradient: 'from-cyan-500/15 via-cyan-500/5 to-transparent',
           iconBg: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
           accent: 'border-cyan-500/30'
@@ -352,7 +352,7 @@ const NewMobileLayout: React.FC = () => {
         <MapBanner />
       </div>
 
-      {/* [NEW] Bangkok Road Flood & CCTV Banner Section */}
+      {/* [NEW] Bangkok Road Flood & Telemetry Banner Section */}
       <div className="px-2">
         <BangkokFloodBanner />
       </div>

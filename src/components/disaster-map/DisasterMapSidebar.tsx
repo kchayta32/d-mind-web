@@ -32,9 +32,9 @@ import { Badge } from '@/components/ui/badge';
 const menuItems = [
   {
     title: 'น้ำท่วมถนน กทม.',
-    icon: Camera,
-    source: 'Sentinel & 65 CCTV',
-    description: 'สภาพน้ำท่วมขังถนนทั่ว กทม. & กล้องสด'
+    icon: Waves,
+    source: 'Sentinel & สสน. ThaiWater',
+    description: 'สภาพน้ำท่วมขังถนนทั่ว กทม. & โทรมาตรสด'
   },
   {
     title: 'แผ่นดินไหว',

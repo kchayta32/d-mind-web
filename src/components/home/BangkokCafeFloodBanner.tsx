@@ -123,7 +123,7 @@ export const BangkokCafeFloodBanner: React.FC = () => {
                                 onClick={() => navigate('/bangkok-flood')}
                             >
                                 <MapPin className="w-4 h-4 mr-1.5 text-cyan-500" />
-                                <span>{isEn ? 'Bangkok Road Flood & CCTV' : 'ตรวจน้ำท่วมถนน กทม.'}</span>
+                                <span>{isEn ? 'Bangkok Road Flood & Telemetry' : 'ตรวจน้ำท่วมถนน กทม.'}</span>
                             </Button>
                         </div>
                     </div>

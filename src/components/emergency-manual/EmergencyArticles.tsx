@@ -55,16 +55,16 @@ const EmergencyArticles: React.FC = () => {
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date } | null>(null);
 
   const articles = useMemo<EmergencyArticleItem[]>(() => [
-    // Banner 2 New Feature: Bangkok Road Flood & CCTV Real-time Monitoring
+    // Banner 2 New Feature: Bangkok Road Flood & Real-time Telemetry
     {
       id: 'bangkok-flood-monitoring',
       title: isEn
-        ? 'Bangkok Road Flood & 65 Live CCTV Monitoring: 4-Zone Interactive Map with 3-Tier Status & Satellite Telemetry'
-        : 'เปิดตัวระบบแผนที่น้ำท่วมขังถนน กทม. & กล้อง CCTV สด 65 จุด: เฝ้าระวัง 4 โซน พร้อมรหัสสี 3 ระดับและดาวเทียม Sentinel',
+        ? 'Bangkok Road Flood & Real-Time Telemetry: 4-Zone Interactive Map with 3-Tier Status, ThaiWater & Citizen Reports'
+        : 'เปิดตัวระบบแผนที่น้ำท่วมขังถนน กทม. & โทรมาตรวัดน้ำ สสน.: เฝ้าระวัง 4 โซน พร้อมรหัสสี 3 ระดับ และรายงานสดจากประชาชน',
       subtitle: isEn ? 'D-MIND GIS & Urban Resilience Team' : 'จาก ทีมพัฒนา D-MIND GIS & Urban Resilience',
       description: isEn
-        ? 'Comprehensive guide and launch announcement for Bangkok Road Flood Surveillance: Interactive map covering 39 flood-prone arterial roads across 4 zones (North, Central, East, Thonburi), real-time passability color codes (Red=Avoid, Orange=Caution, Green=Normal), 65 live CCTV traffic camera streams, BMA canal & drainage pump telemetry, and Sentinel-1 SAR satellite remote sensing.'
-        : 'คู่มือและบทความเปิดตัวระบบเฝ้าระวังน้ำท่วมขังถนนทั่วกรุงเทพมหานคร: แผนที่อินเทอร์แอคทีฟ 39 ถนนสายหลักเสี่ยงท่วม ครอบคลุม 4 โซน (เหนือ, กลาง, ตะวันออก, ธนบุรี) พร้อมรหัสสีสัญจร 3 ระดับ (แดง=หลีกเลี่ยง, ส้ม=ระวัง, เขียว=ปกติ), กล้องวงจรปิด CCTV ถ่ายทอดสด 65 จุด, โทรมาตรระดับน้ำคลองและสถานีสูบน้ำ กทม. และภาพถ่ายดาวเทียม Sentinel-1 SAR',
+        ? 'Comprehensive guide and launch announcement for Bangkok Road Flood Surveillance: Interactive map covering 39 flood-prone arterial roads across 4 zones (North, Central, East, Thonburi), real-time passability color codes (Red=Avoid, Orange=Caution, Green=Normal), ThaiWater canal water telemetry, citizen crowd depth reports, and Sentinel-1 SAR satellite remote sensing.'
+        : 'คู่มือและบทความเปิดตัวระบบเฝ้าระวังน้ำท่วมขังถนนทั่วกรุงเทพมหานคร: แผนที่อินเทอร์แอคทีฟ 39 ถนนสายหลักเสี่ยงท่วม ครอบคลุม 4 โซน (เหนือ, กลาง, ตะวันออก, ธนบุรี) พร้อมรหัสสีสัญจร 3 ระดับ (แดง=หลีกเลี่ยง, ส้ม=ระวัง, เขียว=ปกติ), โทรมาตรระดับน้ำคลอง สสน. ThaiWater, รายงานระดับน้ำท่วมสดจากประชาชน และภาพถ่ายดาวเทียม Sentinel-1 SAR',
       image: '/dmind-premium-icon.png',
       created_at: '2026-09-26',
       category: 'banner',
@@ -72,7 +72,7 @@ const EmergencyArticles: React.FC = () => {
       readTime: isEn ? '8 min read' : '8 นาที',
       isBanner: true,
       bannerBadge: isEn ? 'Banner #2 • Bangkok Road Flood' : 'แบนเนอร์ที่ 2 • น้ำท่วมถนน กทม.',
-      icon: <Camera className="w-5 h-5 text-cyan-400" />
+      icon: <Waves className="w-5 h-5 text-cyan-400" />
     },
     // Today's Major Update: Sentinel Satellites, Crowdsourcing & FCM
     {

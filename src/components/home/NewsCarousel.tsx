@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3, Camera, AlertTriangle, ArrowRight, Coffee, Bot, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Smartphone, Bell, Shield, CloudRain, Calculator, Map, Layers, Cpu, Radio, Sparkles, Waves, Flame, Activity, BarChart3, AlertTriangle, ArrowRight, Coffee, Bot, ShieldCheck, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -89,7 +89,7 @@ const NewsCarousel = () => {
                             <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bkkRoadStatusDesc')}</p>
                         </div>
                         <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors">
-                            <Camera className="w-5 h-5 text-cyan-300 mb-1.5" />
+                            <Users className="w-5 h-5 text-cyan-300 mb-1.5" />
                             <h4 className="font-bold text-white text-xs sm:text-sm leading-tight">{t('newsCarousel.bkkCctvFeeds')}</h4>
                             <p className="text-[10px] sm:text-xs text-blue-100 mt-0.5 line-clamp-2">{t('newsCarousel.bkkCctvFeedsDesc')}</p>
                         </div>
@@ -284,14 +284,14 @@ const NewsCarousel = () => {
                                             </div>
                                         ) : slide.id === 2 ? (
                                             <div className="relative w-full h-full p-4 flex flex-col justify-between">
-                                                {/* Bangkok Flood & CCTV Live Visual Mockup */}
+                                                {/* Bangkok Flood & Telemetry Live Visual Mockup */}
                                                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
-                                                        <span className="text-xs font-mono font-bold text-red-300">Bangkok Flood & CCTV</span>
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping"></div>
+                                                        <span className="text-xs font-mono font-bold text-sky-300">Bangkok Flood & Telemetry</span>
                                                     </div>
-                                                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">
-                                                        LIVE 65 CCTVs
+                                                    <Badge className="bg-sky-500/20 text-sky-300 border-sky-500/30 text-[10px]">
+                                                        LIVE TELEMETRY & REPORTS
                                                     </Badge>
                                                 </div>
 
@@ -315,12 +315,12 @@ const NewsCarousel = () => {
 
                                                 <div className="bg-slate-800/80 rounded-xl p-3 border border-white/10 flex items-center justify-between">
                                                     <div className="flex items-center gap-2.5">
-                                                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
-                                                            <Camera className="w-4 h-4" />
+                                                        <div className="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
+                                                            <Waves className="w-4 h-4" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-xs font-semibold text-white">4 โซนทั่วกรุง</p>
-                                                            <p className="text-[10px] text-slate-300">เหนือ • กลาง • ตะวันออก • ธนบุรี</p>
+                                                            <p className="text-xs font-semibold text-white">โทรมาตร สสน. & รายงานสด</p>
+                                                            <p className="text-[10px] text-slate-300">4 โซนทั่วกรุง • เหนือ กลาง ตะวันออก ธนบุรี</p>
                                                         </div>
                                                     </div>
                                                     <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">
