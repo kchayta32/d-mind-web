@@ -4,6 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   Star, 
   Send, 
@@ -16,7 +25,15 @@ import {
   Bot, 
   HeartHandshake,
   MessageSquareHeart,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck,
+  Lock,
+  Unlock,
+  User,
+  Calendar,
+  Briefcase,
+  MapPin,
+  AlertCircle
 } from 'lucide-react';
 import { SURVEY_CATEGORIES, DetailedSurveySubmission } from '@/types/survey';
 import { submitCompleteSurvey } from '@/services/surveyService';
@@ -26,13 +43,49 @@ interface SurveyFormNewProps {
   onSuccessSubmit?: () => void;
 }
 
-const RATING_DESCRIPTIONS: Record<number, { text: string; color: string }> = {
-  1: { text: 'ไม่พอใจมาก (1)', color: 'text-rose-500 bg-rose-50 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800' },
-  2: { text: 'ไม่พอใจ (2)', color: 'text-orange-500 bg-orange-50 border-orange-200 dark:bg-orange-950/40 dark:border-orange-800' },
-  3: { text: 'ปานกลาง (3)', color: 'text-amber-500 bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-800' },
-  4: { text: 'พอใจ (4)', color: 'text-sky-500 bg-sky-50 border-sky-200 dark:bg-sky-950/40 dark:border-sky-800' },
-  5: { text: 'พอใจมาก (5)', color: 'text-emerald-500 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800' },
-};
+export const THAI_PROVINCES = [
+  'กรุงเทพมหานคร', 'กระบี่', 'กาญจนบุรี', 'กาฬสินธุ์', 'กำแพงเพชร', 
+  'ขอนแก่น', 'จันทบุรี', 'ฉะเชิงเทรา', 'ชลบุรี', 'ชัยนาท', 
+  'ชัยภูมิ', 'ชุมพร', 'เชียงราย', 'เชียงใหม่', 'ตรัง', 
+  'ตราด', 'ตาก', 'นครนายก', 'นครปฐม', 'นครพนม', 
+  'นครราชสีมา', 'นครศรีธรรมราช', 'นครสวรรค์', 'นนทบุรี', 'นราธิวาส', 
+  'น่าน', 'บึงกาฬ', 'บุรีรัมย์', 'ปทุมธานี', 'ประจวบคีรีขันธ์', 
+  'ปราจีนบุรี', 'ปัตตานี', 'พระนครศรีอยุธยา', 'พังงา', 'พัทลุง', 
+  'พิจิตร', 'พิษณุโลก', 'เพชรบุรี', 'เพชรบูรณ์', 'แพร่', 
+  'พะเยา', 'ภูเก็ต', 'มหาสารคาม', 'มุกดาหาร', 'แม่ฮ่องสอน', 
+  'ยโสธร', 'ยะลา', 'ร้อยเอ็ด', 'ระนอง', 'ระยอง', 
+  'ราชบุรี', 'ลพบุรี', 'ลำปาง', 'ลำพูน', 'เลย', 
+  'ศรีสะเกษ', 'สกลนคร', 'สงขลา', 'สตูล', 'สมุทรปราการ', 
+  'สมุทรสงคราม', 'สมุทรสาคร', 'สระแก้ว', 'สระบุรี', 'สิงห์บุรี', 
+  'สุโขทัย', 'สุพรรณบุรี', 'สุราษฎร์ธานี', 'สุรินทร์', 'หนองคาย', 
+  'หนองบัวลำภู', 'อ่างทอง', 'อำนาจเจริญ', 'อุดรธานี', 'อุตรดิตถ์', 
+  'อุทัยธานี', 'อุบลราชธานี'
+];
+
+export const AGE_OPTIONS = [
+  'ต่ำกว่า 20 ปี',
+  '20 - 30 ปี',
+  '31 - 40 ปี',
+  '41 - 50 ปี',
+  '51 - 60 ปี',
+  'มากกว่า 60 ปี'
+];
+
+export const OCCUPATION_OPTIONS = [
+  'นักเรียน / นักศึกษา',
+  'ข้าราชการ / บุคลากรทางการศึกษา / รัฐวิสาหกิจ',
+  'พนักงานบริษัทเอกชน',
+  'เจ้าของธุรกิจ / ค้าขาย / อาชีพอิสระ',
+  'เกษตรกร / ประมง',
+  'บุคลากรทางการแพทย์ / สาธารณสุข',
+  'ประชาชนทั่วไป / อื่น ๆ'
+];
+
+export const GENDER_OPTIONS = [
+  'ชาย',
+  'หญิง',
+  'ทางเลือกอื่น / ไม่ระบุ'
+];
 
 const getCategoryIcon = (key: string) => {
   switch (key) {
@@ -45,6 +98,14 @@ const getCategoryIcon = (key: string) => {
 };
 
 export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit }) => {
+  // PDPA & Demographics
+  const [pdpaConsent, setPdpaConsent] = useState(false);
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState('');
+  const [occupation, setOccupation] = useState('');
+  const [province, setProvince] = useState('');
+
+  // Ratings & Feedback
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [favoriteFeature, setFavoriteFeature] = useState('');
   const [missingFeatures, setMissingFeatures] = useState('');
@@ -58,6 +119,10 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
 
   const handleRatingSelect = (itemId: string, score: number) => {
+    if (!pdpaConsent) {
+      toast.error('กรุณาทำเครื่องหมายยินยอมตามข้อตกลง PDPA ด้านบนก่อน');
+      return;
+    }
     setRatings(prev => ({
       ...prev,
       [itemId]: score
@@ -65,6 +130,12 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
   };
 
   const handleAutofillHigh = () => {
+    setPdpaConsent(true);
+    setGender('ชาย');
+    setAge('20 - 30 ปี');
+    setOccupation('ข้าราชการ / บุคลากรทางการศึกษา / รัฐวิสาหกิจ');
+    setProvince('กรุงเทพมหานคร');
+
     const filled: Record<string, number> = {};
     SURVEY_CATEGORIES.forEach(cat => {
       cat.items.forEach((item, idx) => {
@@ -74,12 +145,17 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
     });
     setRatings(filled);
     setFavoriteFeature('แผนที่เรดาร์สภาพอากาศสด และฟีเจอร์ AI Dr.Mind ที่ช่วยเหลือในสถานการณ์ฉุกเฉิน');
-    setMissingFeatures('ระบบแจ้งเตือนผ่าน SMS เพิ่มเติมกรณีไม่มีอินเทอร์เน็ต');
+    setMissingFeatures('ระบบแจ้งเตือนผ่าน SMS เพิ่มเติมกรณีไม่มีสัญญาณอินเทอร์เน็ต');
     setGeneralSuggestions('แอปพลิเคชันทำงานได้รวดเร็ว ออกแบบสวยงาม ตอบโจทย์การใช้งานมากครับ');
-    toast.info('ใส่ข้อมูลตัวอย่างระดับสูงเรียบร้อยแล้ว');
+    toast.info('ใส่ข้อมูลตัวอย่างระดับสูงและยินยอม PDPA เรียบร้อยแล้ว');
   };
 
   const handleReset = () => {
+    setPdpaConsent(false);
+    setGender('');
+    setAge('');
+    setOccupation('');
+    setProvince('');
     setRatings({});
     setFavoriteFeature('');
     setMissingFeatures('');
@@ -91,6 +167,16 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!pdpaConsent) {
+      toast.error('ท่านต้องทำเครื่องหมายยินยอมข้อตกลง PDPA ก่อนจึงจะสามารถส่งแบบประเมินได้');
+      return;
+    }
+
+    if (!gender || !age || !occupation || !province) {
+      toast.warning('กรุณาระบุข้อมูลส่วนบุคคลในส่วนแรก (เพศ, อายุ, อาชีพ, จังหวัด) ให้ครบถ้วน');
+      return;
+    }
+
     if (answeredCount < totalQuestions) {
       toast.warning(`กรุณาตอบคำถามในส่วนที่ 1 ให้ครบทุกข้อ (ตอบแล้ว ${answeredCount}/${totalQuestions} ข้อ)`);
       return;
@@ -101,6 +187,11 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
       const submission: DetailedSurveySubmission = {
         id: `submission-${Date.now()}`,
         created_at: new Date().toISOString(),
+        gender,
+        age,
+        occupation,
+        province,
+        pdpaConsent,
         ratings,
         favoriteFeature,
         missingFeatures,
@@ -164,8 +255,235 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {/* ========================================================================= */}
+      {/* 1. ส่วนแรก: ความยินยอม PDPA และข้อมูลทั่วไปของผู้ประเมิน */}
+      {/* ========================================================================= */}
+      <div className="space-y-6">
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+          <Badge className="bg-indigo-600 hover:bg-indigo-600 text-white text-xs px-3 py-1 rounded-full mb-2">
+            ส่วนแรก: ข้อมูลทั่วไป & ความยินยอม PDPA
+          </Badge>
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <span>ข้อมูลทั่วไปของผู้ประเมิน และข้อตกลงความเป็นส่วนตัว</span>
+            <ShieldCheck className="w-5 h-5 text-indigo-600" />
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            โปรดให้ความยินยอมตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA) เพื่อเริ่มต้นทำแบบประเมิน
+          </p>
+        </div>
+
+        {/* PDPA Agreement Box */}
+        <Card className={`border-2 transition-all duration-300 rounded-2xl overflow-hidden shadow-sm ${
+          pdpaConsent 
+            ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-emerald-500/5' 
+            : 'border-amber-400/90 bg-amber-50/40 dark:bg-amber-950/20'
+        }`}>
+          <CardHeader className="py-4 px-5 border-b border-slate-100 dark:border-slate-800/60 bg-white/80 dark:bg-slate-900/60">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${
+                  pdpaConsent 
+                    ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600' 
+                    : 'bg-amber-100 dark:bg-amber-900/60 text-amber-600'
+                }`}>
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
+                    ความยินยอมตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    ข้อกำหนดการจัดเก็บ ประมวลผล และรักษาความมั่นคงปลอดภัยของข้อมูล
+                  </CardDescription>
+                </div>
+              </div>
+              <Badge className={`text-xs px-2.5 py-1 rounded-full whitespace-nowrap ${
+                pdpaConsent 
+                  ? 'bg-emerald-600 text-white' 
+                  : 'bg-amber-500 text-white animate-pulse'
+              }`}>
+                {pdpaConsent ? '✓ ยินยอมแล้ว' : '⚠️ จำเป็นต้องยินยอม'}
+              </Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-4 sm:p-6 space-y-4">
+            <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-2">
+              <p>
+                <strong>วัตถุประสงค์การเก็บรวบรวมข้อมูล:</strong> ระบบ D-MIND ขอความยินยอมจากท่านในการจัดเก็บและประมวลผลข้อมูลส่วนบุคคลทั่วไป (เพศ, ช่วงอายุ, อาชีพ, จังหวัด) และข้อมูลผลการประเมินความพึงพอใจ เพื่อนำไปใช้ในการศึกษาวิจัย วิเคราะห์เชิงสถิติ และการพัฒนาปรับปรุงระบบสารสนเทศและการเตือนภัยพิบัติให้มีประสิทธิภาพสูงสุด
+              </p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs">
+                ข้อมูลทั้งหมดจะได้รับการเก็บรักษาตามมาตรฐานความปลอดภัย และจะไม่นำไปใช้ในเชิงพาณิชย์หรือเปิดเผยต่อบุคคลภายนอกโดยไม่ได้รับอนุญาต
+              </p>
+            </div>
+
+            {/* Checkbox item */}
+            <div 
+              onClick={() => setPdpaConsent(!pdpaConsent)}
+              className={`flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                pdpaConsent 
+                  ? 'bg-emerald-100/60 dark:bg-emerald-950/50 border-emerald-500 text-emerald-950 dark:text-emerald-100' 
+                  : 'bg-white dark:bg-slate-800/80 border-amber-300 hover:border-amber-400 text-slate-800 dark:text-slate-200 shadow-xs'
+              }`}
+            >
+              <Checkbox 
+                id="pdpa-consent-checkbox"
+                checked={pdpaConsent}
+                onCheckedChange={(val) => setPdpaConsent(!!val)}
+                className="mt-0.5 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+              />
+              <Label htmlFor="pdpa-consent-checkbox" className="text-xs sm:text-sm font-semibold cursor-pointer leading-snug">
+                ข้าพเจ้ายินยอมให้ระบบ D-MIND จัดเก็บและประมวลผลข้อมูลส่วนบุคคลและการประเมินความพึงพอใจตามข้อตกลง PDPA ดังกล่าวข้างต้น
+                <span className="text-rose-500 ml-1 font-bold">*</span>
+              </Label>
+            </div>
+
+            {!pdpaConsent && (
+              <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/50">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                <span>หากไม่ทำเครื่องหมายถูกยินยอมข้อตกลง PDPA จะไม่สามารถกรอกข้อมูลและทำแบบประเมินได้</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Lock / Unlock Alert Notification */}
+        {!pdpaConsent ? (
+          <div className="bg-amber-100/70 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-amber-900 dark:text-amber-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-200/80 dark:bg-amber-900/60 flex items-center justify-center shrink-0">
+                <Lock className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm">แบบฟอร์มถูกล็อค (ต้องยินยอม PDPA ก่อน)</h4>
+                <p className="text-xs text-amber-700/90 dark:text-amber-300/80">
+                  กรุณาติ๊กถูกในช่องอนุญาต PDPA ด้านบน เพื่อปลดล็อคให้สามารถตอบแบบฟอร์มได้
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={() => setPdpaConsent(true)}
+              size="sm"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs"
+            >
+              กดยินยอม PDPA ทันที
+            </Button>
+          </div>
+        ) : (
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-3 px-4 flex items-center justify-between gap-2 text-emerald-800 dark:text-emerald-200 text-xs font-semibold animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <Unlock className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>ปลดล็อคแบบฟอร์มเรียบร้อยแล้ว: ท่านสามารถระบุข้อมูลทั่วไปและทำแบบประเมินได้</span>
+            </div>
+            <Badge variant="outline" className="border-emerald-300 text-emerald-700 text-[11px] bg-white/70">
+              พร้อมตอบแบบฟอร์ม
+            </Badge>
+          </div>
+        )}
+
+        {/* Demographic Fields Card */}
+        <div className={`transition-all duration-300 ${!pdpaConsent ? 'opacity-40 pointer-events-none select-none filter blur-[0.4px]' : ''}`}>
+          <Card className="border border-slate-200/80 dark:border-slate-800 shadow-sm rounded-2xl p-5 md:p-6 bg-card space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
+                <User className="w-4 h-4 text-blue-600" />
+                <span>ข้อมูลทั่วไปของผู้ประเมิน</span>
+              </div>
+              <span className="text-xs text-rose-500 font-medium">* จำเป็นต้องระบุทุกข้อ</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* 1. เพศ */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <User className="w-4 h-4 text-blue-500" />
+                  <span>เพศ</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </Label>
+                <Select value={gender} onValueChange={setGender} disabled={!pdpaConsent}>
+                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
+                    <SelectValue placeholder="-- เลือกเพศ --" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-64">
+                    {GENDER_OPTIONS.map((g) => (
+                      <SelectItem key={g} value={g} className="text-xs sm:text-sm rounded-lg">
+                        {g}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 2. อายุ */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <Calendar className="w-4 h-4 text-emerald-500" />
+                  <span>อายุ</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </Label>
+                <Select value={age} onValueChange={setAge} disabled={!pdpaConsent}>
+                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
+                    <SelectValue placeholder="-- เลือกช่วงอายุ --" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-64">
+                    {AGE_OPTIONS.map((a) => (
+                      <SelectItem key={a} value={a} className="text-xs sm:text-sm rounded-lg">
+                        {a}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 3. อาชีพ */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <Briefcase className="w-4 h-4 text-purple-500" />
+                  <span>อาชีพ</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </Label>
+                <Select value={occupation} onValueChange={setOccupation} disabled={!pdpaConsent}>
+                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
+                    <SelectValue placeholder="-- เลือกอาชีพ --" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-64">
+                    {OCCUPATION_OPTIONS.map((occ) => (
+                      <SelectItem key={occ} value={occ} className="text-xs sm:text-sm rounded-lg">
+                        {occ}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 4. จังหวัด */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-semibold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <MapPin className="w-4 h-4 text-rose-500" />
+                  <span>จังหวัด</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </Label>
+                <Select value={province} onValueChange={setProvince} disabled={!pdpaConsent}>
+                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
+                    <SelectValue placeholder="-- เลือกจังหวัดที่คุณอาศัยอยู่ --" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-64">
+                    {THAI_PROVINCES.map((prov) => (
+                      <SelectItem key={prov} value={prov} className="text-xs sm:text-sm rounded-lg">
+                        {prov}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
       {/* Progress & Quick Actions Bar */}
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 sticky top-20 z-20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className={`bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 sticky top-20 z-20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 ${!pdpaConsent ? 'opacity-40 pointer-events-none select-none filter blur-[0.4px]' : ''}`}>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
             <span>ความคืบหน้าการตอบแบบประเมิน ({answeredCount}/{totalQuestions} ข้อ)</span>
@@ -201,7 +519,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
       </div>
 
       {/* Rating Scale Legend Card */}
-      <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-100 dark:border-blue-900/50 rounded-2xl p-4 md:p-5">
+      <div className={`bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-100 dark:border-blue-900/50 rounded-2xl p-4 md:p-5 transition-all duration-300 ${!pdpaConsent ? 'opacity-40 pointer-events-none select-none filter blur-[0.4px]' : ''}`}>
         <div className="flex items-center gap-2 mb-2 font-bold text-slate-800 dark:text-slate-200 text-sm">
           <HelpCircle className="w-4 h-4 text-blue-600" />
           <span>ระดับคะแนนการประเมิน (Rating Scale 1 - 5):</span>
@@ -223,9 +541,9 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
       </div>
 
       {/* ========================================================================= */}
-      {/* PART 1: การประเมินความพึงพอใจของผู้ใช้งาน */}
+      {/* ส่วนที่ 1: การประเมินความพึงพอใจของผู้ใช้งาน */}
       {/* ========================================================================= */}
-      <div className="space-y-6">
+      <div className={`space-y-6 transition-all duration-300 ${!pdpaConsent ? 'opacity-40 pointer-events-none select-none filter blur-[0.4px]' : ''}`}>
         <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
           <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-full mb-2">
             ส่วนที่ 1
@@ -238,7 +556,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
           </p>
         </div>
 
-        {SURVEY_CATEGORIES.map((category, catIndex) => {
+        {SURVEY_CATEGORIES.map((category) => {
           const CategoryIcon = getCategoryIcon(category.key);
           const categoryAnswered = category.items.filter(it => ratings[it.id] > 0).length;
 
@@ -299,6 +617,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
                               key={score}
                               type="button"
                               onClick={() => handleRatingSelect(item.id, score)}
+                              disabled={!pdpaConsent}
                               className={`
                                 flex flex-col items-center justify-center w-11 h-12 sm:w-12 sm:h-13 rounded-xl border transition-all duration-200
                                 ${isSelected 
@@ -324,9 +643,9 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
       </div>
 
       {/* ========================================================================= */}
-      {/* PART 2: แบบสอบถามข้อเสนอแนะเพิ่มเติมของผู้ใช้งาน */}
+      {/* ส่วนที่ 2: แบบสอบถามข้อเสนอแนะเพิ่มเติมของผู้ใช้งาน */}
       {/* ========================================================================= */}
-      <div className="space-y-6 pt-4">
+      <div className={`space-y-6 pt-4 transition-all duration-300 ${!pdpaConsent ? 'opacity-40 pointer-events-none select-none filter blur-[0.4px]' : ''}`}>
         <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
           <Badge className="bg-purple-600 hover:bg-purple-600 text-white text-xs px-3 py-1 rounded-full mb-2">
             ส่วนที่ 2
@@ -349,6 +668,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
             <Textarea
               value={favoriteFeature}
               onChange={(e) => setFavoriteFeature(e.target.value)}
+              disabled={!pdpaConsent}
               placeholder="ระบุฟีเจอร์ที่ประทับใจ เช่น แผนที่ภัยพิบัติ GIS, โทรมาตรวัดน้ำ กทม., เรดาร์คาเฟ่ปลอดภัยจากน้ำท่วม, AI Dr.Mind..."
               className="rounded-xl border-slate-200 dark:border-slate-700 min-h-[75px] text-sm"
             />
@@ -363,6 +683,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
             <Textarea
               value={missingFeatures}
               onChange={(e) => setMissingFeatures(e.target.value)}
+              disabled={!pdpaConsent}
               placeholder="ระบุสิ่งที่ต้องการให้มีเพิ่มเติม เช่น การแจ้งเตือนผ่าน SMS, เส้นทางหนีภัยแบบเลี่ยงน้ำท่วม, กล้องวงจรปิดเรียลไทม์..."
               className="rounded-xl border-slate-200 dark:border-slate-700 min-h-[75px] text-sm"
             />
@@ -377,6 +698,7 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
             <Textarea
               value={generalSuggestions}
               onChange={(e) => setGeneralSuggestions(e.target.value)}
+              disabled={!pdpaConsent}
               placeholder="ข้อเสนอแนะทั่วไป ข้อคิดเห็นเพื่อการปรับปรุง หรือคำติชม..."
               className="rounded-xl border-slate-200 dark:border-slate-700 min-h-[85px] text-sm"
             />
@@ -388,13 +710,22 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
       <div className="pt-4">
         <Button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base md:text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200"
+          disabled={isSubmitting || !pdpaConsent}
+          className={`w-full h-14 text-white text-base md:text-lg font-bold rounded-2xl shadow-lg transition-all duration-200 ${
+            pdpaConsent 
+              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl' 
+              : 'bg-slate-400 cursor-not-allowed opacity-60'
+          }`}
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               <span>กำลังส่งข้อมูลแบบประเมิน...</span>
+            </div>
+          ) : !pdpaConsent ? (
+            <div className="flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              <span>กรุณายินยอมข้อตกลง PDPA ด้านบน เพื่อเปิดการส่งแบบประเมิน</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">

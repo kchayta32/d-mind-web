@@ -3,7 +3,8 @@ import {
   SURVEY_CATEGORIES, 
   CategorySummaryItem, 
   DetailedSurveySubmission, 
-  AppEvaluationCriteria 
+  AppEvaluationCriteria,
+  DemographicSummary 
 } from '@/types/survey';
 
 // ---------------------------------------------------------------------------
@@ -61,6 +62,7 @@ export interface SurveyCalculatedReport {
     missing: string[];
     suggestions: string[];
   };
+  demographics: DemographicSummary;
 }
 
 // ---------------------------------------------------------------------------
@@ -158,6 +160,12 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
         favorites: [],
         missing: [],
         suggestions: [],
+      },
+      demographics: {
+        genderCounts: {},
+        ageCounts: {},
+        occupationCounts: {},
+        provinceCounts: {},
       },
     };
   }
@@ -302,6 +310,31 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
     },
   ];
 
+  // Demographics aggregation
+  const genderCounts: Record<string, number> = {};
+  const ageCounts: Record<string, number> = {};
+  const occupationCounts: Record<string, number> = {};
+  const provinceCounts: Record<string, number> = {};
+
+  dbRows.forEach(row => {
+    if (row.gender && typeof row.gender === 'string' && row.gender.trim()) {
+      const g = row.gender.trim();
+      genderCounts[g] = (genderCounts[g] || 0) + 1;
+    }
+    if (row.age && typeof row.age === 'string' && row.age.trim()) {
+      const a = row.age.trim();
+      ageCounts[a] = (ageCounts[a] || 0) + 1;
+    }
+    if (row.occupation && typeof row.occupation === 'string' && row.occupation.trim()) {
+      const o = row.occupation.trim();
+      occupationCounts[o] = (occupationCounts[o] || 0) + 1;
+    }
+    if (row.province && typeof row.province === 'string' && row.province.trim()) {
+      const p = row.province.trim();
+      provinceCounts[p] = (provinceCounts[p] || 0) + 1;
+    }
+  });
+
   return {
     totalResponses,
     categories: categoriesSummary,
@@ -316,6 +349,12 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
       favorites: Array.from(new Set(favorites)).slice(0, 10),
       missing: Array.from(new Set(missing)).slice(0, 8),
       suggestions: Array.from(new Set(suggestions)).slice(0, 10),
+    },
+    demographics: {
+      genderCounts,
+      ageCounts,
+      occupationCounts,
+      provinceCounts,
     },
   };
 };
@@ -357,6 +396,13 @@ export const submitCompleteSurvey = async (submission: DetailedSurveySubmission)
     const totalMean = (usabilityMean + uiMean + alertMean + chatbotMean + overallScore) / 5;
 
     const payload = {
+      // Demographics & PDPA
+      gender: submission.gender?.trim() || null,
+      age: submission.age?.trim() || null,
+      occupation: submission.occupation?.trim() || null,
+      province: submission.province?.trim() || null,
+      pdpa_consent: submission.pdpaConsent ?? true,
+
       usability_1_overall_ease: submission.ratings['usability_1'] || 5,
       usability_2_buttons_menus: submission.ratings['usability_2'] || 5,
       usability_3_speed_response: submission.ratings['usability_3'] || 5,

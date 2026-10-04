@@ -192,12 +192,26 @@ export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
 export interface DetailedSurveySubmission {
   id?: string;
   created_at?: string;
+  // Demographic Info & PDPA
+  gender?: string;
+  age?: string;
+  occupation?: string;
+  province?: string;
+  pdpaConsent: boolean;
+  // Ratings
   ratings: Record<string, number>; // id -> 1 to 5
   favoriteFeature: string;
   missingFeatures: string;
   generalSuggestions: string;
   respondentName?: string;
   respondentRole?: string;
+}
+
+export interface DemographicSummary {
+  genderCounts: Record<string, number>;
+  ageCounts: Record<string, number>;
+  occupationCounts: Record<string, number>;
+  provinceCounts: Record<string, number>;
 }
 
 export interface CategorySummaryItem {

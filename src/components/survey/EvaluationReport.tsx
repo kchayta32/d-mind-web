@@ -37,7 +37,11 @@ import {
   MessageSquare,
   HelpCircle,
   TrendingUp,
-  Info
+  Info,
+  User,
+  Calendar,
+  Briefcase,
+  MapPin
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -958,6 +962,119 @@ export const EvaluationReport: React.FC = () => {
                 ))
               ) : (
                 <p className="text-slate-400">ยังไม่มีข้อมูล</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 8. DEMOGRAPHIC PROFILE OVERVIEW (สถิติข้อมูลทั่วไปของผู้ประเมิน) */}
+      {/* ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100">
+            สถิติข้อมูลทั่วไปของผู้ประเมิน (Demographic Profile)
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Gender */}
+          <Card className="border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <CardHeader className="py-3 px-4 bg-blue-50/50 dark:bg-blue-950/20 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" />
+                <span>สัดส่วนเพศ (Gender)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2 text-xs">
+              {Object.keys(report.demographics?.genderCounts || {}).length > 0 ? (
+                Object.entries(report.demographics.genderCounts).map(([g, count]) => (
+                  <div key={g} className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">{g}</span>
+                    <Badge variant="secondary" className="text-xs font-bold">
+                      {count} คน ({report.totalResponses > 0 ? ((count / report.totalResponses) * 100).toFixed(0) : 0}%)
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-xs">ยังไม่มีข้อมูล</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Age */}
+          <Card className="border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <CardHeader className="py-3 px-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>ช่วงอายุ (Age Groups)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2 text-xs">
+              {Object.keys(report.demographics?.ageCounts || {}).length > 0 ? (
+                Object.entries(report.demographics.ageCounts).map(([a, count]) => (
+                  <div key={a} className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">{a}</span>
+                    <Badge variant="secondary" className="text-xs font-bold">
+                      {count} คน
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-xs">ยังไม่มีข้อมูล</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Occupation */}
+          <Card className="border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <CardHeader className="py-3 px-4 bg-purple-50/50 dark:bg-purple-950/20 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-xs font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                <Briefcase className="w-3.5 h-3.5" />
+                <span>กลุ่มอาชีพ (Occupation)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2 text-xs">
+              {Object.keys(report.demographics?.occupationCounts || {}).length > 0 ? (
+                Object.entries(report.demographics.occupationCounts).map(([o, count]) => (
+                  <div key={o} className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-400 truncate max-w-[120px]" title={o}>{o}</span>
+                    <Badge variant="secondary" className="text-xs font-bold">
+                      {count} คน
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-xs">ยังไม่มีข้อมูล</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Province */}
+          <Card className="border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <CardHeader className="py-3 px-4 bg-rose-50/50 dark:bg-rose-950/20 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-xs font-bold text-rose-900 dark:text-rose-300 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" />
+                <span>จังหวัด (Top Provinces)</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2 text-xs">
+              {Object.keys(report.demographics?.provinceCounts || {}).length > 0 ? (
+                Object.entries(report.demographics.provinceCounts)
+                  .sort(([, a], [, b]) => b - a)
+                  .slice(0, 5)
+                  .map(([p, count]) => (
+                    <div key={p} className="flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">{p}</span>
+                      <Badge variant="secondary" className="text-xs font-bold">
+                        {count} คน
+                      </Badge>
+                    </div>
+                  ))
+              ) : (
+                <p className="text-slate-400 text-xs">ยังไม่มีข้อมูล</p>
               )}
             </CardContent>
           </Card>
