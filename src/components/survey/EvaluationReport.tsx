@@ -39,6 +39,7 @@ import {
   TrendingUp,
   Info
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   fetchAndCalculateSurveyReport, 
   SurveyCalculatedReport,
@@ -49,26 +50,57 @@ import { toast } from 'sonner';
 export const EvaluationReport: React.FC = () => {
   const [report, setReport] = useState<SurveyCalculatedReport | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [copiedTable1, setCopiedTable1] = useState(false);
   const [copiedTable2, setCopiedTable2] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadData();
+    loadData(true);
+
+    // 1. Supabase Realtime Subscription (Triggers when anyone edits/inserts/deletes in Supabase)
+    const channel = supabase
+      .channel('dmind_satisfaction_surveys_live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'dmind_satisfaction_surveys' },
+        (payload) => {
+          console.log('[Supabase Realtime] Change detected:', payload);
+          loadData(false);
+        }
+      )
+      .subscribe();
+
+    // 2. Background polling interval (every 4 seconds) to guarantee sync even without webhooks
+    const timer = setInterval(() => {
+      loadData(false);
+    }, 4000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(timer);
+    };
   }, []);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const data = await fetchAndCalculateSurveyReport();
       setReport(data);
     } catch (e) {
       console.error(e);
-      toast.error('ไม่สามารถโหลดข้อมูลสถิติได้');
+      if (isInitial) toast.error('ไม่สามารถโหลดข้อมูลสถิติได้');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    loadData(false);
+    toast.info('ดึงข้อมูลล่าสุดจาก Supabase สำเร็จ');
   };
 
   const handleCopyTable1 = () => {
@@ -156,12 +188,22 @@ export const EvaluationReport: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white font-bold px-3 py-1 text-xs uppercase tracking-wider">
+              <Badge className={`${
+                report.totalResponses === 0
+                  ? 'bg-slate-600 hover:bg-slate-600'
+                  : report.isPassed
+                    ? 'bg-emerald-500 hover:bg-emerald-500'
+                    : 'bg-amber-500 hover:bg-amber-500'
+              } text-white font-bold px-3 py-1 text-xs uppercase tracking-wider`}>
                 <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                ผลการทดสอบผ่านเกณฑ์ (PASSED)
+                {report.totalResponses === 0
+                  ? 'รอข้อมูลการประเมิน (0 ผู้ประเมิน)'
+                  : report.isPassed
+                    ? 'ผลการทดสอบผ่านเกณฑ์ (PASSED)'
+                    : 'กำลังรวบรวมข้อมูลการประเมิน'}
               </Badge>
               <Badge variant="outline" className="text-white/80 border-white/20 text-xs">
-                รายงานผลวิจัย / ประเมินระบบ
+                Real-time Supabase Sync
               </Badge>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
@@ -172,7 +214,7 @@ export const EvaluationReport: React.FC = () => {
             </h1>
             <p className="text-blue-100/90 text-sm md:text-base leading-relaxed">
               การทดสอบการแสดงผลและประเมินความพึงพอใจของผู้ใช้งาน ตามแบบประเมิน 5 ด้าน 17 ข้อย่อย
-              (กลุ่มตัวอย่างผู้ใช้งานจริง N = {report.totalResponses} คน)
+              (กลุ่มตัวอย่างผู้ใช้งานจริงใน Supabase: N = {report.totalResponses} คน)
             </p>
           </div>
 
@@ -187,13 +229,14 @@ export const EvaluationReport: React.FC = () => {
               พิมพ์รายงาน
             </Button>
             <Button
-              onClick={loadData}
+              onClick={handleManualRefresh}
               variant="outline"
               size="sm"
+              disabled={isRefreshing}
               className="rounded-xl border-white/20 bg-white/10 hover:bg-white/20 text-white hover:text-white"
             >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              รีเฟรชข้อมูล
+              <Sparkles className={`w-4 h-4 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'กำลังโหลด...' : 'รีเฟรชจาก Supabase'}
             </Button>
           </div>
         </div>
@@ -209,9 +252,9 @@ export const EvaluationReport: React.FC = () => {
               <span>{report.overallMean.toFixed(2)}</span>
               <span className="text-xs text-blue-300 font-normal">/ 5.00</span>
             </div>
-            <div className="mt-1 text-xs text-emerald-300 font-semibold flex items-center gap-1">
-              <Check className="w-3 h-3" />
-              <span>ระดับความพึงพอใจ: {report.overallLevelTh}</span>
+            <div className="mt-1 text-xs text-blue-200 font-semibold flex items-center gap-1">
+              <Check className="w-3 h-3 text-emerald-300" />
+              <span>ระดับ: {report.overallLevelTh}</span>
             </div>
           </div>
 
@@ -221,12 +264,12 @@ export const EvaluationReport: React.FC = () => {
               <span>ความสะดวกในการใช้งาน (1.1)</span>
             </div>
             <div className="text-2xl md:text-3xl font-black text-white flex items-baseline gap-1">
-              <span>{report.categories[0]?.mean.toFixed(2) || '4.62'}</span>
+              <span>{(report.categories[0]?.mean || 0).toFixed(2)}</span>
               <span className="text-xs text-blue-300 font-normal">/ 5.00</span>
             </div>
-            <div className="mt-1 text-xs text-emerald-300 font-semibold flex items-center gap-1">
-              <Check className="w-3 h-3" />
-              <span>≥ 4.00 (ผ่านเกณฑ์ดีขึ้นไป)</span>
+            <div className="mt-1 text-xs text-blue-200 font-semibold flex items-center gap-1">
+              <Check className="w-3 h-3 text-emerald-300" />
+              <span>{report.totalResponses > 0 && report.categories[0]?.mean >= 4 ? '≥ 4.00 (ผ่านเกณฑ์)' : 'เกณฑ์ผ่าน ≥ 4.00'}</span>
             </div>
           </div>
 
@@ -239,7 +282,7 @@ export const EvaluationReport: React.FC = () => {
               {report.totalResponses} <span className="text-sm font-normal text-blue-200">คน</span>
             </div>
             <div className="mt-1 text-xs text-blue-300">
-              บันทึกแบบเรียลไทม์
+              ซิงค์ตรงจาก Supabase
             </div>
           </div>
 
@@ -248,15 +291,45 @@ export const EvaluationReport: React.FC = () => {
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>สถานะการประเมินผล</span>
             </div>
-            <div className="text-xl md:text-2xl font-black text-emerald-300 flex items-center gap-1.5">
-              <span>ผ่านทุกเกณฑ์</span>
+            <div className={`text-xl md:text-2xl font-black ${
+              report.totalResponses === 0 ? 'text-slate-300' : report.isPassed ? 'text-emerald-300' : 'text-amber-300'
+            } flex items-center gap-1.5`}>
+              <span>{report.totalResponses === 0 ? 'รอผลประเมิน' : report.isPassed ? 'ผ่านทุกเกณฑ์' : 'รอข้อมูลเพิ่มเติม'}</span>
             </div>
             <div className="mt-1 text-xs text-emerald-200">
-              ถูกต้อง 100% | อัปเดต &lt; 2s
+              {report.totalResponses === 0 ? 'เริ่มต้นรีเซ็ตเป็น 0' : 'ถูกต้อง 100% | อัปเดต < 2s'}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Zero State Alert Banner */}
+      {report.totalResponses === 0 && (
+        <div className="bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-3xl p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-blue-900/60 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Info className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                ตารางข้อมูลใน Supabase ขณะนี้รีเซ็ตเป็น 0 (ยังไม่มีข้อมูลการประเมิน)
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
+                เมื่อผู้ใช้ทำแบบประเมิน หรือท่านทำการแก้ไข/เพิ่ม/ลบข้อมูลใน Supabase ตาราง <code>dmind_satisfaction_surveys</code> หน้านี้จะทำการคำนวณและอัปเดตกราฟสถิติตามข้อมูลจริงทันที
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => {
+              const tab = document.querySelector('[value="survey"]') as HTMLElement;
+              if (tab) tab.click();
+            }}
+            className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm"
+          >
+            ทำแบบประเมินเดี๋ยวนี้ &rarr;
+          </Button>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 2. Score Interpretation Guide Card */}
@@ -728,9 +801,13 @@ export const EvaluationReport: React.FC = () => {
                     {item.failCriteriaTh}
                   </td>
                   <td className="py-4 px-6 text-center print:hidden">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
+                      item.status === 'passed'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700'
+                    }`}>
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      ผ่านเกณฑ์
+                      {item.status === 'passed' ? 'ผ่านเกณฑ์' : 'รอประเมิน'}
                     </span>
                   </td>
                 </tr>
@@ -743,17 +820,37 @@ export const EvaluationReport: React.FC = () => {
       {/* ========================================================================= */}
       {/* 6. OFFICIAL EVALUATION CRITERIA OUTCOME BOX */}
       {/* ========================================================================= */}
-      <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-blue-950/30 border-2 border-emerald-300 dark:border-emerald-700 rounded-3xl p-6 md:p-8 shadow-sm">
+      <div className={`bg-gradient-to-r ${
+        report.totalResponses === 0
+          ? 'from-slate-50 via-blue-50/30 to-slate-50 dark:from-slate-900 dark:via-blue-950/20 dark:to-slate-900 border-slate-300 dark:border-slate-700'
+          : report.isPassed
+            ? 'from-emerald-50 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-blue-950/30 border-emerald-300 dark:border-emerald-700'
+            : 'from-amber-50 via-orange-50 to-slate-50 border-amber-300'
+      } border-2 rounded-3xl p-6 md:p-8 shadow-sm`}>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping" />
-              <Badge className="bg-emerald-600 text-white font-bold text-xs px-3 py-1 rounded-full">
-                สรุปเกณฑ์การประเมินผล (Evaluation Conclusion)
+              <span className={`w-3 h-3 rounded-full ${report.totalResponses === 0 ? 'bg-slate-400' : report.isPassed ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
+              <Badge className={`${
+                report.totalResponses === 0
+                  ? 'bg-slate-600'
+                  : report.isPassed
+                    ? 'bg-emerald-600'
+                    : 'bg-amber-600'
+              } text-white font-bold text-xs px-3 py-1 rounded-full`}>
+                {report.totalResponses === 0 ? 'สถานะ: รอข้อมูลประเมิน' : 'สรุปเกณฑ์การประเมินผล (Evaluation Conclusion)'}
               </Badge>
             </div>
             <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-slate-100">
-              ผลการทดสอบ: <span className="text-emerald-600 dark:text-emerald-400">ผ่านเกณฑ์การประเมินมาตรฐาน</span>
+              ผลการทดสอบ: <span className={
+                report.totalResponses === 0
+                  ? 'text-slate-500 dark:text-slate-400'
+                  : report.isPassed
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-amber-500'
+              }>
+                {report.totalResponses === 0 ? 'รอข้อมูลการประเมิน (0 ผู้ประเมิน)' : report.isPassed ? 'ผ่านเกณฑ์การประเมินมาตรฐาน' : 'ยังไม่ผ่านเกณฑ์ความพึงพอใจ'}
+              </span>
             </h3>
             <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl">
               <strong className="text-slate-900 dark:text-white font-semibold">ข้อกำหนดเกณฑ์การประเมิน: </strong>
@@ -767,21 +864,27 @@ export const EvaluationReport: React.FC = () => {
               <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
                 <Check className="w-4 h-4" /> 2. ความเร็วการแสดงผล: อัปเดตข้อมูล &lt; 2 วินาที (ผ่าน)
               </span>
-              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                <Check className="w-4 h-4" /> 3. ความสะดวกในการใช้งาน: {report.categories[0]?.mean.toFixed(2)} / 5.00 (&ge; 4.00 ระดับดีขึ้นไป)
+              <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
+                <Check className="w-4 h-4 text-emerald-500" /> 3. ความสะดวกในการใช้งาน: {(report.categories[0]?.mean || 0).toFixed(2)} / 5.00 {report.totalResponses > 0 && report.categories[0]?.mean >= 4 ? '(≥ 4.00 ระดับดีขึ้นไป)' : '(เกณฑ์ผ่าน ≥ 4.00)'}
               </span>
             </div>
           </div>
 
-          <div className="self-center md:self-auto shrink-0 text-center bg-white dark:bg-slate-800 p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2">
+          <div className="self-center md:self-auto shrink-0 text-center bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className={`w-16 h-16 rounded-full ${
+              report.totalResponses === 0
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                : report.isPassed
+                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-amber-100 text-amber-600'
+            } flex items-center justify-center mx-auto mb-2`}>
               <ShieldCheck className="w-9 h-9" />
             </div>
             <div className="text-sm font-black text-slate-800 dark:text-slate-200">
-              PASSED
+              {report.totalResponses === 0 ? 'PENDING' : report.isPassed ? 'PASSED' : 'IN PROGRESS'}
             </div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400">
-              ผ่านการรับรองเกณฑ์
+              {report.totalResponses === 0 ? 'รอข้อมูลประเมิน' : 'ผ่านการรับรองเกณฑ์'}
             </div>
           </div>
         </div>

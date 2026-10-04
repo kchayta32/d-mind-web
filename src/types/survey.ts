@@ -6,11 +6,11 @@ export interface SurveyQuestionItem {
   categoryKey: SurveyCategoryKey;
 }
 
-export type SurveyCategoryKey = 
-  | 'usability' 
-  | 'ui' 
-  | 'alert' 
-  | 'chatbot' 
+export type SurveyCategoryKey =
+  | 'usability'
+  | 'ui'
+  | 'alert'
+  | 'chatbot'
   | 'overall';
 
 export interface SurveyCategoryDef {
@@ -25,7 +25,7 @@ export interface SurveyCategoryDef {
 export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
   {
     key: 'usability',
-    code: '1.1',
+    code: '1.',
     titleTh: 'ความสะดวกในการใช้งาน (Usability)',
     titleEn: 'Usability & Ease of Use',
     iconName: 'Wrench',
@@ -69,7 +69,7 @@ export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
   },
   {
     key: 'ui',
-    code: '1.2',
+    code: '2.',
     titleTh: 'ส่วนติดต่อผู้ใช้ (User Interface)',
     titleEn: 'User Interface (UI)',
     iconName: 'Layout',
@@ -106,7 +106,7 @@ export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
   },
   {
     key: 'alert',
-    code: '1.3',
+    code: '3.',
     titleTh: 'ระบบแจ้งเตือน',
     titleEn: 'Notification & Alert System',
     iconName: 'Bell',
@@ -136,7 +136,7 @@ export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
   },
   {
     key: 'chatbot',
-    code: '1.4',
+    code: '4.',
     titleTh: 'ระบบแชทบอท',
     titleEn: 'AI Chatbot System',
     iconName: 'Bot',
@@ -173,7 +173,7 @@ export const SURVEY_CATEGORIES: SurveyCategoryDef[] = [
   },
   {
     key: 'overall',
-    code: '1.5',
+    code: '5.',
     titleTh: 'ความพึงพอใจโดยรวม',
     titleEn: 'Overall Satisfaction',
     iconName: 'HeartHandshake',
