@@ -31,6 +31,7 @@ import MapBanner from './MapBanner';
 import BangkokFloodBanner from './BangkokFloodBanner';
 import { BangkokCafeFloodBanner } from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
+import { SatisfactionSurveyBanner } from './SatisfactionSurveyBanner';
 import AppDownloadSection from './AppDownloadSection';
 import Footer from '@/components/layout/Footer';
 
@@ -345,6 +346,11 @@ const NewMobileLayout: React.FC = () => {
       {/* Watch a one-minute video tour of d-mind-web */}
       <div className="px-2">
         <VideoTourSection />
+      </div>
+
+      {/* [NEW] Satisfaction Survey & Evaluation Banner */}
+      <div className="px-2">
+        <SatisfactionSurveyBanner />
       </div>
 
       {/* Map Banner Section */}

@@ -6,6 +6,7 @@ import MapBanner from './MapBanner';
 import BangkokFloodBanner from './BangkokFloodBanner';
 import BangkokCafeFloodBanner from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
+import { SatisfactionSurveyBanner } from './SatisfactionSurveyBanner';
 import MainLayout from '@/components/layout/MainLayout';
 
 const NewDesktopLayout: React.FC = () => {
@@ -16,6 +17,9 @@ const NewDesktopLayout: React.FC = () => {
 
       {/* Navigation Cards (บริการหลัก) */}
       <NavigationCards />
+
+      {/* [NEW] แบบประเมินความพึงพอใจและผลการทดสอบระบบ D-MIND */}
+      <SatisfactionSurveyBanner />
 
       {/* Watch a one-minute video tour of d-mind-web */}
       <VideoTourSection />

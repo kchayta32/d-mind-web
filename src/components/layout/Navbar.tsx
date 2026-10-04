@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
     Moon, Sun, Globe, Menu, X, Search,
     Home, Phone, AlertTriangle, FileText,
-    Smile, BookOpen, Bot, Info, Mail, CloudSun, Waves, MapPin, Coffee
+    Smile, BookOpen, Bot, Info, Mail, CloudSun, Waves, MapPin, Coffee, Star
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AnimatedLogo from '@/components/ui/AnimatedLogo';
@@ -125,6 +125,17 @@ const Navbar: React.FC = () => {
                             <Waves className="h-3.5 w-3.5 text-sky-400 animate-pulse" />
                             <span>น้ำท่วมถนน กทม.</span>
                             <span className="bg-sky-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="hidden 2xl:flex items-center gap-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 border-yellow-400/40 hover:border-yellow-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            onClick={() => navigate('/satisfaction-survey')}
+                        >
+                            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                            <span>ประเมินความพึงพอใจ</span>
+                            <span className="bg-yellow-400 text-slate-950 text-[9px] px-1.5 py-0.5 rounded-full font-bold">5.0</span>
                         </Button>
 
                         <Button
