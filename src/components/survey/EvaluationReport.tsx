@@ -165,7 +165,10 @@ export const EvaluationReport: React.FC = () => {
               </Badge>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              ผลการประเมินความพึงพอใจต่อระบบ D-MIND
+              ผลการประเมินความพึงพอใจต่อระบบ{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-sky-200 to-emerald-300 font-black whitespace-nowrap">
+                D-MIND
+              </span>
             </h1>
             <p className="text-blue-100/90 text-sm md:text-base leading-relaxed">
               การทดสอบการแสดงผลและประเมินความพึงพอใจของผู้ใช้งาน ตามแบบประเมิน 5 ด้าน 17 ข้อย่อย

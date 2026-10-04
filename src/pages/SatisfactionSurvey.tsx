@@ -31,12 +31,15 @@ const SatisfactionSurvey: React.FC = () => {
         <div className="container max-w-5xl mx-auto px-4">
           {/* Hero Header */}
           <div className="text-center mb-8 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold mb-4 border border-blue-200 dark:border-blue-800">
-              <Award className="w-4 h-4 text-blue-600" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/90 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 text-xs font-bold mb-4 border border-blue-200 dark:border-blue-800 shadow-xs">
+              <Award className="w-4 h-4 text-blue-600 shrink-0" />
               <span>แบบประเมินความพึงพอใจและรับรองผลการทดสอบระบบ D-MIND</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mb-3">
-              การประเมินความพึงพอใจของผู้ใช้งานต่อระบบ D-MIND
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mb-3 leading-tight">
+              การประเมินความพึงพอใจของผู้ใช้งานต่อระบบ
+              <span className="block mt-1 sm:mt-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-400 font-black tracking-wider drop-shadow-sm whitespace-nowrap">
+                D-MIND
+              </span>
             </h1>
             <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed">
               ขอเชิญร่วมประเมินความพึงพอใจการใช้งานระบบ D-MIND (Disaster Management Intelligence Hub) 
