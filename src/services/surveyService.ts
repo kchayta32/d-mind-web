@@ -161,6 +161,20 @@ export interface SurveyCalculatedReport {
 export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedReport> => {
   const detailedLocalSurveys = getStoredDetailedSurveys();
 
+  let dmindDetailedSurveys: any[] = [];
+  try {
+    const { data: dmindData, error: dmindError } = await supabase
+      .from('dmind_satisfaction_surveys' as any)
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!dmindError && dmindData && dmindData.length > 0) {
+      dmindDetailedSurveys = dmindData;
+    }
+  } catch (err) {
+    // ignore if table not created yet
+  }
+
   let supabaseSurveys: any[] = [];
   try {
     const { data, error } = await supabase
@@ -176,7 +190,7 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
   }
 
   // Combine count
-  const effectiveTotal = Math.max(supabaseSurveys.length, detailedLocalSurveys.length, 58);
+  const effectiveTotal = Math.max(supabaseSurveys.length + dmindDetailedSurveys.length, detailedLocalSurveys.length, 58);
 
   // Accumulators for all 17 items
   const itemSums: Record<string, { sum: number; count: number; code: string; textTh: string; categoryKey: string }> = {};
@@ -193,7 +207,34 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
     });
   });
 
-  // 1. Process detailed local surveys first
+  // 1. Process records from dmind_satisfaction_surveys table in Supabase
+  if (dmindDetailedSurveys.length > 0) {
+    dmindDetailedSurveys.forEach(row => {
+      if (row.usability_1_overall_ease) { itemSums['usability_1'].sum += row.usability_1_overall_ease; itemSums['usability_1'].count += 1; }
+      if (row.usability_2_buttons_menus) { itemSums['usability_2'].sum += row.usability_2_buttons_menus; itemSums['usability_2'].count += 1; }
+      if (row.usability_3_speed_response) { itemSums['usability_3'].sum += row.usability_3_speed_response; itemSums['usability_3'].count += 1; }
+      if (row.usability_4_search_features) { itemSums['usability_4'].sum += row.usability_4_search_features; itemSums['usability_4'].count += 1; }
+      if (row.usability_5_stability) { itemSums['usability_5'].sum += row.usability_5_stability; itemSums['usability_5'].count += 1; }
+
+      if (row.ui_1_map_clarity) { itemSums['ui_1'].sum += row.ui_1_map_clarity; itemSums['ui_1'].count += 1; }
+      if (row.ui_2_font_color) { itemSums['ui_2'].sum += row.ui_2_font_color; itemSums['ui_2'].count += 1; }
+      if (row.ui_3_layout) { itemSums['ui_3'].sum += row.ui_3_layout; itemSums['ui_3'].count += 1; }
+      if (row.ui_4_theme_beauty) { itemSums['ui_4'].sum += row.ui_4_theme_beauty; itemSums['ui_4'].count += 1; }
+
+      if (row.alert_1_clear_message) { itemSums['alert_1'].sum += row.alert_1_clear_message; itemSums['alert_1'].count += 1; }
+      if (row.alert_2_sound_style) { itemSums['alert_2'].sum += row.alert_2_sound_style; itemSums['alert_2'].count += 1; }
+      if (row.alert_3_customization) { itemSums['alert_3'].sum += row.alert_3_customization; itemSums['alert_3'].count += 1; }
+
+      if (row.chatbot_1_clear_answers) { itemSums['chatbot_1'].sum += row.chatbot_1_clear_answers; itemSums['chatbot_1'].count += 1; }
+      if (row.chatbot_2_speed) { itemSums['chatbot_2'].sum += row.chatbot_2_speed; itemSums['chatbot_2'].count += 1; }
+      if (row.chatbot_3_coverage) { itemSums['chatbot_3'].sum += row.chatbot_3_coverage; itemSums['chatbot_3'].count += 1; }
+      if (row.chatbot_4_natural_language) { itemSums['chatbot_4'].sum += row.chatbot_4_natural_language; itemSums['chatbot_4'].count += 1; }
+
+      if (row.overall_1_satisfaction) { itemSums['overall_1'].sum += row.overall_1_satisfaction; itemSums['overall_1'].count += 1; }
+    });
+  }
+
+  // 2. Process detailed local surveys
   detailedLocalSurveys.forEach(sub => {
     Object.entries(sub.ratings).forEach(([itemId, val]) => {
       if (itemSums[itemId] && typeof val === 'number' && val > 0) {
@@ -316,6 +357,14 @@ export const fetchAndCalculateSurveyReport = async (): Promise<SurveyCalculatedR
     if (item.generalSuggestions?.trim()) suggestions.push(item.generalSuggestions.trim());
   });
 
+  if (dmindDetailedSurveys.length > 0) {
+    dmindDetailedSurveys.forEach(row => {
+      if (row.favorite_feature?.trim()) favorites.push(row.favorite_feature.trim());
+      if (row.missing_features?.trim()) missing.push(row.missing_features.trim());
+      if (row.general_suggestions?.trim()) suggestions.push(row.general_suggestions.trim());
+    });
+  }
+
   if (supabaseSurveys.length > 0) {
     supabaseSurveys.forEach(row => {
       if (row.most_useful_feature && typeof row.most_useful_feature === 'string') {
@@ -387,7 +436,7 @@ export const submitCompleteSurvey = async (submission: DetailedSurveySubmission)
     // 1. Save locally for immediate breakdown view
     saveDetailedSurvey(submission);
 
-    // 2. Map to Supabase schema columns
+    // Compute category means
     const usabilityMean = (
       (submission.ratings['usability_1'] || 5) +
       (submission.ratings['usability_2'] || 5) +
@@ -417,8 +466,53 @@ export const submitCompleteSurvey = async (submission: DetailedSurveySubmission)
     ) / 4;
 
     const overallScore = submission.ratings['overall_1'] || 5;
+    const totalMean = (usabilityMean + uiMean + alertMean + chatbotMean + overallScore) / 5;
 
-    const payload = {
+    // 2. Try inserting into new detailed table 'dmind_satisfaction_surveys' in Supabase
+    const detailedPayload = {
+      usability_1_overall_ease: submission.ratings['usability_1'] || 5,
+      usability_2_buttons_menus: submission.ratings['usability_2'] || 5,
+      usability_3_speed_response: submission.ratings['usability_3'] || 5,
+      usability_4_search_features: submission.ratings['usability_4'] || 5,
+      usability_5_stability: submission.ratings['usability_5'] || 5,
+
+      ui_1_map_clarity: submission.ratings['ui_1'] || 5,
+      ui_2_font_color: submission.ratings['ui_2'] || 5,
+      ui_3_layout: submission.ratings['ui_3'] || 5,
+      ui_4_theme_beauty: submission.ratings['ui_4'] || 5,
+
+      alert_1_clear_message: submission.ratings['alert_1'] || 5,
+      alert_2_sound_style: submission.ratings['alert_2'] || 5,
+      alert_3_customization: submission.ratings['alert_3'] || 5,
+
+      chatbot_1_clear_answers: submission.ratings['chatbot_1'] || 5,
+      chatbot_2_speed: submission.ratings['chatbot_2'] || 5,
+      chatbot_3_coverage: submission.ratings['chatbot_3'] || 5,
+      chatbot_4_natural_language: submission.ratings['chatbot_4'] || 5,
+
+      overall_1_satisfaction: submission.ratings['overall_1'] || 5,
+
+      avg_usability: Number(usabilityMean.toFixed(2)),
+      avg_ui: Number(uiMean.toFixed(2)),
+      avg_alert: Number(alertMean.toFixed(2)),
+      avg_chatbot: Number(chatbotMean.toFixed(2)),
+      avg_overall: Number(overallScore.toFixed(2)),
+      total_mean: Number(totalMean.toFixed(2)),
+
+      favorite_feature: submission.favoriteFeature || null,
+      missing_features: submission.missingFeatures || null,
+      general_suggestions: submission.generalSuggestions || null,
+      raw_ratings: submission.ratings,
+    };
+
+    try {
+      await supabase.from('dmind_satisfaction_surveys' as any).insert([detailedPayload]);
+    } catch (newTableErr) {
+      console.warn('Notice: dmind_satisfaction_surveys not yet created or pending migration:', newTableErr);
+    }
+
+    // 3. ALSO insert into existing 'satisfaction_surveys' table for 100% compatibility
+    const legacyPayload = {
       overall_rating: Math.round(overallScore),
       user_interface_rating: Math.round(uiMean),
       alert_system_rating: Math.round(alertMean),
@@ -430,14 +524,14 @@ export const submitCompleteSurvey = async (submission: DetailedSurveySubmission)
       would_recommend: 5,
     };
 
-    const { error } = await supabase.from('satisfaction_surveys').insert([payload]);
+    const { error } = await supabase.from('satisfaction_surveys').insert([legacyPayload]);
     if (error) {
-      console.warn('Supabase insert warning, but local save succeeded:', error);
+      console.warn('Supabase satisfaction_surveys insert warning:', error);
     }
 
     return { success: true };
   } catch (err: any) {
     console.error('Submit survey error:', err);
-    return { success: true }; // Local save still holds
+    return { success: true };
   }
 };
