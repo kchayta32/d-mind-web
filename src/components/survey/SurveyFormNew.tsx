@@ -4,15 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { 
   Star, 
   Send, 
@@ -33,7 +25,8 @@ import {
   Calendar,
   Briefcase,
   MapPin,
-  AlertCircle
+  AlertCircle,
+  ChevronDown
 } from 'lucide-react';
 import { SURVEY_CATEGORIES, DetailedSurveySubmission } from '@/types/survey';
 import { submitCompleteSurvey } from '@/services/surveyService';
@@ -139,7 +132,6 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
     const filled: Record<string, number> = {};
     SURVEY_CATEGORIES.forEach(cat => {
       cat.items.forEach((item, idx) => {
-        // Random high scores (4 or 5)
         filled[item.id] = (idx % 3 === 0) ? 4 : 5;
       });
     });
@@ -317,26 +309,31 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
               </p>
             </div>
 
-            {/* Checkbox item */}
-            <div 
-              onClick={() => setPdpaConsent(!pdpaConsent)}
-              className={`flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
+            {/* Checkbox item - Native Clean Label to prevent synthetic event loops */}
+            <label 
+              className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                 pdpaConsent 
                   ? 'bg-emerald-100/60 dark:bg-emerald-950/50 border-emerald-500 text-emerald-950 dark:text-emerald-100' 
                   : 'bg-white dark:bg-slate-800/80 border-amber-300 hover:border-amber-400 text-slate-800 dark:text-slate-200 shadow-xs'
               }`}
             >
-              <Checkbox 
-                id="pdpa-consent-checkbox"
+              <input 
+                type="checkbox"
                 checked={pdpaConsent}
-                onCheckedChange={(val) => setPdpaConsent(!!val)}
-                className="mt-0.5 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setPdpaConsent(checked);
+                  if (checked) {
+                    toast.success('ยินยอมตามข้อตกลง PDPA เรียบร้อยแล้ว (ปลดล็อคแบบฟอร์ม)');
+                  }
+                }}
+                className="w-5 h-5 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-600 shrink-0"
               />
-              <Label htmlFor="pdpa-consent-checkbox" className="text-xs sm:text-sm font-semibold cursor-pointer leading-snug">
+              <span className="text-xs sm:text-sm font-semibold cursor-pointer leading-snug">
                 ข้าพเจ้ายินยอมให้ระบบ D-MIND จัดเก็บและประมวลผลข้อมูลส่วนบุคคลและการประเมินความพึงพอใจตามข้อตกลง PDPA ดังกล่าวข้างต้น
                 <span className="text-rose-500 ml-1 font-bold">*</span>
-              </Label>
-            </div>
+              </span>
+            </label>
 
             {!pdpaConsent && (
               <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/50">
@@ -363,7 +360,10 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
             </div>
             <Button
               type="button"
-              onClick={() => setPdpaConsent(true)}
+              onClick={() => {
+                setPdpaConsent(true);
+                toast.success('ยินยอมตามข้อตกลง PDPA เรียบร้อยแล้ว (ปลดล็อคแบบฟอร์ม)');
+              }}
               size="sm"
               className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs"
             >
@@ -401,18 +401,22 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
                   <span>เพศ</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </Label>
-                <Select value={gender} onValueChange={setGender} disabled={!pdpaConsent}>
-                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
-                    <SelectValue placeholder="-- เลือกเพศ --" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl max-h-64">
+                <div className="relative">
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    disabled={!pdpaConsent}
+                    className="w-full h-11 px-3.5 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer appearance-none shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">-- เลือกเพศ --</option>
                     {GENDER_OPTIONS.map((g) => (
-                      <SelectItem key={g} value={g} className="text-xs sm:text-sm rounded-lg">
-                        {g}
-                      </SelectItem>
+                      <option key={g} value={g}>{g}</option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {/* 2. อายุ */}
@@ -422,18 +426,22 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
                   <span>อายุ</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </Label>
-                <Select value={age} onValueChange={setAge} disabled={!pdpaConsent}>
-                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
-                    <SelectValue placeholder="-- เลือกช่วงอายุ --" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl max-h-64">
+                <div className="relative">
+                  <select
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    disabled={!pdpaConsent}
+                    className="w-full h-11 px-3.5 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer appearance-none shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">-- เลือกช่วงอายุ --</option>
                     {AGE_OPTIONS.map((a) => (
-                      <SelectItem key={a} value={a} className="text-xs sm:text-sm rounded-lg">
-                        {a}
-                      </SelectItem>
+                      <option key={a} value={a}>{a}</option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {/* 3. อาชีพ */}
@@ -443,18 +451,22 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
                   <span>อาชีพ</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </Label>
-                <Select value={occupation} onValueChange={setOccupation} disabled={!pdpaConsent}>
-                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
-                    <SelectValue placeholder="-- เลือกอาชีพ --" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl max-h-64">
+                <div className="relative">
+                  <select
+                    value={occupation}
+                    onChange={(e) => setOccupation(e.target.value)}
+                    disabled={!pdpaConsent}
+                    className="w-full h-11 px-3.5 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer appearance-none shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">-- เลือกอาชีพ --</option>
                     {OCCUPATION_OPTIONS.map((occ) => (
-                      <SelectItem key={occ} value={occ} className="text-xs sm:text-sm rounded-lg">
-                        {occ}
-                      </SelectItem>
+                      <option key={occ} value={occ}>{occ}</option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
 
               {/* 4. จังหวัด */}
@@ -464,18 +476,22 @@ export const SurveyFormNew: React.FC<SurveyFormNewProps> = ({ onSuccessSubmit })
                   <span>จังหวัด</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </Label>
-                <Select value={province} onValueChange={setProvince} disabled={!pdpaConsent}>
-                  <SelectTrigger className="rounded-xl h-11 border-slate-200 dark:border-slate-700 text-xs sm:text-sm">
-                    <SelectValue placeholder="-- เลือกจังหวัดที่คุณอาศัยอยู่ --" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl max-h-64">
+                <div className="relative">
+                  <select
+                    value={province}
+                    onChange={(e) => setProvince(e.target.value)}
+                    disabled={!pdpaConsent}
+                    className="w-full h-11 px-3.5 pr-10 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer appearance-none shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">-- เลือกจังหวัดที่คุณอาศัยอยู่ --</option>
                     {THAI_PROVINCES.map((prov) => (
-                      <SelectItem key={prov} value={prov} className="text-xs sm:text-sm rounded-lg">
-                        {prov}
-                      </SelectItem>
+                      <option key={prov} value={prov}>{prov}</option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
