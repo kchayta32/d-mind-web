@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  Cell, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
   ReferenceLine,
   RadarChart,
   PolarGrid,
@@ -20,19 +20,19 @@ import {
   Radar,
   Legend
 } from 'recharts';
-import { 
-  CheckCircle2, 
-  ShieldCheck, 
-  BarChart3, 
-  FileText, 
-  Download, 
-  Printer, 
-  Copy, 
-  Sparkles, 
-  Users, 
-  Award, 
-  Check, 
-  ChevronDown, 
+import {
+  CheckCircle2,
+  ShieldCheck,
+  BarChart3,
+  FileText,
+  Download,
+  Printer,
+  Copy,
+  Sparkles,
+  Users,
+  Award,
+  Check,
+  ChevronDown,
   ChevronUp,
   MessageSquare,
   HelpCircle,
@@ -44,10 +44,10 @@ import {
   MapPin
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  fetchAndCalculateSurveyReport, 
+import {
+  fetchAndCalculateSurveyReport,
   SurveyCalculatedReport,
-  getSatisfactionLevel 
+  getSatisfactionLevel
 } from '@/services/surveyService';
 import { toast } from 'sonner';
 
@@ -112,7 +112,7 @@ export const EvaluationReport: React.FC = () => {
     const header = "ด้านการประเมิน\tคะแนนเฉลี่ย (1-5)\tระดับความพึงพอใจ\n";
     const rows = report.categories.map(c => `${c.code} ${c.nameTh.split('(')[0].trim()}\t${c.mean.toFixed(2)}\t${c.levelTh}`).join('\n');
     const totalRow = `\nรวมทุกด้าน\t${report.overallMean.toFixed(2)}\t${report.overallLevelTh}`;
-    
+
     navigator.clipboard.writeText(header + rows + totalRow);
     setCopiedTable1(true);
     toast.success('คัดลอกตารางสรุปผลการประเมิน (ภาพที่ 1) ไปยังคลิปบอร์ดแล้ว');
@@ -123,7 +123,7 @@ export const EvaluationReport: React.FC = () => {
     if (!report) return;
     const header = "รายการทดสอบ\tเกณฑ์ผ่าน\tเกณฑ์ไม่ผ่าน\tสถานะผลการทดสอบ\n";
     const rows = report.testCriteria.map(t => `${t.testItemTh}\t${t.passCriteriaTh}\t${t.failCriteriaTh}\tผ่าน (${t.actualResultTh})`).join('\n');
-    
+
     navigator.clipboard.writeText(header + rows);
     setCopiedTable2(true);
     toast.success('คัดลอกตารางเกณฑ์การประเมิน (ภาพที่ 2) ไปยังคลิปบอร์ดแล้ว');
@@ -161,6 +161,146 @@ export const EvaluationReport: React.FC = () => {
     }
   ];
 
+  // Custom Renderers for BarChart Reference Lines (Render on top of bars with high-contrast badge)
+  const renderGreenRefLabel = (props: any) => {
+    const { viewBox } = props;
+    if (!viewBox) return null;
+    const x = viewBox.x + viewBox.width - 150;
+    const y = viewBox.y - 12;
+    return (
+      <g className="recharts-reference-line-label">
+        <rect
+          x={x}
+          y={y}
+          width={142}
+          height={22}
+          rx={6}
+          fill="#ffffff"
+          stroke="#059669"
+          strokeWidth={1.5}
+          filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))"
+        />
+        <text
+          x={x + 71}
+          y={y + 15}
+          fill="#047857"
+          fontSize={10.5}
+          fontWeight={800}
+          textAnchor="middle"
+        >
+          ● เกณฑ์ระดับสูง (3.61)
+        </text>
+      </g>
+    );
+  };
+
+  const renderOrangeRefLabel = (props: any) => {
+    const { viewBox } = props;
+    if (!viewBox) return null;
+    const x = viewBox.x + 8;
+    const y = viewBox.y - 12;
+    return (
+      <g className="recharts-reference-line-label">
+        <rect
+          x={x}
+          y={y}
+          width={172}
+          height={22}
+          rx={6}
+          fill="#ffffff"
+          stroke="#d97706"
+          strokeWidth={1.5}
+          filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))"
+        />
+        <text
+          x={x + 86}
+          y={y + 15}
+          fill="#b45309"
+          fontSize={10.5}
+          fontWeight={800}
+          textAnchor="middle"
+        >
+          ★ เกณฑ์ผ่านความสะดวก (≥ 4.00)
+        </text>
+      </g>
+    );
+  };
+
+  // Custom Radar Tick to break long Thai labels into 2 readable lines without clipping
+  const renderRadarAngleTick = (props: any) => {
+    const { payload, x, y, cx, cy } = props;
+    const rawText = (payload?.value as string) || '';
+
+    let line1 = rawText;
+    let line2 = '';
+
+    if (rawText.includes('ความสะดวก')) {
+      line1 = '1. ความสะดวก';
+      line2 = 'ในการใช้งาน';
+    } else if (rawText.includes('ส่วนติดต่อผู้ใช้') || rawText.includes('UI')) {
+      line1 = '2. ส่วนติดต่อผู้ใช้';
+      line2 = '(User Interface)';
+    } else if (rawText.includes('แจ้งเตือน')) {
+      line1 = '3. ระบบแจ้งเตือน';
+      line2 = '';
+    } else if (rawText.includes('แชทบอท')) {
+      line1 = '4. ระบบแชทบอท';
+      line2 = '(AI Chatbot)';
+    } else if (rawText.includes('พึงพอใจ') || rawText.includes('โดยรวม')) {
+      line1 = '5. ความพึงพอใจ';
+      line2 = 'โดยรวม';
+    }
+
+    const diffX = x - cx;
+    let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+    let offsetX = 0;
+
+    if (diffX < -15) {
+      textAnchor = 'end';
+      offsetX = -8;
+    } else if (diffX > 15) {
+      textAnchor = 'start';
+      offsetX = 8;
+    } else {
+      textAnchor = 'middle';
+      offsetX = 0;
+    }
+
+    const diffY = y - cy;
+    let offsetY = 0;
+    if (diffY < -15) {
+      offsetY = line2 ? -8 : -2;
+    } else if (diffY > 15) {
+      offsetY = 4;
+    }
+
+    return (
+      <text
+        x={x + offsetX}
+        y={y + offsetY}
+        textAnchor={textAnchor}
+        fill="#0f172a"
+        fontSize={11}
+        fontWeight={700}
+      >
+        <tspan x={x + offsetX} dy={0}>
+          {line1}
+        </tspan>
+        {line2 && (
+          <tspan
+            x={x + offsetX}
+            dy={13}
+            fill="#475569"
+            fontSize={10}
+            fontWeight={600}
+          >
+            {line2}
+          </tspan>
+        )}
+      </text>
+    );
+  };
+
   const radarChartData = report.categories.map(c => ({
     subject: c.code + ' ' + c.nameTh.split('(')[0].trim(),
     score: c.mean,
@@ -192,13 +332,12 @@ export const EvaluationReport: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className={`${
-                report.totalResponses === 0
-                  ? 'bg-slate-600 hover:bg-slate-600'
-                  : report.isPassed
-                    ? 'bg-emerald-500 hover:bg-emerald-500'
-                    : 'bg-amber-500 hover:bg-amber-500'
-              } text-white font-bold px-3 py-1 text-xs uppercase tracking-wider`}>
+              <Badge className={`${report.totalResponses === 0
+                ? 'bg-slate-600 hover:bg-slate-600'
+                : report.isPassed
+                  ? 'bg-emerald-500 hover:bg-emerald-500'
+                  : 'bg-amber-500 hover:bg-amber-500'
+                } text-white font-bold px-3 py-1 text-xs uppercase tracking-wider`}>
                 <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                 {report.totalResponses === 0
                   ? 'รอข้อมูลการประเมิน (0 ผู้ประเมิน)'
@@ -265,7 +404,7 @@ export const EvaluationReport: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
             <div className="text-xs text-blue-200 flex items-center gap-1.5 mb-1 font-medium">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span>ความสะดวกในการใช้งาน (1.1)</span>
+              <span>ความสะดวกในการใช้งาน</span>
             </div>
             <div className="text-2xl md:text-3xl font-black text-white flex items-baseline gap-1">
               <span>{(report.categories[0]?.mean || 0).toFixed(2)}</span>
@@ -295,9 +434,8 @@ export const EvaluationReport: React.FC = () => {
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>สถานะการประเมินผล</span>
             </div>
-            <div className={`text-xl md:text-2xl font-black ${
-              report.totalResponses === 0 ? 'text-slate-300' : report.isPassed ? 'text-emerald-300' : 'text-amber-300'
-            } flex items-center gap-1.5`}>
+            <div className={`text-xl md:text-2xl font-black ${report.totalResponses === 0 ? 'text-slate-300' : report.isPassed ? 'text-emerald-300' : 'text-amber-300'
+              } flex items-center gap-1.5`}>
               <span>{report.totalResponses === 0 ? 'รอผลประเมิน' : report.isPassed ? 'ผ่านทุกเกณฑ์' : 'รอข้อมูลเพิ่มเติม'}</span>
             </div>
             <div className="mt-1 text-xs text-emerald-200">
@@ -410,19 +548,19 @@ export const EvaluationReport: React.FC = () => {
                   margin={{ top: 25, right: 20, left: -10, bottom: 25 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis 
-                    dataKey="shortName" 
+                  <XAxis
+                    dataKey="shortName"
                     tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }}
                     axisLine={{ stroke: '#cbd5e1' }}
                     tickLine={{ stroke: '#cbd5e1' }}
                   />
-                  <YAxis 
-                    domain={[0, 5]} 
-                    ticks={[0, 1, 2, 3, 4, 5]} 
+                  <YAxis
+                    domain={[0, 5]}
+                    ticks={[0, 1, 2, 3, 4, 5]}
                     tick={{ fill: '#334155', fontSize: 12 }}
                     axisLine={{ stroke: '#cbd5e1' }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
@@ -441,13 +579,40 @@ export const EvaluationReport: React.FC = () => {
                       return null;
                     }}
                   />
-                  <ReferenceLine y={3.61} stroke="#10b981" strokeDasharray="4 4" label={{ value: 'เกณฑ์สูง (3.61)', fill: '#10b981', fontSize: 10, position: 'right' }} />
-                  <ReferenceLine y={4.00} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: 'เกณฑ์ผ่าน (4.00)', fill: '#f59e0b', fontSize: 10, position: 'insideTopLeft' }} />
-                  <Bar dataKey="score" radius={[8, 8, 0, 0]} label={{ position: 'top', fill: '#0f172a', fontSize: 12, fontWeight: 'bold', formatter: (val: any) => typeof val === 'number' ? val.toFixed(2) : val }}>
+                  {/* Bars rendered FIRST so ReferenceLines can draw on top */}
+                  <Bar 
+                    dataKey="score" 
+                    radius={[8, 8, 0, 0]} 
+                    label={{ 
+                      position: 'top', 
+                      fill: '#0f172a', 
+                      fontSize: 12, 
+                      fontWeight: 'bold', 
+                      formatter: (val: any) => typeof val === 'number' ? val.toFixed(2) : val 
+                    }}
+                  >
                     {barChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Bar>
+
+                  {/* ReferenceLines rendered AFTER Bar with isFront={true} to draw clearly ON TOP of the blue bars */}
+                  <ReferenceLine 
+                    y={3.61} 
+                    stroke="#059669" 
+                    strokeWidth={2.5} 
+                    strokeDasharray="6 4" 
+                    isFront={true} 
+                    label={renderGreenRefLabel} 
+                  />
+                  <ReferenceLine 
+                    y={4.00} 
+                    stroke="#d97706" 
+                    strokeWidth={2.5} 
+                    strokeDasharray="6 4" 
+                    isFront={true} 
+                    label={renderOrangeRefLabel} 
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -477,17 +642,21 @@ export const EvaluationReport: React.FC = () => {
             </div>
 
             {/* WHITE BG RADAR WRAPPER */}
-            <div className="w-full h-80 bg-white">
+            <div className="w-full h-80 md:h-84 bg-white flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={95} data={radarChartData}>
+                <RadarChart 
+                  outerRadius={75} 
+                  data={radarChartData}
+                  margin={{ top: 20, right: 35, bottom: 20, left: 35 }}
+                >
                   <PolarGrid stroke="#e2e8f0" />
-                  <PolarAngleAxis 
-                    dataKey="subject" 
-                    tick={{ fill: '#1e293b', fontSize: 11, fontWeight: 600 }}
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={renderRadarAngleTick}
                   />
-                  <PolarRadiusAxis 
-                    angle={90} 
-                    domain={[0, 5]} 
+                  <PolarRadiusAxis
+                    angle={90}
+                    domain={[0, 5]}
                     tick={{ fill: '#64748b', fontSize: 10 }}
                   />
                   <Radar
@@ -497,7 +666,7 @@ export const EvaluationReport: React.FC = () => {
                     fill="#3b82f6"
                     fillOpacity={0.45}
                   />
-                  <Tooltip 
+                  <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
@@ -545,19 +714,19 @@ export const EvaluationReport: React.FC = () => {
                 margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                <XAxis 
-                  type="number" 
-                  domain={[0, 5]} 
-                  ticks={[0, 1, 2, 3, 4, 5]} 
+                <XAxis
+                  type="number"
+                  domain={[0, 5]}
+                  ticks={[0, 1, 2, 3, 4, 5]}
                   tick={{ fill: '#475569', fontSize: 11 }}
                 />
-                <YAxis 
-                  dataKey="code" 
-                  type="category" 
-                  tick={{ fill: '#0f172a', fontSize: 11, fontWeight: 'bold' }} 
+                <YAxis
+                  dataKey="code"
+                  type="category"
+                  tick={{ fill: '#0f172a', fontSize: 11, fontWeight: 'bold' }}
                   width={35}
                 />
-                <Tooltip 
+                <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
@@ -573,10 +742,10 @@ export const EvaluationReport: React.FC = () => {
                   }}
                 />
                 <ReferenceLine x={4.00} stroke="#f59e0b" strokeDasharray="3 3" />
-                <Bar 
-                  dataKey="score" 
-                  fill="#3b82f6" 
-                  radius={[0, 6, 6, 0]} 
+                <Bar
+                  dataKey="score"
+                  fill="#3b82f6"
+                  radius={[0, 6, 6, 0]}
                   label={{ position: 'right', fill: '#0f172a', fontSize: 11, fontWeight: 'bold', formatter: (v: any) => typeof v === 'number' ? v.toFixed(2) : v }}
                 />
               </BarChart>
@@ -594,7 +763,7 @@ export const EvaluationReport: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Badge className="bg-blue-600 text-white text-xs px-2.5 py-0.5">
-                  ตารางที่ 1 (ภาพที่ 1)
+                  ตารางที่ 1
                 </Badge>
                 <span className="text-xs text-muted-foreground font-medium">Evaluation Summary</span>
               </div>
@@ -737,7 +906,7 @@ export const EvaluationReport: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Badge className="bg-emerald-600 text-white text-xs px-2.5 py-0.5">
-                  ตารางที่ 2 (ภาพที่ 2)
+                  ตารางที่ 2
                 </Badge>
                 <span className="text-xs text-muted-foreground font-medium">Test & Acceptance Criteria</span>
               </div>
@@ -805,11 +974,10 @@ export const EvaluationReport: React.FC = () => {
                     {item.failCriteriaTh}
                   </td>
                   <td className="py-4 px-6 text-center print:hidden">
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
-                      item.status === 'passed'
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${item.status === 'passed'
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-300 dark:border-slate-700'
+                      }`}>
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       {item.status === 'passed' ? 'ผ่านเกณฑ์' : 'รอประเมิน'}
                     </span>
@@ -824,24 +992,22 @@ export const EvaluationReport: React.FC = () => {
       {/* ========================================================================= */}
       {/* 6. OFFICIAL EVALUATION CRITERIA OUTCOME BOX */}
       {/* ========================================================================= */}
-      <div className={`bg-gradient-to-r ${
-        report.totalResponses === 0
-          ? 'from-slate-50 via-blue-50/30 to-slate-50 dark:from-slate-900 dark:via-blue-950/20 dark:to-slate-900 border-slate-300 dark:border-slate-700'
-          : report.isPassed
-            ? 'from-emerald-50 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-blue-950/30 border-emerald-300 dark:border-emerald-700'
-            : 'from-amber-50 via-orange-50 to-slate-50 border-amber-300'
-      } border-2 rounded-3xl p-6 md:p-8 shadow-sm`}>
+      <div className={`bg-gradient-to-r ${report.totalResponses === 0
+        ? 'from-slate-50 via-blue-50/30 to-slate-50 dark:from-slate-900 dark:via-blue-950/20 dark:to-slate-900 border-slate-300 dark:border-slate-700'
+        : report.isPassed
+          ? 'from-emerald-50 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-blue-950/30 border-emerald-300 dark:border-emerald-700'
+          : 'from-amber-50 via-orange-50 to-slate-50 border-amber-300'
+        } border-2 rounded-3xl p-6 md:p-8 shadow-sm`}>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${report.totalResponses === 0 ? 'bg-slate-400' : report.isPassed ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
-              <Badge className={`${
-                report.totalResponses === 0
-                  ? 'bg-slate-600'
-                  : report.isPassed
-                    ? 'bg-emerald-600'
-                    : 'bg-amber-600'
-              } text-white font-bold text-xs px-3 py-1 rounded-full`}>
+              <Badge className={`${report.totalResponses === 0
+                ? 'bg-slate-600'
+                : report.isPassed
+                  ? 'bg-emerald-600'
+                  : 'bg-amber-600'
+                } text-white font-bold text-xs px-3 py-1 rounded-full`}>
                 {report.totalResponses === 0 ? 'สถานะ: รอข้อมูลประเมิน' : 'สรุปเกณฑ์การประเมินผล (Evaluation Conclusion)'}
               </Badge>
             </div>
@@ -858,7 +1024,7 @@ export const EvaluationReport: React.FC = () => {
             </h3>
             <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base leading-relaxed max-w-3xl">
               <strong className="text-slate-900 dark:text-white font-semibold">ข้อกำหนดเกณฑ์การประเมิน: </strong>
-              &ldquo;ผลการทดสอบจะถือว่าผ่านเกณฑ์เมื่อแอปพลิเคชันสามารถแสดงผลข้อมูลได้ถูกต้องทุกรายการ 
+              &ldquo;ผลการทดสอบจะถือว่าผ่านเกณฑ์เมื่อแอปพลิเคชันสามารถแสดงผลข้อมูลได้ถูกต้องทุกรายการ
               และผู้ใช้งานประเมินว่าแอปพลิเคชันมีความสะดวกในการใช้งานในระดับดีขึ้นไป (ระดับความพึงพอใจ &ge; 4 จาก 5)&rdquo;
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400 pt-1">
@@ -875,13 +1041,12 @@ export const EvaluationReport: React.FC = () => {
           </div>
 
           <div className="self-center md:self-auto shrink-0 text-center bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-            <div className={`w-16 h-16 rounded-full ${
-              report.totalResponses === 0
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                : report.isPassed
-                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                  : 'bg-amber-100 text-amber-600'
-            } flex items-center justify-center mx-auto mb-2`}>
+            <div className={`w-16 h-16 rounded-full ${report.totalResponses === 0
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+              : report.isPassed
+                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                : 'bg-amber-100 text-amber-600'
+              } flex items-center justify-center mx-auto mb-2`}>
               <ShieldCheck className="w-9 h-9" />
             </div>
             <div className="text-sm font-black text-slate-800 dark:text-slate-200">
