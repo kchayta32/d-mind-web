@@ -40,6 +40,7 @@ interface DisasterMapHudCardProps {
   onOpenCleanRoom?: () => void;
   onOpenEvacuation?: () => void;
   onActivateRadar?: () => void;
+  onOpenTyphoonModal?: () => void;
 }
 
 export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
@@ -55,7 +56,8 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
   onOpenSafetyCheckIn,
   onOpenCleanRoom,
   onOpenEvacuation,
-  onActivateRadar
+  onActivateRadar,
+  onOpenTyphoonModal
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -304,19 +306,38 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
             ))}
           </div>
 
-          {/* AI Dr.Mind Advisory Banner */}
-          <div className="bg-slate-950/70 border border-slate-800/90 rounded-xl p-2.5 flex items-start gap-2 shadow-inner">
-            <div className="p-1 rounded-md bg-sky-500/20 text-sky-400 flex-shrink-0 mt-0.5">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+          {/* Typhoon AI Live Situational Intelligence Banner */}
+          <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/40 rounded-xl p-2.5 flex flex-col gap-2 shadow-inner">
+            <div className="flex items-start gap-2">
+              <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 flex-shrink-0 mt-0.5 ring-1 ring-cyan-500/40">
+                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+              </div>
+              <div className="text-[11px] leading-relaxed flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="font-black text-cyan-300">
+                    AI Dr.Mind Advisory (Typhoon AI Intelligence)
+                  </span>
+                  <span className="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-700/60 px-1 py-0.2 rounded font-mono font-bold">
+                    v2.5
+                  </span>
+                </div>
+                <p className="text-slate-300 text-[10.5px]">
+                  {config.aiAdvice}
+                </p>
+              </div>
             </div>
-            <div className="text-[11px] leading-relaxed">
-              <span className="font-bold text-sky-300 block mb-0.5">
-                AI Dr.Mind Advisory (คำแนะนำฉุกเฉิน):
-              </span>
-              <p className="text-slate-300 text-[10.5px]">
-                {config.aiAdvice}
-              </p>
-            </div>
+
+            {onOpenTyphoonModal && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={onOpenTyphoonModal}
+                className="w-full h-7 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-[11px] rounded-lg shadow-md shadow-cyan-950/40 gap-1.5 transition-all"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+                <span>เปิดบทวิเคราะห์ & ถาม-ตอบด้วย Typhoon AI</span>
+              </Button>
+            )}
           </div>
 
           {/* Dual Action Buttons */}

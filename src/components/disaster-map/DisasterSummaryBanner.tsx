@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X, Sparkles } from 'lucide-react';
 import { StormData, Earthquake, AirPollutionData } from './types';
 import { FloodDataPoint } from './hooks/useOpenMeteoFloodData';
 
@@ -9,6 +9,7 @@ interface DisasterSummaryBannerProps {
   airStations?: AirPollutionData[];
   floodPoints?: FloodDataPoint[];
   onNavigateTo?: (lat: number, lng: number, zoom?: number) => void;
+  onOpenTyphoonModal?: () => void;
 }
 
 export const DisasterSummaryBanner: React.FC<DisasterSummaryBannerProps> = ({
@@ -16,7 +17,8 @@ export const DisasterSummaryBanner: React.FC<DisasterSummaryBannerProps> = ({
   earthquakes = [],
   airStations = [],
   floodPoints = [],
-  onNavigateTo
+  onNavigateTo,
+  onOpenTyphoonModal
 }) => {
   const [dismissed, setDismissed] = React.useState(false);
 
@@ -77,13 +79,28 @@ export const DisasterSummaryBanner: React.FC<DisasterSummaryBannerProps> = ({
         </div>
       </div>
 
-      <button
-        onClick={() => setDismissed(true)}
-        className="p-1 hover:bg-white/20 rounded text-white/80 hover:text-white transition"
-        title="ปิดการแจ้งเตือน"
-      >
-        <X className="w-4 h-4" />
-      </button>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        {onOpenTyphoonModal && (
+          <button
+            type="button"
+            onClick={onOpenTyphoonModal}
+            className="bg-black/40 hover:bg-black/60 text-white font-bold text-[11px] px-2.5 py-1 rounded-full border border-white/30 flex items-center gap-1 shadow-sm transition hover:scale-105"
+            title="เปิดระบบวิเคราะห์สถานการณ์ด่วนด้วย Typhoon AI"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+            <span className="hidden sm:inline">Typhoon AI วิเคราะห์ด่วน</span>
+            <span className="sm:hidden">Typhoon AI</span>
+          </button>
+        )}
+
+        <button
+          onClick={() => setDismissed(true)}
+          className="p-1 hover:bg-white/20 rounded text-white/80 hover:text-white transition"
+          title="ปิดการแจ้งเตือน"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 };

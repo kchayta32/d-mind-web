@@ -21,8 +21,10 @@ import { BangkokFloodStats } from '@/components/bangkok-flood/BangkokFloodStats'
 import { BangkokRoadDetailModal } from '@/components/bangkok-flood/BangkokRoadDetailModal';
 import { BANGKOK_ROAD_SEGMENTS, BANGKOK_CANAL_STATIONS } from '@/data/bangkokRoadFloodData';
 import { BangkokZone, BangkokRoadSegment } from '@/types/bangkokFlood';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, BarChart2 } from 'lucide-react';
 import { SelectedLocation } from './types';
+import { TyphoonDisasterModal } from './TyphoonDisasterModal';
+import { DisasterTelemetry } from '@/services/typhoonDisasterService';
 
 interface DisasterMapContentProps {
   selectedType: DisasterType;
@@ -30,6 +32,10 @@ interface DisasterMapContentProps {
   onLocationSelect: (lat: number, lon: number, name: string, locationData?: SelectedLocation) => void;
   selectedLocation?: SelectedLocation | null;
   onClearSelectedLocation?: () => void;
+  isFullMapMode?: boolean;
+  onToggleFullMapMode?: () => void;
+  isTyphoonModalOpen?: boolean;
+  onSetTyphoonModalOpen?: (open: boolean) => void;
 }
 
 export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
@@ -37,7 +43,11 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
   onTypeChange,
   onLocationSelect,
   selectedLocation = null,
-  onClearSelectedLocation
+  onClearSelectedLocation,
+  isFullMapMode = false,
+  onToggleFullMapMode,
+  isTyphoonModalOpen,
+  onSetTyphoonModalOpen
 }) => {
   const {
     magnitudeFilter,
@@ -129,10 +139,73 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     });
   }, [bkkSearch, bkkZone, bkkSeverity]);
 
+  // Internal state if parent doesn't control Typhoon Modal
+  const [internalTyphoonOpen, setInternalTyphoonOpen] = useState(false);
+  const isTyphoonOpen = isTyphoonModalOpen !== undefined ? isTyphoonModalOpen : internalTyphoonOpen;
+  const setTyphoonOpen = onSetTyphoonModalOpen || setInternalTyphoonOpen;
+
+  // Aggregate live telemetry for Typhoon AI
+  const liveMaxEarthquake = useMemo(() => {
+    if (!earthquakes || earthquakes.length === 0) return null;
+    return [...earthquakes].sort((a, b) => (b.magnitude || 0) - (a.magnitude || 0))[0];
+  }, [earthquakes]);
+
+  const liveMaxPm25 = useMemo(() => {
+    if (!airStations || airStations.length === 0) return null;
+    return [...airStations].sort((a, b) => (b.pm25 || 0) - (a.pm25 || 0))[0];
+  }, [airStations]);
+
+  const liveTopHotspot = useMemo(() => {
+    if (!hotspots || hotspots.length === 0) return null;
+    return hotspots[0]?.province || null;
+  }, [hotspots]);
+
+  const liveTelemetry: DisasterTelemetry = useMemo(() => {
+    return {
+      disasterType: selectedType,
+      selectedLocationName: selectedLocation?.name || selectedLocation?.displayName,
+      earthquakesCount: earthquakes.length,
+      maxEarthquakeMagnitude: liveMaxEarthquake?.magnitude,
+      maxEarthquakeLocation: liveMaxEarthquake?.place || liveMaxEarthquake?.location,
+      maxEarthquakeDepthKm: liveMaxEarthquake?.depth,
+      hotspotsCount: hotspots.length,
+      topHotspotProvince: liveTopHotspot || undefined,
+      airStationsCount: airStations.length,
+      maxPm25: liveMaxPm25?.pm25,
+      maxPm25Station: liveMaxPm25?.stationName || liveMaxPm25?.province,
+      maxAqi: liveMaxPm25?.usAqi,
+      floodFeaturesCount: gistdaFloodFeatures.length,
+      maxDischargeM3s: floodDataPoints.find(f => f.floodRiskLevel === 'critical' || f.floodRiskLevel === 'high')?.currentDischarge,
+      criticalFloodRivers: floodDataPoints.filter(f => f.floodRiskLevel === 'critical').map(f => f.locationName),
+      stormsCount: storms.length,
+      activeStormName: storms[0]?.name,
+      stormWindSpeedKmH: storms[0]?.windSpeedKmH,
+      bkkFloodedRoadsCount: BANGKOK_ROAD_SEGMENTS.filter(r => r.status !== 'normal').length,
+      bkkCriticalRoadsCount: BANGKOK_ROAD_SEGMENTS.filter(r => r.status === 'critical').length,
+      topBkkFloodedRoad: BANGKOK_ROAD_SEGMENTS.find(r => r.status === 'critical')?.name,
+      volcanoesCount: volcanoes.length,
+      sinkholesCount: sinkholes.length
+    };
+  }, [
+    selectedType,
+    selectedLocation,
+    earthquakes,
+    liveMaxEarthquake,
+    hotspots,
+    liveTopHotspot,
+    airStations,
+    liveMaxPm25,
+    gistdaFloodFeatures,
+    floodDataPoints,
+    storms,
+    volcanoes,
+    sinkholes
+  ]);
+
   return (
-    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-0">
-      {/* Main Map Container (8 cols on desktop) */}
-      <div className="lg:col-span-8 xl:col-span-9 h-[480px] sm:h-[560px] lg:h-[calc(100vh-175px)] min-h-[440px] rounded-xl overflow-hidden shadow-sm border border-slate-200/90 dark:border-slate-800 [&:has([data-state=open])]:pointer-events-none">
+    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-0 relative">
+      {/* Main Map Container (Full width in fullscreen mode, 8-9 cols in split mode) */}
+      <div className={`${isFullMapMode ? 'lg:col-span-12 xl:col-span-12' : 'lg:col-span-8 xl:col-span-9'} h-[480px] sm:h-[560px] lg:h-[calc(100vh-175px)] min-h-[440px] rounded-xl overflow-hidden shadow-sm border border-slate-200/90 dark:border-slate-800 transition-all [&:has([data-state=open])]:pointer-events-none`}>
         {selectedType === 'bkk_road_flood' ? (
           <BangkokFloodMap
             roads={filteredBkkRoads}
@@ -183,17 +256,32 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
             onClearSelectedLocation={onClearSelectedLocation}
             onRefreshAll={refetchAll}
             onOpenCrowdsourceModal={() => setIsCrowdsourceModalOpen(true)}
+            onOpenTyphoonModal={() => setTyphoonOpen(true)}
           />
         )}
       </div>
       
-      {/* Right Sidebar for Analytics & Controls (4 cols on desktop) */}
-      <div className="lg:col-span-4 xl:col-span-3 space-y-3.5 max-h-none lg:max-h-[calc(100vh-175px)] overflow-y-auto pr-1 pb-4">
+      {/* Right Sidebar for Analytics & Controls (4 cols on desktop, hidden when isFullMapMode) */}
+      <div className={`${isFullMapMode ? 'hidden' : 'lg:col-span-4 xl:col-span-3'} space-y-3.5 max-h-none lg:max-h-[calc(100vh-175px)] overflow-y-auto pr-1 pb-4 transition-all`}>
         {selectedType === 'bkk_road_flood' ? (
           <>
+            <button
+              type="button"
+              onClick={() => setTyphoonOpen(true)}
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 text-white shadow-md hover:from-cyan-500 hover:to-indigo-600 transition font-bold text-xs"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-cyan-200 animate-pulse" />
+                <span>Typhoon AI วิเคราะห์น้ำท่วม กทม.</span>
+              </span>
+              <span className="text-[10px] bg-black/25 px-2 py-0.5 rounded font-mono font-medium">
+                Live AI
+              </span>
+            </button>
+
             <a
               href="/bangkok-flood"
-              className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md hover:from-sky-700 hover:to-indigo-800 transition font-bold text-xs"
+              className="flex items-center justify-between p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition font-bold text-xs shadow-xs"
             >
               <span className="flex items-center gap-2">
                 <span className="text-base">🌊</span>
@@ -231,6 +319,35 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           </>
         ) : (
           <>
+            {/* Typhoon AI Quick Intelligence Card in Sidebar */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-950/70 border border-cyan-500/30 shadow-lg flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40 flex-shrink-0">
+                  <Sparkles className="w-4 h-4 animate-pulse" />
+                </div>
+                <div className="truncate">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-extrabold text-xs text-white">Typhoon AI</span>
+                    <span className="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1 py-0.2 rounded font-mono">
+                      v2.5
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 truncate">
+                    วิเคราะห์สถานการณ์ & ประเมินความเสี่ยงสด
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setTyphoonOpen(true)}
+                className="h-7 text-[11px] bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg px-2.5 shadow-md flex-shrink-0"
+              >
+                เปิดบทวิเคราะห์
+              </Button>
+            </div>
+
             {/* Filter Controls */}
             <FilterControls
               selectedType={selectedType}
@@ -347,6 +464,30 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
           onClose={() => setBkkRoadModalOpen(false)}
           road={bkkSelectedRoad}
         />
+      )}
+
+      {/* Typhoon AI Disaster Intelligence Modal */}
+      <TyphoonDisasterModal
+        isOpen={isTyphoonOpen}
+        onClose={() => setTyphoonOpen(false)}
+        telemetry={liveTelemetry}
+        onOpenCrowdsource={() => {
+          setTyphoonOpen(false);
+          setIsCrowdsourceModalOpen(true);
+        }}
+      />
+
+      {/* Floating Restore Analytics Panel Button when in Full Map Mode */}
+      {isFullMapMode && onToggleFullMapMode && (
+        <button
+          type="button"
+          onClick={onToggleFullMapMode}
+          className="fixed bottom-5 right-5 z-[1001] bg-slate-900/95 hover:bg-slate-800 text-cyan-300 hover:text-white border border-cyan-500/50 shadow-2xl rounded-full py-2.5 px-4 flex items-center gap-2 font-bold text-xs backdrop-blur-md transition-all hover:scale-105 active:scale-95 ring-2 ring-cyan-500/30"
+          title="สลับกลับไปดูแถบสถิติและตัวกรอง"
+        >
+          <BarChart2 className="w-4 h-4 text-cyan-400" />
+          <span>เปิดแถบข้อมูลสถิติ (Analytics Panel)</span>
+        </button>
       )}
     </div>
   );

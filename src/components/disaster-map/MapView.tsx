@@ -25,7 +25,7 @@ import { AqiScaleLegend } from './AqiScaleLegend';
 import { SafetyCheckInModal } from './SafetyCheckInModal';
 import { CleanRoomModal } from './CleanRoomModal';
 import { EvacuationModal } from './EvacuationModal';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 
 interface MapViewProps {
   earthquakes?: Earthquake[];
@@ -63,6 +63,7 @@ interface MapViewProps {
   onClearSelectedLocation?: () => void;
   onRefreshAll?: () => void;
   onOpenCrowdsourceModal?: () => void;
+  onOpenTyphoonModal?: () => void;
 }
 
 const JAWG_ACCESS_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JAWG_ACCESS_TOKEN) || 'FTtoH6pBTHEDddbaGWyVP2EDCUBCVIdUP92MVIcbIx5H6jYNdDQca7404lHLL3Dc';
@@ -163,7 +164,8 @@ export const MapView: React.FC<MapViewProps> = ({
   selectedLocation = null,
   onClearSelectedLocation,
   onRefreshAll,
-  onOpenCrowdsourceModal
+  onOpenCrowdsourceModal,
+  onOpenTyphoonModal
 }) => {
   const [baseLayer, setBaseLayer] = useState<BaseMapLayerType>('osm');
   const [rainOverlayType, setRainOverlayType] = useState<'radar' | 'satellite'>('radar');
@@ -319,9 +321,23 @@ export const MapView: React.FC<MapViewProps> = ({
           </div>
         )}
 
-        {/* Top-Left Floating Controls: API Status Badge */}
+        {/* Top-Left Floating Controls: API Status Badge & Typhoon AI Fast Trigger */}
         <div className="absolute top-4 left-14 z-[1000] flex items-center gap-2">
           <ApiStatusBadge onRefreshAll={onRefreshAll} isLoading={isLoading} />
+          {onOpenTyphoonModal && (
+            <button
+              type="button"
+              onClick={onOpenTyphoonModal}
+              className="bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md text-cyan-300 hover:text-white border border-cyan-500/40 hover:border-cyan-400 text-xs font-bold py-1.5 px-3 rounded-full shadow-lg flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 ring-1 ring-cyan-500/20"
+              title="เปิดระบบวิเคราะห์สถานการณ์ด้วย Typhoon AI"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span className="hidden sm:inline">Typhoon AI</span>
+              <span className="text-[10px] bg-cyan-950 text-cyan-400 px-1.5 py-0.2 rounded-full border border-cyan-700 font-medium">
+                วิเคราะห์สด
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Top-Right Floating Controls: Base Layer Selector & Location */}
@@ -381,6 +397,7 @@ export const MapView: React.FC<MapViewProps> = ({
             onOpenCleanRoom={() => setIsCleanRoomOpen(true)}
             onOpenEvacuation={() => setIsEvacuationOpen(true)}
             onActivateRadar={() => setShowRainOverlay(true)}
+            onOpenTyphoonModal={onOpenTyphoonModal}
           />
         </div>
 

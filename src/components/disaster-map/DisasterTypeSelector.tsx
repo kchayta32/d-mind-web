@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Carousel,
   CarouselContent,
@@ -11,20 +11,30 @@ import {
   CloudRain, 
   Flame, 
   Wind, 
-  Sun,
-  Waves,
-  Navigation,
-  CloudDrizzle,
-  Mountain,
+  Sun, 
+  Waves, 
+  Navigation, 
+  CloudDrizzle, 
+  Mountain, 
   FlameKindling,
-  Camera
+  Sparkles,
+  Maximize2,
+  Minimize2,
+  Layers,
+  Filter
 } from 'lucide-react';
 import { DisasterType } from './DisasterMap';
+import { Button } from '@/components/ui/button';
 
 interface DisasterTypeSelectorProps {
   selectedType: DisasterType;
   onTypeChange: (type: DisasterType) => void;
+  onOpenTyphoonModal?: () => void;
+  isFullMapMode?: boolean;
+  onToggleFullMapMode?: () => void;
 }
+
+type CategoryFilter = 'all' | 'core' | 'live_radar';
 
 const disasterTypes: Array<{
   type: DisasterType;
@@ -32,113 +42,237 @@ const disasterTypes: Array<{
   sublabel: string;
   icon: React.ReactNode;
   activeColor: string;
+  glowColor: string;
   available: boolean;
+  category: 'core' | 'live_radar';
   isCoreThesis?: boolean;
 }> = [
   {
     type: 'flood',
     label: 'น้ำท่วม & ลุ่มน้ำ',
     sublabel: 'Sentinel-1 & GISTDA',
-    icon: <Waves className="w-5 h-5 text-cyan-400" />,
-    activeColor: 'bg-gradient-to-br from-cyan-600 to-blue-700 text-white shadow-cyan-900/50',
+    icon: <Waves className="w-4 h-4 text-cyan-400" />,
+    activeColor: 'bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-700 text-white',
+    glowColor: 'shadow-cyan-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'earthquake',
     label: 'แผ่นดินไหว',
     sublabel: 'USGS & TMD Seismic',
-    icon: <Activity className="w-5 h-5 text-red-400" />,
-    activeColor: 'bg-gradient-to-br from-red-600 to-amber-700 text-white shadow-red-900/50',
+    icon: <Activity className="w-4 h-4 text-red-400" />,
+    activeColor: 'bg-gradient-to-br from-red-600 via-rose-600 to-amber-700 text-white',
+    glowColor: 'shadow-red-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'wildfire',
     label: 'ไฟป่า & จุดความร้อน',
     sublabel: 'VIIRS 375m & GISTDA',
-    icon: <Flame className="w-5 h-5 text-orange-400" />,
-    activeColor: 'bg-gradient-to-br from-orange-600 to-red-700 text-white shadow-orange-900/50',
+    icon: <Flame className="w-4 h-4 text-orange-400" />,
+    activeColor: 'bg-gradient-to-br from-orange-600 via-amber-600 to-red-700 text-white',
+    glowColor: 'shadow-orange-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'storm',
     label: 'พายุหมุน & ลมแรง',
     sublabel: 'Doppler Radar & TMD',
-    icon: <Navigation className="w-5 h-5 text-indigo-400 rotate-45" />,
-    activeColor: 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-indigo-900/50',
+    icon: <Navigation className="w-4 h-4 text-indigo-400 rotate-45" />,
+    activeColor: 'bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-800 text-white',
+    glowColor: 'shadow-indigo-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'airpollution',
     label: 'คุณภาพอากาศ PM2.5',
-    sublabel: 'Air4Thai & AQI Real-time',
-    icon: <Wind className="w-5 h-5 text-teal-400" />,
-    activeColor: 'bg-gradient-to-br from-teal-600 to-purple-700 text-white shadow-teal-900/50',
+    sublabel: 'Air4Thai & AQI สด',
+    icon: <Wind className="w-4 h-4 text-teal-400" />,
+    activeColor: 'bg-gradient-to-br from-teal-600 via-emerald-600 to-purple-800 text-white',
+    glowColor: 'shadow-teal-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'drought',
     label: 'ภัยแล้ง & ความชื้นดิน',
-    sublabel: 'NASA SMAP & อ่างเก็บน้ำ',
-    icon: <Sun className="w-5 h-5 text-amber-400" />,
-    activeColor: 'bg-gradient-to-br from-amber-600 to-orange-800 text-white shadow-amber-900/50',
+    sublabel: 'NASA SMAP & สสน.',
+    icon: <Sun className="w-4 h-4 text-amber-400" />,
+    activeColor: 'bg-gradient-to-br from-amber-600 via-orange-600 to-amber-800 text-white',
+    glowColor: 'shadow-amber-500/30',
     available: true,
+    category: 'core',
     isCoreThesis: true
   },
   {
     type: 'bkk_road_flood',
     label: 'น้ำท่วมถนน กทม.',
-    sublabel: 'BMA & Sentinel C-SAR',
-    icon: <Waves className="w-5 h-5 text-sky-400" />,
-    activeColor: 'bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-sky-900/50',
-    available: true
+    sublabel: 'BMA & Sentinel SAR',
+    icon: <Waves className="w-4 h-4 text-sky-400" />,
+    activeColor: 'bg-gradient-to-br from-sky-600 via-blue-600 to-indigo-800 text-white',
+    glowColor: 'shadow-sky-500/30',
+    available: true,
+    category: 'live_radar'
   },
   {
     type: 'heavyrain',
     label: 'เรดาร์ฝน RainViewer',
-    sublabel: 'Doppler Loop สด',
-    icon: <CloudRain className="w-5 h-5 text-blue-400" />,
-    activeColor: 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-blue-900/50',
-    available: true
+    sublabel: 'Doppler Loop เรียลไทม์',
+    icon: <CloudRain className="w-4 h-4 text-blue-400" />,
+    activeColor: 'bg-gradient-to-br from-blue-600 via-sky-600 to-indigo-700 text-white',
+    glowColor: 'shadow-blue-500/30',
+    available: true,
+    category: 'live_radar'
   },
   {
     type: 'openmeteorain',
     label: 'พยากรณ์อากาศ 35+ จุด',
     sublabel: 'Open-Meteo Open Data',
-    icon: <CloudDrizzle className="w-5 h-5 text-indigo-400" />,
-    activeColor: 'bg-gradient-to-br from-indigo-600 to-slate-800 text-white shadow-indigo-900/50',
-    available: true
+    icon: <CloudDrizzle className="w-4 h-4 text-indigo-400" />,
+    activeColor: 'bg-gradient-to-br from-indigo-600 via-slate-700 to-slate-900 text-white',
+    glowColor: 'shadow-indigo-500/30',
+    available: true,
+    category: 'live_radar'
+  },
+  {
+    type: 'volcano',
+    label: 'ภูเขาไฟปะทุ',
+    sublabel: 'NASA EONET Alerts',
+    icon: <FlameKindling className="w-4 h-4 text-rose-400" />,
+    activeColor: 'bg-gradient-to-br from-rose-600 via-red-700 to-stone-900 text-white',
+    glowColor: 'shadow-rose-500/30',
+    available: true,
+    category: 'live_radar'
+  },
+  {
+    type: 'sinkhole',
+    label: 'หลุมยุบ & ดินทรุด',
+    sublabel: 'ธรณีวิทยา & Geo Feeds',
+    icon: <Mountain className="w-4 h-4 text-stone-400" />,
+    activeColor: 'bg-gradient-to-br from-stone-600 via-neutral-700 to-slate-900 text-white',
+    glowColor: 'shadow-stone-500/30',
+    available: true,
+    category: 'live_radar'
   }
 ];
 
-const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
+export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
   selectedType,
-  onTypeChange
+  onTypeChange,
+  onOpenTyphoonModal,
+  isFullMapMode = false,
+  onToggleFullMapMode
 }) => {
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
+
+  const filteredDisasters = disasterTypes.filter(d => {
+    if (activeCategory === 'core') return d.category === 'core';
+    if (activeCategory === 'live_radar') return d.category === 'live_radar';
+    return true;
+  });
+
   return (
-    <div className="bg-slate-900/90 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-700/80 p-2.5 sm:p-3 w-full">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-2">
-          <span>แผนที่ 6 ภัยพิบัติหลักตามกรอบวิทยานิพนธ์</span>
-          <span className="text-[10px] font-semibold text-cyan-300 bg-cyan-950/70 px-2 py-0.5 rounded-full border border-cyan-800/80 shadow-xs">
-            บทที่ 1 - 3 (Open Data สด)
-          </span>
-        </h2>
+    <div className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/80 p-2.5 sm:p-3 w-full transition-all">
+      {/* Top Header Row with Category Tabs + Typhoon AI Action + Full Map Toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-800">
+        {/* Left: Category Segmented Filter */}
+        <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800">
+          <button
+            type="button"
+            onClick={() => setActiveCategory('all')}
+            className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all ${
+              activeCategory === 'all'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            ทั้งหมด (11)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveCategory('core')}
+            className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all flex items-center gap-1 ${
+              activeCategory === 'core'
+                ? 'bg-cyan-600 text-white shadow-xs'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span>6 ภัยหลัก (วิทยานิพนธ์)</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveCategory('live_radar')}
+            className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all ${
+              activeCategory === 'live_radar'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            เรดาร์ & กทม.
+          </button>
+        </div>
+
+        {/* Right: Typhoon AI Quick Action & View Mode Toggles */}
+        <div className="flex items-center gap-1.5">
+          {onOpenTyphoonModal && (
+            <button
+              type="button"
+              onClick={onOpenTyphoonModal}
+              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-black shadow-lg shadow-cyan-900/40 ring-1 ring-cyan-400/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              title="เปิดการวิเคราะห์สถานการณ์อัจฉริยะด้วย Typhoon AI"
+            >
+              <div className="relative">
+                <Sparkles className="w-3.5 h-3.5 animate-pulse text-cyan-200" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full" />
+              </div>
+              <span>Typhoon AI วิเคราะห์ด่วน</span>
+              <span className="hidden sm:inline text-[9px] bg-black/25 px-1.5 py-0.2 rounded font-mono font-medium text-cyan-200">
+                v2.5
+              </span>
+            </button>
+          )}
+
+          {onToggleFullMapMode && (
+            <button
+              type="button"
+              onClick={onToggleFullMapMode}
+              className={`p-1.5 rounded-xl border text-xs font-medium transition flex items-center gap-1 ${
+                isFullMapMode
+                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50'
+                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white hover:bg-slate-700'
+              }`}
+              title={isFullMapMode ? 'กลับสู่โหมดหน้าต่างคู่ (Split Analytics)' : 'ขยายแผนที่เต็มจอ (Full Map Focus)'}
+            >
+              {isFullMapMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              <span className="hidden md:inline text-[11px] font-bold">
+                {isFullMapMode ? 'หน้าต่างคู่' : 'แผนที่เต็มจอ'}
+              </span>
+            </button>
+          )}
+        </div>
       </div>
       
+      {/* Horizontal Carousel of Disaster Types */}
       <Carousel
         opts={{
           align: "start",
-          slidesToScroll: 2,
+          slidesToScroll: 3,
         }}
         className="w-full relative px-1"
       >
         <CarouselContent className="-ml-2 flex items-center">
-          {disasterTypes.map(({ type, label, sublabel, icon, activeColor, available, isCoreThesis }) => {
+          {filteredDisasters.map(({ type, label, sublabel, icon, activeColor, glowColor, available, isCoreThesis }) => {
             const isSelected = selectedType === type;
             return (
               <CarouselItem key={type} className="pl-2 basis-auto">
@@ -146,25 +280,25 @@ const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
                   type="button"
                   onClick={() => available && onTypeChange(type)}
                   className={`
-                    relative flex flex-col items-center justify-center min-w-[124px] sm:min-w-[136px] h-[78px] px-3 py-2 rounded-xl text-xs transition-all duration-200 outline-none
+                    relative flex flex-col items-center justify-center min-w-[120px] sm:min-w-[134px] h-[72px] px-2.5 py-1.5 rounded-xl text-xs transition-all duration-200 outline-none
                     ${isSelected 
-                      ? `${activeColor} shadow-lg ring-2 ring-cyan-400/50 ring-offset-1 ring-offset-slate-900 font-bold scale-[1.02]` 
-                      : 'bg-slate-800/70 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600'
+                      ? `${activeColor} shadow-lg ${glowColor} ring-2 ring-cyan-400/60 ring-offset-1 ring-offset-slate-900 font-bold scale-[1.02]` 
+                      : 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white hover:border-slate-600'
                     }
                   `}
                 >
                   {isCoreThesis && !isSelected && (
-                    <span className="absolute top-1 right-1.5 text-[8px] bg-cyan-950/60 text-cyan-300 px-1 py-0.2 rounded font-semibold border border-cyan-800/60">
+                    <span className="absolute top-1 right-1.5 text-[8px] bg-cyan-950/70 text-cyan-300 px-1 py-0.2 rounded font-semibold border border-cyan-800/60">
                       หลัก
                     </span>
                   )}
-                  <div className={`flex items-center justify-center mb-1 ${isSelected ? 'text-white' : 'text-slate-300'}`}>
+                  <div className={`flex items-center justify-center mb-0.5 ${isSelected ? 'text-white' : 'text-slate-300'}`}>
                     {icon}
                   </div>
-                  <span className="text-center font-bold text-xs leading-snug tracking-tight text-nowrap truncate max-w-[118px]">
+                  <span className="text-center font-bold text-xs leading-tight tracking-tight text-nowrap truncate max-w-[114px]">
                     {label}
                   </span>
-                  <span className={`text-[10px] mt-0.5 leading-none font-medium ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
+                  <span className={`text-[9.5px] mt-0.5 leading-none font-medium truncate max-w-[114px] ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
                     {sublabel}
                   </span>
                 </button>
@@ -172,8 +306,8 @@ const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="-left-3 h-8 w-8 bg-white dark:bg-slate-800 shadow-md border-slate-200 hover:bg-slate-50" />
-        <CarouselNext className="-right-3 h-8 w-8 bg-white dark:bg-slate-800 shadow-md border-slate-200 hover:bg-slate-50" />
+        <CarouselPrevious className="-left-2.5 h-7 w-7 bg-slate-800 text-white border-slate-700 hover:bg-slate-700 shadow-lg" />
+        <CarouselNext className="-right-2.5 h-7 w-7 bg-slate-800 text-white border-slate-700 hover:bg-slate-700 shadow-lg" />
       </Carousel>
     </div>
   );

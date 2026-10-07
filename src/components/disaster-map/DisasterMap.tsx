@@ -20,6 +20,8 @@ export type DisasterType =
 const DisasterMap: React.FC = () => {
   const [selectedType, setSelectedType] = useState<DisasterType>('earthquake');
   const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
+  const [isFullMapMode, setIsFullMapMode] = useState(false);
+  const [isTyphoonModalOpen, setIsTyphoonModalOpen] = useState(false);
 
   const handleLocationSelect = (lat: number, lon: number, name: string, locationData?: SelectedLocation) => {
     if (locationData) {
@@ -46,6 +48,9 @@ const DisasterMap: React.FC = () => {
           <DisasterTypeSelector 
             selectedType={selectedType} 
             onTypeChange={setSelectedType}
+            onOpenTyphoonModal={() => setIsTyphoonModalOpen(true)}
+            isFullMapMode={isFullMapMode}
+            onToggleFullMapMode={() => setIsFullMapMode(prev => !prev)}
           />
         </div>
         <div className="flex items-center justify-end self-end xl:self-center flex-shrink-0">
@@ -63,6 +68,10 @@ const DisasterMap: React.FC = () => {
         onLocationSelect={handleLocationSelect}
         selectedLocation={selectedLocation}
         onClearSelectedLocation={handleClearSelectedLocation}
+        isFullMapMode={isFullMapMode}
+        onToggleFullMapMode={() => setIsFullMapMode(prev => !prev)}
+        isTyphoonModalOpen={isTyphoonModalOpen}
+        onSetTyphoonModalOpen={setIsTyphoonModalOpen}
       />
     </div>
   );
