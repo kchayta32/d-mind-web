@@ -71,6 +71,12 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
     : null;
 
   const liveHotspotCount = hotspots.length;
+  const liveTotalFrp = hotspots.length > 0
+    ? Math.round(hotspots.reduce((sum, h) => sum + (Number(h.properties?.frp ?? h.FRP ?? 0)), 0))
+    : 0;
+  const liveMaxFrp = hotspots.length > 0
+    ? Math.max(...hotspots.map(h => Number(h.properties?.frp ?? h.FRP ?? 0))).toFixed(1)
+    : '0.0';
 
   const liveCriticalFlood = floodPoints.find(f => f.floodRiskLevel === 'critical' || f.floodRiskLevel === 'high');
 
@@ -138,18 +144,18 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
 
       case 'wildfire':
         return {
-          title: 'กลุ่มไฟป่าและจุดความร้อน VIIRS 375m',
-          badge: `${liveHotspotCount || 48} จุดความร้อน`,
+          title: 'จุดความร้อน & ความผิดปกติทางความร้อน (NASA FIRMS)',
+          badge: `${liveHotspotCount || 0} จุดความร้อน (FRP รวม ${liveTotalFrp} MW)`,
           badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/40',
           accentColor: 'border-orange-500/40 shadow-orange-950/30',
           themeColor: 'text-orange-400',
           icon: <Flame className="w-4 h-4 text-orange-400" />,
           metrics: [
-            { label: 'จุดความร้อนสะสม', value: `${liveHotspotCount || 48} จุด`, sub: 'GISTDA VIIRS' },
-            { label: 'กำลังการเผาไหม้', value: '312 MW (FRP)', sub: 'ความเข้มข้นสูง' },
-            { label: 'ความเสี่ยงลุกลาม', value: 'สูงมาก', sub: 'ตามทิศทางลม' },
+            { label: 'ความผิดปกติความร้อน', value: `${liveHotspotCount || 0} จุด`, sub: 'MODIS & VIIRS 375m' },
+            { label: 'พลังงานความร้อน (FRP)', value: `${liveTotalFrp} MW`, sub: `สูงสุด ${liveMaxFrp} MW` },
+            { label: 'ความล่าช้าตรวจจับ', value: 'Real-Time ≤ 3h', sub: 'NASA FIRMS NRT' },
           ],
-          aiAdvice: 'ระวังกลุ่มควันพิษ สวมหน้ากาก N95 ประสานสายด่วนดับไฟป่า 1362 ห้ามเผาเศษวัชพืชเด็ดขาด',
+          aiAdvice: `ตรวจพบความผิดปกติทางความร้อน (Thermal Anomalies) จากดาวเทียม MODIS และ VIIRS กำลังการแผ่รังสีความร้อน (FRP) รวม ${liveTotalFrp} MW แนะนำสวมหน้ากาก N95 หลีกเลี่ยงควันพิษ และแจ้งสายด่วนดับไฟป่า 1362`,
           primaryBtn: {
             label: 'แจ้งเบาะแสไฟป่า (สายด่วน 1362)',
             action: () => window.open('tel:1362', '_self'),
@@ -157,7 +163,7 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
             icon: <Phone className="w-3.5 h-3.5" />
           },
           secondaryBtn: {
-            label: 'แนวกันไฟ & พื้นที่ป่า',
+            label: 'แนวกันไฟ & พื้นที่เสี่ยง',
             action: onOpenEvacuation,
             className: 'bg-slate-700 hover:bg-slate-600 text-white font-bold',
             icon: <ShieldAlert className="w-3.5 h-3.5" />

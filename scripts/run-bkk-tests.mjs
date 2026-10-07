@@ -110,6 +110,9 @@ assert(dialogContent.includes('z-[9999]'), 'DialogContent has z-[9999] above Lea
 
 assert(mapContent.includes("subdomains: ['a', 'b', 'c']"), 'BASE_MAP_URLS satellite has subdomains defined');
 assert(mapContent.includes('subdomains={BASE_MAP_URLS[baseMap].subdomains ||'), 'TileLayer has subdomains fallback preventing undefined length error');
+assert(mapContent.includes('activeUserReports = propUserReports ?? internalUserReports'), 'BangkokFloodMap has activeUserReports fallback');
+assert(mapContent.includes('(activeUserReports || []).length'), 'BangkokFloodMap safely reads activeUserReports length preventing undefined length error');
+assert(disasterContent.includes('showUserReportsLayer={bkkShowUserReports}'), 'DisasterMapContent wires showUserReportsLayer');
 
 const emergencyContent = readFileSync(resolve('src/pages/EmergencyContacts.tsx'), 'utf-8');
 const requiredHotlines = ['191', '199', '1137', '1192', '1193', '1195', '1199', '1300', '1418', '1543', '1555', '1584', '1669', '1646', '1667'];

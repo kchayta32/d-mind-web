@@ -2,8 +2,9 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Clock, Layers, Flame, Map } from 'lucide-react';
+import { Clock, Layers, Flame, Map, Satellite, Activity } from 'lucide-react';
 import { WildfireMapProtocol } from '@/services/gistdaService';
+import { FirmsSatelliteSource } from '@/services/nasaFirmsService';
 
 interface WildfireFiltersProps {
   wildfireTimeFilter: string;
@@ -14,6 +15,10 @@ interface WildfireFiltersProps {
   onShowBurnScarChange?: (value: boolean) => void;
   wildfireMapMode?: WildfireMapProtocol;
   onWildfireMapModeChange?: (value: WildfireMapProtocol) => void;
+  showFirmsLayer?: boolean;
+  onShowFirmsLayerChange?: (value: boolean) => void;
+  firmsSatellite?: FirmsSatelliteSource;
+  onFirmsSatelliteChange?: (value: FirmsSatelliteSource) => void;
 }
 
 export const WildfireFilters: React.FC<WildfireFiltersProps> = ({
@@ -25,6 +30,10 @@ export const WildfireFilters: React.FC<WildfireFiltersProps> = ({
   onShowBurnScarChange,
   wildfireMapMode = 'wmts',
   onWildfireMapModeChange,
+  showFirmsLayer = true,
+  onShowFirmsLayerChange,
+  firmsSatellite = 'ALL',
+  onFirmsSatelliteChange,
 }) => {
   return (
     <div className="space-y-3.5">
@@ -98,6 +107,49 @@ export const WildfireFilters: React.FC<WildfireFiltersProps> = ({
             checked={showBurnScar}
             onCheckedChange={onShowBurnScarChange}
           />
+        </div>
+      )}
+
+      {/* 5. NASA FIRMS Real-time Thermal Anomalies Web-GIS Layer Toggle */}
+      {onShowFirmsLayerChange && (
+        <div className="flex items-center justify-between p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 dark:bg-slate-800/80 rounded-lg border border-amber-300 dark:border-amber-700/60 shadow-xs">
+          <div className="space-y-0.5 pr-2">
+            <Label htmlFor="firms-layer" className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5 cursor-pointer">
+              <Activity className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 animate-pulse" />
+              <span>NASA FIRMS Thermal Anomalies (Web-GIS)</span>
+            </Label>
+            <p className="text-[10px] text-amber-800/80 dark:text-amber-300/80 leading-relaxed">
+              จุดความร้อน Near Real-Time (ภายใน 3 ชม.) จากดาวเทียม MODIS/VIIRS พร้อมวัดค่า FRP (MW)
+            </p>
+          </div>
+          <Switch
+            id="firms-layer"
+            checked={showFirmsLayer}
+            onCheckedChange={onShowFirmsLayerChange}
+          />
+        </div>
+      )}
+
+      {/* 6. NASA FIRMS Satellite Sensor Selector */}
+      {showFirmsLayer && onFirmsSatelliteChange && (
+        <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 space-y-1.5">
+          <Label htmlFor="firms-satellite" className="text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+            <Satellite className="w-3.5 h-3.5 text-orange-500" />
+            <span>เซนเซอร์ดาวเทียม NASA FIRMS</span>
+          </Label>
+          <Select value={firmsSatellite} onValueChange={(val) => onFirmsSatelliteChange(val as FirmsSatelliteSource)}>
+            <SelectTrigger id="firms-satellite" className="w-full text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+              <SelectValue placeholder="เลือกดาวเทียม" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL" className="text-xs">VIIRS (375m) + MODIS (1km) ทุกระบบ</SelectItem>
+              <SelectItem value="VIIRS_375M" className="text-xs">VIIRS 375m (Suomi NPP / NOAA-20 / NOAA-21)</SelectItem>
+              <SelectItem value="MODIS_1KM" className="text-xs">MODIS 1km (Terra & Aqua ตรวจ 4 รอบ/วัน)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-[9px] text-slate-500 dark:text-slate-400">
+            *VIIRS 375m คมชัดกว่า 3 เท่า ตรวจจับไฟเริ่มแรกได้ดีกว่า | MODIS บันทึกสถิติต่อเนื่องยาวนาน
+          </p>
         </div>
       )}
     </div>

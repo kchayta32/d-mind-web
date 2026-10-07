@@ -72,7 +72,7 @@ const disasterTypes: Array<{
   {
     type: 'wildfire',
     label: 'ไฟป่า & จุดความร้อน',
-    sublabel: 'VIIRS 375m & GISTDA',
+    sublabel: 'NASA FIRMS & VIIRS/MODIS',
     icon: <Flame className="w-4 h-4 text-orange-400" />,
     activeColor: 'bg-gradient-to-br from-orange-600 via-amber-600 to-red-700 text-white',
     glowColor: 'shadow-orange-500/30',

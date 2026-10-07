@@ -63,8 +63,8 @@ const menuItems = [
   {
     title: 'ไฟป่า & จุดความร้อน',
     icon: Flame,
-    source: 'NASA / VIIRS',
-    description: 'จุดความร้อนจากดาวเทียม & ความเสี่ยง'
+    source: 'NASA FIRMS / MODIS & VIIRS',
+    description: 'ความผิดปกติทางความร้อน (FRP) & NRT ≤ 3 ชม.'
   },
   {
     title: 'มลพิษอากาศ PM2.5',

@@ -32,7 +32,7 @@ import {
 } from '@/data/bangkokCctvData';
 import { BangkokZone, FloodSeverity, BangkokRoadSegment, BangkokCanalStation } from '@/types/bangkokFlood';
 import { BangkokFloodUserReportsLayer } from './BangkokFloodUserReportsLayer';
-import { BangkokUserFloodReport } from '@/services/bangkokFloodUserReportService';
+import { BangkokUserFloodReport, bangkokFloodUserReportService } from '@/services/bangkokFloodUserReportService';
 import { GoogleFloodHubLayer } from './GoogleFloodHubLayer';
 import { FloodHubGaugeStation } from '@/services/googleFloodHubService';
 
@@ -199,7 +199,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
   showInundationPolygons = true,
   showBangkokBoundary = true,
   selectedFloodHubStationId,
-  userReports,
+  userReports: propUserReports,
   onSelectRoad,
   onSelectCctv,
   onSelectStation,
@@ -212,6 +212,25 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
   const [baseMap, setBaseMap] = useState<BaseMapStyle>('osm');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+
+  // Fallback internal state for citizen reports when not provided via props
+  const [internalUserReports, setInternalUserReports] = useState<BangkokUserFloodReport[]>([]);
+
+  useEffect(() => {
+    if (propUserReports !== undefined) return;
+    bangkokFloodUserReportService.loadReports().then(loaded => {
+      setInternalUserReports(loaded || []);
+    });
+    const unsubscribe = bangkokFloodUserReportService.subscribeToReports((updated) => {
+      setInternalUserReports(updated || []);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [propUserReports]);
+
+  const safeRoads = Array.isArray(roads) ? roads : [];
+  const activeUserReports = propUserReports ?? internalUserReports;
 
   // Center on Bangkok
   const bangkokCenter: [number, number] = [13.7563, 100.5018];
@@ -346,11 +365,11 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-600 dark:text-slate-400">
           <span className="flex items-center gap-1">
             <Users className="w-3 h-3 text-emerald-500" />
-            รายงานประชาชนสด ({userReports.length})
+            รายงานประชาชนสด ({(activeUserReports || []).length})
           </span>
           <span className="flex items-center gap-1">
             <Waves className="w-3 h-3 text-cyan-500" />
-            โทรมาตร สสน./คลอง ({waterStations.length})
+            โทรมาตร สสน./คลอง ({(waterStations || []).length})
           </span>
         </div>
         {showSentinelSarLayer && (
@@ -434,7 +453,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         )}
 
         {/* Road Segments as Polylines */}
-        {roads.map(road => {
+        {safeRoads.map(road => {
           const isSelected = selectedRoadId === road.id;
           const style = getRoadPolylineStyle(road, isSelected);
 
@@ -478,7 +497,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
 
 
         {/* Canal Water Gauges & Pumping Stations */}
-        {showCanalPumpsLayer && waterStations.map(station => {
+        {showCanalPumpsLayer && (waterStations || []).map(station => {
           const icon = createWaterStationIcon(station.status);
 
           return (
@@ -514,7 +533,7 @@ export const BangkokFloodMap: React.FC<BangkokFloodMapProps> = ({
         {/* Bangkok Citizen User Reports Layer */}
         {showUserReportsLayer && (
           <BangkokFloodUserReportsLayer
-            reports={userReports}
+            reports={activeUserReports}
             onSelectReport={onSelectUserReport}
           />
         )}

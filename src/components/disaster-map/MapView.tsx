@@ -22,6 +22,8 @@ import { SentinelFloodLegend } from './SentinelFloodLegend';
 import { LocationBoundaryLayer } from './LocationBoundaryLayer';
 import { DisasterMapHudCard } from './DisasterMapHudCard';
 import { AqiScaleLegend } from './AqiScaleLegend';
+import { FirmsFrpLegend } from './FirmsFrpLegend';
+import { FirmsSatelliteSource } from '@/services/nasaFirmsService';
 import { SafetyCheckInModal } from './SafetyCheckInModal';
 import { CleanRoomModal } from './CleanRoomModal';
 import { EvacuationModal } from './EvacuationModal';
@@ -57,6 +59,8 @@ interface MapViewProps {
   showBurnFreq?: boolean;
   showBurnScar?: boolean;
   wildfireMapMode?: import('@/services/gistdaService').WildfireMapProtocol;
+  showFirmsLayer?: boolean;
+  firmsSatellite?: FirmsSatelliteSource;
   isLoading?: boolean;
   onLocationSelect?: (lat: number, lon: number, name: string) => void;
   selectedLocation?: SelectedLocation | null;
@@ -159,6 +163,8 @@ export const MapView: React.FC<MapViewProps> = ({
   showBurnFreq = false,
   showBurnScar = false,
   wildfireMapMode = 'wmts',
+  showFirmsLayer = true,
+  firmsSatellite = 'ALL',
   isLoading = false,
   onLocationSelect,
   selectedLocation = null,
@@ -260,6 +266,8 @@ export const MapView: React.FC<MapViewProps> = ({
             showBurnFreq={showBurnFreq}
             showBurnScar={showBurnScar}
             wildfireMapMode={wildfireMapMode}
+            showFirmsLayer={showFirmsLayer}
+            firmsSatellite={firmsSatellite}
             rainFrameIndex={rainFrameIndex}
           />
           
@@ -356,6 +364,13 @@ export const MapView: React.FC<MapViewProps> = ({
         {selectedType === 'airpollution' && (
           <div className="absolute top-16 right-4 z-[1000]">
             <AqiScaleLegend />
+          </div>
+        )}
+
+        {/* NASA FIRMS FRP & Thermal Anomalies Legend for Wildfire */}
+        {selectedType === 'wildfire' && (
+          <div className="absolute top-16 right-4 sm:top-20 sm:right-4 z-[1000]">
+            <FirmsFrpLegend hotspots={safeHotspots} />
           </div>
         )}
         

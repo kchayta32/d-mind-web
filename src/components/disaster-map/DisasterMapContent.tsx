@@ -67,6 +67,10 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
     setShowBurnScar,
     wildfireMapMode,
     setWildfireMapMode,
+    showFirmsLayer,
+    setShowFirmsLayer,
+    firmsSatellite,
+    setFirmsSatellite,
     droughtLayers,
     setDroughtLayers,
     droughtMapMode,
@@ -120,6 +124,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
   const [bkkSeverity, setBkkSeverity] = useState<'all' | 'normal' | 'warning' | 'critical'>('all');
   const [bkkShowCanals, setBkkShowCanals] = useState(true);
   const [bkkShowSentinel, setBkkShowSentinel] = useState(true);
+  const [bkkShowUserReports, setBkkShowUserReports] = useState(true);
+  const [bkkShowFloodHub, setBkkShowFloodHub] = useState(true);
   const [bkkSelectedRoad, setBkkSelectedRoad] = useState<BangkokRoadSegment | null>(null);
   const [bkkRoadModalOpen, setBkkRoadModalOpen] = useState(false);
   const [bkkFocusTarget, setBkkFocusTarget] = useState<[number, number] | null>(null);
@@ -214,6 +220,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
             selectedRoadId={bkkSelectedRoad?.id}
             showCanalPumpsLayer={bkkShowCanals}
             showSentinelSarLayer={bkkShowSentinel}
+            showUserReportsLayer={bkkShowUserReports}
+            showFloodHubLayer={bkkShowFloodHub}
             onSelectRoad={(road) => {
               setBkkSelectedRoad(road);
               setBkkRoadModalOpen(true);
@@ -251,6 +259,8 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
             showBurnFreq={showBurnFreq}
             showBurnScar={showBurnScar}
             wildfireMapMode={wildfireMapMode}
+            showFirmsLayer={showFirmsLayer}
+            firmsSatellite={firmsSatellite}
             isLoading={getCurrentLoading(selectedType)}
             onLocationSelect={onLocationSelect}
             selectedLocation={selectedLocation}
@@ -302,6 +312,10 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
               onToggleCanalPumps={setBkkShowCanals}
               showSentinelSarLayer={bkkShowSentinel}
               onToggleSentinelSar={setBkkShowSentinel}
+              showUserReportsLayer={bkkShowUserReports}
+              onToggleUserReports={setBkkShowUserReports}
+              showFloodHubLayer={bkkShowFloodHub}
+              onToggleFloodHub={setBkkShowFloodHub}
               totalRoadsCount={BANGKOK_ROAD_SEGMENTS.length}
               filteredRoadsCount={filteredBkkRoads.length}
               onResetFilters={() => {
@@ -368,6 +382,10 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
               onShowBurnScarChange={setShowBurnScar}
               wildfireMapMode={wildfireMapMode}
               onWildfireMapModeChange={setWildfireMapMode}
+              showFirmsLayer={showFirmsLayer}
+              onShowFirmsLayerChange={setShowFirmsLayer}
+              firmsSatellite={firmsSatellite}
+              onFirmsSatelliteChange={setFirmsSatellite}
               droughtLayers={droughtLayers}
               onDroughtLayersChange={setDroughtLayers}
               droughtMapMode={droughtMapMode}

@@ -8,19 +8,24 @@ import {
   getGistdaWmtsUrl, 
   getGistdaTmsTileUrl 
 } from '@/services/gistdaService';
+import { NASA_FIRMS_WEB_GIS, FirmsSatelliteSource } from '@/services/nasaFirmsService';
 
 interface WildfireWMSLayersProps {
   timeFilter: string;
   showBurnFreq?: boolean;
   showBurnScar?: boolean;
   mapProtocol?: WildfireMapProtocol;
+  showFirmsLayer?: boolean;
+  firmsSatellite?: FirmsSatelliteSource;
 }
 
 export const WildfireWMSLayers: React.FC<WildfireWMSLayersProps> = ({
   timeFilter = '3days',
   showBurnFreq = false,
   showBurnScar = false,
-  mapProtocol = 'wmts'
+  mapProtocol = 'wmts',
+  showFirmsLayer = true,
+  firmsSatellite = 'ALL'
 }) => {
   const safeTime = (timeFilter === '1day' || timeFilter === '3days' || timeFilter === '7days' || timeFilter === '30days') 
     ? (timeFilter as ViirsTimeFilter) 
@@ -28,9 +33,31 @@ export const WildfireWMSLayers: React.FC<WildfireWMSLayersProps> = ({
 
   const apiKey = GISTDA_CONFIG.PRIMARY_API_KEY;
 
+  // Compute NASA GIBS layer name based on satellite selection
+  const gibsLayers = firmsSatellite === 'VIIRS_375M'
+    ? NASA_FIRMS_WEB_GIS.LAYERS.VIIRS_SNPP_375M
+    : firmsSatellite === 'MODIS_1KM'
+    ? NASA_FIRMS_WEB_GIS.LAYERS.MODIS_COMBINED_1KM
+    : `${NASA_FIRMS_WEB_GIS.LAYERS.VIIRS_SNPP_375M},${NASA_FIRMS_WEB_GIS.LAYERS.MODIS_COMBINED_1KM}`;
+
   return (
     <>
-      {/* 1. VIIRS Hotspots Map Layer */}
+      {/* 1. NASA FIRMS Global Web-GIS WMS Thermal Anomalies Layer (Free & NRT 3-hour) */}
+      {showFirmsLayer && (
+        <WMSTileLayer
+          key={`nasa-firms-gibs-${firmsSatellite}`}
+          url={NASA_FIRMS_WEB_GIS.GIBS_WMS_BASE_URL}
+          layers={gibsLayers}
+          format="image/png"
+          transparent={true}
+          opacity={0.80}
+          attribution={NASA_FIRMS_WEB_GIS.ATTRIBUTION}
+          maxZoom={18}
+          zIndex={450}
+        />
+      )}
+
+      {/* 2. VIIRS Hotspots Map Layer (Regional/GISTDA) */}
       {timeFilter && (
         mapProtocol === 'tms' ? (
           <TileLayer
@@ -66,7 +93,7 @@ export const WildfireWMSLayers: React.FC<WildfireWMSLayersProps> = ({
         )
       )}
       
-      {/* 2. Burn Frequency Map Layer (พื้นที่เผาไหม้ซ้ำซาก) */}
+      {/* 3. Burn Frequency Map Layer (พื้นที่เผาไหม้ซ้ำซาก) */}
       {showBurnFreq && (
         mapProtocol === 'tms' ? (
           <TileLayer
@@ -102,7 +129,7 @@ export const WildfireWMSLayers: React.FC<WildfireWMSLayersProps> = ({
         )
       )}
 
-      {/* 3. Burn Scar Map Layer (พื้นที่ร่องรอยเผาไหม้ รายสัปดาห์) */}
+      {/* 4. Burn Scar Map Layer (พื้นที่ร่องรอยเผาไหม้ รายสัปดาห์) */}
       {showBurnScar && (
         mapProtocol === 'tms' ? (
           <TileLayer

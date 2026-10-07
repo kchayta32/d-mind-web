@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { DisasterType } from '../DisasterMap';
 import { WildfireMapProtocol, FloodMapProtocol, DroughtMapProtocol } from '@/services/gistdaService';
+import { FirmsSatelliteSource } from '@/services/nasaFirmsService';
 
 export const useDisasterMapState = () => {
   const [selectedType, setSelectedType] = useState<DisasterType>('earthquake');
@@ -14,6 +15,8 @@ export const useDisasterMapState = () => {
   const [showBurnFreq, setShowBurnFreq] = useState(false);
   const [showBurnScar, setShowBurnScar] = useState(false);
   const [wildfireMapMode, setWildfireMapMode] = useState<WildfireMapProtocol>('wmts');
+  const [showFirmsLayer, setShowFirmsLayer] = useState(true);
+  const [firmsSatellite, setFirmsSatellite] = useState<FirmsSatelliteSource>('ALL');
   
   // Drought state
   const [droughtLayers, setDroughtLayers] = useState(['dri']);
@@ -48,6 +51,10 @@ export const useDisasterMapState = () => {
     setShowBurnScar,
     wildfireMapMode,
     setWildfireMapMode,
+    showFirmsLayer,
+    setShowFirmsLayer,
+    firmsSatellite,
+    setFirmsSatellite,
     droughtLayers,
     setDroughtLayers,
     droughtMapMode,

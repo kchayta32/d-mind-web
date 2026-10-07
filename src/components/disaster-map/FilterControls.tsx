@@ -9,6 +9,7 @@ import { DroughtFilters } from './filter-components/DroughtFilters';
 import { FloodFilters } from './filter-components/FloodFilters';
 import { SlidersHorizontal } from 'lucide-react';
 import { WildfireMapProtocol, FloodMapProtocol, DroughtMapProtocol } from '@/services/gistdaService';
+import { FirmsSatelliteSource } from '@/services/nasaFirmsService';
 
 interface FilterControlsProps {
   selectedType: DisasterType;
@@ -28,6 +29,10 @@ interface FilterControlsProps {
   onShowBurnScarChange?: (value: boolean) => void;
   wildfireMapMode?: WildfireMapProtocol;
   onWildfireMapModeChange?: (value: WildfireMapProtocol) => void;
+  showFirmsLayer?: boolean;
+  onShowFirmsLayerChange?: (value: boolean) => void;
+  firmsSatellite?: FirmsSatelliteSource;
+  onFirmsSatelliteChange?: (value: FirmsSatelliteSource) => void;
   droughtLayers: string[];
   onDroughtLayersChange: (layers: string[]) => void;
   droughtMapMode?: DroughtMapProtocol;
@@ -68,6 +73,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onShowBurnScarChange,
   wildfireMapMode = 'wmts',
   onWildfireMapModeChange,
+  showFirmsLayer = true,
+  onShowFirmsLayerChange,
+  firmsSatellite = 'ALL',
+  onFirmsSatelliteChange,
   droughtLayers,
   onDroughtLayersChange,
   droughtMapMode = 'wmts',
@@ -123,6 +132,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             onShowBurnScarChange={onShowBurnScarChange}
             wildfireMapMode={wildfireMapMode}
             onWildfireMapModeChange={onWildfireMapModeChange}
+            showFirmsLayer={showFirmsLayer}
+            onShowFirmsLayerChange={onShowFirmsLayerChange}
+            firmsSatellite={firmsSatellite}
+            onFirmsSatelliteChange={onFirmsSatelliteChange}
           />
         )}
 

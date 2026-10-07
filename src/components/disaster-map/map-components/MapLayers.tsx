@@ -6,6 +6,7 @@ import RainOverlay from '../RainOverlay';
 import { DisasterType } from '../DisasterMap';
 import { RainViewerData } from '../useRainViewerData';
 import { WildfireMapProtocol, FloodMapProtocol, DroughtMapProtocol, FloodTimeFilter } from '@/services/gistdaService';
+import { FirmsSatelliteSource } from '@/services/nasaFirmsService';
 
 interface MapLayersProps {
   selectedType: DisasterType;
@@ -24,6 +25,8 @@ interface MapLayersProps {
   showBurnFreq: boolean;
   showBurnScar?: boolean;
   wildfireMapMode?: WildfireMapProtocol;
+  showFirmsLayer?: boolean;
+  firmsSatellite?: FirmsSatelliteSource;
   rainFrameIndex?: number;
 }
 
@@ -44,6 +47,8 @@ export const MapLayers: React.FC<MapLayersProps> = ({
   showBurnFreq,
   showBurnScar = false,
   wildfireMapMode = 'wmts',
+  showFirmsLayer = true,
+  firmsSatellite = 'ALL',
   rainFrameIndex
 }) => {
   return (
@@ -55,6 +60,8 @@ export const MapLayers: React.FC<MapLayersProps> = ({
           showBurnFreq={showBurnFreq}
           showBurnScar={showBurnScar}
           mapProtocol={wildfireMapMode}
+          showFirmsLayer={showFirmsLayer}
+          firmsSatellite={firmsSatellite}
         />
       )}
 
