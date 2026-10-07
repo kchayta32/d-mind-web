@@ -20,6 +20,11 @@ import { UserLocationMarker } from './UserLocationMarker';
 import { LocationControls } from './LocationControls';
 import { SentinelFloodLegend } from './SentinelFloodLegend';
 import { LocationBoundaryLayer } from './LocationBoundaryLayer';
+import { DisasterMapHudCard } from './DisasterMapHudCard';
+import { AqiScaleLegend } from './AqiScaleLegend';
+import { SafetyCheckInModal } from './SafetyCheckInModal';
+import { CleanRoomModal } from './CleanRoomModal';
+import { EvacuationModal } from './EvacuationModal';
 import { X } from 'lucide-react';
 
 interface MapViewProps {
@@ -166,6 +171,9 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showRainOverlay, setShowRainOverlay] = useState(true);
   const [rainFrameIndex, setRainFrameIndex] = useState(0);
   const [showUserLocation, setShowUserLocation] = useState(false);
+  const [isSafetyCheckInOpen, setIsSafetyCheckInOpen] = useState(false);
+  const [isCleanRoomOpen, setIsCleanRoomOpen] = useState(false);
+  const [isEvacuationOpen, setIsEvacuationOpen] = useState(false);
   const mapRef = useRef<any>(null);
 
   const safeEarthquakes = Array.isArray(earthquakes) ? earthquakes : [];
@@ -328,9 +336,16 @@ export const MapView: React.FC<MapViewProps> = ({
           />
         </div>
         
+        {/* AQI Scale Legend for PM2.5 */}
+        {selectedType === 'airpollution' && (
+          <div className="absolute top-16 right-4 z-[1000]">
+            <AqiScaleLegend />
+          </div>
+        )}
+        
         {/* Radar Player for Heavy Rain & Flood Radar overlay mode (TMD Radar) */}
         {((selectedType === 'heavyrain') || (selectedType === 'flood' && showRainRadarOnFlood)) && rainData && (
-          <div className="absolute bottom-6 left-4 z-[1000]">
+          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-[1000]">
             <RadarPlayer
               rainData={rainData}
               showOverlay={showRainOverlay}
@@ -350,13 +365,32 @@ export const MapView: React.FC<MapViewProps> = ({
           <SentinelFloodLegend isRadarActive={Boolean(showRainRadarOnFlood && rainData)} />
         )}
 
-        {/* Floating Quick Crowdsourcing Button for Citizens (Ground Truth) */}
-        <div className="absolute bottom-6 right-4 z-[1000] flex flex-col items-end gap-2">
-          {onOpenCrowdsourceModal && (
+        {/* Modern Mobile-First Disaster Map HUD Card (Matches Designed Nano Banana UX/UI 100%) */}
+        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[1000] max-w-[calc(100vw-1.5rem)] sm:max-w-md pointer-events-auto">
+          <DisasterMapHudCard
+            selectedType={selectedType}
+            earthquakes={filteredEarthquakes}
+            hotspots={safeHotspots}
+            airStations={filteredAirStations}
+            floodFeatures={gistdaFloodFeatures}
+            floodPoints={safeFloodPoints}
+            rainDataPoints={safeOpenMeteoRain}
+            storms={safeStorms}
+            onOpenCrowdsourceModal={onOpenCrowdsourceModal}
+            onOpenSafetyCheckIn={() => setIsSafetyCheckInOpen(true)}
+            onOpenCleanRoom={() => setIsCleanRoomOpen(true)}
+            onOpenEvacuation={() => setIsEvacuationOpen(true)}
+            onActivateRadar={() => setShowRainOverlay(true)}
+          />
+        </div>
+
+        {/* Floating Quick Crowdsourcing Button for Citizens (Ground Truth) - shown if HUD minimized/custom */}
+        <div className="hidden lg:flex absolute bottom-4 right-4 z-[999] flex-col items-end gap-2">
+          {onOpenCrowdsourceModal && selectedType === 'flood' && !showRainRadarOnFlood && (
             <button
               type="button"
               onClick={onOpenCrowdsourceModal}
-              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-xs py-2 px-3.5 rounded-full shadow-xl flex items-center gap-2 border-2 border-white/90 hover:scale-105 active:scale-95 transition-all"
+              className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 hover:from-cyan-700 hover:to-indigo-800 text-white font-bold text-xs py-2 px-3.5 rounded-full shadow-xl flex items-center gap-2 border-2 border-white/90 hover:scale-105 active:scale-95 transition-all"
             >
               <span className="text-base">📢</span>
               <span>รายงานน้ำท่วมด้วยตนเอง</span>
@@ -370,6 +404,22 @@ export const MapView: React.FC<MapViewProps> = ({
         {/* Overlays for loading */}
         <MapOverlays selectedType={selectedType} isLoading={isLoading} />
       </div>
+
+      {/* Safety & Emergency Modals */}
+      <SafetyCheckInModal
+        isOpen={isSafetyCheckInOpen}
+        onClose={() => setIsSafetyCheckInOpen(false)}
+        disasterTitle={selectedType === 'earthquake' ? 'แผ่นดินไหว' : 'ภัยพิบัติ'}
+      />
+      <CleanRoomModal
+        isOpen={isCleanRoomOpen}
+        onClose={() => setIsCleanRoomOpen(false)}
+      />
+      <EvacuationModal
+        isOpen={isEvacuationOpen}
+        onClose={() => setIsEvacuationOpen(false)}
+        disasterType={selectedType}
+      />
     </div>
   );
 };

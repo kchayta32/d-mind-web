@@ -8,6 +8,8 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "test": "node scripts/run-bkk-tests.mjs",
+    "test:uxui": "node scripts/test-disaster-map-uxui.mjs",
+    "test:all": "node scripts/run-bkk-tests.mjs && node scripts/test-disaster-map-uxui.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
