@@ -14,16 +14,16 @@ export const AqiScaleLegend: React.FC = () => {
   ];
 
   return (
-    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white rounded-xl shadow-2xl p-2.5 transition-all w-36 sm:w-40 z-[1000]">
+    <div className="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white rounded-xl shadow-xl p-2.5 transition-all w-36 sm:w-40 z-[1000]">
       <div 
         className="flex items-center justify-between cursor-pointer select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-1.5 font-bold text-xs">
-          <Wind className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
+        <div className="flex items-center gap-1.5 font-extrabold text-xs">
+          <Wind className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-pulse" />
           <span>ดัชนี AQI</span>
         </div>
-        <button className="text-slate-400 hover:text-white transition">
+        <button className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">
           {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
       </div>
@@ -38,7 +38,7 @@ export const AqiScaleLegend: React.FC = () => {
         <div className="flex-1 bg-purple-700" />
       </div>
 
-      <div className="flex justify-between text-[9px] text-slate-400 mt-0.5 px-0.5">
+      <div className="flex justify-between text-[9px] text-slate-600 dark:text-slate-400 font-semibold mt-0.5 px-0.5">
         <span>0 ดี</span>
         <span>100</span>
         <span>300+ วิกฤต</span>
@@ -46,14 +46,14 @@ export const AqiScaleLegend: React.FC = () => {
 
       {/* Expanded list view */}
       {isExpanded && (
-        <div className="mt-2.5 pt-2 border-t border-slate-700/80 space-y-1.5 text-[10px] animate-in fade-in slide-in-from-top-1">
+        <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700/80 space-y-1.5 text-[10px] animate-in fade-in slide-in-from-top-1">
           {aqiBands.map((band, idx) => (
             <div key={idx} className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className={`w-2.5 h-2.5 rounded-full ${band.color} shadow-xs`} />
-                <span className="font-medium text-slate-200">{band.label}</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{band.label}</span>
               </div>
-              <span className={`font-mono text-[9px] ${band.text}`}>{band.range}</span>
+              <span className="font-mono text-[9px] font-bold text-slate-700 dark:text-slate-300">{band.range}</span>
             </div>
           ))}
         </div>

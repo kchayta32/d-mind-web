@@ -257,19 +257,19 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
 
   return (
     <div 
-      className={`bg-slate-900/95 dark:bg-slate-900/90 backdrop-blur-md border ${config.accentColor} rounded-2xl shadow-2xl transition-all duration-300 w-full max-w-[420px] sm:max-w-[460px] text-white z-[1000] overflow-hidden`}
+      className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300 w-full max-w-[420px] sm:max-w-[460px] text-slate-900 dark:text-white z-[1000] overflow-hidden"
     >
       {/* Header Bar */}
       <div 
-        className="px-3.5 py-2.5 bg-slate-800/80 flex items-center justify-between border-b border-slate-700/60 cursor-pointer select-none"
+        className="px-3.5 py-2.5 bg-slate-50/90 dark:bg-slate-800/80 flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 cursor-pointer select-none"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-2 overflow-hidden pr-2">
-          <div className="p-1.5 rounded-lg bg-slate-950/60 border border-slate-700/60 flex-shrink-0">
+          <div className="p-1.5 rounded-lg bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/60 flex-shrink-0 shadow-2xs">
             {config.icon}
           </div>
           <div className="truncate">
-            <h3 className="font-bold text-xs sm:text-sm text-slate-100 truncate">
+            <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
               {config.title}
             </h3>
           </div>
@@ -281,7 +281,7 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
           </span>
           <button 
             type="button"
-            className="text-slate-400 hover:text-white p-0.5 rounded transition"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-0.5 rounded transition"
             aria-label="Toggle HUD"
           >
             {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -297,31 +297,31 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
             {config.metrics.map((m, idx) => (
               <div 
                 key={idx}
-                className="bg-slate-950/60 border border-slate-800 rounded-xl p-2 text-center flex flex-col justify-between"
+                className="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2 text-center flex flex-col justify-between shadow-2xs"
               >
-                <span className="text-[10px] text-slate-400 truncate block">{m.label}</span>
-                <span className="font-bold text-xs sm:text-sm text-white my-0.5 font-mono">{m.value}</span>
-                <span className="text-[9px] text-slate-500 truncate block">{m.sub}</span>
+                <span className="text-[10px] text-slate-600 dark:text-slate-400 font-semibold truncate block">{m.label}</span>
+                <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white my-0.5 font-mono">{m.value}</span>
+                <span className="text-[9.5px] text-slate-500 dark:text-slate-400 font-medium truncate block">{m.sub}</span>
               </div>
             ))}
           </div>
 
           {/* Typhoon AI Live Situational Intelligence Banner */}
-          <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/40 rounded-xl p-2.5 flex flex-col gap-2 shadow-inner">
+          <div className="bg-gradient-to-r from-sky-50 via-blue-50/60 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 border border-sky-200 dark:border-cyan-500/40 rounded-xl p-2.5 flex flex-col gap-2 shadow-2xs">
             <div className="flex items-start gap-2">
-              <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 flex-shrink-0 mt-0.5 ring-1 ring-cyan-500/40">
+              <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-cyan-500/20 text-blue-700 dark:text-cyan-300 flex-shrink-0 mt-0.5 ring-1 ring-blue-300 dark:ring-cyan-500/40">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
               </div>
               <div className="text-[11px] leading-relaxed flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="font-black text-cyan-300">
+                  <span className="font-black text-blue-900 dark:text-cyan-300">
                     AI Dr.Mind Advisory (Typhoon AI Intelligence)
                   </span>
-                  <span className="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-700/60 px-1 py-0.2 rounded font-mono font-bold">
+                  <span className="text-[9px] bg-blue-100 dark:bg-cyan-950 text-blue-800 dark:text-cyan-400 border border-blue-300 dark:border-cyan-700/60 px-1 py-0.2 rounded font-mono font-bold">
                     v2.5
                   </span>
                 </div>
-                <p className="text-slate-300 text-[10.5px]">
+                <p className="text-slate-700 dark:text-slate-300 text-[10.5px] font-medium leading-relaxed">
                   {config.aiAdvice}
                 </p>
               </div>
@@ -332,7 +332,7 @@ export const DisasterMapHudCard: React.FC<DisasterMapHudCardProps> = ({
                 type="button"
                 size="sm"
                 onClick={onOpenTyphoonModal}
-                className="w-full h-7 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-[11px] rounded-lg shadow-md shadow-cyan-950/40 gap-1.5 transition-all"
+                className="w-full h-7 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-[11px] rounded-lg shadow-md shadow-cyan-900/30 gap-1.5 transition-all"
               >
                 <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
                 <span>เปิดบทวิเคราะห์ & ถาม-ตอบด้วย Typhoon AI</span>

@@ -137,34 +137,34 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
           onClick={toggleSearch}
           variant="outline"
           size="sm"
-          className="bg-white/90 backdrop-blur border-gray-200 hover:bg-white"
+          className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shadow-xs"
         >
-          <Search className="w-4 h-4 mr-2" />
+          <Search className="w-4 h-4 mr-2 text-slate-600 dark:text-slate-300" />
           ค้นหาตำแหน่ง
         </Button>
       ) : (
-        <Card className="bg-white/95 backdrop-blur shadow-lg border-gray-200">
+        <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur shadow-lg border-slate-200 dark:border-slate-800">
           <CardContent className="p-3">
             <div className="flex items-center space-x-2 mb-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
                 <Input
                   ref={inputRef}
                   type="text"
                   placeholder="ค้นหาจังหวัด อำเภอ หรือตำแหน่ง..."
                   value={query}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="pl-10 pr-4 py-2 text-sm"
+                  className="pl-10 pr-4 py-2 text-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                 />
                 {isLoading && (
-                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 animate-spin" />
                 )}
               </div>
               <Button
                 onClick={toggleSearch}
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -184,22 +184,22 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
                     <button
                       key={index}
                       onClick={() => handleResultSelect(result)}
-                      className="w-full text-left p-2 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-lg transition-colors group"
+                      className="w-full text-left p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors group"
                     >
                       <div className="flex items-start space-x-2">
                         <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-1.5">
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                               {result.name}
                             </span>
                             {hasBoundary && (
-                              <span className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium flex-shrink-0">
+                              <span className="text-[10px] bg-blue-50 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-200 dark:border-blue-700 px-1.5 py-0.5 rounded font-bold flex-shrink-0">
                                 ขอบเขตพื้นที่
                               </span>
                             )}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                          <div className="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5 font-medium">
                             {result.displayName}
                           </div>
                         </div>
@@ -211,7 +211,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
             )}
 
             {query && !isLoading && results.length === 0 && (
-              <div className="text-sm text-gray-500 text-center py-2">
+              <div className="text-sm text-slate-600 dark:text-slate-400 text-center py-2 font-medium">
                 ไม่พบผลการค้นหา
               </div>
             )}

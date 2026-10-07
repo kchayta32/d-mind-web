@@ -89,10 +89,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onOpenCrowdsourceModal
 }) => {
   return (
-    <Card className="shadow-xs border-slate-200">
+    <Card className="shadow-xs border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-blue-500" />
+        <CardTitle className="text-sm font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+          <SlidersHorizontal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           ตัวกรองข้อมูล
         </CardTitle>
       </CardHeader>
@@ -163,29 +163,29 @@ const FilterControls: React.FC<FilterControlsProps> = ({
         )}
 
         {selectedType === 'storm' && (
-          <div className="text-xs text-gray-600 bg-purple-50 p-2.5 rounded-lg border border-purple-100">
-            <span className="font-semibold text-purple-900 block mb-1">ข้อมูลพายุ Real-time:</span>
+          <div className="text-xs text-slate-700 dark:text-slate-300 font-medium bg-purple-50 dark:bg-purple-950/40 p-2.5 rounded-lg border border-purple-200 dark:border-purple-800/40">
+            <span className="font-bold text-purple-900 dark:text-purple-300 block mb-1">ข้อมูลพายุ Real-time:</span>
             แสดงตำแหน่งพายุหมุนเขตร้อนที่กำลังดำเนินอยู่จากดาวเทียม NASA EONET และระบบเตือนภัยสากล GDACS
           </div>
         )}
 
         {selectedType === 'volcano' && (
-          <div className="text-xs text-gray-600 bg-rose-50 p-2.5 rounded-lg border border-rose-100">
-            <span className="font-semibold text-rose-900 block mb-1">ข้อมูลภูเขาไฟ Real-time:</span>
+          <div className="text-xs text-slate-700 dark:text-slate-300 font-medium bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-lg border border-rose-200 dark:border-rose-800/40">
+            <span className="font-bold text-rose-900 dark:text-rose-300 block mb-1">ข้อมูลภูเขาไฟ Real-time:</span>
             แสดงจุดตรวจจับการปะทุของภูเขาไฟทั่วโลกและในแนววงแหวนไฟ (Ring of Fire)
           </div>
         )}
 
         {selectedType === 'openmeteorain' && (
-          <div className="text-xs text-gray-600 bg-indigo-50 p-2.5 rounded-lg border border-indigo-100">
-            <span className="font-semibold text-indigo-900 block mb-1">พยากรณ์สภาพอากาศรายชั่วโมง:</span>
+          <div className="text-xs text-slate-700 dark:text-slate-300 font-medium bg-indigo-50 dark:bg-indigo-950/40 p-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/40">
+            <span className="font-bold text-indigo-900 dark:text-indigo-300 block mb-1">พยากรณ์สภาพอากาศรายชั่วโมง:</span>
             คลิกที่หมุดแต่ละจังหวัดเพื่อดูพยากรณ์ฝน, อุณหภูมิ, ความชื้น, และความเร็วลมรายวัน
           </div>
         )}
 
         {selectedType === 'sinkhole' && (
-          <div className="text-xs text-gray-600 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
-            <span className="font-semibold text-stone-900 block mb-1">ฐานข้อมูลแผ่นดินทรุดและดินถล่ม:</span>
+          <div className="text-xs text-slate-700 dark:text-slate-300 font-medium bg-stone-50 dark:bg-stone-900/40 p-2.5 rounded-lg border border-stone-200 dark:border-stone-800">
+            <span className="font-bold text-stone-900 dark:text-stone-300 block mb-1">ฐานข้อมูลแผ่นดินทรุดและดินถล่ม:</span>
             รายงานเหตุการณ์จริงในไทยและต่างประเทศ พร้อมรูปภาพและสาเหตุ
           </div>
         )}

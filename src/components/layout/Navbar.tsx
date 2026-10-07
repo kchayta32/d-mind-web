@@ -84,7 +84,7 @@ const Navbar: React.FC = () => {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="fixed top-0 left-0 right-0 z-[9990] bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-md shadow-md border-b border-white/10"
+                className="fixed top-0 left-0 right-0 z-[9990] bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-xs dark:shadow-md border-b border-slate-200/90 dark:border-white/10 transition-colors duration-300"
             >
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     {/* Logo Area */}
@@ -97,10 +97,10 @@ const Navbar: React.FC = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="hidden xl:flex items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border-emerald-400/40 hover:border-emerald-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            className="hidden xl:flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-600/20 dark:hover:bg-emerald-600/30 text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-400/40 hover:border-emerald-500 text-xs font-bold rounded-full px-3 py-1 shadow-xs transition-all"
                             onClick={() => navigate('/disaster-map')}
                         >
-                            <MapPin className="h-3.5 w-3.5 text-emerald-400" />
+                            <MapPin className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                             <span>แผนที่ภัยพิบัติ</span>
                             <span className="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">GIS</span>
                         </Button>
@@ -108,10 +108,10 @@ const Navbar: React.FC = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="hidden lg:flex items-center gap-1.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-200 border-amber-400/40 hover:border-amber-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            className="hidden lg:flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-600/20 dark:hover:bg-amber-600/30 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-400/40 hover:border-amber-500 text-xs font-bold rounded-full px-3 py-1 shadow-xs transition-all"
                             onClick={() => navigate('/cafe-flood-map')}
                         >
-                            <Coffee className="h-3.5 w-3.5 text-amber-400" />
+                            <Coffee className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
                             <span>เรดาร์คาเฟ่ & บาร์</span>
                             <span className="bg-amber-500 text-slate-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold">AI</span>
                         </Button>
@@ -119,10 +119,10 @@ const Navbar: React.FC = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="hidden md:flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-sky-200 border-sky-400/40 hover:border-sky-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            className="hidden md:flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-blue-600/20 dark:hover:bg-blue-600/30 text-sky-800 dark:text-sky-200 border-sky-300 dark:border-sky-400/40 hover:border-sky-500 text-xs font-bold rounded-full px-3 py-1 shadow-xs transition-all"
                             onClick={() => navigate('/bangkok-flood')}
                         >
-                            <Waves className="h-3.5 w-3.5 text-sky-400 animate-pulse" />
+                            <Waves className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 animate-pulse" />
                             <span>น้ำท่วมถนน กทม.</span>
                             <span className="bg-sky-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
                         </Button>
@@ -130,18 +130,18 @@ const Navbar: React.FC = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="hidden 2xl:flex items-center gap-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 border-yellow-400/40 hover:border-yellow-400 text-xs font-semibold rounded-full px-3 py-1 shadow-sm transition-all"
+                            className="hidden 2xl:flex items-center gap-1.5 bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-500/20 dark:hover:bg-yellow-500/30 text-yellow-900 dark:text-yellow-200 border-yellow-300 dark:border-yellow-400/40 hover:border-yellow-500 text-xs font-bold rounded-full px-3 py-1 shadow-xs transition-all"
                             onClick={() => navigate('/satisfaction-survey')}
                         >
-                            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                            <Star className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400 fill-yellow-500 dark:fill-yellow-400" />
                             <span>ประเมินความพึงพอใจ</span>
-                            <span className="bg-yellow-400 text-slate-950 text-[9px] px-1.5 py-0.5 rounded-full font-bold">5.0</span>
+                            <span className="bg-yellow-500 text-slate-950 text-[9px] px-1.5 py-0.5 rounded-full font-bold">5.0</span>
                         </Button>
 
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                            className="text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors"
                             onClick={toggleTheme}
                             title={t('theme.toggleTheme')}
                         >
@@ -153,7 +153,7 @@ const Navbar: React.FC = () => {
                                 {resolvedTheme === 'dark' ? (
                                     <Sun className="h-5 w-5 text-yellow-400" />
                                 ) : (
-                                    <Moon className="h-5 w-5 text-blue-200" />
+                                    <Moon className="h-5 w-5 text-slate-700 hover:text-blue-600" />
                                 )}
                             </motion.div>
                         </Button>
@@ -161,19 +161,19 @@ const Navbar: React.FC = () => {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full flex items-center gap-1.5 px-3"
+                            className="text-slate-700 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full flex items-center gap-1.5 px-3"
                             onClick={toggleLanguage}
                             title={t('menu.changeLanguage')}
                         >
-                            <Globe className="h-4 w-4 text-blue-400" />
-                            <span className="text-sm font-semibold">{language.toUpperCase()}</span>
+                            <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{language.toUpperCase()}</span>
                         </Button>
 
-                        <div className="w-px h-6 bg-white/20 mx-1" />
+                        <div className="w-px h-6 bg-slate-200 dark:bg-white/20 mx-1" />
 
                         {/* Burger Toggle */}
                         <motion.button
-                            className="p-2 text-white hover:bg-white/10 rounded-full relative z-50 focus:outline-none"
+                            className="p-2 text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-full relative z-50 focus:outline-none"
                             onClick={() => setMenuOpen(!menuOpen)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -210,7 +210,7 @@ const Navbar: React.FC = () => {
             <AnimatePresence>
                 {menuOpen && (
                     <motion.div
-                        className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl flex flex-col pt-24 pb-8 px-4 overflow-y-auto"
+                        className="fixed inset-0 z-40 bg-white/98 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col pt-24 pb-8 px-4 overflow-y-auto text-slate-900 dark:text-slate-100 transition-colors"
                         initial="closed"
                         animate="open"
                         exit="closed"
@@ -223,7 +223,7 @@ const Navbar: React.FC = () => {
                         <div className="container mx-auto max-w-2xl relative z-10 font-[family-name:Inter,sans-serif]">
                             <motion.h2
                                 variants={itemVariants}
-                                className="text-sm font-medium text-slate-400 uppercase tracking-widest mb-6"
+                                className="text-sm font-extrabold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-6"
                             >
                                 {t('menu.menuTitle')}
                             </motion.h2>
@@ -242,19 +242,21 @@ const Navbar: React.FC = () => {
                                             onClick={() => handleMenuClick(item)}
                                             className={`
                                                 group flex flex-col items-center justify-center gap-3 p-4 rounded-xl text-center transition-all duration-300
-                                                ${isActive ? 'bg-white/10' : 'bg-white/5 hover:bg-white/10'}
+                                                ${isActive
+                                                    ? 'bg-blue-50 dark:bg-white/10 border border-blue-200 dark:border-white/20 shadow-xs'
+                                                    : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200/80 dark:border-transparent'}
                                             `}
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                         >
                                             <div className={`
-                                                p-3 rounded-full bg-slate-900 border border-white/10
-                                                ${item.color} group-hover:bg-white/10 group-hover:scale-110 transition-all duration-300
+                                                p-3 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xs
+                                                ${item.color} group-hover:scale-110 transition-all duration-300
                                             `}>
                                                 <Icon className="w-6 h-6" />
                                             </div>
                                             <div className="space-y-0.5">
-                                                <div className={`text-sm font-semibold text-slate-200 group-hover:text-white transition-colors`}>
+                                                <div className={`text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-white transition-colors`}>
                                                     {label}
                                                 </div>
                                             </div>
@@ -265,16 +267,16 @@ const Navbar: React.FC = () => {
 
                             <motion.div
                                 variants={itemVariants}
-                                className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center"
+                                className="mt-8 pt-8 border-t border-slate-200 dark:border-white/10 flex justify-between items-center"
                             >
-                                <div className="text-slate-500 text-sm">
+                                <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                                     © 2025 D-MIND Application
                                 </div>
                                 <div className="flex gap-4">
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="text-slate-400 hover:text-white"
+                                        className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium"
                                         onClick={toggleLanguage}
                                     >
                                         <Globe className="w-4 h-4 mr-2" />

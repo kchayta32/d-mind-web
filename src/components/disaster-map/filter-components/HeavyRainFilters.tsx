@@ -48,8 +48,8 @@ export const HeavyRainFilters: React.FC<HeavyRainFiltersProps> = ({
         />
       </div>
       
-      <div className="text-xs text-gray-600 mt-2 p-2 bg-blue-50 rounded">
-        <strong>ข้อมูลเซ็นเซอร์ฝน:</strong> แสดงตำแหน่งเซ็นเซอร์วัดความชื้นและสถานะฝนตก จากฐานข้อมูล Supabase
+      <div className="text-xs text-slate-700 dark:text-slate-300 font-medium mt-2 p-2 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 rounded-lg">
+        <strong className="text-blue-900 dark:text-blue-300 font-bold">ข้อมูลเซ็นเซอร์ฝน:</strong> แสดงตำแหน่งเซ็นเซอร์วัดความชื้นและสถานะฝนตก จากฐานข้อมูล Supabase
       </div>
     </div>
   );

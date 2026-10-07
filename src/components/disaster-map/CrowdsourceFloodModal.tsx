@@ -201,8 +201,8 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
-        <DialogHeader className="space-y-1.5 pb-2 border-b">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white">
+        <DialogHeader className="space-y-1.5 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
               📢
@@ -211,7 +211,7 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
               <DialogTitle className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                 รายงานน้ำท่วมด้วยตนเอง (Crowdsourcing)
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-500">
+              <DialogDescription className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                 ข้อมูลสดจากพื้นที่จริง (Ground Truth 24 ชม.) ช่วยยืนยันความถูกต้องของดาวเทียม Sentinel
               </DialogDescription>
             </div>
@@ -284,35 +284,35 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
               }}
               className="grid grid-cols-2 gap-2"
             >
-              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'ankle' ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30' : 'border-slate-200'}`}>
+              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'ankle' ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30' : 'border-slate-200 dark:border-slate-800'}`}>
                 <RadioGroupItem value="ankle" id="level-ankle" />
                 <Label htmlFor="level-ankle" className="text-xs cursor-pointer">
                   <span className="font-semibold block text-blue-700 dark:text-blue-400">ระดับข้อเท้า</span>
-                  <span className="text-[10px] text-slate-500">10 - 30 ซม. (รถเล็กผ่านได้ช้าๆ)</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">10 - 30 ซม. (รถเล็กผ่านได้ช้าๆ)</span>
                 </Label>
               </div>
 
-              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'knee' ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/30' : 'border-slate-200'}`}>
+              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'knee' ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/30' : 'border-slate-200 dark:border-slate-800'}`}>
                 <RadioGroupItem value="knee" id="level-knee" />
                 <Label htmlFor="level-knee" className="text-xs cursor-pointer">
                   <span className="font-semibold block text-yellow-700 dark:text-yellow-400">ระดับหัวเข่า</span>
-                  <span className="text-[10px] text-slate-500">30 - 60 ซม. (รถเล็กไม่ควรผ่าน)</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">30 - 60 ซม. (รถเล็กไม่ควรผ่าน)</span>
                 </Label>
               </div>
 
-              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'waist' ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/30' : 'border-slate-200'}`}>
+              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'waist' ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/30' : 'border-slate-200 dark:border-slate-800'}`}>
                 <RadioGroupItem value="waist" id="level-waist" />
                 <Label htmlFor="level-waist" className="text-xs cursor-pointer">
                   <span className="font-semibold block text-amber-700 dark:text-amber-400">ระดับเอว</span>
-                  <span className="text-[10px] text-slate-500">60 - 90 ซม. (ต้องใช้เรือ/รถยกสูง)</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">60 - 90 ซม. (ต้องใช้เรือ/รถยกสูง)</span>
                 </Label>
               </div>
 
-              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'critical' ? 'border-red-500 bg-red-50/50 dark:bg-red-950/30' : 'border-slate-200'}`}>
+              <div className={`flex items-center space-x-2 border rounded-lg p-2.5 cursor-pointer transition-colors ${waterLevel === 'critical' ? 'border-red-500 bg-red-50/50 dark:bg-red-950/30' : 'border-slate-200 dark:border-slate-800'}`}>
                 <RadioGroupItem value="critical" id="level-critical" />
                 <Label htmlFor="level-critical" className="text-xs cursor-pointer">
                   <span className="font-semibold block text-red-700 dark:text-red-400">วิกฤติ มิดหัว/หลังคา</span>
-                  <span className="text-[10px] text-slate-500">&gt; 100 ซม. (ต้องอพยพด่วน)</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">&gt; 100 ซม. (ต้องอพยพด่วน)</span>
                 </Label>
               </div>
             </RadioGroup>
@@ -355,11 +355,11 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
                 <Camera className="w-3.5 h-3.5 text-blue-500" />
                 <span>ถ่ายรูปภาพน้ำท่วมในพื้นที่ (Ground Truth)</span>
               </span>
-              <span className="text-[10px] text-slate-500">ช่วยยืนยันระดับน้ำจริง</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">ช่วยยืนยันระดับน้ำจริง</span>
             </Label>
 
             {photoPreview ? (
-              <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-48">
+              <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 max-h-48">
                 <img
                   src={photoPreview}
                   alt="ตัวอย่างรูปภาพน้ำท่วม"
@@ -382,7 +382,7 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
                   <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
                     แตะที่นี่เพื่อถ่ายภาพหรือเลือกรูป
                   </span>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">
                     รองรับกล้องมือถือโดยตรง (JPEG, PNG, WebP)
                   </span>
                 </div>
@@ -414,7 +414,7 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
           {/* 6. Reporter Info (Optional) */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-[11px] text-slate-600 dark:text-slate-400 flex items-center gap-1">
+              <Label className="text-[11px] text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1">
                 <User className="w-3 h-3" />
                 <span>ชื่อผู้รายงาน (ไม่บังคับ)</span>
               </Label>
@@ -426,7 +426,7 @@ export const CrowdsourceFloodModal: React.FC<CrowdsourceFloodModalProps> = ({
               />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-600 dark:text-slate-400 flex items-center gap-1">
+              <Label className="text-[11px] text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1">
                 <Phone className="w-3 h-3" />
                 <span>เบอร์ติดต่อ (ไม่บังคับ)</span>
               </Label>

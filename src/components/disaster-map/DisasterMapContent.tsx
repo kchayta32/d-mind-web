@@ -282,13 +282,13 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
 
             <a
               href="/bangkok-flood"
-              className="flex items-center justify-between p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition font-bold text-xs shadow-xs"
+              className="flex items-center justify-between p-3 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 hover:text-blue-700 dark:text-slate-200 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition font-bold text-xs shadow-xs"
             >
               <span className="flex items-center gap-2">
                 <span className="text-base">🌊</span>
                 <span>เปิดหน้าจอเต็มระบบ กทม. (Full Portal)</span>
               </span>
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
             </a>
 
             <BangkokFloodControls
@@ -321,19 +321,19 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
         ) : (
           <>
             {/* Typhoon AI Quick Intelligence Card in Sidebar */}
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-950/70 border border-cyan-500/30 shadow-lg flex items-center justify-between gap-2.5">
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-cyan-950/70 border border-blue-200 dark:border-cyan-500/30 shadow-xs dark:shadow-lg flex items-center justify-between gap-2.5 text-slate-900 dark:text-white">
               <div className="flex items-center gap-2.5 overflow-hidden">
-                <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40 flex-shrink-0">
+                <div className="p-2 rounded-xl bg-blue-100 dark:bg-cyan-500/20 text-blue-700 dark:text-cyan-300 ring-1 ring-blue-300 dark:ring-cyan-500/40 flex-shrink-0">
                   <Sparkles className="w-4 h-4 animate-pulse" />
                 </div>
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-xs text-white">Typhoon AI</span>
-                    <span className="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1 py-0.2 rounded font-mono">
+                    <span className="font-extrabold text-xs text-slate-900 dark:text-white">Typhoon AI</span>
+                    <span className="text-[9px] bg-blue-100 dark:bg-cyan-950 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-cyan-800 px-1 py-0.2 rounded font-mono font-bold">
                       v2.5
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 truncate">
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 truncate font-medium">
                     วิเคราะห์สถานการณ์ & ประเมินความเสี่ยงสด
                   </p>
                 </div>
@@ -343,7 +343,7 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
                 type="button"
                 size="sm"
                 onClick={() => setTyphoonOpen(true)}
-                className="h-7 text-[11px] bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg px-2.5 shadow-md flex-shrink-0"
+                className="h-7 text-[11px] bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold rounded-lg px-2.5 shadow-xs flex-shrink-0"
               >
                 เปิดบทวิเคราะห์
               </Button>
@@ -483,10 +483,10 @@ export const DisasterMapContent: React.FC<DisasterMapContentProps> = ({
         <button
           type="button"
           onClick={onToggleFullMapMode}
-          className="fixed bottom-5 right-5 z-[1001] bg-slate-900/95 hover:bg-slate-800 text-cyan-300 hover:text-white border border-cyan-500/50 shadow-2xl rounded-full py-2.5 px-4 flex items-center gap-2 font-bold text-xs backdrop-blur-md transition-all hover:scale-105 active:scale-95 ring-2 ring-cyan-500/30"
+          className="fixed bottom-5 right-5 z-[1001] bg-white/95 dark:bg-slate-900/95 hover:bg-slate-50 dark:hover:bg-slate-800 text-blue-700 dark:text-cyan-300 hover:text-blue-900 dark:hover:text-white border border-blue-300 dark:border-cyan-500/50 shadow-2xl rounded-full py-2.5 px-4 flex items-center gap-2 font-extrabold text-xs backdrop-blur-md transition-all hover:scale-105 active:scale-95 ring-2 ring-blue-500/20 dark:ring-cyan-500/30"
           title="สลับกลับไปดูแถบสถิติและตัวกรอง"
         >
-          <BarChart2 className="w-4 h-4 text-cyan-400" />
+          <BarChart2 className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
           <span>เปิดแถบข้อมูลสถิติ (Analytics Panel)</span>
         </button>
       )}

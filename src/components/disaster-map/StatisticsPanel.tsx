@@ -29,14 +29,14 @@ interface StatisticsPanelProps {
 const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, disasterType }) => {
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">สถิติข้อมูล</CardTitle>
+          <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">สถิติข้อมูล</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-2"></div>
-            <p className="text-xs text-gray-600">กำลังเชื่อมต่อ API และดึงข้อมูล Real-time...</p>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-2"></div>
+            <p className="text-xs font-medium text-slate-600 dark:text-slate-400">กำลังเชื่อมต่อ API และดึงข้อมูล Real-time...</p>
           </div>
         </CardContent>
       </Card>
@@ -45,12 +45,12 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
 
   if (!stats) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">สถิติข้อมูล</CardTitle>
+          <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100">สถิติข้อมูล</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-gray-600">ไม่มีข้อมูลสถิติ</p>
+          <p className="text-xs font-medium text-slate-600 dark:text-slate-400">ไม่มีข้อมูลสถิติ</p>
         </CardContent>
       </Card>
     );
@@ -59,27 +59,27 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderEarthquakeStats = (earthquakeStats: EarthquakeStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-          <div className="text-2xl font-bold text-orange-600">{earthquakeStats.total}</div>
-          <div className="text-xs text-gray-600">แผ่นดินไหวทั้งหมด</div>
+        <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+          <div className="text-2xl font-black text-orange-600 dark:text-orange-400">{earthquakeStats.total}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">แผ่นดินไหวทั้งหมด</div>
         </div>
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{earthquakeStats.major}</div>
-          <div className="text-xs text-gray-600">ขนาดใหญ่ (6.0+)</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{earthquakeStats.major}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ขนาดใหญ่ (6.0+)</div>
         </div>
-        <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-          <div className="text-lg font-semibold text-blue-600">{earthquakeStats.averageMagnitude}</div>
-          <div className="text-xs text-gray-600">ขนาดเฉลี่ย (Mag)</div>
+        <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{earthquakeStats.averageMagnitude}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ขนาดเฉลี่ย (Mag)</div>
         </div>
-        <div className="text-center bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-          <div className="text-lg font-semibold text-emerald-600">{earthquakeStats.last24Hours}</div>
-          <div className="text-xs text-gray-600">24 ชม. ล่าสุด</div>
+        <div className="text-center bg-emerald-50 dark:bg-emerald-950/30 p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
+          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{earthquakeStats.last24Hours}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">24 ชม. ล่าสุด</div>
         </div>
       </div>
 
       {earthquakeStats.sourceBreakdown && (
-        <div className="border-t pt-2 text-[11px] text-gray-500">
-          <div className="font-semibold text-gray-700 mb-1">ข้อมูลรวมจาก Open Feeds:</div>
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+          <div className="font-bold text-slate-800 dark:text-slate-200 mb-1">ข้อมูลรวมจาก Open Feeds:</div>
           <div className="flex justify-between">
             <span>USGS: {earthquakeStats.sourceBreakdown.usgs}</span>
             <span>EMSC: {earthquakeStats.sourceBreakdown.emsc}</span>
@@ -93,36 +93,36 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderStormStats = (stormStats: StormStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-          <div className="text-2xl font-bold text-purple-600">{stormStats.totalActiveStorms}</div>
-          <div className="text-xs text-gray-600">พายุที่กำลังเคลื่อนตัว</div>
+        <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+          <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{stormStats.totalActiveStorms}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">พายุที่กำลังเคลื่อนตัว</div>
         </div>
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{stormStats.maxWindSpeedKmH}</div>
-          <div className="text-xs text-gray-600">ความเร็วลมสูงสุด (km/h)</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{stormStats.maxWindSpeedKmH}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ความเร็วลมสูงสุด (km/h)</div>
         </div>
-        <div className="text-center bg-amber-50 p-2 rounded-lg border border-amber-100">
-          <div className="text-lg font-semibold text-amber-600">{stormStats.severeStormsCount}</div>
-          <div className="text-xs text-gray-600">ระดับไต้ฝุ่น/รุนแรง</div>
+        <div className="text-center bg-amber-50 dark:bg-amber-950/30 p-2 rounded-lg border border-amber-200 dark:border-amber-800/40">
+          <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{stormStats.severeStormsCount}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ระดับไต้ฝุ่น/รุนแรง</div>
         </div>
-        <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-          <div className="text-lg font-semibold text-blue-600">{stormStats.tropicalStormsCount}</div>
-          <div className="text-xs text-gray-600">พายุโซนร้อน/ดีเปรสชัน</div>
+        <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{stormStats.tropicalStormsCount}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">พายุโซนร้อน/ดีเปรสชัน</div>
         </div>
       </div>
 
-      <div className="border-t pt-2 text-[11px] text-gray-600">
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-2 text-[11px] text-slate-700 dark:text-slate-300">
         <div className="flex justify-between items-center mb-1">
-          <span>ระดับการเตือนภัย:</span>
+          <span className="font-medium">ระดับการเตือนภัย:</span>
           <div className="flex gap-1.5">
-            <span className="text-red-600 font-bold">แดง: {stormStats.alertBreakdown.red}</span>
-            <span className="text-orange-600 font-bold">ส้ม: {stormStats.alertBreakdown.orange}</span>
-            <span className="text-emerald-600 font-bold">เขียว: {stormStats.alertBreakdown.green}</span>
+            <span className="text-red-600 dark:text-red-400 font-bold">แดง: {stormStats.alertBreakdown.red}</span>
+            <span className="text-orange-600 dark:text-orange-400 font-bold">ส้ม: {stormStats.alertBreakdown.orange}</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">เขียว: {stormStats.alertBreakdown.green}</span>
           </div>
         </div>
         {stormStats.mostSevereStorm && (
-          <div className="text-[11px] text-gray-700 bg-gray-50 p-1.5 rounded">
-            พายุรุนแรงสูงสุด: <span className="font-bold text-purple-700">{stormStats.mostSevereStorm}</span>
+          <div className="text-[11px] text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 p-1.5 rounded">
+            พายุรุนแรงสูงสุด: <span className="font-bold text-purple-700 dark:text-purple-300">{stormStats.mostSevereStorm}</span>
           </div>
         )}
       </div>
@@ -132,24 +132,24 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderVolcanoStats = (volcanoStats: VolcanoStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-rose-50 p-2 rounded-lg border border-rose-100">
-          <div className="text-2xl font-bold text-rose-600">{volcanoStats.totalActiveVolcanoes}</div>
-          <div className="text-xs text-gray-600">ภูเขาไฟตรวจพบ</div>
+        <div className="text-center bg-rose-50 dark:bg-rose-950/30 p-2 rounded-lg border border-rose-200 dark:border-rose-800/40">
+          <div className="text-2xl font-black text-rose-600 dark:text-rose-400">{volcanoStats.totalActiveVolcanoes}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ภูเขาไฟตรวจพบ</div>
         </div>
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{volcanoStats.eruptingCount}</div>
-          <div className="text-xs text-gray-600">กำลังปะทุต่อเนื่อง</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{volcanoStats.eruptingCount}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">กำลังปะทุต่อเนื่อง</div>
         </div>
-        <div className="text-center bg-amber-50 p-2 rounded-lg border border-amber-100">
-          <div className="text-lg font-semibold text-amber-600">{volcanoStats.warningCount}</div>
-          <div className="text-xs text-gray-600">เฝ้าระวัง / ผิดปกติ</div>
+        <div className="text-center bg-amber-50 dark:bg-amber-950/30 p-2 rounded-lg border border-amber-200 dark:border-amber-800/40">
+          <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{volcanoStats.warningCount}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">เฝ้าระวัง / ผิดปกติ</div>
         </div>
-        <div className="text-center bg-indigo-50 p-2 rounded-lg border border-indigo-100">
-          <div className="text-lg font-semibold text-indigo-600">{volcanoStats.regionalCount}</div>
-          <div className="text-xs text-gray-600">ภูมิภาคเอเชีย-แปซิฟิก</div>
+        <div className="text-center bg-indigo-50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800/40">
+          <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{volcanoStats.regionalCount}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ภูมิภาคเอเชีย-แปซิฟิก</div>
         </div>
       </div>
-      <div className="text-[11px] text-gray-500 border-t pt-2">
+      <div className="text-[11px] text-slate-600 dark:text-slate-400 font-medium border-t border-slate-200 dark:border-slate-800 pt-2">
         แหล่งข้อมูล: NASA EONET & Smithsonian Global Volcanism
       </div>
     </div>
@@ -158,27 +158,27 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderRainSensorStats = (rainStats: StatisticsWithRainViewer) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-          <div className="text-2xl font-bold text-blue-600">{rainStats.total}</div>
-          <div className="text-xs text-gray-600">เซ็นเซอร์ฝนทั้งหมด</div>
+        <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+          <div className="text-2xl font-black text-blue-600 dark:text-blue-400">{rainStats.total}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">เซ็นเซอร์ฝนทั้งหมด</div>
         </div>
-        <div className="text-center bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-          <div className="text-2xl font-bold text-emerald-600">{rainStats.activeRaining}</div>
-          <div className="text-xs text-gray-600">กำลังตกฝน</div>
+        <div className="text-center bg-emerald-50 dark:bg-emerald-950/30 p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
+          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{rainStats.activeRaining}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">กำลังตกฝน</div>
         </div>
-        <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-          <div className="text-lg font-semibold text-purple-600">{rainStats.averageHumidity}%</div>
-          <div className="text-xs text-gray-600">ความชื้นเฉลี่ย</div>
+        <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+          <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{rainStats.averageHumidity}%</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ความชื้นเฉลี่ย</div>
         </div>
-        <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-          <div className="text-lg font-semibold text-orange-600">{rainStats.maxHumidity}%</div>
-          <div className="text-xs text-gray-600">ความชื้นสูงสุด</div>
+        <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+          <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{rainStats.maxHumidity}%</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ความชื้นสูงสุด</div>
         </div>
       </div>
       {rainStats.rainViewer && (
-        <div className="border-t pt-2 bg-gray-50 p-2 rounded text-xs">
-          <div className="font-semibold text-gray-700 mb-1">เรดาร์ฝน RainViewer Animation:</div>
-          <div className="flex justify-between text-gray-600">
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 p-2 rounded text-xs">
+          <div className="font-bold text-slate-800 dark:text-slate-200 mb-1">เรดาร์ฝน RainViewer Animation:</div>
+          <div className="flex justify-between text-slate-600 dark:text-slate-400 font-medium">
             <span>ย้อนหลัง: {rainStats.rainViewer.pastFrames} เฟรม</span>
             <span>พยากรณ์: {rainStats.rainViewer.futureFrames} เฟรม</span>
           </div>
@@ -190,35 +190,35 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderWildfireStats = (wildfireStats: WildfireStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{(wildfireStats.totalHotspots || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">จุดความร้อน VIIRS ทั้งหมด</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{(wildfireStats.totalHotspots || 0).toLocaleString()}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">จุดความร้อน VIIRS ทั้งหมด</div>
         </div>
-        <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-          <div className="text-2xl font-bold text-orange-600">{(wildfireStats.highConfidence || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">ความเชื่อมั่นสูง (80%+)</div>
+        <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+          <div className="text-2xl font-black text-orange-600 dark:text-orange-400">{(wildfireStats.highConfidence || 0).toLocaleString()}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ความเชื่อมั่นสูง (80%+)</div>
         </div>
-        <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-          <div className="text-lg font-semibold text-blue-600">{(wildfireStats.thailand?.totalHotspots || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">ในประเทศไทย</div>
+        <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{(wildfireStats.thailand?.totalHotspots || 0).toLocaleString()}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ในประเทศไทย</div>
         </div>
-        <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-          <div className="text-lg font-semibold text-purple-600">{(wildfireStats.international?.totalHotspots || 0).toLocaleString()}</div>
-          <div className="text-xs text-gray-600">ประเทศเพื่อนบ้าน</div>
+        <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+          <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{(wildfireStats.international?.totalHotspots || 0).toLocaleString()}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ประเทศเพื่อนบ้าน</div>
         </div>
       </div>
       
       {/* Risk Area & GISTDA Data Info */}
-      <div className="border-t pt-2 space-y-1 text-xs">
-        <div className="flex justify-between text-gray-700">
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-2 space-y-1 text-xs">
+        <div className="flex justify-between text-slate-800 dark:text-slate-200 font-medium">
           <span>พื้นที่เสี่ยงรวมในไทย:</span>
-          <span className="font-bold text-red-600">{(wildfireStats.thailand?.totalRiskArea || 0).toLocaleString()} ไร่</span>
+          <span className="font-bold text-red-600 dark:text-red-400">{(wildfireStats.thailand?.totalRiskArea || 0).toLocaleString()} ไร่</span>
         </div>
-        <div className="flex justify-between text-[11px] text-gray-500">
+        <div className="flex justify-between text-[11px] text-slate-600 dark:text-slate-400 font-medium">
           <span>ความเชื่อมั่นเฉลี่ย:</span>
-          <span className="font-semibold text-orange-600">{wildfireStats.averageConfidence || 0}%</span>
+          <span className="font-bold text-orange-600 dark:text-orange-400">{wildfireStats.averageConfidence || 0}%</span>
         </div>
-        <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-100 flex items-center justify-between">
+        <div className="text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <span>แหล่งข้อมูล: GISTDA API 2.0</span>
           <span>VIIRS • Burn Scar • Burn Freq</span>
         </div>
@@ -229,31 +229,31 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderAirPollutionStats = (airStats: AirPollutionStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-teal-50 p-2 rounded-lg border border-teal-100">
-          <div className="text-2xl font-bold text-teal-600">{airStats.totalStations}</div>
-          <div className="text-xs text-gray-600">สถานีตรวจวัดทั่วไทย</div>
+        <div className="text-center bg-teal-50 dark:bg-teal-950/30 p-2 rounded-lg border border-teal-200 dark:border-teal-800/40">
+          <div className="text-2xl font-black text-teal-600 dark:text-teal-400">{airStats.totalStations}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">สถานีตรวจวัดทั่วไทย</div>
         </div>
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{airStats.unhealthyStations}</div>
-          <div className="text-xs text-gray-600">เกินเกณฑ์มาตรฐาน</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{airStats.unhealthyStations}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">เกินเกณฑ์มาตรฐาน</div>
         </div>
-        <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-          <div className="text-lg font-semibold text-purple-600">{airStats.averagePM25}</div>
-          <div className="text-xs text-gray-600">PM2.5 เฉลี่ย (µg/m³)</div>
+        <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+          <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{airStats.averagePM25}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">PM2.5 เฉลี่ย (µg/m³)</div>
         </div>
-        <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-          <div className="text-lg font-semibold text-orange-600">{airStats.maxPM25}</div>
-          <div className="text-xs text-gray-600">PM2.5 สูงสุด (µg/m³)</div>
+        <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+          <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{airStats.maxPM25}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">PM2.5 สูงสุด (µg/m³)</div>
         </div>
       </div>
 
       {airStats.aqiDistribution && (
-        <div className="border-t pt-2 text-[11px] space-y-1">
-          <div className="font-semibold text-gray-700">การกระจายตัวของคุณภาพอากาศ:</div>
-          <div className="grid grid-cols-3 gap-1 text-center">
-            <div className="bg-emerald-50 text-emerald-700 py-0.5 rounded">ดี: {airStats.aqiDistribution.good}</div>
-            <div className="bg-amber-50 text-amber-700 py-0.5 rounded">ปานกลาง: {airStats.aqiDistribution.moderate}</div>
-            <div className="bg-red-50 text-red-700 py-0.5 rounded">มีผลกระทบ: {airStats.aqiDistribution.unhealthy + airStats.aqiDistribution.veryUnhealthy}</div>
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 text-[11px] space-y-1">
+          <div className="font-bold text-slate-800 dark:text-slate-200">การกระจายตัวของคุณภาพอากาศ:</div>
+          <div className="grid grid-cols-3 gap-1 text-center font-medium">
+            <div className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 py-0.5 rounded">ดี: {airStats.aqiDistribution.good}</div>
+            <div className="bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 py-0.5 rounded">ปานกลาง: {airStats.aqiDistribution.moderate}</div>
+            <div className="bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800/40 py-0.5 rounded">มีผลกระทบ: {airStats.aqiDistribution.unhealthy + airStats.aqiDistribution.veryUnhealthy}</div>
           </div>
         </div>
       )}
@@ -263,21 +263,21 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderDroughtStats = (droughtStats: DroughtStats) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-amber-50 p-2 rounded-lg border border-amber-100">
-          <div className="text-2xl font-bold text-amber-600">{droughtStats.nationalAverage.toFixed(1)}%</div>
-          <div className="text-xs text-gray-600">ดัชนีความเสี่ยงเฉลี่ย</div>
+        <div className="text-center bg-amber-50 dark:bg-amber-950/30 p-2 rounded-lg border border-amber-200 dark:border-amber-800/40">
+          <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{droughtStats.nationalAverage.toFixed(1)}%</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ดัชนีความเสี่ยงเฉลี่ย</div>
         </div>
-        <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-          <div className="text-2xl font-bold text-red-600">{droughtStats.highRiskProvinces}</div>
-          <div className="text-xs text-gray-600">จังหวัดเสี่ยงสูง</div>
+        <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+          <div className="text-2xl font-black text-red-600 dark:text-red-400">{droughtStats.highRiskProvinces}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">จังหวัดเสี่ยงสูง</div>
         </div>
       </div>
-      <div className="border-t pt-2">
-        <div className="text-xs text-gray-600 mb-1">5 จังหวัดเสี่ยงสูงสุด (วิเคราะห์ความชื้นดิน):</div>
+      <div className="border-t border-slate-200 dark:border-slate-800 pt-2">
+        <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">5 จังหวัดเสี่ยงสูงสุด (วิเคราะห์ความชื้นดิน):</div>
         <div className="space-y-1">
           {droughtStats.topProvinces.slice(0, 5).map((province, index) => (
-            <div key={index} className="flex justify-between text-xs p-1 bg-gray-50 rounded">
-              <span className="font-medium text-gray-800">{province.province}</span>
+            <div key={index} className="flex justify-between text-xs p-1 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded">
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{province.province}</span>
               <span className="font-bold" style={{ color: province.color }}>{province.percentage}</span>
             </div>
           ))}
@@ -289,21 +289,21 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
   const renderFloodStats = (floodStats: any) => (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center bg-cyan-50 p-2 rounded-lg border border-cyan-100">
-          <div className="text-2xl font-bold text-cyan-600">16</div>
-          <div className="text-xs text-gray-600">สถานีลุ่มน้ำหลัก (GloFAS)</div>
+        <div className="text-center bg-cyan-50 dark:bg-cyan-950/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-800/40">
+          <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400">16</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">สถานีลุ่มน้ำหลัก (GloFAS)</div>
         </div>
-        <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-          <div className="text-2xl font-bold text-blue-600">{floodStats.currentFloods?.totalArea ? Math.round(floodStats.currentFloods.totalArea / 1000000) : 0}</div>
-          <div className="text-xs text-gray-600">ล้าน ตร.ม. (ดาวเทียม)</div>
+        <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+          <div className="text-2xl font-black text-blue-600 dark:text-blue-400">{floodStats.currentFloods?.totalArea ? Math.round(floodStats.currentFloods.totalArea / 1000000) : 0}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ล้าน ตร.ม. (ดาวเทียม)</div>
         </div>
-        <div className="text-center bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-          <div className="text-lg font-semibold text-emerald-600">30 วัน</div>
-          <div className="text-xs text-gray-600">พยากรณ์น้ำหลากล่วงหน้า</div>
+        <div className="text-center bg-emerald-50 dark:bg-emerald-950/30 p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
+          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">30 วัน</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">พยากรณ์น้ำหลากล่วงหน้า</div>
         </div>
-        <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-          <div className="text-lg font-semibold text-orange-600">{floodStats.waterObstructions?.totalHyacinthAreas || 0}</div>
-          <div className="text-xs text-gray-600">จุดสิ่งกีดขวางทางน้ำ</div>
+        <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+          <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{floodStats.waterObstructions?.totalHyacinthAreas || 0}</div>
+          <div className="text-xs font-medium text-slate-700 dark:text-slate-300">จุดสิ่งกีดขวางทางน้ำ</div>
         </div>
       </div>
     </div>
@@ -311,42 +311,42 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
 
   const renderOpenMeteoRainStats = (openMeteoStats: OpenMeteoRainStats) => (
     <div className="grid grid-cols-2 gap-3">
-      <div className="text-center bg-indigo-50 p-2 rounded-lg border border-indigo-100">
-        <div className="text-2xl font-bold text-indigo-600">{openMeteoStats.totalStations}</div>
-        <div className="text-xs text-gray-600">สถานีตรวจวัดสภาพอากาศ</div>
+      <div className="text-center bg-indigo-50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800/40">
+        <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{openMeteoStats.totalStations}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">สถานีตรวจวัดสภาพอากาศ</div>
       </div>
-      <div className="text-center bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-        <div className="text-2xl font-bold text-emerald-600">{openMeteoStats.activeRainStations}</div>
-        <div className="text-xs text-gray-600">จุดที่กำลังมีฝนตก</div>
+      <div className="text-center bg-emerald-50 dark:bg-emerald-950/30 p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
+        <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{openMeteoStats.activeRainStations}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">จุดที่กำลังมีฝนตก</div>
       </div>
-      <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-        <div className="text-lg font-semibold text-purple-600">{openMeteoStats.maxRainfall.toFixed(1)} mm</div>
-        <div className="text-xs text-gray-600">ปริมาณฝนสูงสุด</div>
+      <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+        <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{openMeteoStats.maxRainfall.toFixed(1)} mm</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ปริมาณฝนสูงสุด</div>
       </div>
-      <div className="text-center bg-orange-50 p-2 rounded-lg border border-orange-100">
-        <div className="text-lg font-semibold text-orange-600">{openMeteoStats.avgTemperature.toFixed(1)}°C</div>
-        <div className="text-xs text-gray-600">อุณหภูมิเฉลี่ย</div>
+      <div className="text-center bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg border border-orange-200 dark:border-orange-800/40">
+        <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{openMeteoStats.avgTemperature.toFixed(1)}°C</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">อุณหภูมิเฉลี่ย</div>
       </div>
     </div>
   );
 
   const renderSinkholeStats = (sinkholeStats: SinkholeStats) => (
     <div className="grid grid-cols-2 gap-3">
-      <div className="text-center bg-stone-50 p-2 rounded-lg border border-stone-200">
-        <div className="text-2xl font-bold text-stone-700">{sinkholeStats.totalIncidents}</div>
-        <div className="text-xs text-gray-600">เหตุการณ์ทั้งหมด</div>
+      <div className="text-center bg-stone-50 dark:bg-stone-900/40 p-2 rounded-lg border border-stone-200 dark:border-stone-800">
+        <div className="text-2xl font-black text-stone-800 dark:text-stone-200">{sinkholeStats.totalIncidents}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">เหตุการณ์ทั้งหมด</div>
       </div>
-      <div className="text-center bg-red-50 p-2 rounded-lg border border-red-100">
-        <div className="text-2xl font-bold text-red-600">{sinkholeStats.highSeverity}</div>
-        <div className="text-xs text-gray-600">ระดับร้ายแรง</div>
+      <div className="text-center bg-red-50 dark:bg-red-950/30 p-2 rounded-lg border border-red-200 dark:border-red-800/40">
+        <div className="text-2xl font-black text-red-600 dark:text-red-400">{sinkholeStats.highSeverity}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ระดับร้ายแรง</div>
       </div>
-      <div className="text-center bg-purple-50 p-2 rounded-lg border border-purple-100">
-        <div className="text-lg font-semibold text-purple-600">{sinkholeStats.averageSize}</div>
-        <div className="text-xs text-gray-600">ขนาดเฉลี่ย</div>
+      <div className="text-center bg-purple-50 dark:bg-purple-950/30 p-2 rounded-lg border border-purple-200 dark:border-purple-800/40">
+        <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{sinkholeStats.averageSize}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">ขนาดเฉลี่ย</div>
       </div>
-      <div className="text-center bg-blue-50 p-2 rounded-lg border border-blue-100">
-        <div className="text-lg font-semibold text-blue-600">{sinkholeStats.affectedAreas}</div>
-        <div className="text-xs text-gray-600">พื้นที่ได้รับผลกระทบ</div>
+      <div className="text-center bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg border border-blue-200 dark:border-blue-800/40">
+        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{sinkholeStats.affectedAreas}</div>
+        <div className="text-xs font-medium text-slate-700 dark:text-slate-300">พื้นที่ได้รับผลกระทบ</div>
       </div>
     </div>
   );
@@ -390,16 +390,16 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ stats, isLoading, dis
       case 'sinkhole':
         return renderSinkholeStats(stats as SinkholeStats);
       default:
-        return <p className="text-xs text-gray-600">ไม่รองรับการแสดงสถิติสำหรับประเภทนี้</p>;
+        return <p className="text-xs font-medium text-slate-600 dark:text-slate-400">ไม่รองรับการแสดงสถิติสำหรับประเภทนี้</p>;
     }
   };
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
+    <Card className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-bold flex items-center justify-between">
+        <CardTitle className="text-sm font-bold flex items-center justify-between text-slate-900 dark:text-slate-100">
           <span>{getTitle()}</span>
-          <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-mono">
+          <Badge variant="outline" className="text-[10px] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 font-mono font-bold">
             Live
           </Badge>
         </CardTitle>

@@ -181,18 +181,18 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
   });
 
   return (
-    <div className="bg-slate-900/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/80 p-2.5 sm:p-3 w-full transition-all">
+    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl border border-slate-200/90 dark:border-slate-700/80 p-2.5 sm:p-3 w-full transition-all">
       {/* Top Header Row with Category Tabs + Typhoon AI Action + Full Map Toggle */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200 dark:border-slate-800">
         {/* Left: Category Segmented Filter */}
-        <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-800">
           <button
             type="button"
             onClick={() => setActiveCategory('all')}
             className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all ${
               activeCategory === 'all'
                 ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             ทั้งหมด (11)
@@ -203,7 +203,7 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all flex items-center gap-1 ${
               activeCategory === 'core'
                 ? 'bg-cyan-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <span>6 ภัยหลัก (วิทยานิพนธ์)</span>
@@ -215,7 +215,7 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             className={`px-2.5 py-1 text-[11px] rounded-lg font-bold transition-all ${
               activeCategory === 'live_radar'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             เรดาร์ & กทม.
@@ -228,7 +228,7 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             <button
               type="button"
               onClick={onOpenTyphoonModal}
-              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-black shadow-lg shadow-cyan-900/40 ring-1 ring-cyan-400/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="relative group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-black shadow-lg shadow-cyan-900/30 ring-1 ring-cyan-400/50 hover:scale-[1.02] active:scale-[0.98] transition-all"
               title="เปิดการวิเคราะห์สถานการณ์อัจฉริยะด้วย Typhoon AI"
             >
               <div className="relative">
@@ -247,10 +247,10 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             <button
               type="button"
               onClick={onToggleFullMapMode}
-              className={`p-1.5 rounded-xl border text-xs font-medium transition flex items-center gap-1 ${
+              className={`p-1.5 rounded-xl border text-xs font-semibold transition flex items-center gap-1 ${
                 isFullMapMode
-                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50'
-                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white hover:bg-slate-700'
+                  ? 'bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-600/30 dark:text-blue-300 dark:border-blue-500/50'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:text-white dark:hover:bg-slate-700'
               }`}
               title={isFullMapMode ? 'กลับสู่โหมดหน้าต่างคู่ (Split Analytics)' : 'ขยายแผนที่เต็มจอ (Full Map Focus)'}
             >
@@ -282,23 +282,23 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
                   className={`
                     relative flex flex-col items-center justify-center min-w-[120px] sm:min-w-[134px] h-[72px] px-2.5 py-1.5 rounded-xl text-xs transition-all duration-200 outline-none
                     ${isSelected 
-                      ? `${activeColor} shadow-lg ${glowColor} ring-2 ring-cyan-400/60 ring-offset-1 ring-offset-slate-900 font-bold scale-[1.02]` 
-                      : 'bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white hover:border-slate-600'
+                      ? `${activeColor} shadow-lg ${glowColor} ring-2 ring-cyan-400/60 ring-offset-1 ring-offset-white dark:ring-offset-slate-900 font-bold scale-[1.02]` 
+                      : 'bg-slate-50 hover:bg-slate-100/90 border border-slate-200/90 dark:bg-slate-800/80 dark:hover:bg-slate-800 dark:border-slate-700/80 text-slate-800 dark:text-slate-300 hover:text-blue-700 dark:hover:text-white hover:border-blue-300 dark:hover:border-slate-600 shadow-2xs'
                     }
                   `}
                 >
                   {isCoreThesis && !isSelected && (
-                    <span className="absolute top-1 right-1.5 text-[8px] bg-cyan-950/70 text-cyan-300 px-1 py-0.2 rounded font-semibold border border-cyan-800/60">
+                    <span className="absolute top-1 right-1.5 text-[8px] bg-cyan-100 dark:bg-cyan-950/70 text-cyan-800 dark:text-cyan-300 px-1 py-0.2 rounded font-bold border border-cyan-300 dark:border-cyan-800/60">
                       หลัก
                     </span>
                   )}
-                  <div className={`flex items-center justify-center mb-0.5 ${isSelected ? 'text-white' : 'text-slate-300'}`}>
+                  <div className={`flex items-center justify-center mb-0.5 ${isSelected ? 'text-white' : 'text-slate-700 dark:text-slate-300'}`}>
                     {icon}
                   </div>
-                  <span className="text-center font-bold text-xs leading-tight tracking-tight text-nowrap truncate max-w-[114px]">
+                  <span className={`text-center font-extrabold text-xs leading-tight tracking-tight text-nowrap truncate max-w-[114px] ${isSelected ? 'text-white' : 'text-slate-900 dark:text-slate-100'}`}>
                     {label}
                   </span>
-                  <span className={`text-[9.5px] mt-0.5 leading-none font-medium truncate max-w-[114px] ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
+                  <span className={`text-[9.5px] mt-0.5 leading-none font-semibold truncate max-w-[114px] ${isSelected ? 'text-white/95' : 'text-slate-600 dark:text-slate-400'}`}>
                     {sublabel}
                   </span>
                 </button>
@@ -306,8 +306,8 @@ export const DisasterTypeSelector: React.FC<DisasterTypeSelectorProps> = ({
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="-left-2.5 h-7 w-7 bg-slate-800 text-white border-slate-700 hover:bg-slate-700 shadow-lg" />
-        <CarouselNext className="-right-2.5 h-7 w-7 bg-slate-800 text-white border-slate-700 hover:bg-slate-700 shadow-lg" />
+        <CarouselPrevious className="-left-2.5 h-7 w-7 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-md" />
+        <CarouselNext className="-right-2.5 h-7 w-7 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-md" />
       </Carousel>
     </div>
   );

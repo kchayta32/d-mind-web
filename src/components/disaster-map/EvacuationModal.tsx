@@ -55,17 +55,17 @@ export const EvacuationModal: React.FC<EvacuationModalProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full bg-slate-900 border border-slate-700 text-white shadow-2xl p-6 max-h-[85vh] flex flex-col">
+      <DialogContent className="max-w-lg w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white shadow-2xl p-6 max-h-[85vh] flex flex-col">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 rounded-xl bg-red-500/20 text-red-400">
+            <div className="p-2 rounded-xl bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400">
               <Compass className="w-6 h-6" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-bold text-white">
+              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
                 เส้นทางอพยพ & ศูนย์พักพิงชั่วคราว
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-400">
+              <DialogDescription className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                 ข้อมูลจุดปลอดภัย ศูนย์อพยพฉุกเฉิน และสายด่วนกู้ภัย ปภ. 1784
               </DialogDescription>
             </div>
@@ -73,12 +73,12 @@ export const EvacuationModal: React.FC<EvacuationModalProps> = ({
         </DialogHeader>
 
         {/* Hotlines */}
-        <div className="bg-red-950/40 border border-red-800/80 rounded-xl p-3 flex items-center justify-between mt-2">
+        <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 rounded-xl p-3 flex items-center justify-between mt-2">
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-red-400 animate-bounce" />
+            <Phone className="w-4 h-4 text-red-600 dark:text-red-400 animate-bounce" />
             <div>
-              <p className="font-bold text-xs text-red-200">สายด่วนขอความช่วยเหลือเร่งด่วน</p>
-              <p className="text-[10px] text-slate-300">ปภ. รับแจ้งเหตุ 1784 • กู้ชีพ 1669 • สายด่วน กทม. 1555</p>
+              <p className="font-bold text-xs text-red-900 dark:text-red-200">สายด่วนขอความช่วยเหลือเร่งด่วน</p>
+              <p className="text-[10px] text-slate-700 dark:text-slate-300 font-medium">ปภ. รับแจ้งเหตุ 1784 • กู้ชีพ 1669 • สายด่วน กทม. 1555</p>
             </div>
           </div>
           <a
@@ -91,37 +91,37 @@ export const EvacuationModal: React.FC<EvacuationModalProps> = ({
 
         {/* Shelters List */}
         <div className="flex-1 overflow-y-auto mt-3 space-y-2.5 pr-1">
-          <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-            <ShieldAlert className="w-4 h-4 text-amber-400" />
+          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
+            <ShieldAlert className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             <span>ศูนย์พักพิงและจุดรวมพลปลอดภัย</span>
           </h4>
 
           {EVACUATION_SHELTERS.map((shelter, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-xl bg-slate-800/70 border border-slate-700/80 hover:border-red-500/50 transition-all flex flex-col gap-2"
+              className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 hover:border-red-500/50 transition-all flex flex-col gap-2"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h5 className="font-bold text-xs text-white flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                  <h5 className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-red-600 dark:text-red-400 flex-shrink-0" />
                     <span>{shelter.name}</span>
                   </h5>
-                  <p className="text-[10px] text-slate-400 mt-0.5">
+                  <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
                     {shelter.province} • {shelter.capacity}
                   </p>
                 </div>
                 <a
                   href={`tel:${shelter.contact.replace(/-/g, '')}`}
-                  className="text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-1 rounded-md font-mono flex items-center gap-1"
+                  className="text-[10px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 px-2 py-1 rounded-md font-mono flex items-center gap-1 font-semibold"
                 >
-                  <Phone className="w-3 h-3 text-emerald-400" />
+                  <Phone className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                   <span>{shelter.contact}</span>
                 </a>
               </div>
 
-              <div className="text-[10px] text-slate-300 bg-slate-900/60 p-2 rounded-lg flex items-center gap-1.5">
-                <CheckCircle className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+              <div className="text-[10px] text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900/60 p-2 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 font-medium">
+                <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <span>สิ่งอำนวยความสะดวก: {shelter.facilities}</span>
               </div>
 
@@ -130,7 +130,7 @@ export const EvacuationModal: React.FC<EvacuationModalProps> = ({
                   href={`https://www.google.com/maps/dir/?api=1&destination=${shelter.lat},${shelter.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 font-semibold bg-sky-950/60 hover:bg-sky-900/60 px-3 py-1.5 rounded-lg border border-sky-800 transition"
+                  className="flex items-center gap-1 text-[11px] text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 font-semibold bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-3 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800 transition"
                 >
                   <Navigation className="w-3 h-3" />
                   <span>นำทางเส้นทางอพยพ</span>
@@ -140,12 +140,12 @@ export const EvacuationModal: React.FC<EvacuationModalProps> = ({
           ))}
         </div>
 
-        <div className="pt-3 border-t border-slate-800 flex justify-end">
+        <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            className="bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
+            className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
           >
             ปิดหน้าต่าง
           </Button>

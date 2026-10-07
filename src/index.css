@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* ===== LIGHT THEME - Clean, Professional Blue ===== */
+    /* ===== LIGHT THEME - Clean, Professional Blue with High Contrast Typography ===== */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
 
@@ -14,30 +14,32 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 211 100% 50%;
+    --primary: 211 100% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
+    --secondary: 210 32% 94%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    /* Enhanced contrast for muted text (WCAG AAA readability: Slate-700 equivalent) */
+    --muted: 210 32% 95%;
+    --muted-foreground: 215 25% 35%;
 
-    --accent: 210 40% 96%;
+    --accent: 210 32% 95%;
     --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 56%;
     --destructive-foreground: 0 0% 98%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 92% 48%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 211 100% 50%;
+    /* Crisp borders in light mode for visible boundaries */
+    --border: 214 24% 85%;
+    --input: 214 24% 85%;
+    --ring: 211 100% 48%;
 
     --radius: 0.75rem;
 
@@ -46,9 +48,9 @@
     --gradient-hero-end: 220 100% 40%;
 
     /* Light Theme Specific */
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --shadow-color: 220 40% 80%;
+    --glass-bg: rgba(255, 255, 255, 0.92);
+    --glass-border: rgba(203, 213, 225, 0.85);
+    --shadow-color: 220 30% 75%;
   }
 
   .dark {
@@ -107,6 +109,23 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* High-contrast crisp typography in light theme */
+  :root:not(.dark) {
+    color-scheme: light;
+  }
+
+  :root:not(.dark) body {
+    color: hsl(222, 47%, 11%);
+  }
+
+  /* Thai & bilingual font clarity optimization */
+  body, button, input, select, textarea {
+    font-family: 'Prompt', 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   /* Smooth Theme Transition */

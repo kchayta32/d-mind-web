@@ -328,12 +328,12 @@ export const MapView: React.FC<MapViewProps> = ({
             <button
               type="button"
               onClick={onOpenTyphoonModal}
-              className="bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md text-cyan-300 hover:text-white border border-cyan-500/40 hover:border-cyan-400 text-xs font-bold py-1.5 px-3 rounded-full shadow-lg flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 ring-1 ring-cyan-500/20"
+              className="bg-white/95 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 backdrop-blur-md text-blue-700 dark:text-cyan-300 hover:text-blue-900 dark:hover:text-white border border-blue-200 dark:border-cyan-500/40 hover:border-blue-400 dark:hover:border-cyan-400 text-xs font-bold py-1.5 px-3 rounded-full shadow-md flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 ring-1 ring-blue-500/20 dark:ring-cyan-500/20"
               title="เปิดระบบวิเคราะห์สถานการณ์ด้วย Typhoon AI"
             >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400 animate-pulse" />
               <span className="hidden sm:inline">Typhoon AI</span>
-              <span className="text-[10px] bg-cyan-950 text-cyan-400 px-1.5 py-0.2 rounded-full border border-cyan-700 font-medium">
+              <span className="text-[10px] bg-blue-50 dark:bg-cyan-950 text-blue-700 dark:text-cyan-400 px-1.5 py-0.2 rounded-full border border-blue-200 dark:border-cyan-700 font-bold">
                 วิเคราะห์สด
               </span>
             </button>

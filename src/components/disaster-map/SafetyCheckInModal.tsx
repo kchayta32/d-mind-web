@@ -63,17 +63,17 @@ export const SafetyCheckInModal: React.FC<SafetyCheckInModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md w-full bg-slate-900 border border-slate-700 text-white shadow-2xl p-6">
+      <DialogContent className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white shadow-2xl p-6">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
-            <div className="p-2 rounded-xl bg-orange-500/20 text-orange-400">
+            <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <DialogTitle className="text-lg font-bold text-white">
+              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
                 Safety Check-in (รายงานความปลอดภัย)
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-400">
+              <DialogDescription className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                 สถานการณ์: {disasterTitle}
               </DialogDescription>
             </div>
@@ -88,13 +88,13 @@ export const SafetyCheckInModal: React.FC<SafetyCheckInModalProps> = ({
               onClick={() => setStatus('safe')}
               className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
                 status === 'safe'
-                  ? 'bg-emerald-600/30 border-emerald-500 text-emerald-300 shadow-md ring-1 ring-emerald-500'
-                  : 'bg-slate-800/60 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-emerald-50 dark:bg-emerald-600/30 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-md ring-1 ring-emerald-500'
+                  : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <HeartHandshake className="w-5 h-5" />
+              <HeartHandshake className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               <span className="font-bold text-sm">ฉันปลอดภัยดี</span>
-              <span className="text-[10px] text-slate-400">ไม่ได้รับอันตราย</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">ไม่ได้รับอันตราย</span>
             </button>
 
             <button
@@ -102,38 +102,38 @@ export const SafetyCheckInModal: React.FC<SafetyCheckInModalProps> = ({
               onClick={() => setStatus('need_help')}
               className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
                 status === 'need_help'
-                  ? 'bg-red-600/30 border-red-500 text-red-300 shadow-md ring-1 ring-red-500'
-                  : 'bg-slate-800/60 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-red-50 dark:bg-red-600/30 border-red-500 text-red-800 dark:text-red-300 shadow-md ring-1 ring-red-500'
+                  : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <AlertCircle className="w-5 h-5" />
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
               <span className="font-bold text-sm">ต้องการความช่วยเหลือ</span>
-              <span className="text-[10px] text-slate-400">แจ้งทีมกู้ภัยด่วน</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">แจ้งทีมกู้ภัยด่วน</span>
             </button>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">ชื่อ - นามสกุล หรือ นามแฝง</label>
+            <label className="block text-slate-800 dark:text-slate-300 font-semibold mb-1">ชื่อ - นามสกุล หรือ นามแฝง</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="เช่น นายสมชาย ปลอดภัย"
-              className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 text-xs"
+              className="bg-white dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs font-medium"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">เบอร์ติดต่อ</label>
+              <label className="block text-slate-800 dark:text-slate-300 font-semibold mb-1">เบอร์ติดต่อ</label>
               <Input
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
                 placeholder="08X-XXX-XXXX"
-                className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 text-xs"
+                className="bg-white dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs font-medium"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1">
+              <label className="block text-slate-800 dark:text-slate-300 font-semibold mb-1 flex items-center gap-1">
                 <Users className="w-3.5 h-3.5" />
                 <span>จำนวนคน (รวมตัวคุณ)</span>
               </label>
@@ -143,19 +143,19 @@ export const SafetyCheckInModal: React.FC<SafetyCheckInModalProps> = ({
                 max="50"
                 value={peopleCount}
                 onChange={(e) => setPeopleCount(e.target.value)}
-                className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 text-xs"
+                className="bg-white dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs font-medium"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">ข้อความเพิ่มเติม / จุดสังเกต</label>
+            <label className="block text-slate-800 dark:text-slate-300 font-semibold mb-1">ข้อความเพิ่มเติม / จุดสังเกต</label>
             <Textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="เช่น อยู่ชั้น 2 ของบ้าน, อาคารร้าวเล็กน้อยแต่ปลอดภัย..."
               rows={2}
-              className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 text-xs resize-none"
+              className="bg-white dark:bg-slate-800/80 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs font-medium resize-none"
             />
           </div>
 
@@ -164,7 +164,7 @@ export const SafetyCheckInModal: React.FC<SafetyCheckInModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700"
+              className="flex-1 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 font-medium"
             >
               ยกเลิก
             </Button>
