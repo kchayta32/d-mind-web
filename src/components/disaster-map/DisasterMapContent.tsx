@@ -21,7 +21,8 @@ import { BangkokFloodStats } from '@/components/bangkok-flood/BangkokFloodStats'
 import { BangkokRoadDetailModal } from '@/components/bangkok-flood/BangkokRoadDetailModal';
 import { BANGKOK_ROAD_SEGMENTS, BANGKOK_CANAL_STATIONS } from '@/data/bangkokRoadFloodData';
 import { BangkokZone, BangkokRoadSegment } from '@/types/bangkokFlood';
-import { ExternalLink, BarChart2 } from 'lucide-react';
+import { ExternalLink, BarChart2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { SelectedLocation } from './types';
 import { TyphoonDisasterModal } from './TyphoonDisasterModal';
 import { DisasterTelemetry } from '@/services/typhoonDisasterService';

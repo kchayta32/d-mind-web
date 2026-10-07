@@ -130,6 +130,14 @@ test('DisasterMapSidebar has Typhoon AI badge and dark theme tokens', () => {
   assert(content.includes('dark:bg-slate-900'), 'Missing dark theme background');
 });
 
+// Test 10: DisasterMapContent JSX components are all explicitly imported (prevent ReferenceError)
+test('DisasterMapContent explicitly imports all used JSX components including Sparkles and Button', () => {
+  const filePath = path.join(rootDir, 'src/components/disaster-map/DisasterMapContent.tsx');
+  const content = fs.readFileSync(filePath, 'utf-8');
+  assert(content.includes('Sparkles') && content.includes("from 'lucide-react'"), 'Sparkles must be imported from lucide-react');
+  assert(content.includes('Button') && content.includes("from '@/components/ui/button'"), 'Button must be imported from @/components/ui/button');
+});
+
 console.log('----------------------------------------------------');
 console.log(` Test Summary: ${passedCount} Passed, ${failedCount} Failed`);
 console.log('----------------------------------------------------\n');
