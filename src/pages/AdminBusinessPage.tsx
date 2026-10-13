@@ -116,6 +116,7 @@ export default function AdminBusinessPage() {
   const [expenseOpen, setExpenseOpen] = useState<boolean>(false);
 
   // Form states for Deposit
+  const [depositInvestorMode, setDepositInvestorMode] = useState<string>('__new__'); // '__new__' or founder.id
   const [depositNameTh, setDepositNameTh] = useState<string>('');
   const [depositNameEn, setDepositNameEn] = useState<string>('');
   const [depositAmount, setDepositAmount] = useState<number>(1000);
@@ -125,6 +126,48 @@ export default function AdminBusinessPage() {
   const [withdrawFounderId, setWithdrawFounderId] = useState<string>('founder-1');
   const [withdrawShares, setWithdrawShares] = useState<number>(1000);
   const [withdrawReason, setWithdrawReason] = useState<string>('ขอถอนคืนเงินทุน / ลดสัดส่วนหุ้นส่วน');
+
+  // Selected withdraw founder object
+  const selectedWithdrawFounder = useMemo(() => {
+    return data.founders.find(f => f.id === withdrawFounderId);
+  }, [data.founders, withdrawFounderId]);
+
+  // Selected deposit founder object (when existing investor mode)
+  const selectedDepositFounder = useMemo(() => {
+    if (depositInvestorMode === '__new__') return null;
+    return data.founders.find(f => f.id === depositInvestorMode);
+  }, [data.founders, depositInvestorMode]);
+
+  // Openers with clean state reset
+  const openDepositModal = (presetFounderId?: string) => {
+    if (presetFounderId) {
+      setDepositInvestorMode(presetFounderId);
+      const found = data.founders.find(f => f.id === presetFounderId);
+      if (found) {
+        setDepositNameTh(found.nameTh);
+        setDepositNameEn(found.nameEn);
+        setDepositNote(`เพิ่มทุนผู้ร่วมลงทุนเดิม (${found.nameTh})`);
+      }
+    } else {
+      setDepositInvestorMode('__new__');
+      setDepositNameTh('');
+      setDepositNameEn('');
+      setDepositNote('ผู้ร่วมลงทุนรายใหม่ (New Equity Round)');
+    }
+    setDepositAmount(1000);
+    setDepositOpen(true);
+  };
+
+  const openWithdrawModal = (presetFounderId?: string) => {
+    const validFounder = data.founders.find(f => f.shares > 0);
+    const targetId = presetFounderId || withdrawFounderId || (validFounder ? validFounder.id : 'founder-1');
+    setWithdrawFounderId(targetId);
+    const targetFounder = data.founders.find(f => f.id === targetId);
+    if (targetFounder) {
+      setWithdrawShares(Math.min(1000, targetFounder.shares));
+    }
+    setWithdrawOpen(true);
+  };
 
   // Form states for Expense
   const [expenseTitle, setExpenseTitle] = useState<string>('');
@@ -193,7 +236,7 @@ export default function AdminBusinessPage() {
   // Handlers
   const handleExecuteDeposit = async () => {
     if (!depositNameTh.trim()) {
-      toast.error('กรุณาระบุชื่อผู้ร่วมลงทุน');
+      toast.error('กรุณาระบุชื่อผู้ร่วมลงทุน (ภาษาไทย)');
       return;
     }
     if (depositAmount <= 0) {
@@ -212,6 +255,7 @@ export default function AdminBusinessPage() {
       );
       setData(updated);
       setDepositOpen(false);
+      setDepositInvestorMode('__new__');
       setDepositNameTh('');
       setDepositNameEn('');
       setDepositAmount(1000);
@@ -224,8 +268,16 @@ export default function AdminBusinessPage() {
   };
 
   const handleExecuteWithdrawal = async () => {
+    if (!selectedWithdrawFounder) {
+      toast.error('กรุณาเลือกผู้ถือหุ้นที่ต้องการถอนทุน');
+      return;
+    }
     if (withdrawShares <= 0) {
       toast.error('จำนวนหุ้นที่ต้องการถอนต้องมากกว่า 0 หุ้น');
+      return;
+    }
+    if (withdrawShares > selectedWithdrawFounder.shares) {
+      toast.error(`จำนวนหุ้นที่ต้องการถอนต้องไม่เกิน ${selectedWithdrawFounder.shares.toLocaleString()} หุ้น`);
       return;
     }
 
@@ -239,7 +291,7 @@ export default function AdminBusinessPage() {
       );
       setData(updated);
       setWithdrawOpen(false);
-      toast.success(`บันทึกการถอนทุนเรียบร้อย จ่ายคืน ${withdrawSim.payoutAmount.toLocaleString()} บาท`);
+      toast.success(`บันทึกการถอนทุนของ ${selectedWithdrawFounder.nameTh} เรียบร้อย จ่ายคืน ฿${withdrawSim.payoutAmount.toLocaleString()} บาท`);
     } catch (err) {
       toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     } finally {
@@ -382,14 +434,14 @@ export default function AdminBusinessPage() {
 
             <div className="flex items-center gap-2 flex-wrap">
               <Button
-                onClick={() => setDepositOpen(true)}
+                onClick={() => openDepositModal()}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-900/20 text-xs gap-1.5"
               >
                 <PlusCircle className="w-4 h-4" />
                 ฝากทุน / เพิ่มผู้ลงทุน
               </Button>
               <Button
-                onClick={() => setWithdrawOpen(true)}
+                onClick={() => openWithdrawModal()}
                 variant="outline"
                 className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs gap-1.5"
               >
@@ -909,14 +961,14 @@ export default function AdminBusinessPage() {
 
                   <div className="space-y-3 pt-2">
                     <Button
-                      onClick={() => setDepositOpen(true)}
+                      onClick={() => openDepositModal()}
                       className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs gap-2 py-2.5 shadow-sm"
                     >
                       <PlusCircle className="w-4 h-4" />
                       เปิดระบบจำลองและบันทึกเงินลงทุน (Deposit)
                     </Button>
                     <Button
-                      onClick={() => setWithdrawOpen(true)}
+                      onClick={() => openWithdrawModal()}
                       variant="outline"
                       className="w-full border-rose-300 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-xs gap-2 py-2.5"
                     >
@@ -1285,6 +1337,9 @@ export default function AdminBusinessPage() {
       {/* ========================================================================= */}
       {/* MODAL: DEPOSIT / NEW INVESTMENT */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* MODAL: DEPOSIT / NEW INVESTMENT */}
+      {/* ========================================================================= */}
       <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
         <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 max-w-lg shadow-xl">
           <DialogHeader>
@@ -1293,31 +1348,133 @@ export default function AdminBusinessPage() {
               บันทึกเงินร่วมลงทุนและคำนวณหุ้นส่วน (Deposit / Equity Dilution)
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-              ระบบจะคำนวณ Post-Money Valuation, หุ้นออกใหม่ และสัดส่วนที่เจือจาง (Dilution) โดยอัตโนมัติ
+              เลือกระหว่างเพิ่มทุนให้ผู้ร่วมลงทุนเดิมในพอร์ต หรือระบุชื่อผู้ลงทุนรายใหม่ผ่าน Textbox
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
+            {/* 1. Dropdown for selecting existing portfolio investors or new investor */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-700 dark:text-slate-300">ชื่อผู้ร่วมลงทุน (ภาษาไทย)</Label>
-              <Input
-                placeholder="เช่น สมชาย ใจดี หรือ กองทุนร่วมลงทุน"
-                value={depositNameTh}
-                onChange={(e) => setDepositNameTh(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs"
-              />
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  ดรอปดาวน์เลือกผู้ร่วมลงทุน (จากพอร์ตลงทุนทั้งหมด)
+                </Label>
+                <Badge
+                  variant="outline"
+                  className={`text-[10px] ${
+                    depositInvestorMode === '__new__'
+                      ? 'text-blue-600 dark:text-cyan-400 border-blue-500/30 bg-blue-500/10'
+                      : 'text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+                  }`}
+                >
+                  {depositInvestorMode === '__new__' ? '✨ ผู้ลงทุนรายใหม่' : '🔄 เพิ่มทุนผู้ถือหุ้นเดิม'}
+                </Badge>
+              </div>
+
+              <Select
+                value={depositInvestorMode}
+                onValueChange={(val) => {
+                  setDepositInvestorMode(val);
+                  if (val === '__new__') {
+                    setDepositNameTh('');
+                    setDepositNameEn('');
+                    setDepositNote('ผู้ร่วมลงทุนรายใหม่ (New Equity Round)');
+                  } else {
+                    const found = data.founders.find(f => f.id === val);
+                    if (found) {
+                      setDepositNameTh(found.nameTh);
+                      setDepositNameEn(found.nameEn);
+                      setDepositNote(`เพิ่มทุนผู้ร่วมลงทุนเดิม (${found.nameTh})`);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs">
+                  <SelectValue placeholder="เลือกรายชื่อในพอร์ตลงทุน หรือ ผู้ลงทุนใหม่" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 text-xs">
+                  <SelectItem value="__new__" className="font-semibold text-blue-600 dark:text-cyan-400">
+                    ➕ ผู้ลงทุนรายใหม่ (New Investor - ระบุในช่อง Textbox ด้านล่าง)
+                  </SelectItem>
+                  {data.founders.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.nameTh} ({f.nameEn}) {f.shares > 0 ? `• ลงทุน ฿${f.investedAmount.toLocaleString()} (${f.shares.toLocaleString()} หุ้น - ${f.percentage}%)` : `• ${f.roleTh}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-700 dark:text-slate-300">ชื่อผู้ร่วมลงทุน (ภาษาอังกฤษ - ไม่บังคับ)</Label>
-              <Input
-                placeholder="e.g. Somchai Jaidee / Angel Fund"
-                value={depositNameEn}
-                onChange={(e) => setDepositNameEn(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs"
-              />
+            {/* Existing Member Card Summary (when selected from dropdown) */}
+            {selectedDepositFounder && (
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-500/30 text-xs text-emerald-800 dark:text-emerald-200 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">
+                    {selectedDepositFounder.nameTh} ({selectedDepositFounder.nameEn})
+                  </span>
+                  <Badge variant="outline" className="text-[10px] text-emerald-700 dark:text-emerald-300 border-emerald-500/40">
+                    ถือครองปัจจุบัน {selectedDepositFounder.percentage}%
+                  </Badge>
+                </div>
+                <div className="text-[11px] text-emerald-700 dark:text-emerald-300 flex items-center justify-between">
+                  <span>เงินลงทุนเดิม: ฿{selectedDepositFounder.investedAmount.toLocaleString()}</span>
+                  <span>จำนวนหุ้นเดิม: {selectedDepositFounder.shares.toLocaleString()} หุ้น</span>
+                </div>
+              </div>
+            )}
+
+            {/* 2. Textboxes for Thai and English names */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-slate-700 dark:text-slate-300">
+                    ชื่อผู้ร่วมลงทุน (ภาษาไทย)
+                  </Label>
+                  {depositInvestorMode === '__new__' ? (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">* ผู้ลงทุนใหม่</span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">จากพอร์ต</span>
+                  )}
+                </div>
+                <Input
+                  placeholder="เช่น สมชาย ใจดี หรือ กองทุนร่วมลงทุน"
+                  value={depositNameTh}
+                  onChange={(e) => {
+                    setDepositNameTh(e.target.value);
+                    if (depositInvestorMode !== '__new__') {
+                      setDepositInvestorMode('__new__');
+                    }
+                  }}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-slate-700 dark:text-slate-300">
+                    ชื่อผู้ร่วมลงทุน (ภาษาอังกฤษ)
+                  </Label>
+                  {depositInvestorMode === '__new__' ? (
+                    <span className="text-[10px] text-slate-400">(Optional)</span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">จากพอร์ต</span>
+                  )}
+                </div>
+                <Input
+                  placeholder="e.g. Somchai Jaidee / Angel Fund"
+                  value={depositNameEn}
+                  onChange={(e) => {
+                    setDepositNameEn(e.target.value);
+                    if (depositInvestorMode !== '__new__') {
+                      setDepositInvestorMode('__new__');
+                    }
+                  }}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs"
+                />
+              </div>
             </div>
 
+            {/* 3. Amount and Purpose */}
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-700 dark:text-slate-300">จำนวนเงินลงทุน (บาท)</Label>
               <Input
@@ -1358,7 +1515,7 @@ export default function AdminBusinessPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400 block">สัดส่วนผู้ลงทุนใหม่:</span>
+                  <span className="text-slate-500 dark:text-slate-400 block">สัดส่วนผู้ลงทุนในรอบนี้:</span>
                   <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
                     {depositSim.ownershipPercent}%
                   </span>
@@ -1404,34 +1561,107 @@ export default function AdminBusinessPage() {
               ถอนเงินทุนคืน / ลดสัดส่วนหุ้นส่วน (Withdrawal &amp; Liquidation)
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-              คำนวณจำนวนเงินที่ต้องจ่ายคืนผู้ร่วมลงทุนตามราคาประเมิน และปรับลดจำนวนหุ้นของบริษัท
+              เลือกผู้ถือหุ้นที่มีอยู่ในพอร์ตลงทุนทั้งหมดเพื่อคำนวณเงินสดจ่ายคืนและยกเลิกหุ้น
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
+            {/* 1. Dropdown for all portfolio shareholders */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-700 dark:text-slate-300">เลือกผู้ถือหุ้นที่ต้องการถอนทุน</Label>
-              <Select value={withdrawFounderId} onValueChange={setWithdrawFounderId}>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  ดรอปดาวน์เลือกผู้ถือหุ้นที่ต้องการถอนทุน (มีในพอร์ตลงทุนทั้งหมด)
+                </Label>
+                <span className="text-[11px] text-rose-600 dark:text-rose-400 font-mono">
+                  {data.founders.filter(f => f.shares > 0).length} รายการ
+                </span>
+              </div>
+              <Select
+                value={withdrawFounderId}
+                onValueChange={(val) => {
+                  setWithdrawFounderId(val);
+                  const found = data.founders.find(f => f.id === val);
+                  if (found) {
+                    setWithdrawShares(Math.min(1000, found.shares));
+                  }
+                }}
+              >
                 <SelectTrigger className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs">
-                  <SelectValue placeholder="เลือกผู้ถือหุ้น" />
+                  <SelectValue placeholder="เลือกผู้ถือหุ้นที่มีในพอร์ตทั้งหมด" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 text-xs">
                   {data.founders.filter(f => f.shares > 0).map((f) => (
                     <SelectItem key={f.id} value={f.id}>
-                      {f.nameTh} ({f.shares.toLocaleString()} หุ้น - {f.percentage}%)
+                      {f.nameTh} ({f.nameEn}) • ทุน ฿{f.investedAmount.toLocaleString()} ({f.shares.toLocaleString()} หุ้น - {f.percentage}%)
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Selected Shareholder Status Card with Quick Preset Percentages */}
+            {selectedWithdrawFounder && (
+              <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {selectedWithdrawFounder.nameTh} ({selectedWithdrawFounder.nameEn})
+                  </span>
+                  <Badge variant="outline" className="text-[10px] text-rose-600 border-rose-500/30 bg-rose-500/10">
+                    ถือครอง {selectedWithdrawFounder.percentage}%
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-400">
+                  <div>เงินลงทุนเดิม: <strong className="text-slate-900 dark:text-slate-200 font-mono">฿{selectedWithdrawFounder.investedAmount.toLocaleString()}</strong></div>
+                  <div>หุ้นที่มีอยู่: <strong className="text-slate-900 dark:text-slate-200 font-mono">{selectedWithdrawFounder.shares.toLocaleString()} หุ้น</strong></div>
+                </div>
+                <div className="flex items-center gap-1.5 pt-1 border-t border-slate-200 dark:border-slate-800/80">
+                  <span className="text-[10px] text-slate-500">เลือกด่วน:</span>
+                  <button
+                    type="button"
+                    onClick={() => setWithdrawShares(Math.max(1, Math.round(selectedWithdrawFounder.shares * 0.25)))}
+                    className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition"
+                  >
+                    25%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWithdrawShares(Math.max(1, Math.round(selectedWithdrawFounder.shares * 0.5)))}
+                    className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition"
+                  >
+                    50%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWithdrawShares(Math.max(1, Math.round(selectedWithdrawFounder.shares * 0.75)))}
+                    className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition"
+                  >
+                    75%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWithdrawShares(selectedWithdrawFounder.shares)}
+                    className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-medium hover:bg-rose-200 dark:hover:bg-rose-900 transition"
+                  >
+                    ทั้งหมด (100%)
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-700 dark:text-slate-300">จำนวนหุ้นที่ต้องการถอนออก</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-slate-700 dark:text-slate-300">จำนวนหุ้นที่ต้องการถอนออก</Label>
+                {selectedWithdrawFounder && (
+                  <span className="text-[10px] text-slate-500">
+                    สูงสุด: {selectedWithdrawFounder.shares.toLocaleString()} หุ้น
+                  </span>
+                )}
+              </div>
               <Input
                 type="number"
-                min={100}
-                max={data.founders.find(f => f.id === withdrawFounderId)?.shares || 10000}
-                step={500}
+                min={1}
+                max={selectedWithdrawFounder ? selectedWithdrawFounder.shares : 10000}
+                step={100}
                 value={withdrawShares}
                 onChange={(e) => setWithdrawShares(Number(e.target.value))}
                 className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono font-bold"
