@@ -32,6 +32,8 @@ import BangkokFloodBanner from './BangkokFloodBanner';
 import { BangkokCafeFloodBanner } from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
 import { SatisfactionSurveyBanner } from './SatisfactionSurveyBanner';
+import { LiveCrisisTicker } from './LiveCrisisTicker';
+import { SurvivalKitWidget } from './SurvivalKitWidget';
 import AppDownloadSection from './AppDownloadSection';
 import Footer from '@/components/layout/Footer';
 
@@ -255,6 +257,9 @@ const NewMobileLayout: React.FC = () => {
         </div>
       </header>
 
+      {/* [NEW] Real-time Bangkok Disaster & Weather Status Pulse */}
+      <LiveCrisisTicker />
+
       {/* Hero Banner - NewsCarousel with Full Parity to PC */}
       <section className="w-full">
         <NewsCarousel />
@@ -351,6 +356,11 @@ const NewMobileLayout: React.FC = () => {
       {/* [NEW] Satisfaction Survey & Evaluation Banner */}
       <div className="px-2">
         <SatisfactionSurveyBanner />
+      </div>
+
+      {/* [NEW] 72-Hour Survival Go-Bag Checklist */}
+      <div className="px-2">
+        <SurvivalKitWidget />
       </div>
 
       {/* Map Banner Section */}

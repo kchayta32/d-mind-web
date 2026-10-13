@@ -22,6 +22,14 @@ const TYPHOON_MODEL = 'typhoon-v2.5-30b-a3b-instruct';
 const DEFAULT_TYPHOON_KEY = 'sk-Ag7gTlwbTjlUBmm2DbjInoKo0mZUPZOcRSUnmcBHMU1YMAIU';
 
 function getApiKey(): string {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const userKey = window.localStorage.getItem('TYPHOON_API_KEY');
+      if (userKey && userKey.trim()) return userKey.trim();
+    }
+  } catch {
+    // Ignore
+  }
   if (typeof process !== 'undefined' && process.env && process.env.VITE_TYPHOON_API_KEY) {
     return process.env.VITE_TYPHOON_API_KEY;
   }

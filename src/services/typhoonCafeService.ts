@@ -45,6 +45,14 @@ interface TyphoonChatResponse {
 
 function getApiKey(): string {
   try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const userKey = window.localStorage.getItem('TYPHOON_API_KEY');
+      if (userKey && userKey.trim()) return userKey.trim();
+    }
+  } catch {
+    // Ignore
+  }
+  try {
     if (typeof process !== 'undefined' && process.env && process.env.VITE_TYPHOON_API_KEY) {
       return process.env.VITE_TYPHOON_API_KEY;
     }

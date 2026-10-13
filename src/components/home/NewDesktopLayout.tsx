@@ -7,16 +7,24 @@ import BangkokFloodBanner from './BangkokFloodBanner';
 import BangkokCafeFloodBanner from './BangkokCafeFloodBanner';
 import VideoTourSection from './VideoTourSection';
 import { SatisfactionSurveyBanner } from './SatisfactionSurveyBanner';
+import { LiveCrisisTicker } from './LiveCrisisTicker';
+import { SurvivalKitWidget } from './SurvivalKitWidget';
 import MainLayout from '@/components/layout/MainLayout';
 
 const NewDesktopLayout: React.FC = () => {
   return (
     <MainLayout className="bg-background text-foreground">
+      {/* [NEW] Real-time Bangkok Disaster & Weather Status Pulse */}
+      <LiveCrisisTicker />
+
       {/* News Carousel (Replaces Hero) */}
       <NewsCarousel />
 
       {/* Navigation Cards (บริการหลัก) */}
       <NavigationCards />
+
+      {/* [NEW] Interactive 72-Hour Survival Go-Bag Checklist & Gamified Scoring */}
+      <SurvivalKitWidget />
 
       {/* [NEW] แบบประเมินความพึงพอใจและผลการทดสอบระบบ D-MIND */}
       <SatisfactionSurveyBanner />
@@ -40,4 +48,3 @@ const NewDesktopLayout: React.FC = () => {
 };
 
 export default NewDesktopLayout;
-

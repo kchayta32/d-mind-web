@@ -1,0 +1,23 @@
+{
+  "name": "D-MIND | Disaster Intelligence & Flood Radar",
+  "short_name": "D-MIND",
+  "description": "แพลตฟอร์มบูรณาการข้อมูลและระบบเตือนภัยพิบัติอัจฉริยะสำหรับประเทศไทย ผสาน GIS ดาวเทียม เรดาร์คาเฟ่น้ำท่วม และ Typhoon AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "/dmind-premium-icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["weather", "utilities", "news", "navigation"]
+}

@@ -110,8 +110,8 @@ THAILLM_API_KEY = os.environ.get("THAILLM_API_KEY") or _safe_b64("VGU1bjhzY3JsRz
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY") or _safe_b64("NTdlZDUwYTViZTdmNDc4MDgzZjNjZjBkNjNlNWIzY2YuUXdwcHBlOU5zS09YTnB2WGlwMmIwS1Jf")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY") or _safe_b64("c2stb3ItdjEtZDQ0NWMyMmY1M2E4MjY1N2QyYjFiNGI1ZWQzMGFiYWU4MTNhNTgyZjBmNzJmODViMTkyOGEyMGU3NTFmZTA4MA==")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY") or _safe_b64("QVEuQWI4Uk42S1A4TXNOV2xhVDlFSjBuTUFyQl93VFB0cmxXVkRIeXFxeGNieExTVTVMMlE=")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN") or _safe_b64("ODY4NjQwMTUyMDpBQUZ1QUJUMm9pTGRwcERNdVlpNVRlc29mTGh5c1hzM3pTRQ==")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID") or _safe_b64("Njg2MjUzNTM1Ng==")
 ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY", "")
 
 SUBJECT_MAP = {
@@ -158,8 +158,16 @@ def send_telegram_alert(html_text):
             if cid:
                 recipient_chats.append(cid)
 
+    # Also include any subscribed chat IDs from the database
+    try:
+        subscribers = db.get_telegram_subscribers()
+        if subscribers:
+            recipient_chats.extend(subscribers)
+    except Exception:
+        pass
+
     if not recipient_chats:
-        print("[Telegram Alert] Warning: No TELEGRAM_CHAT_ID configured in environment variables.")
+        print("[Telegram Alert] Warning: No TELEGRAM_CHAT_ID or database subscribers found.")
         return 0
 
     sent_count = 0
@@ -839,6 +847,50 @@ def get_telegram_subscribers():
         "bot_configured": bool(TELEGRAM_BOT_TOKEN),
         "admin_chat_configured": bool(TELEGRAM_CHAT_ID)
     })
+
+@app.route('/api/telegram_webhook', methods=['POST', 'GET'])
+@app.route('/telegram_webhook', methods=['POST', 'GET'])
+def telegram_webhook():
+    if request.method == 'GET':
+        return jsonify({
+            "status": "active",
+            "bot": "@drmind_alert_bot",
+            "bot_configured": bool(TELEGRAM_BOT_TOKEN)
+        })
+
+    update = request.json or {}
+    message = update.get("message") or update.get("edited_message") or {}
+    chat = message.get("chat") or {}
+    chat_id = chat.get("id")
+    text = (message.get("text") or "").strip()
+    from_user = message.get("from") or {}
+    first_name = from_user.get("first_name", "")
+    username = from_user.get("username", "")
+
+    if chat_id:
+        db.save_telegram_subscriber(str(chat_id), first_name, username)
+
+        if TELEGRAM_BOT_TOKEN and text.startswith("/start"):
+            welcome_text = (
+                f"👋 <b>สวัสดีครับคุณ {first_name or 'ผู้ดูแล'}!</b>\n\n"
+                f"✅ <b>เชื่อมต่อกับระบบ D-MIND Alert Bot สำเร็จแล้ว</b>\n"
+                f"🆔 <b>Chat ID ของคุณ:</b> <code>{chat_id}</code>\n\n"
+                f"ระบบจะส่งการแจ้งเตือนทันทีเมื่อมีข้อความติดต่อผ่านแพลตฟอร์ม D-MIND"
+            )
+            try:
+                requests.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                    json={
+                        "chat_id": chat_id,
+                        "text": welcome_text,
+                        "parse_mode": "HTML"
+                    },
+                    timeout=5
+                )
+            except Exception as e:
+                print(f"[Telegram Webhook] Error sending welcome message: {e}")
+
+    return jsonify({"ok": True})
 
 @app.route('/api/cctv/datagoth', methods=['GET'])
 @app.route('/cctv/datagoth', methods=['GET'])

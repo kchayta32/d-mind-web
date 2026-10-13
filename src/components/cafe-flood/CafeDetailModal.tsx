@@ -20,8 +20,10 @@ import {
   Compass, 
   Sparkles,
   ExternalLink,
-  Waves
+  Waves,
+  Share2
 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { TyphoonMarkdownRenderer } from '@/components/chat/TyphoonMarkdownRenderer';
 import {
   Dialog,
@@ -75,8 +77,50 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   onAskTyphoon,
   onFocusMap,
 }) => {
+  const { toast } = useToast();
   const [typhoonOpinion, setTyphoonOpinion] = useState<string>('');
   const [loadingOpinion, setLoadingOpinion] = useState<boolean>(false);
+
+  const handleShareVenue = async () => {
+    if (!venue) return;
+    const floodScore = calculateFloodSafetyScore(venue);
+    const riskLabel = venue.floodRisk === 'safe' ? 'ปลอดภัยมาก' : venue.floodRisk === 'moderate' ? 'เฝ้าระวัง' : 'จุดเสี่ยงน้ำท่วม';
+    const statusLabel = isOpenNow ? '🟢 เปิดให้บริการอยู่' : '🔴 ปิดในขณะนี้';
+    
+    const shareText = `☕ ${venue.name} (${venue.category.toUpperCase()})
+📍 ย่าน: ${venue.district || venue.zone}
+🛡️ ความปลอดภัยน้ำท่วม: ${floodScore}/100 (${riskLabel})
+⏰ สถานะ: ${statusLabel}
+🗺️ นำทาง: https://www.google.com/maps/search/?api=1&query=${venue.lat},${venue.lng}
+🌊 เรดาร์คาเฟ่ & บาร์ น้ำท่วม กทม. (D-MIND): https://d-mind-six.vercel.app/cafe-flood-map`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${venue.name} - D-MIND Cafe Radar`,
+          text: shareText,
+          url: 'https://d-mind-six.vercel.app/cafe-flood-map',
+        });
+        toast({
+          title: 'แชร์ข้อมูลร้านสำเร็จ!',
+          description: `แชร์ ${venue.name} เรียบร้อยแล้ว`,
+        });
+        return;
+      } catch (err) {
+        // Fallback to clipboard
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: 'คัดลอกข้อมูลร้านสำเร็จ! 📋',
+        description: 'นำข้อความไปส่งต่อใน LINE หรือ Social Media ได้ทันที',
+      });
+    } catch {
+      window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
+    }
+  };
 
   // Active target day of week
   const activeDayOfWeek = useMemo(() => resolveDayOfWeek(selectedDay), [selectedDay]);
@@ -507,6 +551,15 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             >
               <Navigation className="w-4 h-4" />
               <span>เปิดเส้นทางใน Google Maps</span>
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handleShareVenue}
+              className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold h-10 rounded-xl flex items-center justify-center gap-1.5 shadow-md"
+            >
+              <Share2 className="w-4 h-4 text-white" />
+              <span>แชร์ร้านนี้</span>
             </Button>
 
             {onFocusMap && (
