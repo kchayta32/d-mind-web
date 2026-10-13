@@ -451,7 +451,7 @@ const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.
 
 function formatThaiDateDisplay(dateStr?: string): string {
   if (!dateStr) return 'วันนี้';
-  if (dateStr.includes('ต.ค.') || dateStr.includes('ม.ค.') || dateStr.includes('พ.ย.')) {
+  if (THAI_MONTHS.some(m => dateStr.includes(m))) {
     return dateStr;
   }
   const parts = dateStr.split('-');
@@ -481,6 +481,7 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       event: 'ศตวรรษ อินทรักษ์ ลงทุนเริ่มต้น 1,000 บ.',
       type: 'seed',
       netCash: 1000,
+      valuation: 1000,
       inflowAmount: 1000
     },
     {
@@ -493,6 +494,7 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       event: 'ธนกฤษ วรรณรังษี ลงทุนเริ่มต้น 1,000 บ.',
       type: 'seed',
       netCash: 2000,
+      valuation: 2000,
       inflowAmount: 1000
     },
     {
@@ -505,17 +507,18 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       event: 'กิตติ ชัยตา ลงทุนเริ่มต้น 1,000 บ. (ครบ 3,000 บ.)',
       type: 'seed',
       netCash: 3000,
+      valuation: 3000,
       inflowAmount: 1000
     }
   ];
 
-  let runningBalance = 3000;
+  let runningCash = 3000;
+  let runningValuation = 3000;
 
   // Process any subsequent transactions (sorted chronologically: oldest first)
   const extraTransactions = (businessData.transactions || [])
     .filter(tx => tx.id !== 'tx-001' && tx.id !== 'tx-002' && tx.id !== 'tx-003')
-    .slice()
-    .reverse();
+    .slice();
 
   // Also check if any expenses are not yet in transactions
   const txExpenseTitles = new Set(extraTransactions.filter(t => t.type === 'expense').map(t => t.title));
@@ -550,6 +553,9 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
     });
   });
 
+  // Sort events chronologically
+  allExtraEvents.sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
+
   if (allExtraEvents.length === 0) {
     points.push({
       date: '13 ต.ค. 2569',
@@ -560,36 +566,47 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       volume: 0,
       event: 'ปัจจุบัน: เงินทุนสะสม 3,000 บ. (ยังไม่มีผู้สนับสนุนทุนภายนอก)',
       type: 'milestone',
-      netCash: 3000
+      netCash: 3000,
+      valuation: 3000
     });
     return points;
   }
 
   allExtraEvents.forEach((item) => {
-    const prevBalance = runningBalance;
+    const prevCash = runningCash;
     if (typeof item.balanceAfter === 'number') {
-      runningBalance = item.balanceAfter;
+      runningCash = item.balanceAfter;
+      if (item.type === 'deposit') {
+        runningValuation += item.amount;
+      } else if (item.type === 'withdraw') {
+        runningValuation = Math.max(0, runningValuation - item.amount);
+      }
     } else {
       if (item.type === 'deposit') {
-        runningBalance = runningBalance + item.amount;
+        runningCash += item.amount;
+        runningValuation += item.amount;
+      } else if (item.type === 'withdraw') {
+        runningCash = Math.max(0, runningCash - item.amount);
+        runningValuation = Math.max(0, runningValuation - item.amount);
       } else {
-        runningBalance = Math.max(0, runningBalance - item.amount);
+        runningCash = Math.max(0, runningCash - item.amount);
       }
     }
 
-    const high = Math.max(prevBalance, runningBalance);
-    const low = Math.min(prevBalance, runningBalance);
+    const high = Math.max(prevCash, runningCash);
+    const low = Math.min(prevCash, runningCash);
 
     points.push({
       date: formatThaiDateDisplay(item.date),
-      open: prevBalance,
+      open: prevCash,
       high,
       low,
-      close: runningBalance,
+      close: runningCash,
       volume: item.amount,
       event: item.title,
       type: item.type,
-      netCash: runningBalance,
+      netCash: runningCash,
+      valuation: runningValuation,
       expenseAmount: item.type === 'expense' ? item.amount : undefined,
       inflowAmount: item.type === 'deposit' ? item.amount : undefined
     });
@@ -599,16 +616,17 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
   const totalExpenses = (businessData.expenses || []).reduce((acc, e) => acc + (e.amount || 0), 0);
   points.push({
     date: 'ปัจจุบัน',
-    open: runningBalance,
-    high: runningBalance,
-    low: runningBalance,
-    close: runningBalance,
+    open: runningCash,
+    high: Math.max(runningCash, runningValuation),
+    low: Math.min(runningCash, runningValuation),
+    close: runningCash,
     volume: 0,
     event: totalExpenses > 0
-      ? `ปัจจุบัน: เงินสดคงเหลือ ฿${runningBalance.toLocaleString()} บ. (ใช้จ่ายสะสม ฿${totalExpenses.toLocaleString()} บ.)`
-      : `ปัจจุบัน: เงินทุนคงเหลือครบเต็มจำนวน ฿${runningBalance.toLocaleString()} บ.`,
+      ? `ปัจจุบัน: เงินสดคงเหลือ ฿${runningCash.toLocaleString()} บ. (มูลค่าการเติบโตของทุน ฿${runningValuation.toLocaleString()} บ.)`
+      : `ปัจจุบัน: เงินทุนคงเหลือครบเต็มจำนวน ฿${runningCash.toLocaleString()} บ.`,
     type: 'milestone',
-    netCash: runningBalance
+    netCash: runningCash,
+    valuation: runningValuation
   });
 
   return points;
@@ -678,7 +696,13 @@ export function getFoundersCapTableSummary(businessData: BusinessData): FounderC
 
   return (businessData.founders || []).map(f => {
     const remainingShares = f.shares || 0;
-    const initialShares = f.isMentor ? 0 : 10000;
+    let initialShares = 10000;
+    if (f.isMentor) {
+      initialShares = 0;
+    } else if (f.id.startsWith('investor-')) {
+      initialShares = f.shares;
+    }
+
     const netAssetValue = totalShares > 0 && remainingShares > 0
       ? Number(((remainingShares / totalShares) * cashBalance).toFixed(2))
       : 0;
@@ -689,6 +713,8 @@ export function getFoundersCapTableSummary(businessData: BusinessData): FounderC
     let statusText = 'ผู้ร่วมก่อตั้งหลัก';
     if (f.isMentor) {
       statusText = 'อาจารย์ที่ปรึกษา (Advisor)';
+    } else if (f.id.startsWith('investor-')) {
+      statusText = 'ผู้ร่วมลงทุนรอบขยาย (Investor)';
     } else if (remainingShares === 0) {
       statusText = 'ถอนทุนครบจำนวนแล้ว';
     } else if (remainingShares < initialShares) {

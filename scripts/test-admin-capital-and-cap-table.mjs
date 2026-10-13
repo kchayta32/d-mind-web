@@ -79,9 +79,9 @@ try {
     assert(expensePoint.close === 2150, `Expense point reflects deducted balance (expected 2150, got ${expensePoint.close})`);
     assert(expensePoint.volume === 850, `Expense point reflects expense volume (expected 850, got ${expensePoint.volume})`);
   }
-
   const latestPoint = dynamicPoints[dynamicPoints.length - 1];
   assert(latestPoint.close === 2150, `Latest trajectory point reflects net treasury of 2150 (got ${latestPoint.close})`);
+  assert(latestPoint.valuation === 3000, `Latest valuation point is preserved at 3000 despite expenses`);
 } catch (err) {
   assert(false, `Candlestick generation threw an error: ${err.message}`);
 }
@@ -172,6 +172,35 @@ try {
   const founder2 = capSummaryWithdraw.find(f => f.id === 'founder-2');
   if (founder2) {
     assert(founder2.remainingShares === 8000, `Remaining shares reflects withdrawal (expected 8000, got ${founder2.remainingShares})`);
+  }
+
+  // With new investor
+  const dataWithInvestor = {
+    ...INITIAL_BUSINESS_DATA,
+    totalShares: 35000,
+    founders: [
+      ...INITIAL_BUSINESS_DATA.founders,
+      {
+        id: 'investor-12345',
+        nameTh: 'นักลงทุน ทดสอบ',
+        nameEn: 'Test Investor',
+        university: 'Angel Investor',
+        roleTh: 'ผู้ร่วมลงทุน',
+        roleEn: 'Investor',
+        bioTh: 'Investor',
+        investedAmount: 5000,
+        investDate: '2569-10-15',
+        shares: 5000,
+        percentage: 14.29,
+        skills: ['Investment']
+      }
+    ]
+  };
+  const capSummaryInvestor = getFoundersCapTableSummary(dataWithInvestor);
+  const newInvestor = capSummaryInvestor.find(f => f.id === 'investor-12345');
+  if (newInvestor) {
+    assert(newInvestor.initialShares === 5000, `New investor initial shares matches their investment (expected 5000, got ${newInvestor.initialShares})`);
+    assert(newInvestor.statusText.includes('ผู้ร่วมลงทุน'), `New investor has correct status text (got ${newInvestor.statusText})`);
   }
 } catch (err) {
   assert(false, `Cap table summary helper threw an error: ${err.message}`);

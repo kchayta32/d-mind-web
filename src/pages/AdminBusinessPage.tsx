@@ -343,8 +343,11 @@ export default function AdminBusinessPage() {
   }, [data]);
 
   const chartMaxY = useMemo(() => {
-    const maxVal = Math.max(...candlestickPoints.map(p => Math.max(p.high, p.close, p.open)), 3500);
-    return Math.ceil((maxVal * 1.15) / 500) * 500;
+    const peak = candlestickPoints.reduce((max, p) => {
+      const pointMax = Math.max(p.high || 0, p.close || 0, p.open || 0, p.valuation || 0);
+      return Math.max(max, pointMax);
+    }, 3500);
+    return Math.ceil((peak * 1.15) / 500) * 500;
   }, [candlestickPoints]);
 
   return (
@@ -647,13 +650,21 @@ export default function AdminBusinessPage() {
                           }}
                           formatter={(value: any, name: string) => [
                             `฿${Number(value).toLocaleString()}`,
-                            name === 'close' ? 'กระแสเงินสดคงเหลือสะสม (Net Treasury)' : name === 'high' ? 'High' : name === 'low' ? 'Low' : 'เงินทุน/ค่าใช้จ่ายในรอบ (Volume)'
+                            name === 'close'
+                              ? 'กระแสเงินสดคงเหลือสะสม (Net Capital Flow)'
+                              : name === 'valuation'
+                              ? 'มูลค่าการเติบโตของทุน (Valuation Trajectory)'
+                              : name === 'high'
+                              ? 'High'
+                              : name === 'low'
+                              ? 'Low'
+                              : 'เงินทุน/ค่าใช้จ่ายในรอบ (Volume)'
                           ]}
                           labelStyle={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 'bold' }}
                         />
-                        <Bar dataKey="volume" fill="#0284c7" fillOpacity={0.4} yAxisId={0} name="เงินลงทุนในรอบ (Volume)" />
-                        <Line type="monotone" dataKey="close" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 6 }} name="Valuation Accumulation" />
-                        <Line type="monotone" dataKey="high" stroke="#38bdf8" strokeDasharray="2 2" strokeWidth={1} dot={false} name="High Point" />
+                        <Bar dataKey="volume" fill="#0284c7" fillOpacity={0.4} yAxisId={0} name="เงินลงทุน/ค่าใช้จ่ายในรอบ (Volume)" />
+                        <Line type="monotone" dataKey="valuation" stroke="#8b5cf6" strokeWidth={2.5} strokeDasharray="3 3" dot={{ fill: '#8b5cf6', r: 4 }} name="มูลค่าการเติบโตของทุน (Valuation Trajectory)" />
+                        <Line type="monotone" dataKey="close" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} name="กระแสเงินสดคงเหลือสุทธิ (Net Capital Flow)" />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
@@ -957,7 +968,9 @@ export default function AdminBusinessPage() {
                         <tr>
                           <td className="p-3">รวมทั้งหมด (Total Diluted)</td>
                           <td className="p-3 text-right text-emerald-600 dark:text-emerald-400 font-mono">฿{totalCapitalInflow.toLocaleString()}</td>
-                          <td className="p-3 text-right font-mono text-slate-500">30,000 หุ้น</td>
+                          <td className="p-3 text-right font-mono text-slate-500">
+                            {capTableSummary.reduce((sum, f) => sum + (f.initialShares || 0), 0).toLocaleString()} หุ้น
+                          </td>
                           <td className="p-3 text-right font-mono text-emerald-600 dark:text-emerald-400">{data.totalShares.toLocaleString()} หุ้น</td>
                           <td className="p-3 text-right text-cyan-600 dark:text-cyan-400 font-mono">100.00%</td>
                           <td className="p-3 text-right text-slate-800 dark:text-slate-200 font-mono">฿{data.cashBalance.toLocaleString()}</td>
