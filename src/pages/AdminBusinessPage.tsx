@@ -1,0 +1,1566 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  TrendingUp,
+  Shield,
+  Coins,
+  Cpu,
+  FileText,
+  Award,
+  Users,
+  Building2,
+  DollarSign,
+  ArrowUpRight,
+  ArrowDownRight,
+  PlusCircle,
+  MinusCircle,
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  Lock,
+  BatteryCharging,
+  Sun,
+  Radio,
+  Box,
+  Layers,
+  Sparkles,
+  Wallet,
+  Calendar,
+  Clock,
+  Briefcase,
+  ChevronRight,
+  Info
+} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { toast } from 'sonner';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from 'recharts';
+
+import {
+  BusinessData,
+  FounderMember,
+  FinancialTransaction,
+  ExpenseItem,
+  GrantProgram,
+  HardwareSpec,
+  PatentItem,
+  INITIAL_BUSINESS_DATA,
+  getBusinessData,
+  saveBusinessData,
+  calculateDepositMath,
+  calculateWithdrawMath,
+  executeDeposit,
+  executeWithdrawal,
+  addExpenseItem,
+  getCandlestickData
+} from '@/services/firebaseBusinessService';
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+export default function AdminBusinessPage() {
+  const [data, setData] = useState<BusinessData>(INITIAL_BUSINESS_DATA);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [syncing, setSyncing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>('เพิ่งซิงก์');
+  const [activeTab, setActiveTab] = useState<string>('financial');
+
+  // Modals
+  const [depositOpen, setDepositOpen] = useState<boolean>(false);
+  const [withdrawOpen, setWithdrawOpen] = useState<boolean>(false);
+  const [expenseOpen, setExpenseOpen] = useState<boolean>(false);
+
+  // Form states for Deposit
+  const [depositNameTh, setDepositNameTh] = useState<string>('');
+  const [depositNameEn, setDepositNameEn] = useState<string>('');
+  const [depositAmount, setDepositAmount] = useState<number>(5000);
+  const [depositNote, setDepositNote] = useState<string>('ผู้ร่วมลงทุนรอบใหม่ (New Equity Round)');
+
+  // Form states for Withdraw
+  const [withdrawFounderId, setWithdrawFounderId] = useState<string>('founder-1');
+  const [withdrawShares, setWithdrawShares] = useState<number>(1000);
+  const [withdrawReason, setWithdrawReason] = useState<string>('ขอถอนคืนเงินทุน / ลดสัดส่วนหุ้นส่วน');
+
+  // Form states for Expense
+  const [expenseTitle, setExpenseTitle] = useState<string>('');
+  const [expenseAmount, setExpenseAmount] = useState<number>(500);
+  const [expenseCategory, setExpenseCategory] = useState<ExpenseItem['category']>('hardware');
+  const [expenseRecipient, setExpenseRecipient] = useState<string>('');
+  const [expenseNote, setExpenseNote] = useState<string>('');
+
+  // Fetch initial data
+  const loadData = async (showToast: boolean = false) => {
+    try {
+      setSyncing(true);
+      const res = await getBusinessData();
+      setData(res);
+      setLastSyncTime(new Date().toLocaleTimeString('th-TH'));
+      if (showToast) {
+        toast.success('ซิงก์ข้อมูลกับ Firebase Realtime Database สำเร็จ');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('ไม่สามารถดึงข้อมูลล่าสุดจาก Firebase ได้');
+    } finally {
+      setLoading(false);
+      setSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+    // Auto-refresh every 60s
+    const interval = setInterval(() => {
+      loadData();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Total Grants Calculation
+  const totalGrantPipeline = useMemo(() => {
+    return data.grants.reduce((acc, g) => acc + g.maxGrantThb, 0);
+  }, [data.grants]);
+
+  // Total Capital Inflows
+  const totalCapitalInflow = useMemo(() => {
+    return data.founders.reduce((acc, f) => acc + f.investedAmount, 0);
+  }, [data.founders]);
+
+  // Total Expenses
+  const totalExpenses = useMemo(() => {
+    return data.expenses.reduce((acc, e) => acc + e.amount, 0);
+  }, [data.expenses]);
+
+  // Deposit simulation math
+  const depositSim = useMemo(() => {
+    return calculateDepositMath(data, depositAmount, depositNameTh);
+  }, [data, depositAmount, depositNameTh]);
+
+  // Withdraw simulation math
+  const withdrawSim = useMemo(() => {
+    return calculateWithdrawMath(data, withdrawFounderId, withdrawShares);
+  }, [data, withdrawFounderId, withdrawShares]);
+
+  // Handlers
+  const handleExecuteDeposit = async () => {
+    if (!depositNameTh.trim()) {
+      toast.error('กรุณาระบุชื่อผู้ร่วมลงทุน');
+      return;
+    }
+    if (depositAmount <= 0) {
+      toast.error('จำนวนเงินลงทุนต้องมากกว่า 0 บาท');
+      return;
+    }
+
+    try {
+      setSyncing(true);
+      const updated = await executeDeposit(
+        data,
+        depositNameTh.trim(),
+        depositNameEn.trim(),
+        depositAmount,
+        depositNote
+      );
+      setData(updated);
+      setDepositOpen(false);
+      setDepositNameTh('');
+      setDepositNameEn('');
+      setDepositAmount(5000);
+      toast.success(`บันทึกเงินลงทุนของ ${depositNameTh} สำเร็จแล้ว (+${depositAmount.toLocaleString()} บาท)`);
+    } catch (err) {
+      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleExecuteWithdrawal = async () => {
+    if (withdrawShares <= 0) {
+      toast.error('จำนวนหุ้นที่ต้องการถอนต้องมากกว่า 0 หุ้น');
+      return;
+    }
+
+    try {
+      setSyncing(true);
+      const updated = await executeWithdrawal(
+        data,
+        withdrawFounderId,
+        withdrawShares,
+        withdrawReason
+      );
+      setData(updated);
+      setWithdrawOpen(false);
+      toast.success(`บันทึกการถอนทุนเรียบร้อย จ่ายคืน ${withdrawSim.payoutAmount.toLocaleString()} บาท`);
+    } catch (err) {
+      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleAddExpense = async () => {
+    if (!expenseTitle.trim()) {
+      toast.error('กรุณาระบุรายการค่าใช้จ่าย');
+      return;
+    }
+    if (expenseAmount <= 0) {
+      toast.error('จำนวนเงินต้องมากกว่า 0 บาท');
+      return;
+    }
+
+    try {
+      setSyncing(true);
+      const updated = await addExpenseItem(data, {
+        date: new Date().toISOString().split('T')[0],
+        title: expenseTitle.trim(),
+        category: expenseCategory,
+        amount: expenseAmount,
+        recipient: expenseRecipient.trim() || 'ผู้จัดจำหน่าย/บริการ',
+        proofNote: expenseNote.trim() || 'บันทึกรายจ่ายการวิจัยและพัฒนา'
+      });
+      setData(updated);
+      setExpenseOpen(false);
+      setExpenseTitle('');
+      setExpenseAmount(500);
+      setExpenseRecipient('');
+      setExpenseNote('');
+      toast.success('บันทึกค่าใช้จ่ายลง Firebase RTDB สำเร็จ');
+    } catch (err) {
+      toast.error('เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Pie chart data for Cap Table
+  const capPieData = useMemo(() => {
+    return data.founders
+      .filter(f => f.shares > 0)
+      .map(f => ({
+        name: f.nameTh,
+        value: f.shares,
+        percentage: f.percentage
+      }));
+  }, [data.founders]);
+
+  const candlestickPoints = useMemo(() => {
+    return getCandlestickData(data);
+  }, [data]);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
+      {/* Top Banner & Security Warning */}
+      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-blue-500/20">
+              <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-cyan-400" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                  D-MIND Business Portal
+                </h1>
+                <Badge variant="outline" className="text-[11px] font-mono border-amber-500/40 text-amber-300 bg-amber-500/10 flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-amber-400" />
+                  RESTRICTED /admin
+                </Badge>
+              </div>
+              <p className="text-xs text-slate-400 hidden sm:block">
+                ระบบข้อมูลผู้ร่วมลงทุน วิจัย พัฒนา และงบการเงิน D-MIND
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            {/* Live Database Pill */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-slate-300 hidden md:inline">Firebase RTDB:</span>
+              <span className="font-mono text-emerald-400 text-[11px]">Connected</span>
+              <span className="text-slate-500 text-[10px] hidden lg:inline">({lastSyncTime})</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadData(true)}
+              disabled={syncing}
+              className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin text-cyan-400' : ''}`} />
+              <span className="hidden sm:inline">ซิงก์ข้อมูล</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Project Intro Notice */}
+        <div className="rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/20 p-5 sm:p-6 relative overflow-hidden">
+          <div className="absolute -right-8 -top-8 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1.5 max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs uppercase tracking-wider font-semibold text-blue-400">
+                  {data.projectName}
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="text-xs text-slate-300">
+                  {data.projectThName}
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                ศูนย์กลางการบริหารยุทธศาสตร์ธุรกิจ ผู้ร่วมลงทุน และ R&amp;D
+              </h2>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                ขับเคลื่อนนวัตกรรมจากโครงการ Super AI Engineer Season 5 (Track: AI INNOVATOR) สู่นวัตกรรมเชิงพาณิชย์กึ่งอุตสาหกรรม (Pre-Production) และการบริหารจัดการเงินทุนให้โปร่งใสแบบเรียลไทม์
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setDepositOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 text-xs gap-1.5"
+              >
+                <PlusCircle className="w-4 h-4" />
+                ฝากทุน / ผู้ร่วมลงทุนใหม่
+              </Button>
+              <Button
+                onClick={() => setWithdrawOpen(true)}
+                variant="outline"
+                className="border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs gap-1.5"
+              >
+                <MinusCircle className="w-4 h-4 text-rose-400" />
+                ถอนทุน / คืนหุ้น
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Dashboard Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          {/* Card 1: Total Capital */}
+          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-sm">
+            <CardHeader className="p-4 pb-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-xs font-medium">ทุนจดทะเบียนรวม</span>
+                <Coins className="w-4 h-4 text-blue-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                ฿{totalCapitalInflow.toLocaleString()}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                3 ผู้ก่อตั้งแรกเริ่ม
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Cash Balance */}
+          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-sm">
+            <CardHeader className="p-4 pb-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-xs font-medium">เงินสดคงเหลือ (Treasury)</span>
+                <Wallet className="w-4 h-4 text-emerald-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-emerald-400 tracking-tight">
+                ฿{data.cashBalance.toLocaleString()}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                หักค่าใช้จ่ายทดสอบ R&amp;D แล้ว
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Pre-Money Valuation */}
+          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-sm">
+            <CardHeader className="p-4 pb-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-xs font-medium">มูลค่าประเมิน (Valuation)</span>
+                <TrendingUp className="w-4 h-4 text-cyan-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-cyan-300 tracking-tight">
+                ฿{data.valuationPostMoney.toLocaleString()}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                ฿{(data.valuationPostMoney / data.totalShares).toFixed(2)} ต่อหุ้น
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Card 4: Non-Dilutive Grants */}
+          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-sm">
+            <CardHeader className="p-4 pb-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-xs font-medium">เป้าหมายทุนให้เปล่า</span>
+                <Award className="w-4 h-4 text-amber-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-amber-400 tracking-tight">
+                ฿{(totalGrantPipeline / 1000000).toFixed(2)}M
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                5 แหล่งทุน (Non-Dilutive)
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Card 5: Total Shares */}
+          <Card className="col-span-2 lg:col-span-1 bg-slate-900/60 border-slate-800 backdrop-blur-sm">
+            <CardHeader className="p-4 pb-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-xs font-medium">จำนวนหุ้นทั้งหมด</span>
+                <Layers className="w-4 h-4 text-purple-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-purple-300 tracking-tight">
+                {data.totalShares.toLocaleString()}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Par Value ฿{data.parValuePerShare} / หุ้น
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tab Navigation */}
+        <Tabs defaultValue="financial" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-slate-900 border border-slate-800 p-1 flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="financial" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
+              กราฟแท่งเทียนการเงิน
+            </TabsTrigger>
+            <TabsTrigger value="team" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Users className="w-3.5 h-3.5 mr-1.5" />
+              ทีมวิจัย &amp; ผู้ร่วมก่อตั้ง
+            </TabsTrigger>
+            <TabsTrigger value="captable" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Coins className="w-3.5 h-3.5 mr-1.5" />
+              Cap Table &amp; คำนวณฝาก/ถอน
+            </TabsTrigger>
+            <TabsTrigger value="expenses" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <DollarSign className="w-3.5 h-3.5 mr-1.5" />
+              การนำเงินไปใช้ (Expenses)
+            </TabsTrigger>
+            <TabsTrigger value="grants" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Award className="w-3.5 h-3.5 mr-1.5" />
+              ทุนสนับสนุนให้เปล่า (Grants)
+            </TabsTrigger>
+            <TabsTrigger value="hardware" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <Cpu className="w-3.5 h-3.5 mr-1.5" />
+              ฮาร์ดแวร์กึ่งอุตสาหกรรม
+            </TabsTrigger>
+            <TabsTrigger value="patents" className="text-xs py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <FileText className="w-3.5 h-3.5 mr-1.5" />
+              สิทธิบัตรและอนุสิทธิบัตร
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ========================================================================= */}
+          {/* TAB 1: Financial & Candlestick */}
+          {/* ========================================================================= */}
+          <TabsContent value="financial" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Candlestick & Trajectory Chart */}
+              <Card className="lg:col-span-2 bg-slate-900/60 border-slate-800">
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-base text-white flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-cyan-400" />
+                        กราฟแสดงกระแสการระดมทุนและการเปลี่ยนแปลงมูลค่า (Capital &amp; Valuation Trajectory)
+                      </CardTitle>
+                      <CardDescription className="text-xs text-slate-400 mt-1">
+                        แสดงราคาปิดและช่วงความผันแปรของมูลค่าประเมินบริษัทตามกิจกรรมการลงทุนและค่าใช้จ่ายวิจัย
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 bg-cyan-950/40 text-[11px] self-start sm:self-auto">
+                      Candlestick Simulation
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[320px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={candlestickPoints} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                        <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} />
+                        <YAxis domain={['auto', 'auto']} stroke="#64748b" tick={{ fontSize: 11 }} />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
+                          formatter={(value: any, name: string) => [
+                            `฿${Number(value).toLocaleString()}`,
+                            name === 'close' ? 'มูลค่าประเมิน (Close)' : name === 'high' ? 'High' : name === 'low' ? 'Low' : 'ปริมาณเงิน (Volume)'
+                          ]}
+                          labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                        />
+                        <Bar dataKey="volume" fill="#0284c7" fillOpacity={0.3} yAxisId={0} name="เงินหมุนเวียน (Volume)" />
+                        <Line type="monotone" dataKey="close" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} name="Valuation Trajectory" />
+                        <Line type="monotone" dataKey="high" stroke="#38bdf8" strokeDasharray="2 2" strokeWidth={1} dot={false} name="High Point" />
+                        <Line type="monotone" dataKey="low" stroke="#f43f5e" strokeDasharray="2 2" strokeWidth={1} dot={false} name="Low Point" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-800">
+                    <div className="text-center p-2 rounded-lg bg-slate-950/60">
+                      <span className="text-[11px] text-slate-400 block">จุดเริ่มต้น (Pre-Money)</span>
+                      <span className="text-sm font-semibold text-slate-200">฿300,000</span>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-slate-950/60">
+                      <span className="text-[11px] text-slate-400 block">ระดมทุนสะสม</span>
+                      <span className="text-sm font-semibold text-emerald-400">+฿{totalCapitalInflow.toLocaleString()}</span>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-slate-950/60">
+                      <span className="text-[11px] text-slate-400 block">ค่าใช้จ่าย R&amp;D รวม</span>
+                      <span className="text-sm font-semibold text-rose-400">-฿{totalExpenses.toLocaleString()}</span>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-slate-950/60">
+                      <span className="text-[11px] text-slate-400 block">มูลค่าปัจจุบัน</span>
+                      <span className="text-sm font-semibold text-cyan-300">฿{data.valuationPostMoney.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Transactions Log */}
+              <Card className="bg-slate-900/60 border-slate-800 flex flex-col">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base text-white flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-400" />
+                      ประวัติการทำธุรกรรมล่าสุด
+                    </CardTitle>
+                    <Badge variant="secondary" className="text-[10px] bg-slate-800 text-slate-300">
+                      {data.transactions.length} รายการ
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-y-auto max-h-[380px] space-y-3 pr-1">
+                  {data.transactions.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700/80 transition space-y-1.5"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          {tx.type === 'deposit' ? (
+                            <span className="p-1 rounded bg-emerald-500/10 text-emerald-400">
+                              <ArrowDownRight className="w-3.5 h-3.5" />
+                            </span>
+                          ) : tx.type === 'withdraw' ? (
+                            <span className="p-1 rounded bg-rose-500/10 text-rose-400">
+                              <ArrowUpRight className="w-3.5 h-3.5" />
+                            </span>
+                          ) : (
+                            <span className="p-1 rounded bg-amber-500/10 text-amber-400">
+                              <DollarSign className="w-3.5 h-3.5" />
+                            </span>
+                          )}
+                          <span className="text-xs font-semibold text-slate-200 line-clamp-1">
+                            {tx.title}
+                          </span>
+                        </div>
+                        <span className={`text-xs font-mono font-bold whitespace-nowrap ${
+                          tx.type === 'deposit' ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                          {tx.type === 'deposit' ? '+' : '-'}฿{tx.amount.toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 line-clamp-2">
+                        {tx.description}
+                      </p>
+                      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900">
+                        <span>{tx.investorOrParty}</span>
+                        <span className="font-mono">{tx.date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+            </div>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 2: Team Members & R&D Profiles */}
+          {/* ========================================================================= */}
+          <TabsContent value="team" className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-400" />
+                คณะผู้ร่วมวิจัย ผู้ก่อตั้ง และที่ปรึกษาโครงการ D-MIND
+              </h3>
+              <p className="text-xs text-slate-400">
+                บุคลากรผู้วิจัยและคิดค้นระบบเฝ้าระวังและแจ้งเตือนภัยพิบัติอัจฉริยะ สาขาวิชาวิศวกรรมคอมพิวเตอร์ มหาวิทยาลัยราชภัฏสวนสุนันทา
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {data.founders.map((member, idx) => (
+                <Card
+                  key={member.id}
+                  className={`bg-slate-900/70 border-slate-800 hover:border-slate-700 transition relative overflow-hidden ${
+                    member.isMentor ? 'border-amber-500/30 bg-amber-950/10' : ''
+                  }`}
+                >
+                  <div className={`h-1.5 w-full bg-gradient-to-r ${
+                    idx === 0 ? 'from-blue-500 to-indigo-500' :
+                    idx === 1 ? 'from-emerald-500 to-teal-500' :
+                    idx === 2 ? 'from-cyan-500 to-blue-500' :
+                    'from-amber-500 to-orange-500'
+                  }`} />
+                  <CardHeader className="p-5 pb-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-base font-bold text-white">
+                            {member.nameTh}
+                          </h4>
+                          <span className="text-xs text-slate-400 font-mono">
+                            ({member.nameEn})
+                          </span>
+                        </div>
+                        <p className="text-xs text-blue-400 font-medium mt-0.5">
+                          {member.roleTh}
+                        </p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          {member.university}
+                        </p>
+                      </div>
+
+                      {member.isMentor ? (
+                        <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[10px]">
+                          Project Mentor
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-[10px]">
+                          Co-Founder
+                        </Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="p-5 pt-0 space-y-4">
+                    <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+                      {member.bioTh}
+                    </p>
+
+                    {/* Financial summary for member */}
+                    {!member.isMentor ? (
+                      <div className="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-center">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">เงินลงทุน</span>
+                          <span className="text-xs font-bold text-emerald-400 font-mono">
+                            ฿{member.investedAmount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">จำนวนหุ้น</span>
+                          <span className="text-xs font-bold text-slate-200 font-mono">
+                            {member.shares.toLocaleString()} หุ้น
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">สัดส่วนถือหุ้น</span>
+                          <span className="text-xs font-bold text-cyan-400 font-mono">
+                            {member.percentage}%
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/20 text-xs text-amber-200">
+                        ⚡ อาจารย์ที่ปรึกษาตั้งแต่การแข่งขันปี 2567 จนถึงวิทยานิพนธ์ (Advisory &amp; Research Supervision)
+                      </div>
+                    )}
+
+                    {/* Skills pills */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {member.skills.map((skill, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700/50"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 3: Cap Table & Deposit/Withdraw Simulator */}
+          {/* ========================================================================= */}
+          <TabsContent value="captable" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Cap Table Breakdown */}
+              <Card className="lg:col-span-2 bg-slate-900/60 border-slate-800">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base text-white flex items-center gap-2">
+                        <Coins className="w-4 h-4 text-emerald-400" />
+                        ตารางโครงสร้างผู้ถือหุ้น (Founding Cap Table)
+                      </CardTitle>
+                      <CardDescription className="text-xs text-slate-400 mt-1">
+                        คำนวณสัดส่วนความเป็นเจ้าของตามเงินลงทุนจริงและมูลค่าประเมินบริษัท
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline" className="border-emerald-500/30 text-emerald-300 bg-emerald-950/30 text-[11px]">
+                      Par ฿{data.parValuePerShare}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="overflow-x-auto rounded-lg border border-slate-800">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                        <tr>
+                          <th className="p-3 font-semibold">ผู้ถือหุ้น / ผู้ร่วมลงทุน</th>
+                          <th className="p-3 font-semibold text-right">เงินลงทุน (THB)</th>
+                          <th className="p-3 font-semibold text-right">จำนวนหุ้น</th>
+                          <th className="p-3 font-semibold text-right">สัดส่วน (%)</th>
+                          <th className="p-3 font-semibold text-center">วันที่ลงทุน</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/80 text-slate-200">
+                        {data.founders.map((f) => (
+                          <tr key={f.id} className="hover:bg-slate-800/30 transition">
+                            <td className="p-3">
+                              <div className="font-semibold text-white">{f.nameTh}</div>
+                              <div className="text-[11px] text-slate-400">{f.roleTh}</div>
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-emerald-400">
+                              {f.investedAmount > 0 ? `฿${f.investedAmount.toLocaleString()}` : '-'}
+                            </td>
+                            <td className="p-3 text-right font-mono text-slate-200">
+                              {f.shares > 0 ? f.shares.toLocaleString() : '-'}
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-cyan-400">
+                              {f.percentage > 0 ? `${f.percentage}%` : 'Mentor'}
+                            </td>
+                            <td className="p-3 text-center text-slate-400 font-mono text-[11px]">
+                              {f.investDate}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-slate-950/80 font-bold text-white border-t border-slate-800">
+                        <tr>
+                          <td className="p-3">รวมทั้งหมด (Total Diluted)</td>
+                          <td className="p-3 text-right text-emerald-400 font-mono">฿{totalCapitalInflow.toLocaleString()}</td>
+                          <td className="p-3 text-right font-mono">{data.totalShares.toLocaleString()} หุ้น</td>
+                          <td className="p-3 text-right text-cyan-400 font-mono">100.00%</td>
+                          <td className="p-3 text-center text-slate-400">-</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  {/* Visual Share Distribution */}
+                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-xs font-semibold text-slate-300 block mb-2">
+                      แผนภูมิการกระจายสัดส่วนหุ้นส่วน (Equity Distribution Bar):
+                    </span>
+                    <div className="w-full h-4 rounded-full bg-slate-800 flex overflow-hidden">
+                      {data.founders.filter(f => f.shares > 0).map((f, i) => (
+                        <div
+                          key={f.id}
+                          style={{
+                            width: `${f.percentage}%`,
+                            backgroundColor: COLORS[i % COLORS.length]
+                          }}
+                          className="h-full transition-all duration-500 relative group cursor-pointer"
+                          title={`${f.nameTh}: ${f.percentage}%`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-4 mt-3 text-[11px] text-slate-400">
+                      {data.founders.filter(f => f.shares > 0).map((f, i) => (
+                        <div key={f.id} className="flex items-center gap-1.5">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                          />
+                          <span>{f.nameTh} ({f.percentage}%)</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Deposit & Withdraw Simulator Card */}
+              <Card className="bg-slate-900/60 border-slate-800 flex flex-col justify-between">
+                <CardHeader>
+                  <CardTitle className="text-base text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-cyan-400" />
+                    เครื่องมือคำนวณฝาก/ถอนหุ้น (Valuation Simulator)
+                  </CardTitle>
+                  <CardDescription className="text-xs text-slate-400 mt-1">
+                    จำลองผลกระทบต่อสัดส่วนหุ้น (Dilution) และมูลค่า Post-Money ก่อนบันทึกจริง
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-blue-500/20 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">ราคาประเมินต่อหุ้นปัจจุบัน:</span>
+                      <span className="font-mono font-bold text-cyan-400">
+                        ฿{(data.valuationPreMoney / data.totalShares).toFixed(2)} / หุ้น
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">Pre-Money Valuation:</span>
+                      <span className="font-mono text-slate-200">
+                        ฿{data.valuationPreMoney.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">จำนวนหุ้นจดทะเบียนเดิม:</span>
+                      <span className="font-mono text-slate-200">
+                        {data.totalShares.toLocaleString()} หุ้น
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-2">
+                    <Button
+                      onClick={() => setDepositOpen(true)}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs gap-2 py-2.5"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      เปิดระบบจำลองและบันทึกเงินลงทุน (Deposit)
+                    </Button>
+                    <Button
+                      onClick={() => setWithdrawOpen(true)}
+                      variant="outline"
+                      className="w-full border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/30 text-rose-300 text-xs gap-2 py-2.5"
+                    >
+                      <MinusCircle className="w-4 h-4 text-rose-400" />
+                      เปิดระบบจำลองและบันทึกการถอนทุน (Withdraw)
+                    </Button>
+                  </div>
+                </CardContent>
+                <div className="p-4 bg-slate-950/40 border-t border-slate-800 text-[11px] text-slate-500 leading-relaxed">
+                  💡 การเปลี่ยนแปลงทั้งหมดจะถูกอัปเดตและบันทึกตรงสู่ <strong>Firebase Realtime Database</strong> แบบทันท่วงที
+                </div>
+              </Card>
+
+            </div>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 4: Fund Usage & Expenses */}
+          {/* ========================================================================= */}
+          <TabsContent value="expenses" className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-amber-400" />
+                  การนำเงินไปใช้และบันทึกรายจ่าย (D-MIND Fund Allocation)
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  ติดตามการใช้จ่ายเงินทุนสำหรับอุปกรณ์เซนเซอร์ กล่องกึ่งอุตสาหกรรม ซิมการ์ด IoT และการวิจัย
+                </p>
+              </div>
+
+              <Button
+                onClick={() => setExpenseOpen(true)}
+                className="bg-amber-600 hover:bg-amber-500 text-white text-xs gap-1.5 self-start sm:self-auto"
+              >
+                <PlusCircle className="w-4 h-4" />
+                บันทึกค่าใช้จ่ายใหม่
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Category Breakdown */}
+              <Card className="bg-slate-900/60 border-slate-800">
+                <CardHeader>
+                  <CardTitle className="text-sm text-white">
+                    สัดส่วนหมวดหมู่ค่าใช้จ่าย
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">ชิ้นส่วนฮาร์ดแวร์ &amp; Enclosure:</span>
+                      <span className="font-mono font-bold text-slate-200">฿670 (78.8%)</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-blue-500 h-full w-[78.8%]"></div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">ซิม IoT 4G &amp; Telemetry:</span>
+                      <span className="font-mono font-bold text-slate-200">฿180 (21.2%)</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-emerald-500 h-full w-[21.2%]"></div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-800 text-xs text-slate-400">
+                    รวมรายจ่าย R&amp;D ทั้งหมด: <strong className="text-rose-400 font-mono">฿{totalExpenses.toLocaleString()}</strong>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Expense Items Table */}
+              <Card className="md:col-span-2 bg-slate-900/60 border-slate-800">
+                <CardHeader>
+                  <CardTitle className="text-sm text-white">
+                    รายการค่าใช้จ่ายทั้งหมด
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto rounded-lg border border-slate-800">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                        <tr>
+                          <th className="p-3 font-semibold">รายการ</th>
+                          <th className="p-3 font-semibold">หมวดหมู่</th>
+                          <th className="p-3 font-semibold text-right">จำนวนเงิน (THB)</th>
+                          <th className="p-3 font-semibold">ผู้รับเงิน / หลักฐาน</th>
+                          <th className="p-3 font-semibold text-center">วันที่</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/80 text-slate-200">
+                        {data.expenses.map((exp) => (
+                          <tr key={exp.id} className="hover:bg-slate-800/30 transition">
+                            <td className="p-3 font-medium text-white">{exp.title}</td>
+                            <td className="p-3">
+                              <Badge variant="outline" className="text-[10px] uppercase border-slate-700 bg-slate-800 text-slate-300">
+                                {exp.category}
+                              </Badge>
+                            </td>
+                            <td className="p-3 text-right font-mono font-bold text-rose-400">
+                              -฿{exp.amount.toLocaleString()}
+                            </td>
+                            <td className="p-3 text-slate-400 text-[11px]">
+                              {exp.recipient}
+                            </td>
+                            <td className="p-3 text-center text-slate-400 font-mono text-[11px]">
+                              {exp.date}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
+            </div>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 5: Non-Dilutive Grants */}
+          {/* ========================================================================= */}
+          <TabsContent value="grants" className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Award className="w-5 h-5 text-amber-400" />
+                แผนระดมทุนสนับสนุนให้เปล่าจากภาครัฐ (Non-Dilutive Grants Pipeline)
+              </h3>
+              <p className="text-xs text-slate-400">
+                ทุนสนับสนุนเพื่อขยายผลงานวิจัยโดยไม่ต้องเสียสัดส่วนการถือหุ้น (Non-Dilutive Capital) รวมมูลค่าเป้าหมาย <strong>฿5,250,000 บาท</strong>
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {data.grants.map((grant) => (
+                <Card key={grant.id} className="bg-slate-900/60 border-slate-800 hover:border-slate-700 transition flex flex-col justify-between">
+                  <CardHeader className="p-5 pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <Badge className={`text-[10px] ${
+                        grant.status === 'pitching' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 animate-pulse' :
+                        grant.status === 'drafting' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
+                        'bg-slate-800 text-slate-300 border-slate-700'
+                      }`}>
+                        สถานะ: {grant.status.toUpperCase()}
+                      </Badge>
+                      <span className="text-xs font-mono font-bold text-emerald-400">
+                        ฿{grant.maxGrantThb.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm font-bold text-white mt-2 leading-snug">
+                      {grant.nameTh}
+                    </h4>
+                    <p className="text-[11px] text-slate-400">
+                      หน่วยงาน: {grant.agency}
+                    </p>
+                  </CardHeader>
+
+                  <CardContent className="p-5 pt-0 space-y-3">
+                    <div className="p-3 rounded-lg bg-slate-950/70 border border-slate-800 text-xs space-y-1.5">
+                      <div className="text-[11px] text-cyan-300 font-medium">
+                        เงื่อนไข: {grant.matchRatio}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        <strong>เป้าหมายส่งมอบ:</strong> {grant.deliverableTarget}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                      <span>กำหนดการ: {grant.expectedDate}</span>
+                      <span className="text-slate-400 font-mono">100% Equity Retained</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 6: Pre-Production Hardware */}
+          {/* ========================================================================= */}
+          <TabsContent value="hardware" className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Cpu className="w-5 h-5 text-cyan-400" />
+                การปรับแต่งฮาร์ดแวร์สู่ระดับกึ่งอุตสาหกรรม (Pre-Production Hardware R&amp;D)
+              </h3>
+              <p className="text-xs text-slate-400">
+                สถาปัตยกรรมทางวิศวกรรมเพื่อยกระดับจากอุปกรณ์ต้นแบบสู่สถานีตรวจวัดภาคสนามทนทานต่อสภาพอากาศ 24/7
+              </p>
+            </div>
+
+            {/* Architecture Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="p-5 rounded-2xl bg-gradient-to-b from-blue-950/40 to-slate-900 border border-blue-500/20 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                  <Box className="w-5 h-5" />
+                </div>
+                <h4 className="text-sm font-bold text-white">1. Enclosure กันน้ำกันฝุ่น IP66/IP67</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  กล่อง Polycarbonate / High-Impact ABS กันแสง UV พร้อมเคเบิลแกลนด์กันน้ำ IP68 (PG7/PG9/PG11) และ Breathable Vent ป้องกันหยดน้ำค้างและความชื้นสะสมภายใน
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-gradient-to-b from-amber-950/40 to-slate-900 border border-amber-500/20 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <Sun className="w-5 h-5" />
+                </div>
+                <h4 className="text-sm font-bold text-white">2. ระบบพลังงานสำรอง (Autonomy &ge; 3 วัน)</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  แผงโซลาร์เซลล์ 30W–50W โมโนคริสตัลไลน์ + วงจรชาร์จ MPPT + แบตเตอรี่ LiFePO4 12.8V พร้อม BMS อัจฉริยะ สำรองไฟทำงานได้ต่อเนื่องเกิน 72 ชม. แม้ฝนตกหนักไม่มีแดด
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-gradient-to-b from-emerald-950/40 to-slate-900 border border-emerald-500/20 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Radio className="w-5 h-5" />
+                </div>
+                <h4 className="text-sm font-bold text-white">3. การสื่อสารระดับ Cellular 4G LTE-M / NB-IoT</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  ติดตั้งชิปสื่อสาร Quectel BG95 / SIM7080G ทดแทน Wi-Fi บ้าน เชื่อมต่อเครือข่ายมือถือตรงสู่ Firebase และมี Circular Buffer Local SD ป้องกันข้อมูลสูญหายเมื่ออับสัญญาณ
+                </p>
+              </div>
+            </div>
+
+            {/* Bill of Materials (BOM) Specs Table */}
+            <Card className="bg-slate-900/60 border-slate-800">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-cyan-400" />
+                    รายการข้อมูลจำเพาะเชิงเทคนิคและต้นทุนต่อหน่วย (Bill of Materials - BOM)
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs text-slate-300 border-slate-700">
+                    Pre-Production Baseline
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto rounded-lg border border-slate-800">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        <th className="p-3 font-semibold">อุปกรณ์ / ชิ้นส่วน</th>
+                        <th className="p-3 font-semibold">ข้อมูลจำเพาะเชิงเทคนิค</th>
+                        <th className="p-3 font-semibold">มาตรฐานอุตสาหกรรม</th>
+                        <th className="p-3 font-semibold text-right">ราคาต่อหน่วย (THB)</th>
+                        <th className="p-3 font-semibold text-center">สถานะ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80 text-slate-200">
+                      {data.hardwareSpecs.map((hw) => (
+                        <tr key={hw.id} className="hover:bg-slate-800/30 transition">
+                          <td className="p-3 font-semibold text-white">{hw.item}</td>
+                          <td className="p-3 text-slate-300 max-w-xs">{hw.specDetail}</td>
+                          <td className="p-3 font-mono text-cyan-400 text-[11px]">{hw.industrialStandard}</td>
+                          <td className="p-3 text-right font-mono font-bold text-emerald-400">
+                            ฿{hw.costPerUnitThb.toLocaleString()}
+                          </td>
+                          <td className="p-3 text-center">
+                            <Badge variant="outline" className="text-[10px] border-slate-700 bg-slate-800 text-slate-300">
+                              {hw.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-slate-950/80 font-bold text-white border-t border-slate-800">
+                      <tr>
+                        <td className="p-3" colSpan={3}>ต้นทุนรวมโดยประมาณต่อ 1 สถานีตรวจวัด (Total BOM per Station)</td>
+                        <td className="p-3 text-right font-mono text-emerald-400">
+                          ฿{data.hardwareSpecs.reduce((a, b) => a + b.costPerUnitThb, 0).toLocaleString()}
+                        </td>
+                        <td className="p-3 text-center">-</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========================================================================= */}
+          {/* TAB 7: Patents & IP Roadmap */}
+          {/* ========================================================================= */}
+          <TabsContent value="patents" className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-400" />
+                แผนงานจดสิทธิบัตรและอนุสิทธิบัตร (Intellectual Property Roadmap)
+              </h3>
+              <p className="text-xs text-slate-400">
+                การสร้างกำแพงคุ้มครองทรัพย์สินทางปัญญากับกรมทรัพย์สินทางปัญญา (DIP) และมหาวิทยาลัยราชภัฏสวนสุนันทา
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {data.patents.map((pat) => (
+                <Card key={pat.id} className="bg-slate-900/60 border-slate-800 flex flex-col justify-between">
+                  <CardHeader className="p-5 pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge className={`text-[10px] ${
+                        pat.type === 'petty_patent' ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' :
+                        pat.type === 'invention_patent' ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' :
+                        'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                      }`}>
+                        {pat.type === 'petty_patent' ? 'อนุสิทธิบัตร (10 ปี)' :
+                         pat.type === 'invention_patent' ? 'สิทธิบัตรการประดิษฐ์ (20 ปี)' :
+                         'ลิขสิทธิ์ซอฟต์แวร์ (50 ปี)'}
+                      </Badge>
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {pat.status}
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm font-bold text-white mt-2 leading-snug">
+                      {pat.titleTh}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 font-mono italic">
+                      {pat.titleEn}
+                    </p>
+                  </CardHeader>
+
+                  <CardContent className="p-5 pt-0 space-y-3">
+                    <div className="p-3 rounded-lg bg-slate-950/70 border border-slate-800 text-xs space-y-2">
+                      <span className="text-slate-400 font-semibold block text-[11px]">
+                        ข้อถือสิทธิหลัก (Core Claims):
+                      </span>
+                      <ul className="space-y-1.5 list-disc list-inside text-[11px] text-slate-300">
+                        {pat.coreClaims.map((claim, cIdx) => (
+                          <li key={cIdx} className="leading-relaxed">
+                            {claim}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                      <span>เป้าหมายยื่น: {pat.filingTargetDate}</span>
+                      <span className="text-indigo-400">{pat.targetAgency}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+        </Tabs>
+      </main>
+
+      {/* ========================================================================= */}
+      {/* MODAL: DEPOSIT / NEW INVESTMENT */}
+      {/* ========================================================================= */}
+      <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base text-white flex items-center gap-2">
+              <PlusCircle className="w-5 h-5 text-emerald-400" />
+              บันทึกเงินร่วมลงทุนและคำนวณหุ้นส่วน (Deposit / Equity Dilution)
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              ระบบจะคำนวณ Post-Money Valuation, หุ้นออกใหม่ และสัดส่วนที่เจือจาง (Dilution) โดยอัตโนมัติ
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">ชื่อผู้ร่วมลงทุน (ภาษาไทย)</Label>
+              <Input
+                placeholder="เช่น สมชาย ใจดี หรือ กองทุนร่วมลงทุน"
+                value={depositNameTh}
+                onChange={(e) => setDepositNameTh(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">ชื่อผู้ร่วมลงทุน (ภาษาอังกฤษ - ไม่บังคับ)</Label>
+              <Input
+                placeholder="e.g. Somchai Jaidee / Angel Fund"
+                value={depositNameEn}
+                onChange={(e) => setDepositNameEn(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">จำนวนเงินลงทุน (บาท)</Label>
+              <Input
+                type="number"
+                min={100}
+                step={500}
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(Number(e.target.value))}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs font-mono font-bold"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">หมายเหตุ / วัตถุประสงค์เงินลงทุน</Label>
+              <Input
+                value={depositNote}
+                onChange={(e) => setDepositNote(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            {/* Live Calculation Preview */}
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2 text-xs">
+              <span className="font-semibold text-emerald-400 block text-[11px]">
+                ผลการคำนวณจำลองสัดส่วนหุ้นส่วน (Live Math Output):
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div>
+                  <span className="text-slate-400 block">มูลค่า Post-Money:</span>
+                  <span className="font-mono font-bold text-white">
+                    ฿{depositSim.postMoney.toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">หุ้นออกใหม่ (New Shares):</span>
+                  <span className="font-mono font-bold text-cyan-400">
+                    +{depositSim.newShares.toLocaleString()} หุ้น
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">สัดส่วนผู้ลงทุนใหม่:</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {depositSim.ownershipPercent}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">อัตราเจือจางหุ้นเดิม (Dilution):</span>
+                  <span className="font-mono text-amber-400">
+                    -{depositSim.dilutionFactor}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setDepositOpen(false)}
+              className="border-slate-800 bg-slate-950 text-slate-300 text-xs"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleExecuteDeposit}
+              disabled={syncing}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              บันทึกและซิงก์สู่ Firebase RTDB
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL: WITHDRAW / SHARE BUYBACK */}
+      {/* ========================================================================= */}
+      <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base text-white flex items-center gap-2">
+              <MinusCircle className="w-5 h-5 text-rose-400" />
+              ถอนเงินทุนคืน / ลดสัดส่วนหุ้นส่วน (Withdrawal &amp; Liquidation)
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              คำนวณจำนวนเงินที่ต้องจ่ายคืนผู้ร่วมลงทุนตามราคาประเมิน และปรับลดจำนวนหุ้นของบริษัท
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">เลือกผู้ถือหุ้นที่ต้องการถอนทุน</Label>
+              <Select value={withdrawFounderId} onValueChange={setWithdrawFounderId}>
+                <SelectTrigger className="bg-slate-950 border-slate-800 text-slate-100 text-xs">
+                  <SelectValue placeholder="เลือกผู้ถือหุ้น" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 text-xs">
+                  {data.founders.filter(f => f.shares > 0).map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      {f.nameTh} ({f.shares.toLocaleString()} หุ้น - {f.percentage}%)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">จำนวนหุ้นที่ต้องการถอนออก</Label>
+              <Input
+                type="number"
+                min={100}
+                max={data.founders.find(f => f.id === withdrawFounderId)?.shares || 10000}
+                step={500}
+                value={withdrawShares}
+                onChange={(e) => setWithdrawShares(Number(e.target.value))}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs font-mono font-bold"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">เหตุผลในการถอนทุน</Label>
+              <Input
+                value={withdrawReason}
+                onChange={(e) => setWithdrawReason(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            {/* Withdraw math preview */}
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-rose-500/30 space-y-2 text-xs">
+              <span className="font-semibold text-rose-400 block text-[11px]">
+                สรุปการจ่ายคืนเงินสดและผลกระทบต่อบริษัท (Withdrawal Summary):
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div>
+                  <span className="text-slate-400 block">เงินสดที่ต้องจ่ายคืนผู้ถือหุ้น:</span>
+                  <span className="font-mono font-bold text-rose-400">
+                    ฿{withdrawSim.payoutAmount.toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">หุ้นคงเหลือของผู้ถือหุ้นนี้:</span>
+                  <span className="font-mono font-bold text-slate-200">
+                    {withdrawSim.remainingFounderShares.toLocaleString()} หุ้น
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">หุ้นคงเหลือรวมทั้งบริษัท:</span>
+                  <span className="font-mono text-slate-300">
+                    {withdrawSim.newTotalShares.toLocaleString()} หุ้น
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">กระแสเงินสดคงเหลือหลังจ่าย:</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    ฿{Math.max(0, data.cashBalance - withdrawSim.payoutAmount).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setWithdrawOpen(false)}
+              className="border-slate-800 bg-slate-950 text-slate-300 text-xs"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleExecuteWithdrawal}
+              disabled={syncing}
+              className="bg-rose-600 hover:bg-rose-500 text-white text-xs gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              ยืนยันการถอนทุนสู่ Firebase RTDB
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL: ADD EXPENSE */}
+      {/* ========================================================================= */}
+      <Dialog open={expenseOpen} onOpenChange={setExpenseOpen}>
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base text-white flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-amber-400" />
+              บันทึกค่าใช้จ่ายการวิจัยและพัฒนา D-MIND (Record Expense)
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              บันทึกรายการใช้จ่ายเงินทุนเพื่ออัปเดตกระแสเงินสดคงเหลือแบบเรียลไทม์
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">ชื่อรายการค่าใช้จ่าย</Label>
+              <Input
+                placeholder="เช่น จัดซื้อแผงโซลาร์เซลล์ 30W หรือ ค่าซิม 4G"
+                value={expenseTitle}
+                onChange={(e) => setExpenseTitle(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-300">หมวดหมู่ค่าใช้จ่าย</Label>
+                <Select value={expenseCategory} onValueChange={(val: any) => setExpenseCategory(val)}>
+                  <SelectTrigger className="bg-slate-950 border-slate-800 text-slate-100 text-xs">
+                    <SelectValue placeholder="หมวดหมู่" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 text-xs">
+                    <SelectItem value="hardware">ฮาร์ดแวร์ &amp; Enclosure</SelectItem>
+                    <SelectItem value="iot_cellular">ซิม 4G &amp; Telemetry</SelectItem>
+                    <SelectItem value="cloud_infrastructure">คลาวด์ &amp; เซิร์ฟเวอร์</SelectItem>
+                    <SelectItem value="patents_legal">สิทธิบัตร &amp; นิติกรรม</SelectItem>
+                    <SelectItem value="field_testing">การทดสอบภาคสนาม</SelectItem>
+                    <SelectItem value="other">อื่นๆ</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-300">จำนวนเงิน (บาท)</Label>
+                <Input
+                  type="number"
+                  min={10}
+                  step={50}
+                  value={expenseAmount}
+                  onChange={(e) => setExpenseAmount(Number(e.target.value))}
+                  className="bg-slate-950 border-slate-800 text-slate-100 text-xs font-mono font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">ผู้รับเงิน / ร้านค้า</Label>
+              <Input
+                placeholder="เช่น ร้านชิ้นส่วนอุตสาหกรรม หรือ ผู้ให้บริการโทรคมนาคม"
+                value={expenseRecipient}
+                onChange={(e) => setExpenseRecipient(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300">หมายเหตุ / อ้างอิงใบเสร็จ</Label>
+              <Input
+                placeholder="เช่น ใบเสร็จเล่มที่ 01/2569 สำหรับทดสอบสถานีตรวจวัด"
+                value={expenseNote}
+                onChange={(e) => setExpenseNote(e.target.value)}
+                className="bg-slate-950 border-slate-800 text-slate-100 text-xs"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setExpenseOpen(false)}
+              className="border-slate-800 bg-slate-950 text-slate-300 text-xs"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleAddExpense}
+              disabled={syncing}
+              className="bg-amber-600 hover:bg-amber-500 text-white text-xs gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              บันทึกรายจ่ายสู่ Firebase RTDB
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+    </div>
+  );
+}
