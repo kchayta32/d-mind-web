@@ -89,6 +89,49 @@ export interface CandlestickPoint {
   close: number;
   volume: number;
   event: string;
+  type?: 'seed' | 'deposit' | 'withdraw' | 'expense' | 'milestone';
+  netCash?: number;
+  expenseAmount?: number;
+  inflowAmount?: number;
+}
+
+export interface CapitalExpenditureStatus {
+  totalExpenses: number;
+  initialCapital: number;
+  remainingCash: number;
+  utilizationRate: number; // percentage (0 - 100)
+  remainingRate: number; // percentage (0 - 100)
+  categoryBreakdown: {
+    hardware: number;
+    iot_cellular: number;
+    cloud_infrastructure: number;
+    patents_legal: number;
+    field_testing: number;
+    other: number;
+  };
+  expensesCount: number;
+  isFullyFunded: boolean;
+  statusBadge: string;
+  statusDescription: string;
+}
+
+export interface FounderCapTableSummary {
+  id: string;
+  nameTh: string;
+  nameEn: string;
+  university: string;
+  roleTh: string;
+  roleEn: string;
+  investedAmount: number;
+  investDate: string;
+  initialShares: number;
+  remainingShares: number; // หุ้นคงเหลือปัจจุบัน
+  percentage: number; // สัดส่วนถือหุ้นปัจจุบัน %
+  netAssetValue: number; // มูลค่าหุ้นตามเงินสดคงเหลือสุทธิ (Book Value)
+  valuationValue: number; // มูลค่าหุ้นตามราคาประเมิน (Valuation Value)
+  isMentor?: boolean;
+  statusText: string;
+  skills: string[];
 }
 
 export interface BusinessData {
@@ -404,11 +447,30 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
   lastUpdated: new Date().toISOString()
 };
 
+const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+
+function formatThaiDateDisplay(dateStr?: string): string {
+  if (!dateStr) return 'วันนี้';
+  if (dateStr.includes('ต.ค.') || dateStr.includes('ม.ค.') || dateStr.includes('พ.ย.')) {
+    return dateStr;
+  }
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const yearNum = parseInt(parts[0], 10);
+    const thaiYear = yearNum < 2500 ? yearNum + 543 : yearNum;
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const monthName = THAI_MONTHS[monthIdx] || parts[1];
+    return `${day < 10 ? '0' + day : day} ${monthName} ${thaiYear}`;
+  }
+  return dateStr;
+}
+
 /**
- * Generate historical financial candlesticks for capital flows & valuation
+ * Generate historical financial candlesticks for capital flows & valuation dynamically
  */
 export const getCandlestickData = (businessData: BusinessData): CandlestickPoint[] => {
-  return [
+  const points: CandlestickPoint[] = [
     {
       date: '07 ต.ค. 2569',
       open: 0,
@@ -416,7 +478,10 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       low: 0,
       close: 1000,
       volume: 1000,
-      event: 'ศตวรรษ อินทรักษ์ ลงทุนเริ่มต้น 1,000 บ.'
+      event: 'ศตวรรษ อินทรักษ์ ลงทุนเริ่มต้น 1,000 บ.',
+      type: 'seed',
+      netCash: 1000,
+      inflowAmount: 1000
     },
     {
       date: '09 ต.ค. 2569',
@@ -425,7 +490,10 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       low: 1000,
       close: 2000,
       volume: 1000,
-      event: 'ธนกฤษ วรรณรังษี ลงทุนเริ่มต้น 1,000 บ.'
+      event: 'ธนกฤษ วรรณรังษี ลงทุนเริ่มต้น 1,000 บ.',
+      type: 'seed',
+      netCash: 2000,
+      inflowAmount: 1000
     },
     {
       date: '11 ต.ค. 2569',
@@ -434,19 +502,221 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
       low: 2000,
       close: 3000,
       volume: 1000,
-      event: 'กิตติ ชัยตา ลงทุนเริ่มต้น 1,000 บ. (ครบ 3,000 บ.)'
-    },
-    {
+      event: 'กิตติ ชัยตา ลงทุนเริ่มต้น 1,000 บ. (ครบ 3,000 บ.)',
+      type: 'seed',
+      netCash: 3000,
+      inflowAmount: 1000
+    }
+  ];
+
+  let runningBalance = 3000;
+
+  // Process any subsequent transactions (sorted chronologically: oldest first)
+  const extraTransactions = (businessData.transactions || [])
+    .filter(tx => tx.id !== 'tx-001' && tx.id !== 'tx-002' && tx.id !== 'tx-003')
+    .slice()
+    .reverse();
+
+  // Also check if any expenses are not yet in transactions
+  const txExpenseTitles = new Set(extraTransactions.filter(t => t.type === 'expense').map(t => t.title));
+  const standaloneExpenses = (businessData.expenses || []).filter(e => {
+    return !txExpenseTitles.has(`ค่าใช้จ่าย: ${e.title}`) && !txExpenseTitles.has(e.title);
+  });
+
+  const allExtraEvents: Array<{
+    date: string;
+    type: 'deposit' | 'withdraw' | 'expense';
+    amount: number;
+    title: string;
+    balanceAfter?: number;
+  }> = [];
+
+  extraTransactions.forEach(tx => {
+    allExtraEvents.push({
+      date: tx.date,
+      type: tx.type === 'deposit' ? 'deposit' : tx.type === 'withdraw' ? 'withdraw' : 'expense',
+      amount: tx.amount,
+      title: tx.title,
+      balanceAfter: tx.balanceAfter
+    });
+  });
+
+  standaloneExpenses.forEach(exp => {
+    allExtraEvents.push({
+      date: exp.date,
+      type: 'expense',
+      amount: exp.amount,
+      title: `ค่าใช้จ่าย: ${exp.title}`
+    });
+  });
+
+  if (allExtraEvents.length === 0) {
+    points.push({
       date: '13 ต.ค. 2569',
       open: 3000,
       high: 3000,
       low: 3000,
       close: 3000,
       volume: 0,
-      event: 'ปัจจุบัน: เงินทุนสะสม 3,000 บ. (ยังไม่มีผู้สนับสนุนทุนภายนอก)'
+      event: 'ปัจจุบัน: เงินทุนสะสม 3,000 บ. (ยังไม่มีผู้สนับสนุนทุนภายนอก)',
+      type: 'milestone',
+      netCash: 3000
+    });
+    return points;
+  }
+
+  allExtraEvents.forEach((item) => {
+    const prevBalance = runningBalance;
+    if (typeof item.balanceAfter === 'number') {
+      runningBalance = item.balanceAfter;
+    } else {
+      if (item.type === 'deposit') {
+        runningBalance = runningBalance + item.amount;
+      } else {
+        runningBalance = Math.max(0, runningBalance - item.amount);
+      }
     }
-  ];
+
+    const high = Math.max(prevBalance, runningBalance);
+    const low = Math.min(prevBalance, runningBalance);
+
+    points.push({
+      date: formatThaiDateDisplay(item.date),
+      open: prevBalance,
+      high,
+      low,
+      close: runningBalance,
+      volume: item.amount,
+      event: item.title,
+      type: item.type,
+      netCash: runningBalance,
+      expenseAmount: item.type === 'expense' ? item.amount : undefined,
+      inflowAmount: item.type === 'deposit' ? item.amount : undefined
+    });
+  });
+
+  // Add final present state point
+  const totalExpenses = (businessData.expenses || []).reduce((acc, e) => acc + (e.amount || 0), 0);
+  points.push({
+    date: 'ปัจจุบัน',
+    open: runningBalance,
+    high: runningBalance,
+    low: runningBalance,
+    close: runningBalance,
+    volume: 0,
+    event: totalExpenses > 0
+      ? `ปัจจุบัน: เงินสดคงเหลือ ฿${runningBalance.toLocaleString()} บ. (ใช้จ่ายสะสม ฿${totalExpenses.toLocaleString()} บ.)`
+      : `ปัจจุบัน: เงินทุนคงเหลือครบเต็มจำนวน ฿${runningBalance.toLocaleString()} บ.`,
+    type: 'milestone',
+    netCash: runningBalance
+  });
+
+  return points;
 };
+
+/**
+ * Calculates current capital expenditure status, utilization rate, and category allocation
+ */
+export function getCapitalExpenditureStatus(businessData: BusinessData): CapitalExpenditureStatus {
+  const expenses = businessData.expenses || [];
+  const initialCapital = (businessData.founders || []).reduce((acc, f) => acc + (f.investedAmount || 0), 0) || 3000;
+  const totalExpenses = expenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+  const remainingCash = typeof businessData.cashBalance === 'number'
+    ? businessData.cashBalance
+    : Math.max(0, initialCapital - totalExpenses);
+  
+  const utilizationRate = initialCapital > 0 ? Number(((totalExpenses / initialCapital) * 100).toFixed(1)) : 0;
+  const remainingRate = initialCapital > 0 ? Number(((remainingCash / initialCapital) * 100).toFixed(1)) : 100;
+
+  const categoryBreakdown = {
+    hardware: 0,
+    iot_cellular: 0,
+    cloud_infrastructure: 0,
+    patents_legal: 0,
+    field_testing: 0,
+    other: 0
+  };
+
+  expenses.forEach(e => {
+    if (e.category && categoryBreakdown[e.category] !== undefined) {
+      categoryBreakdown[e.category] += e.amount;
+    } else {
+      categoryBreakdown.other += e.amount;
+    }
+  });
+
+  const isFullyFunded = totalExpenses === 0;
+  let statusBadge = 'เงินทุนคงเหลือเต็มจำนวน (100%)';
+  let statusDescription = `เงินทุนทั้งหมด ฿${initialCapital.toLocaleString()} ยังคงอยู่ในกระเป๋าเงินสดคงเหลือครบ 100%`;
+
+  if (totalExpenses > 0) {
+    statusBadge = `เบิกจ่ายแล้ว ${utilizationRate}%`;
+    statusDescription = `มีการบันทึกค่าใช้จ่ายแล้ว ${expenses.length} รายการ รวม ฿${totalExpenses.toLocaleString()} บาท (คงเหลือ ฿${remainingCash.toLocaleString()} บาท หรือ ${remainingRate}%)`;
+  }
+
+  return {
+    totalExpenses,
+    initialCapital,
+    remainingCash,
+    utilizationRate,
+    remainingRate,
+    categoryBreakdown,
+    expensesCount: expenses.length,
+    isFullyFunded,
+    statusBadge,
+    statusDescription
+  };
+}
+
+/**
+ * Calculates current Cap Table summary with individual remaining shares and equity value
+ */
+export function getFoundersCapTableSummary(businessData: BusinessData): FounderCapTableSummary[] {
+  const totalShares = businessData.totalShares || 30000;
+  const cashBalance = businessData.cashBalance ?? 3000;
+  const valuation = businessData.valuationPostMoney || businessData.valuationPreMoney || 3000;
+
+  return (businessData.founders || []).map(f => {
+    const remainingShares = f.shares || 0;
+    const initialShares = f.isMentor ? 0 : 10000;
+    const netAssetValue = totalShares > 0 && remainingShares > 0
+      ? Number(((remainingShares / totalShares) * cashBalance).toFixed(2))
+      : 0;
+    const valuationValue = totalShares > 0 && remainingShares > 0
+      ? Number(((remainingShares / totalShares) * valuation).toFixed(2))
+      : 0;
+
+    let statusText = 'ผู้ร่วมก่อตั้งหลัก';
+    if (f.isMentor) {
+      statusText = 'อาจารย์ที่ปรึกษา (Advisor)';
+    } else if (remainingShares === 0) {
+      statusText = 'ถอนทุนครบจำนวนแล้ว';
+    } else if (remainingShares < initialShares) {
+      statusText = 'ลดสัดส่วนหุ้น / ถอนทุนบางส่วน';
+    } else if (remainingShares > initialShares) {
+      statusText = 'เพิ่มทุนในรอบขยาย';
+    }
+
+    return {
+      id: f.id,
+      nameTh: f.nameTh,
+      nameEn: f.nameEn,
+      university: f.university,
+      roleTh: f.roleTh,
+      roleEn: f.roleEn,
+      investedAmount: f.investedAmount || 0,
+      investDate: f.investDate,
+      initialShares,
+      remainingShares,
+      percentage: f.percentage || 0,
+      netAssetValue,
+      valuationValue,
+      isMentor: f.isMentor,
+      statusText,
+      skills: f.skills || []
+    };
+  });
+}
 
 /**
  * Fetches current business data from Firebase Realtime Database.

@@ -89,7 +89,9 @@ import {
   executeDeposit,
   executeWithdrawal,
   addExpenseItem,
-  getCandlestickData
+  getCandlestickData,
+  getCapitalExpenditureStatus,
+  getFoundersCapTableSummary
 } from '@/services/firebaseBusinessService';
 
 const COLORS = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
@@ -328,9 +330,22 @@ export default function AdminBusinessPage() {
     }
   };
 
+  const expenseStatus = useMemo(() => {
+    return getCapitalExpenditureStatus(data);
+  }, [data]);
+
+  const capTableSummary = useMemo(() => {
+    return getFoundersCapTableSummary(data);
+  }, [data]);
+
   const candlestickPoints = useMemo(() => {
     return getCandlestickData(data);
   }, [data]);
+
+  const chartMaxY = useMemo(() => {
+    const maxVal = Math.max(...candlestickPoints.map(p => Math.max(p.high, p.close, p.open)), 3500);
+    return Math.ceil((maxVal * 1.15) / 500) * 500;
+  }, [candlestickPoints]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 relative">
@@ -497,7 +512,9 @@ export default function AdminBusinessPage() {
                 ฿{data.cashBalance.toLocaleString()}
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                คงเหลือเต็มจำนวน (100%)
+                {expenseStatus.totalExpenses === 0
+                  ? 'คงเหลือเต็มจำนวน (100%)'
+                  : `คงเหลือ ${expenseStatus.remainingRate}% (ใช้จ่ายไป ฿${expenseStatus.totalExpenses.toLocaleString()})`}
               </p>
             </CardContent>
           </Card>
@@ -606,11 +623,11 @@ export default function AdminBusinessPage() {
                         กราฟแสดงกระแสเงินทุนและการเติบโต (Capital Flow &amp; Valuation Trajectory)
                       </CardTitle>
                       <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        แสดงมูลค่าสะสมจากเงินลงทุนของ 3 ผู้ร่วมก่อตั้งคนละ 1,000 บาท (รวม 3,000 บาท)
+                        แสดงมูลค่าสะสมและกระแสเงินทุนคงเหลือสุทธิหลังหักรายจ่ายตามเวลาจริง
                       </CardDescription>
                     </div>
                     <Badge variant="outline" className="border-cyan-500/30 text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 text-[11px] self-start sm:self-auto">
-                      Candlestick Flow
+                      {expenseStatus.totalExpenses > 0 ? `ใช้จ่ายแล้ว ฿${expenseStatus.totalExpenses.toLocaleString()}` : 'ทุนตั้งต้นเต็ม 100%'}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -620,7 +637,7 @@ export default function AdminBusinessPage() {
                       <ComposedChart data={candlestickPoints} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1e293b' : '#e2e8f0'} />
                         <XAxis dataKey="date" stroke={isDark ? '#64748b' : '#94a3b8'} tick={{ fontSize: 11 }} />
-                        <YAxis domain={[0, 4000]} stroke={isDark ? '#64748b' : '#94a3b8'} tick={{ fontSize: 11 }} />
+                        <YAxis domain={[0, chartMaxY]} stroke={isDark ? '#64748b' : '#94a3b8'} tick={{ fontSize: 11 }} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: isDark ? '#0f172a' : '#ffffff',
@@ -630,7 +647,7 @@ export default function AdminBusinessPage() {
                           }}
                           formatter={(value: any, name: string) => [
                             `฿${Number(value).toLocaleString()}`,
-                            name === 'close' ? 'มูลค่าสะสม (Close)' : name === 'high' ? 'High' : name === 'low' ? 'Low' : 'เงินลงทุนรอบนั้น (Volume)'
+                            name === 'close' ? 'กระแสเงินสดคงเหลือสะสม (Net Treasury)' : name === 'high' ? 'High' : name === 'low' ? 'Low' : 'เงินทุน/ค่าใช้จ่ายในรอบ (Volume)'
                           ]}
                           labelStyle={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 'bold' }}
                         />
@@ -643,20 +660,20 @@ export default function AdminBusinessPage() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                     <div className="text-center p-2 rounded-lg bg-slate-100 dark:bg-slate-950/60">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">ศตวรรษ อินทรักษ์</span>
-                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">1,000 บ. (7 ต.ค.)</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">ทุนจดทะเบียนรวม</span>
+                      <span className="text-sm font-semibold text-blue-600 dark:text-cyan-300">฿{totalCapitalInflow.toLocaleString()} บ.</span>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-100 dark:bg-slate-950/60">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">ธนกฤษ วรรณรังษี</span>
-                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">1,000 บ. (9 ต.ค.)</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">รายจ่ายสะสมจริง</span>
+                      <span className="text-sm font-semibold text-rose-600 dark:text-rose-400">฿{totalExpenses.toLocaleString()} บ.</span>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-100 dark:bg-slate-950/60">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">กิตติ ชัยตา</span>
-                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">1,000 บ. (11 ต.ค.)</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">เงินสดคงเหลือสุทธิ</span>
+                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">฿{data.cashBalance.toLocaleString()} บ.</span>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-100 dark:bg-slate-950/60">
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">ทุนรวมปัจจุบัน</span>
-                      <span className="text-sm font-semibold text-blue-600 dark:text-cyan-300">฿3,000 บาท</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">สัดส่วนเงินทุนคงเหลือ</span>
+                      <span className="text-sm font-semibold text-purple-600 dark:text-purple-300">{expenseStatus.remainingRate}%</span>
                     </div>
                   </div>
                 </CardContent>
@@ -843,19 +860,62 @@ export default function AdminBusinessPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Individual Founder Remaining Shares Overview Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {capTableSummary.map((f, i) => (
+                      <div
+                        key={f.id}
+                        className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 flex flex-col justify-between shadow-sm"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {f.nameTh}
+                          </span>
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between items-center">
+                            <span>หุ้นคงเหลือปัจจุบัน:</span>
+                            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded text-[11px]">
+                              {f.remainingShares > 0 ? `${f.remainingShares.toLocaleString()} หุ้น` : 'ที่ปรึกษา'}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between items-center">
+                            <span>สัดส่วนถือหุ้น:</span>
+                            <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                              {f.percentage > 0 ? `${f.percentage}%` : '0%'}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between items-center">
+                            <span>สินทรัพย์สุทธิ:</span>
+                            <span className="font-mono text-slate-700 dark:text-slate-300">
+                              {f.netAssetValue > 0 ? `฿${f.netAssetValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                   <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="p-3 font-semibold">ผู้ถือหุ้น / ผู้ร่วมลงทุน</th>
                           <th className="p-3 font-semibold text-right">เงินลงทุน (THB)</th>
-                          <th className="p-3 font-semibold text-right">จำนวนหุ้น</th>
+                          <th className="p-3 font-semibold text-right">หุ้นเริ่มต้น</th>
+                          <th className="p-3 font-semibold text-right">หุ้นคงเหลือปัจจุบัน</th>
                           <th className="p-3 font-semibold text-right">สัดส่วน (%)</th>
+                          <th className="p-3 font-semibold text-right">มูลค่าสินทรัพย์สุทธิ</th>
+                          <th className="p-3 font-semibold text-center">สถานะ</th>
                           <th className="p-3 font-semibold text-center">วันที่ลงทุน</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80 text-slate-800 dark:text-slate-200">
-                        {data.founders.map((f) => (
+                        {capTableSummary.map((f) => (
                           <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                             <td className="p-3">
                               <div className="font-semibold text-slate-900 dark:text-white">{f.nameTh}</div>
@@ -864,11 +924,28 @@ export default function AdminBusinessPage() {
                             <td className="p-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
                               {f.investedAmount > 0 ? `฿${f.investedAmount.toLocaleString()}` : '-'}
                             </td>
-                            <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-200">
-                              {f.shares > 0 ? f.shares.toLocaleString() : '-'}
+                            <td className="p-3 text-right font-mono text-slate-500 dark:text-slate-400">
+                              {f.initialShares > 0 ? f.initialShares.toLocaleString() : '-'}
+                            </td>
+                            <td className="p-3 text-right font-mono">
+                              {f.remainingShares > 0 ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600/30">
+                                  {f.remainingShares.toLocaleString()} หุ้น
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">-</span>
+                              )}
                             </td>
                             <td className="p-3 text-right font-mono font-bold text-cyan-600 dark:text-cyan-400">
                               {f.percentage > 0 ? `${f.percentage}%` : 'Mentor'}
+                            </td>
+                            <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-200">
+                              {f.netAssetValue > 0 ? `฿${f.netAssetValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
+                            </td>
+                            <td className="p-3 text-center">
+                              <Badge variant="outline" className="text-[10px] border-slate-300 dark:border-slate-700">
+                                {f.statusText}
+                              </Badge>
                             </td>
                             <td className="p-3 text-center text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                               {f.investDate}
@@ -880,8 +957,11 @@ export default function AdminBusinessPage() {
                         <tr>
                           <td className="p-3">รวมทั้งหมด (Total Diluted)</td>
                           <td className="p-3 text-right text-emerald-600 dark:text-emerald-400 font-mono">฿{totalCapitalInflow.toLocaleString()}</td>
-                          <td className="p-3 text-right font-mono">{data.totalShares.toLocaleString()} หุ้น</td>
+                          <td className="p-3 text-right font-mono text-slate-500">30,000 หุ้น</td>
+                          <td className="p-3 text-right font-mono text-emerald-600 dark:text-emerald-400">{data.totalShares.toLocaleString()} หุ้น</td>
                           <td className="p-3 text-right text-cyan-600 dark:text-cyan-400 font-mono">100.00%</td>
+                          <td className="p-3 text-right text-slate-800 dark:text-slate-200 font-mono">฿{data.cashBalance.toLocaleString()}</td>
+                          <td className="p-3 text-center text-slate-400">-</td>
                           <td className="p-3 text-center text-slate-400">-</td>
                         </tr>
                       </tfoot>
@@ -1009,19 +1089,91 @@ export default function AdminBusinessPage() {
               {/* Category Breakdown */}
               <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-sm text-slate-900 dark:text-white">
-                    สถานะการใช้จ่ายเงินทุน
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm text-slate-900 dark:text-white">
+                      สถานะการใช้จ่ายเงินทุน
+                    </CardTitle>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] ${
+                        expenseStatus.isFullyFunded
+                          ? 'border-emerald-500/30 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10'
+                          : 'border-amber-500/30 text-amber-700 dark:text-amber-300 bg-amber-500/10'
+                      }`}
+                    >
+                      {expenseStatus.statusBadge}
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-500/30 text-xs text-emerald-800 dark:text-emerald-200">
-                    ✨ <strong>ยังไม่มีรายจ่ายเกิดขึ้น (0 บาท):</strong> เงินทุนทั้งหมด 3,000 บาท ยังคงอยู่ในกระเป๋าเงินสดคงเหลือครบ 100%
+                  {expenseStatus.isFullyFunded ? (
+                    <div className="p-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-500/30 text-xs text-emerald-800 dark:text-emerald-200">
+                      ✨ <strong>ยังไม่มีรายจ่ายเกิดขึ้น (0 บาท):</strong> เงินทุนทั้งหมด ฿{expenseStatus.initialCapital.toLocaleString()} บาท ยังคงอยู่ในกระเป๋าเงินสดคงเหลือครบ 100%
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-500/30 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                      <div>
+                        ⚡ <strong>บันทึกค่าใช้จ่ายแล้ว {expenseStatus.expensesCount} รายการ:</strong> รวม ฿{expenseStatus.totalExpenses.toLocaleString()} บาท (อัตราการใช้เงินทุน {expenseStatus.utilizationRate}%)
+                      </div>
+                      <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">
+                        กระแสเงินสดสำรองคงเหลือสุทธิ ฿{expenseStatus.remainingCash.toLocaleString()} บาท ({expenseStatus.remainingRate}%)
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fund Utilization Progress Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                      <span>อัตราการใช้เงินทุน</span>
+                      <span className="font-mono font-medium">{expenseStatus.utilizationRate}%</span>
+                    </div>
+                    <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex">
+                      <div
+                        className="bg-amber-500 h-full transition-all duration-500"
+                        style={{ width: `${expenseStatus.utilizationRate}%` }}
+                        title={`ใช้จ่ายไปแล้ว ${expenseStatus.utilizationRate}%`}
+                      />
+                      <div
+                        className="bg-emerald-500 h-full transition-all duration-500"
+                        style={{ width: `${expenseStatus.remainingRate}%` }}
+                        title={`เงินสดคงเหลือ ${expenseStatus.remainingRate}%`}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>เบิกจ่ายแล้ว: ฿{expenseStatus.totalExpenses.toLocaleString()}</span>
+                      <span>คงเหลือ: ฿{expenseStatus.remainingCash.toLocaleString()}</span>
+                    </div>
                   </div>
 
-                  <div className="pt-2 text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                    <div>ทุนตั้งต้นทั้งหมด: <strong className="text-slate-900 dark:text-white font-mono">฿3,000</strong></div>
-                    <div>รายจ่ายสะสม: <strong className="text-rose-500 font-mono">฿0</strong></div>
-                    <div>เงินสดคงเหลือ: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">฿3,000</strong></div>
+                  {/* Category Allocation Chips */}
+                  <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 block">
+                      จัดสรรตามหมวดหมู่งานวิจัย:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div className="p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/60">
+                        <span className="text-slate-400 block text-[10px]">ฮาร์ดแวร์ &amp; กล่อง</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">฿{expenseStatus.categoryBreakdown.hardware.toLocaleString()}</span>
+                      </div>
+                      <div className="p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/60">
+                        <span className="text-slate-400 block text-[10px]">ซิม 4G &amp; IoT</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">฿{expenseStatus.categoryBreakdown.iot_cellular.toLocaleString()}</span>
+                      </div>
+                      <div className="p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/60">
+                        <span className="text-slate-400 block text-[10px]">คลาวด์ &amp; เซิร์ฟเวอร์</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">฿{expenseStatus.categoryBreakdown.cloud_infrastructure.toLocaleString()}</span>
+                      </div>
+                      <div className="p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/60">
+                        <span className="text-slate-400 block text-[10px]">สิทธิบัตร &amp; กฎหมาย</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">฿{expenseStatus.categoryBreakdown.patents_legal.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 text-xs text-slate-600 dark:text-slate-400 space-y-1 border-t border-slate-200 dark:border-slate-800">
+                    <div>ทุนตั้งต้นทั้งหมด: <strong className="text-slate-900 dark:text-white font-mono">฿{expenseStatus.initialCapital.toLocaleString()}</strong></div>
+                    <div>รายจ่ายสะสม: <strong className="text-rose-500 font-mono">฿{expenseStatus.totalExpenses.toLocaleString()}</strong></div>
+                    <div>เงินสดคงเหลือ: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">฿{expenseStatus.remainingCash.toLocaleString()}</strong></div>
                   </div>
                 </CardContent>
               </Card>
