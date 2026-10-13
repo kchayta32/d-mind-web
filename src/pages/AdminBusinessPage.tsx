@@ -31,6 +31,7 @@ import {
   Clock,
   Briefcase,
   ChevronRight,
+  ChevronDown,
   Info,
   Activity,
   AlertTriangle,
@@ -57,13 +58,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
   ResponsiveContainer,
@@ -325,9 +319,10 @@ export default function AdminBusinessPage() {
       setExpenseAmount(500);
       setExpenseRecipient('');
       setExpenseNote('');
-      toast.success('บันทึกค่าใช้จ่ายลง Firebase RTDB สำเร็จ');
-    } catch (err) {
-      toast.error('เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย');
+      toast.success(`บันทึกค่าใช้จ่าย "${expenseTitle.trim()}" (฿${expenseAmount.toLocaleString()}) ลง Firebase RTDB สำเร็จ`);
+    } catch (err: any) {
+      console.error('[Admin Business] Error adding expense:', err);
+      toast.error(err?.message || 'เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย');
     } finally {
       setSyncing(false);
     }
@@ -1371,38 +1366,38 @@ export default function AdminBusinessPage() {
                 </Badge>
               </div>
 
-              <Select
-                value={depositInvestorMode}
-                onValueChange={(val) => {
-                  setDepositInvestorMode(val);
-                  if (val === '__new__') {
-                    setDepositNameTh('');
-                    setDepositNameEn('');
-                    setDepositNote('ผู้ร่วมลงทุนรายใหม่ (New Equity Round)');
-                  } else {
-                    const found = data.founders.find(f => f.id === val);
-                    if (found) {
-                      setDepositNameTh(found.nameTh);
-                      setDepositNameEn(found.nameEn);
-                      setDepositNote(`เพิ่มทุนผู้ร่วมลงทุนเดิม (${found.nameTh})`);
+              <div className="relative">
+                <select
+                  value={depositInvestorMode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDepositInvestorMode(val);
+                    if (val === '__new__') {
+                      setDepositNameTh('');
+                      setDepositNameEn('');
+                      setDepositNote('ผู้ร่วมลงทุนรายใหม่ (New Equity Round)');
+                    } else {
+                      const found = data.founders.find(f => f.id === val);
+                      if (found) {
+                        setDepositNameTh(found.nameTh);
+                        setDepositNameEn(found.nameEn);
+                        setDepositNote(`เพิ่มทุนผู้ร่วมลงทุนเดิม (${found.nameTh})`);
+                      }
                     }
-                  }
-                }}
-              >
-                <SelectTrigger className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs">
-                  <SelectValue placeholder="เลือกรายชื่อในพอร์ตลงทุน หรือ ผู้ลงทุนใหม่" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 text-xs">
-                  <SelectItem value="__new__" className="font-semibold text-blue-600 dark:text-cyan-400">
+                  }}
+                  className="w-full h-10 appearance-none rounded-lg border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 pr-9 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-sm transition-colors"
+                >
+                  <option value="__new__" className="font-semibold text-blue-600 dark:text-cyan-400 bg-white dark:bg-slate-900">
                     ➕ ผู้ลงทุนรายใหม่ (New Investor - ระบุในช่อง Textbox ด้านล่าง)
-                  </SelectItem>
+                  </option>
                   {data.founders.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
+                    <option key={f.id} value={f.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                       {f.nameTh} ({f.nameEn}) {f.shares > 0 ? `• ลงทุน ฿${f.investedAmount.toLocaleString()} (${f.shares.toLocaleString()} หุ้น - ${f.percentage}%)` : `• ${f.roleTh}`}
-                    </SelectItem>
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
 
             {/* Existing Member Card Summary (when selected from dropdown) */}
@@ -1576,27 +1571,27 @@ export default function AdminBusinessPage() {
                   {data.founders.filter(f => f.shares > 0).length} รายการ
                 </span>
               </div>
-              <Select
-                value={withdrawFounderId}
-                onValueChange={(val) => {
-                  setWithdrawFounderId(val);
-                  const found = data.founders.find(f => f.id === val);
-                  if (found) {
-                    setWithdrawShares(Math.min(1000, found.shares));
-                  }
-                }}
-              >
-                <SelectTrigger className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs">
-                  <SelectValue placeholder="เลือกผู้ถือหุ้นที่มีในพอร์ตทั้งหมด" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 text-xs">
+              <div className="relative">
+                <select
+                  value={withdrawFounderId}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setWithdrawFounderId(val);
+                    const found = data.founders.find(f => f.id === val);
+                    if (found) {
+                      setWithdrawShares(Math.min(1000, found.shares));
+                    }
+                  }}
+                  className="w-full h-10 appearance-none rounded-lg border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 pr-9 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer shadow-sm transition-colors"
+                >
                   {data.founders.filter(f => f.shares > 0).map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
+                    <option key={f.id} value={f.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                       {f.nameTh} ({f.nameEn}) • ทุน ฿{f.investedAmount.toLocaleString()} ({f.shares.toLocaleString()} หุ้น - {f.percentage}%)
-                    </SelectItem>
+                    </option>
                   ))}
-                </SelectContent>
-              </Select>
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
 
             {/* Selected Shareholder Status Card with Quick Preset Percentages */}
@@ -1760,19 +1755,21 @@ export default function AdminBusinessPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs text-slate-700 dark:text-slate-300">หมวดหมู่ค่าใช้จ่าย</Label>
-                <Select value={expenseCategory} onValueChange={(val: any) => setExpenseCategory(val)}>
-                  <SelectTrigger className="bg-slate-50 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs">
-                    <SelectValue placeholder="หมวดหมู่" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 text-xs">
-                    <SelectItem value="hardware">ฮาร์ดแวร์ &amp; Enclosure</SelectItem>
-                    <SelectItem value="iot_cellular">ซิม 4G &amp; Telemetry</SelectItem>
-                    <SelectItem value="cloud_infrastructure">คลาวด์ &amp; เซิร์ฟเวอร์</SelectItem>
-                    <SelectItem value="patents_legal">สิทธิบัตร &amp; นิติกรรม</SelectItem>
-                    <SelectItem value="field_testing">การทดสอบภาคสนาม</SelectItem>
-                    <SelectItem value="other">อื่นๆ</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <select
+                    value={expenseCategory}
+                    onChange={(e) => setExpenseCategory(e.target.value as any)}
+                    className="w-full h-10 appearance-none rounded-lg border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 pr-9 text-xs font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-sm transition-colors"
+                  >
+                    <option value="hardware" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">ฮาร์ดแวร์ &amp; Enclosure (กล่อง/สาย/โซลาร์)</option>
+                    <option value="iot_cellular" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">ซิม 4G &amp; Telemetry (IoT Module)</option>
+                    <option value="cloud_infrastructure" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">คลาวด์ &amp; เซิร์ฟเวอร์ (Cloud &amp; DB)</option>
+                    <option value="patents_legal" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">สิทธิบัตร &amp; นิติกรรม (IP &amp; Legal)</option>
+                    <option value="field_testing" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">การทดสอบภาคสนาม (Field Testing)</option>
+                    <option value="other" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">อื่นๆ (Miscellaneous)</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
               </div>
 
               <div className="space-y-1.5">

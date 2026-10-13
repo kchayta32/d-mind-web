@@ -462,7 +462,16 @@ export async function getBusinessData(): Promise<BusinessData> {
     if (res.ok) {
       const data = await res.json();
       if (data && data.founders && Array.isArray(data.founders) && data.founders.length > 0) {
-        return data as BusinessData;
+        return {
+          ...INITIAL_BUSINESS_DATA,
+          ...data,
+          founders: Array.isArray(data.founders) ? data.founders : INITIAL_BUSINESS_DATA.founders,
+          transactions: Array.isArray(data.transactions) ? data.transactions : (INITIAL_BUSINESS_DATA.transactions || []),
+          expenses: Array.isArray(data.expenses) ? data.expenses : [],
+          grants: Array.isArray(data.grants) ? data.grants : (INITIAL_BUSINESS_DATA.grants || []),
+          hardwareSpecs: Array.isArray(data.hardwareSpecs) ? data.hardwareSpecs : (INITIAL_BUSINESS_DATA.hardwareSpecs || []),
+          patents: Array.isArray(data.patents) ? data.patents : (INITIAL_BUSINESS_DATA.patents || []),
+        } as BusinessData;
       }
     }
   } catch (err) {
@@ -486,6 +495,12 @@ export async function saveBusinessData(data: BusinessData): Promise<boolean> {
   try {
     const payload = {
       ...data,
+      expenses: data.expenses || [],
+      transactions: data.transactions || [],
+      founders: data.founders || [],
+      grants: data.grants || [],
+      hardwareSpecs: data.hardwareSpecs || [],
+      patents: data.patents || [],
       lastUpdated: new Date().toISOString()
     };
     const res = await fetch(`${RTDB_BASE_URL}${RTDB_BUSINESS_PATH}`, {
@@ -495,7 +510,11 @@ export async function saveBusinessData(data: BusinessData): Promise<boolean> {
       },
       body: JSON.stringify(payload)
     });
-    return res.ok;
+    if (!res.ok) {
+      console.error('[Firebase RTDB] HTTP error saving data:', res.status, res.statusText);
+      return false;
+    }
+    return true;
   } catch (err) {
     console.error('[Firebase RTDB] Failed to save business data:', err);
     return false;
@@ -648,10 +667,14 @@ export async function executeDeposit(
     totalShares: newTotalShares,
     cashBalance: newBalance,
     founders: updatedFounders,
-    transactions: [newTx, ...currentData.transactions]
+    transactions: [newTx, ...(currentData.transactions || [])],
+    expenses: currentData.expenses || []
   };
 
-  await saveBusinessData(updatedData);
+  const saved = await saveBusinessData(updatedData);
+  if (!saved) {
+    throw new Error('บันทึกข้อมูลเงินลงทุนไปยัง Firebase RTDB ล้มเหลว');
+  }
   return updatedData;
 }
 
@@ -707,10 +730,14 @@ export async function executeWithdrawal(
     totalShares: newTotalShares,
     cashBalance: newBalance,
     founders: updatedFounders,
-    transactions: [newTx, ...currentData.transactions]
+    transactions: [newTx, ...(currentData.transactions || [])],
+    expenses: currentData.expenses || []
   };
 
-  await saveBusinessData(updatedData);
+  const saved = await saveBusinessData(updatedData);
+  if (!saved) {
+    throw new Error('บันทึกข้อมูลการถอนทุนไปยัง Firebase RTDB ล้มเหลว');
+  }
   return updatedData;
 }
 
@@ -742,10 +769,13 @@ export async function addExpenseItem(
   const updatedData: BusinessData = {
     ...currentData,
     cashBalance: newBalance,
-    expenses: [newExp, ...currentData.expenses],
-    transactions: [newTx, ...currentData.transactions]
+    expenses: [newExp, ...(currentData.expenses || [])],
+    transactions: [newTx, ...(currentData.transactions || [])]
   };
 
-  await saveBusinessData(updatedData);
+  const saved = await saveBusinessData(updatedData);
+  if (!saved) {
+    throw new Error('บันทึกข้อมูลค่าใช้จ่ายไปยัง Firebase RTDB ล้มเหลว');
+  }
   return updatedData;
 }

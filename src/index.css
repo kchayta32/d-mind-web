@@ -314,3 +314,9 @@
 .leaflet-popup-close-button:hover {
   color: #38bdf8 !important;
 }
+
+/* Ensure Radix Popper dropdowns and selects appear above Dialog modals (z-[9999]) */
+[data-radix-popper-content-wrapper] {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+}
