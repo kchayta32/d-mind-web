@@ -4,11 +4,12 @@ const RTDB_URL = 'https://d-mind-e11fc-default-rtdb.asia-southeast1.firebasedata
 const seedData = {
   projectName: 'Disaster Monitoring and Intelligent Notification Device (D-MIND)',
   projectThName: 'ระบบเฝ้าระวังและแจ้งเตือนภัยพิบัติอัจฉริยะ',
-  valuationPreMoney: 300000,
-  valuationPostMoney: 303000,
+  valuationPreMoney: 3000,
+  valuationPostMoney: 3000,
   totalShares: 30000,
-  cashBalance: 2150,
-  parValuePerShare: 10,
+  cashBalance: 3000,
+  parValuePerShare: 0.1,
+  totalGrantsReceived: 0,
   founders: [
     {
       id: 'founder-1',
@@ -62,7 +63,7 @@ const seedData = {
       university: 'อาจารย์ประจำสาขาวิศวกรรมคอมพิวเตอร์ มหาวิทยาลัยราชภัฏสวนสุนันทา',
       roleTh: 'Project Mentor & Academic Advisor',
       roleEn: 'Project Mentor & Senior Thesis Advisor',
-      bioTh: 'อาจารย์ที่ปรึกษาโครงการวิจัยตั้งแต่การแข่งขันปี 2567 ไปจนถึงการทำวิทยานิพนธ์ระดับปริญญาตรี (Capstone Senior Project) ให้คำปรึกษาด้านระเบียบวิธีวิจัย การทดสอบเชิงวิทยาศาสตร์ และการคุ้มครองทรัพย์สินทางปัญญา',
+      bioTh: 'อาจารย์ที่ปรึกษาโครงการวิจัยตั้งแต่การแข่งขันปี 2567 ไปจนถึงการทำวิทยานิพนธ์ระดับปริญญาตรี (Capstone Senior Project) ให้คำปรึกษาด้านระเบียบวิธีวิจัย การทดสอบเชิงวิทยาศาสตร์ และการคุ้มครองทรัพย์สินทางปัญญา (ไม่มีข้อมูลการลงทุน)',
       investedAmount: 0,
       investDate: '2567-08-01',
       shares: 0,
@@ -79,7 +80,7 @@ const seedData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - ศตวรรษ อินทรักษ์',
-      description: 'ทุนตั้งต้นสำหรับสถาปัตยกรรมระบบฮาร์ดแวร์และสถานีต้นแบบ',
+      description: 'ทุนตั้งต้นสำหรับสถาปัตยกรรมระบบฮาร์ดแวร์และสถานีต้นแบบ (สัดส่วน 33.33%)',
       investorOrParty: 'ศตวรรษ อินทรักษ์',
       balanceAfter: 1000,
       sharesImpact: 10000
@@ -90,7 +91,7 @@ const seedData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - ธนกฤษ วรรณรังษี',
-      description: 'ทุนตั้งต้นสำหรับระบบพลังงานสำรองและโมดูลสื่อสารโทรมาตร',
+      description: 'ทุนตั้งต้นสำหรับระบบพลังงานสำรองและโมดูลสื่อสารโทรมาตร (สัดส่วน 33.33%)',
       investorOrParty: 'ธนกฤษ วรรณรังษี',
       balanceAfter: 2000,
       sharesImpact: 10000
@@ -101,51 +102,13 @@ const seedData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - กิตติ ชัยตา',
-      description: 'ทุนตั้งต้นสำหรับระบบซอฟต์แวร์ คลาวด์ และโมเดล AI ตัดสินใจเตือนภัย',
+      description: 'ทุนตั้งต้นสำหรับระบบซอฟต์แวร์ คลาวด์ และโมเดล AI ตัดสินใจเตือนภัย (สัดส่วน 33.33%)',
       investorOrParty: 'กิตติ ชัยตา',
       balanceAfter: 3000,
       sharesImpact: 10000
-    },
-    {
-      id: 'tx-004',
-      date: '2569-10-12',
-      type: 'expense',
-      amount: 850,
-      title: 'จัดซื้อกล่อง Enclosure กันน้ำ IP67 + เคเบิลแกลนด์ PG9/PG11 สำหรับทดสอบ',
-      description: 'ทดสอบการประกอบฮาร์ดแวร์กึ่งอุตสาหกรรมสำหรับสถานีตรวจวัดน้ำท่วม',
-      investorOrParty: 'ร้านจำหน่ายอุปกรณ์ตู้คอนโทรลอุตสาหกรรม',
-      balanceAfter: 2150
     }
   ],
-  expenses: [
-    {
-      id: 'exp-001',
-      date: '2569-10-12',
-      title: 'กล่อง Enclosure โพลีคาร์บอเนตกันน้ำมาตรฐาน IP67 พร้อมยางซิลิโคนคู่',
-      category: 'hardware',
-      amount: 450,
-      recipient: 'ผู้นำเข้าอุปกรณ์ Enclosure อุตสาหกรรม',
-      proofNote: 'ใบเสร็จจัดซื้อกล่องทดสอบรุ่นต้นแบบ Pre-Production'
-    },
-    {
-      id: 'exp-002',
-      date: '2569-10-12',
-      title: 'เคเบิลแกลนด์กันน้ำ IP68 ขนาด PG9 และ PG11 พร้อมซีลยางกันซึม',
-      category: 'hardware',
-      amount: 220,
-      recipient: 'ร้านค้าชิ้นส่วนไฟฟ้าอุตสาหกรรม',
-      proofNote: 'ชุดร้อยสายเซนเซอร์วัดระดับน้ำและสายไฟโซลาร์เซลล์'
-    },
-    {
-      id: 'exp-003',
-      date: '2569-10-13',
-      title: 'ซิมการ์ด IoT 4G LTE-M / NB-IoT เพื่อทดสอบสัญญาณภาคสนาม',
-      category: 'iot_cellular',
-      amount: 180,
-      recipient: 'ผู้ให้บริการเครือข่ายโทรคมนาคม (IoT Data Package)',
-      proofNote: 'แพ็กเกจส่งข้อมูลโทรมาตรแบบความหน่วงต่ำ'
-    }
-  ],
+  expenses: [],
   grants: [
     {
       id: 'grant-001',
@@ -153,11 +116,13 @@ const seedData = {
       nameEn: 'TED Fund - Youth Startup Fund (Idea & Proof of Concept)',
       agency: 'กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรม (อว.)',
       maxGrantThb: 1500000,
-      status: 'drafting',
+      receivedThb: 0,
+      status: 'planned',
       category: 'ทุนสนับสนุนการพัฒนานวัตกรรมระยะเริ่มต้นสำหรับนิสิตนักศึกษา',
       matchRatio: '100% Grant (Non-Dilutive - ไม่เสียสัดส่วนหุ้น)',
       deliverableTarget: 'สถานีตรวจวัดภัยพิบัติ D-MIND กึ่งอุตสาหกรรม 10 สถานี พร้อมระบบแจ้งเตือนภาคประชาชน',
-      expectedDate: 'ธันวาคม 2569'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-002',
@@ -165,11 +130,13 @@ const seedData = {
       nameEn: 'National Innovation Agency (NIA) - Open Innovation Grant',
       agency: 'สำนักงานนวัตกรรมแห่งชาติ (องค์การมหาชน)',
       maxGrantThb: 1500000,
+      receivedThb: 0,
       status: 'planned',
       category: 'นวัตกรรมด้านการจัดการสิ่งแวดล้อมและภัยพิบัติ (ClimateTech & Smart City)',
       matchRatio: '75% Non-Dilutive Grant (ให้เปล่าสูงสุด 1.5 ล้านบาท)',
       deliverableTarget: 'การทดสอบเชิงพาณิชย์ร่วมกับองค์กรปกครองส่วนท้องถิ่น (อปท.) และ ปภ.',
-      expectedDate: 'มกราคม 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-003',
@@ -177,11 +144,13 @@ const seedData = {
       nameEn: 'depa Digital Startup Fund (Seed/Early Stage S2)',
       agency: 'สำนักงานส่งเสริมเศรษฐกิจดิจิทัล (depa)',
       maxGrantThb: 1000000,
+      receivedThb: 0,
       status: 'planned',
       category: 'การประยุกต์ใช้ดิจิทัลและ AI ในการเตือนภัยสาธารณะ',
       matchRatio: '100% Non-Dilutive Co-funding',
       deliverableTarget: 'แพลตฟอร์มคลาวด์และโมบายล์แอปพลิเคชันระบบเตือนภัย D-MIND สำหรับเมืองอัจฉริยะ',
-      expectedDate: 'กุมภาพันธ์ 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-004',
@@ -189,11 +158,13 @@ const seedData = {
       nameEn: 'Super AI Engineer S5 - AI Innovation Grant',
       agency: 'สมาคมปัญญาประดิษฐ์ประเทศไทย (AIAT) & สวทช.',
       maxGrantThb: 250000,
-      status: 'pitching',
+      receivedThb: 0,
+      status: 'planned',
       category: 'รางวัลพัฒนาผลงาน AI ต้นแบบสู่การใช้งานจริงในระดับประเทศ',
       matchRatio: '100% Prize & Non-Dilutive Award',
       deliverableTarget: 'AI Multi-modal Disaster Risk Engine พร้อมสาธิตในรอบตัดสิน Final Demo Day',
-      expectedDate: 'พฤศจิกายน 2569'
+      expectedDate: 'รอบแข่งขันกำลังดำเนินงาน',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-005',
@@ -201,11 +172,13 @@ const seedData = {
       nameEn: 'National Research Council of Thailand (NRCT) - Disaster Innovation',
       agency: 'สำนักงานการวิจัยแห่งชาติ (วช.)',
       maxGrantThb: 1000000,
+      receivedThb: 0,
       status: 'planned',
       category: 'ทุนวิจัยและถ่ายทอดเทคโนโลยีสู่ชุมชนเสี่ยงภัย',
       matchRatio: '100% Research Grant',
       deliverableTarget: 'โครงการติดตั้งสถานีต้นแบบนำร่องในพื้นที่เสี่ยงดินโคลนถล่มและน้ำท่วมฉับพลัน',
-      expectedDate: 'มีนาคม 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     }
   ],
   hardwareSpecs: [
@@ -320,14 +293,14 @@ const seedData = {
 };
 
 async function seed() {
-  console.log('Sending seed data to Firebase RTDB...');
+  console.log('Sending updated seed data to Firebase RTDB...');
   const res = await fetch(RTDB_URL, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(seedData)
   });
   if (res.ok) {
-    console.log('Successfully seeded business_data to Firebase RTDB!');
+    console.log('Successfully updated business_data on Firebase RTDB: 3 founders x 1000 = 3000 THB, 0 grants received, 0 expenses!');
   } else {
     console.error('Failed to seed:', res.status, res.statusText);
   }

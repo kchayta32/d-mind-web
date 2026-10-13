@@ -49,11 +49,13 @@ export interface GrantProgram {
   nameEn: string;
   agency: string;
   maxGrantThb: number;
+  receivedThb: number; // Actual money received so far = 0
   status: 'planned' | 'drafting' | 'submitted' | 'pitching' | 'approved' | 'disbursed';
   category: string;
-  matchRatio: string; // e.g. "100% Grant (Non-Dilutive)"
+  matchRatio: string;
   deliverableTarget: string;
   expectedDate: string;
+  note: string;
 }
 
 export interface HardwareSpec {
@@ -72,7 +74,7 @@ export interface PatentItem {
   type: 'petty_patent' | 'invention_patent' | 'copyright';
   titleTh: string;
   titleEn: string;
-  targetAgency: string; // e.g. "กรมทรัพย์สินทางปัญญา (DIP)"
+  targetAgency: string;
   protectionYears: number;
   coreClaims: string[];
   status: 'prior_art_search' | 'drafting_claims' | 'university_review' | 'filing_ready' | 'submitted';
@@ -97,6 +99,7 @@ export interface BusinessData {
   totalShares: number;
   cashBalance: number;
   parValuePerShare: number;
+  totalGrantsReceived: number;
   founders: FounderMember[];
   transactions: FinancialTransaction[];
   expenses: ExpenseItem[];
@@ -109,15 +112,16 @@ export interface BusinessData {
 const RTDB_BASE_URL = 'https://d-mind-e11fc-default-rtdb.asia-southeast1.firebasedatabase.app';
 const RTDB_BUSINESS_PATH = '/business_data.json';
 
-// Initial verified founding data
+// Updated verified founding data: Exactly 3 founders, 1,000 THB each, 0 external sponsors, 0 THB grants received
 export const INITIAL_BUSINESS_DATA: BusinessData = {
   projectName: 'Disaster Monitoring and Intelligent Notification Device (D-MIND)',
   projectThName: 'ระบบเฝ้าระวังและแจ้งเตือนภัยพิบัติอัจฉริยะ',
-  valuationPreMoney: 300000, // Initial pre-money valuation (300,000 THB)
-  valuationPostMoney: 303000,
-  totalShares: 30000,
-  cashBalance: 2150, // 3,000 initial - 850 seed R&D prototyping expenses
-  parValuePerShare: 10,
+  valuationPreMoney: 3000, // ทุนตั้งต้นจริงจาก 3 ผู้ร่วมก่อตั้งคนละ 1,000 บาท
+  valuationPostMoney: 3000,
+  totalShares: 30000, // 30,000 หุ้น (คนละ 10,000 หุ้น)
+  cashBalance: 3000, // เงินสดคงเหลือเต็มจำนวน 3,000 บาท (ยังไม่มีรายจ่าย)
+  parValuePerShare: 0.1, // ราคาพาร์ 0.10 บาท/หุ้น (30,000 หุ้น = 3,000 บาท)
+  totalGrantsReceived: 0, // ยังไม่มีผู้สนับสนุนทุนใดๆ ได้รับจริง 0 บาท
   founders: [
     {
       id: 'founder-1',
@@ -171,7 +175,7 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       university: 'อาจารย์ประจำสาขาวิศวกรรมคอมพิวเตอร์ มหาวิทยาลัยราชภัฏสวนสุนันทา',
       roleTh: 'Project Mentor & Academic Advisor',
       roleEn: 'Project Mentor & Senior Thesis Advisor',
-      bioTh: 'อาจารย์ที่ปรึกษาโครงการวิจัยตั้งแต่การแข่งขันปี 2567 ไปจนถึงการทำวิทยานิพนธ์ระดับปริญญาตรี (Capstone Senior Project) ให้คำปรึกษาด้านระเบียบวิธีวิจัย การทดสอบเชิงวิทยาศาสตร์ และการคุ้มครองทรัพย์สินทางปัญญา',
+      bioTh: 'อาจารย์ที่ปรึกษาโครงการวิจัยตั้งแต่การแข่งขันปี 2567 ไปจนถึงการทำวิทยานิพนธ์ระดับปริญญาตรี (Capstone Senior Project) ให้คำปรึกษาด้านระเบียบวิธีวิจัย การทดสอบเชิงวิทยาศาสตร์ และการคุ้มครองทรัพย์สินทางปัญญา (ไม่มีข้อมูลการลงทุน)',
       investedAmount: 0,
       investDate: '2567-08-01',
       shares: 0,
@@ -188,7 +192,7 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - ศตวรรษ อินทรักษ์',
-      description: 'ทุนตั้งต้นสำหรับสถาปัตยกรรมระบบฮาร์ดแวร์และสถานีต้นแบบ',
+      description: 'ทุนตั้งต้นสำหรับสถาปัตยกรรมระบบฮาร์ดแวร์และสถานีต้นแบบ (สัดส่วน 33.33%)',
       investorOrParty: 'ศตวรรษ อินทรักษ์',
       balanceAfter: 1000,
       sharesImpact: 10000
@@ -199,7 +203,7 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - ธนกฤษ วรรณรังษี',
-      description: 'ทุนตั้งต้นสำหรับระบบพลังงานสำรองและโมดูลสื่อสารโทรมาตร',
+      description: 'ทุนตั้งต้นสำหรับระบบพลังงานสำรองและโมดูลสื่อสารโทรมาตร (สัดส่วน 33.33%)',
       investorOrParty: 'ธนกฤษ วรรณรังษี',
       balanceAfter: 2000,
       sharesImpact: 10000
@@ -210,51 +214,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       type: 'deposit',
       amount: 1000,
       title: 'เงินลงทุนเริ่มต้น (Initial Seed) - กิตติ ชัยตา',
-      description: 'ทุนตั้งต้นสำหรับระบบซอฟต์แวร์ คลาวด์ และโมเดล AI ตัดสินใจเตือนภัย',
+      description: 'ทุนตั้งต้นสำหรับระบบซอฟต์แวร์ คลาวด์ และโมเดล AI ตัดสินใจเตือนภัย (สัดส่วน 33.33%)',
       investorOrParty: 'กิตติ ชัยตา',
       balanceAfter: 3000,
       sharesImpact: 10000
-    },
-    {
-      id: 'tx-004',
-      date: '2569-10-12',
-      type: 'expense',
-      amount: 850,
-      title: 'จัดซื้อกล่อง Enclosure กันน้ำ IP67 + เคเบิลแกลนด์ PG9/PG11 สำหรับทดสอบ',
-      description: 'ทดสอบการประกอบฮาร์ดแวร์กึ่งอุตสาหกรรมสำหรับสถานีตรวจวัดน้ำท่วม',
-      investorOrParty: 'ร้านจำหน่ายอุปกรณ์ตู้คอนโทรลอุตสาหกรรม',
-      balanceAfter: 2150
     }
   ],
-  expenses: [
-    {
-      id: 'exp-001',
-      date: '2569-10-12',
-      title: 'กล่อง Enclosure โพลีคาร์บอเนตกันน้ำมาตรฐาน IP67 พร้อมยางซิลิโคนคู่',
-      category: 'hardware',
-      amount: 450,
-      recipient: 'ผู้นำเข้าอุปกรณ์ Enclosure อุตสาหกรรม',
-      proofNote: 'ใบเสร็จจัดซื้อกล่องทดสอบรุ่นต้นแบบ Pre-Production'
-    },
-    {
-      id: 'exp-002',
-      date: '2569-10-12',
-      title: 'เคเบิลแกลนด์กันน้ำ IP68 ขนาด PG9 และ PG11 พร้อมซีลยางกันซึม',
-      category: 'hardware',
-      amount: 220,
-      recipient: 'ร้านค้าชิ้นส่วนไฟฟ้าอุตสาหกรรม',
-      proofNote: 'ชุดร้อยสายเซนเซอร์วัดระดับน้ำและสายไฟโซลาร์เซลล์'
-    },
-    {
-      id: 'exp-003',
-      date: '2569-10-13',
-      title: 'ซิมการ์ด IoT 4G LTE-M / NB-IoT เพื่อทดสอบสัญญาณภาคสนาม',
-      category: 'iot_cellular',
-      amount: 180,
-      recipient: 'ผู้ให้บริการเครือข่ายโทรคมนาคม (IoT Data Package)',
-      proofNote: 'แพ็กเกจส่งข้อมูลโทรมาตรแบบความหน่วงต่ำ'
-    }
-  ],
+  expenses: [], // ปัจจุบันยังไม่มีรายจ่าย เงินทุนทั้งหมดยังคงอยู่ครบ 3,000 บาท
   grants: [
     {
       id: 'grant-001',
@@ -262,11 +228,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       nameEn: 'TED Fund - Youth Startup Fund (Idea & Proof of Concept)',
       agency: 'กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรม (อว.)',
       maxGrantThb: 1500000,
-      status: 'drafting',
+      receivedThb: 0,
+      status: 'planned',
       category: 'ทุนสนับสนุนการพัฒนานวัตกรรมระยะเริ่มต้นสำหรับนิสิตนักศึกษา',
       matchRatio: '100% Grant (Non-Dilutive - ไม่เสียสัดส่วนหุ้น)',
       deliverableTarget: 'สถานีตรวจวัดภัยพิบัติ D-MIND กึ่งอุตสาหกรรม 10 สถานี พร้อมระบบแจ้งเตือนภาคประชาชน',
-      expectedDate: 'ธันวาคม 2569'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-002',
@@ -274,11 +242,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       nameEn: 'National Innovation Agency (NIA) - Open Innovation Grant',
       agency: 'สำนักงานนวัตกรรมแห่งชาติ (องค์การมหาชน)',
       maxGrantThb: 1500000,
+      receivedThb: 0,
       status: 'planned',
       category: 'นวัตกรรมด้านการจัดการสิ่งแวดล้อมและภัยพิบัติ (ClimateTech & Smart City)',
       matchRatio: '75% Non-Dilutive Grant (ให้เปล่าสูงสุด 1.5 ล้านบาท)',
       deliverableTarget: 'การทดสอบเชิงพาณิชย์ร่วมกับองค์กรปกครองส่วนท้องถิ่น (อปท.) และ ปภ.',
-      expectedDate: 'มกราคม 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-003',
@@ -286,11 +256,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       nameEn: 'depa Digital Startup Fund (Seed/Early Stage S2)',
       agency: 'สำนักงานส่งเสริมเศรษฐกิจดิจิทัล (depa)',
       maxGrantThb: 1000000,
+      receivedThb: 0,
       status: 'planned',
       category: 'การประยุกต์ใช้ดิจิทัลและ AI ในการเตือนภัยสาธารณะ',
       matchRatio: '100% Non-Dilutive Co-funding',
       deliverableTarget: 'แพลตฟอร์มคลาวด์และโมบายล์แอปพลิเคชันระบบเตือนภัย D-MIND สำหรับเมืองอัจฉริยะ',
-      expectedDate: 'กุมภาพันธ์ 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-004',
@@ -298,11 +270,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       nameEn: 'Super AI Engineer S5 - AI Innovation Grant',
       agency: 'สมาคมปัญญาประดิษฐ์ประเทศไทย (AIAT) & สวทช.',
       maxGrantThb: 250000,
-      status: 'pitching',
+      receivedThb: 0,
+      status: 'planned',
       category: 'รางวัลพัฒนาผลงาน AI ต้นแบบสู่การใช้งานจริงในระดับประเทศ',
       matchRatio: '100% Prize & Non-Dilutive Award',
       deliverableTarget: 'AI Multi-modal Disaster Risk Engine พร้อมสาธิตในรอบตัดสิน Final Demo Day',
-      expectedDate: 'พฤศจิกายน 2569'
+      expectedDate: 'รอบแข่งขันกำลังดำเนินงาน',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     },
     {
       id: 'grant-005',
@@ -310,11 +284,13 @@ export const INITIAL_BUSINESS_DATA: BusinessData = {
       nameEn: 'National Research Council of Thailand (NRCT) - Disaster Innovation',
       agency: 'สำนักงานการวิจัยแห่งชาติ (วช.)',
       maxGrantThb: 1000000,
+      receivedThb: 0,
       status: 'planned',
       category: 'ทุนวิจัยและถ่ายทอดเทคโนโลยีสู่ชุมชนเสี่ยงภัย',
       matchRatio: '100% Research Grant',
       deliverableTarget: 'โครงการติดตั้งสถานีต้นแบบนำร่องในพื้นที่เสี่ยงดินโคลนถล่มและน้ำท่วมฉับพลัน',
-      expectedDate: 'มีนาคม 2570'
+      expectedDate: 'อยู่ระหว่างเตรียมข้อเสนอโครงการ',
+      note: 'ยังไม่ได้รับทุน (อยู่ในแผนงาน)'
     }
   ],
   hardwareSpecs: [
@@ -435,48 +411,39 @@ export const getCandlestickData = (businessData: BusinessData): CandlestickPoint
   return [
     {
       date: '07 ต.ค. 2569',
-      open: 300000,
-      high: 301000,
-      low: 300000,
-      close: 301000,
+      open: 0,
+      high: 1000,
+      low: 0,
+      close: 1000,
       volume: 1000,
-      event: 'ศตวรรษ อินทรักษ์ ลงทุน Seed 1,000 บ.'
+      event: 'ศตวรรษ อินทรักษ์ ลงทุนเริ่มต้น 1,000 บ.'
     },
     {
       date: '09 ต.ค. 2569',
-      open: 301000,
-      high: 302000,
-      low: 301000,
-      close: 302000,
+      open: 1000,
+      high: 2000,
+      low: 1000,
+      close: 2000,
       volume: 1000,
-      event: 'ธนกฤษ วรรณรังษี ลงทุน Seed 1,000 บ.'
+      event: 'ธนกฤษ วรรณรังษี ลงทุนเริ่มต้น 1,000 บ.'
     },
     {
       date: '11 ต.ค. 2569',
-      open: 302000,
-      high: 303000,
-      low: 302000,
-      close: 303000,
+      open: 2000,
+      high: 3000,
+      low: 2000,
+      close: 3000,
       volume: 1000,
-      event: 'กิตติ ชัยตา ลงทุน Seed 1,000 บ. (Super AI S5)'
-    },
-    {
-      date: '12 ต.ค. 2569',
-      open: 303000,
-      high: 303000,
-      low: 302150,
-      close: 302150,
-      volume: 850,
-      event: 'จัดซื้อกล่อง Enclosure IP67 & เคเบิลแกลนด์ (-850 บ.)'
+      event: 'กิตติ ชัยตา ลงทุนเริ่มต้น 1,000 บ. (ครบ 3,000 บ.)'
     },
     {
       date: '13 ต.ค. 2569',
-      open: 302150,
-      high: 305000,
-      low: 302150,
-      close: 305000,
-      volume: 2850,
-      event: 'ประเมินมูลค่าสินทรัพย์ทรัพย์สินทางปัญญาและซอฟต์แวร์ต้นแบบ (+2,850 บ.)'
+      open: 3000,
+      high: 3000,
+      low: 3000,
+      close: 3000,
+      volume: 0,
+      event: 'ปัจจุบัน: เงินทุนสะสม 3,000 บ. (ยังไม่มีผู้สนับสนุนทุนภายนอก)'
     }
   ];
 };
@@ -537,17 +504,13 @@ export async function saveBusinessData(data: BusinessData): Promise<boolean> {
 
 /**
  * Mathematical Calculation for Investor Deposit (New Investment / Capital Increase)
- * Follows venture capital pre-money vs post-money standard dilution:
- * Post-money = Pre-money + Deposit
- * New Investor Share % = Deposit / Post-money
- * New Shares = Old Shares * (Deposit / Pre-money)
  */
 export function calculateDepositMath(
   currentData: BusinessData,
   depositAmount: number,
   investorName: string
 ) {
-  const preMoney = currentData.valuationPreMoney || 300000;
+  const preMoney = currentData.valuationPreMoney || 3000;
   const oldTotalShares = currentData.totalShares || 30000;
   
   if (depositAmount <= 0) {
@@ -579,9 +542,6 @@ export function calculateDepositMath(
 
 /**
  * Mathematical Calculation for Investor Withdrawal (Share Buyback / Liquidation)
- * Payout = Shares * PricePerShare
- * Remaining Shares = Old Shares - Shares
- * New Total Shares = Old Total Shares - Shares
  */
 export function calculateWithdrawMath(
   currentData: BusinessData,
@@ -589,7 +549,7 @@ export function calculateWithdrawMath(
   sharesToWithdraw: number
 ) {
   const founder = currentData.founders.find(f => f.id === founderId);
-  const preMoney = currentData.valuationPreMoney || 300000;
+  const preMoney = currentData.valuationPreMoney || 3000;
   const oldTotalShares = currentData.totalShares || 30000;
   const pricePerShare = preMoney / oldTotalShares;
 
@@ -638,7 +598,6 @@ export async function executeDeposit(
   const newTotalShares = math.newTotalShares;
 
   if (existingFounderIndex >= 0) {
-    // Existing founder adding more capital
     const f = updatedFounders[existingFounderIndex];
     const newShares = f.shares + math.newShares;
     updatedFounders[existingFounderIndex] = {
@@ -647,7 +606,6 @@ export async function executeDeposit(
       shares: newShares
     };
   } else {
-    // New external or co-investor joining
     const newInvestor: FounderMember = {
       id: `investor-${Date.now()}`,
       nameTh: investorNameTh,
@@ -665,7 +623,6 @@ export async function executeDeposit(
     updatedFounders.push(newInvestor);
   }
 
-  // Recalculate percentages for all founders
   updatedFounders = updatedFounders.map(f => ({
     ...f,
     percentage: Number(((f.shares / newTotalShares) * 100).toFixed(2))
@@ -723,10 +680,8 @@ export async function executeWithdrawal(
     return f;
   });
 
-  // Remove founder if shares drop to 0 and not mentor
   updatedFounders = updatedFounders.filter(f => f.shares > 0 || f.isMentor);
 
-  // Recalculate percentages
   updatedFounders = updatedFounders.map(f => ({
     ...f,
     percentage: Number(((f.shares / newTotalShares) * 100).toFixed(2))
